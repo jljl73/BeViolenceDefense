@@ -378,8 +378,34 @@ internal sealed class DefenseBoardView
         float width = grid.CoreSize.x - 0.04f;
         float depth = grid.CoreSize.y - 0.04f;
         const float rim = 0.16f;
-        const float platformTop = 0.32f;
+        float platformTop = 0.32f;
         const float platformThickness = 0.12f;
+        if (theme.corePlatformPrefab != null)
+        {
+            // 테마가 받침 모델을 주면 기본 블록 받침대 대신 그것을 놓고, 캐릭터는 그 위에 세운다.
+            GameObject platform = Object.Instantiate(theme.corePlatformPrefab, model, false);
+            platform.name = "Core platform model";
+            platform.transform.localScale *= theme.corePlatformScale;
+            platformTop = theme.corePlatformTop;
+        }
+        else
+            CreateCorePedestal(model, width, depth, rim, platformTop, platformThickness, foundation, wall);
+
+        if (theme.coreCharacterPrefab != null)
+        {
+            CreateCoreCharacter(model, theme, platformTop);
+            return;
+        }
+
+        Transform coreBody = Box("Core body", model, Vector3.up * 0.56f, new Vector3(0.86f, 0.52f, 0.86f), core);
+        Transform crown = Box("Core crown", model, Vector3.up * 0.94f, new Vector3(0.58f, 0.24f, 0.58f), core);
+        crown.localRotation = Quaternion.Euler(0, 45, 0);
+        coreTintSlots = CollectTintSlots(new Renderer[] { coreBody.GetComponent<Renderer>(), crown.GetComponent<Renderer>() });
+    }
+
+    private void CreateCorePedestal(Transform model, float width, float depth, float rim, float platformTop,
+        float platformThickness, Material foundation, Material wall)
+    {
         Box("Core base", model, Vector3.up * 0.1f, new Vector3(width, 0.2f, depth), foundation);
         Box("Core platform", model, Vector3.up * (platformTop - platformThickness * 0.5f),
             new Vector3(width - rim, platformThickness, depth - rim), trim);
@@ -391,27 +417,21 @@ internal sealed class DefenseBoardView
         Box("Core rim right", model, new Vector3(sideX, 0.29f, 0f), new Vector3(rim, 0.26f, depth), wall);
         Box("Core rim front", model, new Vector3(0f, 0.29f, -sideZ), new Vector3(width - rim * 2f, 0.26f, rim), wall);
         Box("Core rim back", model, new Vector3(0f, 0.29f, sideZ), new Vector3(width - rim * 2f, 0.26f, rim), wall);
+    }
 
-        if (theme.coreCharacterPrefab != null)
+    private void CreateCoreCharacter(Transform model, BoardTheme theme, float platformTop)
+    {
+        GameObject character = Object.Instantiate(theme.coreCharacterPrefab, model, false);
+        character.transform.SetLocalPositionAndRotation(Vector3.up * platformTop, Quaternion.LookRotation(Vector3.back));
+        character.transform.localScale *= theme.coreCharacterScale;
+        Renderer[] body = character.GetComponentsInChildren<SkinnedMeshRenderer>();
+        coreTintSlots = CollectTintSlots(body.Length > 0 ? body : character.GetComponentsInChildren<Renderer>());
+        if (character.GetComponentInChildren<Animator>() is { } animator && animator.runtimeAnimatorController != null)
         {
-            GameObject character = Object.Instantiate(theme.coreCharacterPrefab, model, false);
-            character.transform.SetLocalPositionAndRotation(Vector3.up * platformTop, Quaternion.LookRotation(Vector3.back));
-            character.transform.localScale *= theme.coreCharacterScale;
-            Renderer[] body = character.GetComponentsInChildren<SkinnedMeshRenderer>();
-            coreTintSlots = CollectTintSlots(body.Length > 0 ? body : character.GetComponentsInChildren<Renderer>());
-            if (character.GetComponentInChildren<Animator>() is { } animator && animator.runtimeAnimatorController != null)
-            {
-                coreAnimator = animator;
-                if (animator.HasState(0, IdleState))
-                    animator.Play(IdleState, 0, 0f);
-            }
-            return;
+            coreAnimator = animator;
+            if (animator.HasState(0, IdleState))
+                animator.Play(IdleState, 0, 0f);
         }
-
-        Transform coreBody = Box("Core body", model, Vector3.up * 0.56f, new Vector3(0.86f, 0.52f, 0.86f), core);
-        Transform crown = Box("Core crown", model, Vector3.up * 0.94f, new Vector3(0.58f, 0.24f, 0.58f), core);
-        crown.localRotation = Quaternion.Euler(0, 45, 0);
-        coreTintSlots = CollectTintSlots(new Renderer[] { coreBody.GetComponent<Renderer>(), crown.GetComponent<Renderer>() });
     }
 
     private void PlayCoreHit()

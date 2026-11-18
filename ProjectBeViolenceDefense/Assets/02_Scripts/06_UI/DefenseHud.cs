@@ -64,6 +64,7 @@ internal sealed class DefenseHud
     private readonly RectTransform manaGauge;
     private readonly RectTransform roundStatus;
     private bool externalBattleInfo;
+    private bool externalBuildPanel;
     private readonly RectTransform noticeArea;
     private readonly TextMeshProUGUI core;
     private readonly Image coreFill;
@@ -230,6 +231,12 @@ internal sealed class DefenseHud
         wallSupply.anchoredPosition = new Vector2(wallSupply.anchoredPosition.x, -132);
     }
 
+    /// <summary>건설 모드에서 자리를 내주는 하단 행동 UI(시작 버튼·스킬 바).</summary>
+    public RectTransform ActionBar => actionBar;
+
+    /// <summary>별도 건설 패널(BuildModeHud)을 쓰는 씬에서 호출한다. 우상단의 벽 개수 표시를 숨긴다(패널이 대신 보여 준다).</summary>
+    public void UseExternalBuildPanel() => externalBuildPanel = true;
+
     public void Notify(string message)
     {
         noticeText = message;
@@ -319,7 +326,7 @@ internal sealed class DefenseHud
         coreFill.color = displayedCoreHealth <= DefenseBattle.CoreMaxHealth / 4
             ? UIPalette.ButtonDanger : UIPalette.ButtonPrimary;
         SetBarFraction(coreFill, (float)displayedCoreHealth / DefenseBattle.CoreMaxHealth);
-        wallSupply.gameObject.SetActive(!inCombat && !defeated);
+        wallSupply.gameObject.SetActive(!inCombat && !defeated && !externalBuildPanel);
         if (!inCombat && !defeated)
         {
             int wallsLeft = DefenseGrid.WallLimit - grid.WallCount;

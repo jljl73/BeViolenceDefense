@@ -25,6 +25,11 @@ public sealed class LeftCoreHud : MonoBehaviour
     [Tooltip("무표정일 때 반복 재생하는 대기 프레임. 프레임마다 초상 타일 수만큼 이어 붙인 배열.")]
     [SerializeField] private Texture2D[] idleFrames = Array.Empty<Texture2D>();
     [SerializeField] private float idleFps = 16f;
+    [Tooltip("기본 대기에서 반복할 프레임 구간(x=첫 프레임, y=마지막 프레임, 둘 다 포함). 움직임이 멈춰 있는 앞뒤 프레임을 빼는 데 쓴다. y가 0 이하면 전체를 재생한다.")]
+    [SerializeField] private Vector2Int idleLoop;
+    [Tooltip("선택. 체력이 낮아 곤란한 표정일 때 반복 재생하는 대기 프레임. 비어 있으면 정지 그림을 쓴다.")]
+    [SerializeField] private Texture2D[] troubledIdleFrames = Array.Empty<Texture2D>();
+    [SerializeField] private Vector2Int troubledIdleLoop;
     [Tooltip("선택. 초상 타일 위에 겹친 같은 배치의 타일. 대기 프레임 사이를 부드럽게 섞는 데 쓴다.")]
     [SerializeField] private RawImage[] portraitBlendTiles = Array.Empty<RawImage>();
     [SerializeField] private Graphic[] flashTargets = Array.Empty<Graphic>();
@@ -128,26 +133,31 @@ public sealed class LeftCoreHud : MonoBehaviour
             Expression.Neutral;
         SetExpression(want);
         if (want == Expression.Neutral)
-            PlayIdle(now);
+            PlayIdle(now, idleFrames, idleLoop);
+        else if (want == Expression.Troubled)
+            PlayIdle(now, troubledIdleFrames, troubledIdleLoop);
     }
 
-    private void PlayIdle(float now)
+    private void PlayIdle(float now, Texture2D[] source, Vector2Int loop)
     {
         int tiles = portraitTiles.Length;
-        int frames = tiles > 0 ? idleFrames.Length / tiles : 0;
-        if (frames == 0)
+        int total = tiles > 0 ? source.Length / tiles : 0;
+        if (total == 0)
             return;
+        int first = loop.y > 0 ? Mathf.Clamp(loop.x, 0, total - 1) : 0;
+        int last = loop.y > 0 ? Mathf.Clamp(loop.y, first, total - 1) : total - 1;
+        int frames = last - first + 1;
         float position = now * idleFps;
-        int frame = Mathf.FloorToInt(position) % frames;
+        int frame = first + Mathf.FloorToInt(position) % frames;
         bool blend = portraitBlendTiles.Length == tiles;
         if (frame != shownIdleFrame)
         {
-            int next = (frame + 1) % frames;
+            int next = first + (frame - first + 1) % frames;
             for (int i = 0; i < tiles; i++)
             {
-                portraitTiles[i].texture = idleFrames[frame * tiles + i];
+                portraitTiles[i].texture = source[frame * tiles + i];
                 if (blend)
-                    portraitBlendTiles[i].texture = idleFrames[next * tiles + i];
+                    portraitBlendTiles[i].texture = source[next * tiles + i];
             }
             shownIdleFrame = frame;
         }
