@@ -81,3 +81,92 @@ A single rocky beast den for a strategy game board, the place wolves and boars c
 no humans, -3::1girl, 1boy, human, animal, monster, statue::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
 one dragon nest, a ring of jagged dark volcanic rock spikes around a shallow bowl, three large speckled dragon eggs in the bowl, teal and cream eggs, glowing orange cracks in the dark rock, a few charred bones, wisps of scorch marks, chunky, low-poly feeling,
 A single dragon nest for a strategy game board, the place dragon hatchlings come out of: a ring of jagged dark volcanic rock with glowing orange cracks around three large speckled eggs. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 5-B. 주인공이 올라서는 원기둥형 성채 (3x3칸)
+no humans, -3::1girl, 1boy, human, animal, statue, square tower, pointed roof, cone roof, spire::, game asset, prop, environment prop, tower, {{black background, simple background}}, single object, centered, isolated, -3::castle town, large castle, multiple towers, village, ground, grass field, scenery, sky, text, realistic::,
+one short wide round stone tower, cylindrical keep, drum shape, wider than tall, flat open circular top with a wide empty stone floor, low crenellated battlement ring around the top edge, pale sandstone blocks with warm tan trim bands, slightly flared round base, one arched wooden door on the front, small arrow slits, three small honey-gold banners hanging around the wall, dark plum caps on the merlons, chunky, low-poly feeling, simple shapes,
+A single short, wide cylindrical stone keep for a strategy game board, seen from a slightly raised three-quarter view. It is a round drum-shaped tower, clearly wider than it is tall, with a flat open circular roof that is an empty stone floor where a character can stand, ringed by a low battlement with square merlons. Pale sandstone blocks, warm tan trim bands, a small arched wooden door and small honey-gold banners. Simple chunky shapes like a low-poly model. The whole tower is visible from its base to the battlements. Isolated on a solid black background.
+
+## 7. 묘지와 무너진 성채 (1:1)
+### 7-A. 죽은 나무
+no humans, -3::1girl, 1boy, human, animal, monster, ghost, zombie, skeleton::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one dead leafless tree, twisted gnarled dark grey-brown trunk, thick short trunk, a few bare crooked branches spreading wide, exposed roots, a little pale green moss on one side, no leaves, chunky, low-poly feeling,
+A single dead leafless tree for a graveyard strategy game map: a short thick twisted grey-brown trunk with a few bare crooked branches and exposed roots. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 7-B. 묘비 무리
+no humans, -3::1girl, 1boy, human, animal, monster, ghost, zombie, skeleton::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+a small cluster of three old gravestones on a low mound of dark earth, one rounded headstone, one stone cross, one broken leaning slab, blue-grey weathered stone, cracks, pale green moss patches, a few dry weeds, chunky, low-poly feeling,
+A small cluster of three old weathered gravestones on a low mound of dark earth for a graveyard strategy game map: a rounded headstone, a stone cross and a broken leaning slab in blue-grey stone with moss. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 7-C. 무너진 성탑
+no humans, -3::1girl, 1boy, human, animal, monster, ghost, zombie, skeleton::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one ruined round castle tower, broken off halfway with a jagged top edge, pale grey-beige stone blocks darkened by age, a big hole in the wall, fallen stone blocks piled at its foot, a torn faded plum banner, dead ivy vines, chunky, low-poly feeling,
+A single ruined round castle tower for a strategy game map, the remains of a fallen fortress: broken off halfway with a jagged top, a hole in the wall, fallen blocks at its foot and a torn faded banner. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 7-D. 무너진 성벽
+no humans, -3::1girl, 1boy, human, animal, monster, ghost, zombie, skeleton::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one crumbled castle wall segment, a short thick stone wall with two remaining battlement merlons and a broken pointed archway, pale grey-beige stone blocks darkened by age, collapsed at both ends into rubble piles, dead ivy vines, a rusty iron torch bracket, chunky, low-poly feeling,
+A single crumbled segment of a castle wall for a strategy game map, the remains of a fallen fortress: a short thick wall with a broken archway and two remaining merlons, collapsed into rubble at both ends. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 7-E. 묘지 바닥 질감
+no humans, -3::1girl, 1boy, human, animal, tree, flowers, path, horizon, sky, perspective, objects, graves, text::, texture, seamless pattern, top-down view, flat, ground texture, full frame,
+dead dry grass and bare dark earth, muted grey-green and cold brown, short painted grass strokes, even coverage, very low contrast, a few tiny pebbles,
+A flat top-down ground texture of dead grass and bare dark earth filling the whole frame evenly: short soft painted strokes in muted grey-green and cold brown with very low contrast and no large shapes, so it can repeat as a tile.
+
+### 7-F. 화면 전경 — 마른 가시 가지
+no humans, -3::1girl, 1boy, human, animal, tree trunk, whole tree, ground, pot, vase, leaves, flowers::, game asset, foreground foliage, branch, {{black background, simple background}}, single object, isolated, -3::scenery, sky, text, frame, wreath, symmetrical, realistic::,
+one dead bare branch growing diagonally from the lower left corner toward the upper right, thick dark grey-brown twig that forks into many thin crooked twigs, small thorns, no leaves, a few strands of pale grey cobweb, flat simple shapes,
+A single dead thorny branch for a game screen corner decoration: a dark grey-brown twig starts at the lower left corner and spreads diagonally up and to the right, forking into many thin crooked bare twigs with small thorns and a few cobweb strands. No leaves. Flat simple shapes. Isolated on a solid black background.
+
+## 8. 추가 소품 — 묘지 (1:1)
+### 8-A. 묘지 랜턴 기둥
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one short stone lantern post, square blue-grey stone pillar on a stepped base, an iron lantern on top with warm glowing orange glass, a little moss, a few cracks, chunky, low-poly feeling,
+A single short stone lantern post for a graveyard strategy game map: a square blue-grey stone pillar on a stepped base with an iron lantern on top glowing warm orange. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 8-B. 묘지 철제 울타리
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one short segment of old wrought iron fence, five black iron bars with spear tips between two square stone posts, slightly bent and rusty, one bar leaning, chunky, low-poly feeling,
+A single short segment of an old wrought iron graveyard fence for a strategy game map: five black spear-tipped bars between two square stone posts, a little bent and rusty. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+## 9. 추가 소품 — 황금 단풍 평원 (1:1)
+### 9-A. 가을 덤불
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one round autumn bush, a low dense shrub made of chunky leaf clumps in orange, golden yellow and a few red, tiny dark twigs showing at the base, a few fallen leaves around it, chunky, low-poly feeling,
+A single low round autumn bush for a strategy game map: chunky leaf clumps in orange, golden yellow and a little red. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 9-B. 볏단 더미
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+three bundled wheat sheaves leaning together into a small stook, golden straw tied with brown rope, a small round hay bale beside them, chunky, low-poly feeling,
+A small stook of three golden wheat sheaves tied with rope and a round hay bale beside it, for an autumn plain strategy game map. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 9-C. 버섯 그루터기
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one old tree stump with thick roots, warm brown bark, pale cut top with rings, a cluster of orange and cream mushrooms growing on its side, a few fallen maple leaves on top, golden moss, chunky, low-poly feeling,
+A single old tree stump with a cluster of orange and cream mushrooms on its side and a few fallen maple leaves on top, for an autumn strategy game map. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 9-D. 부서진 수레
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one broken wooden farm cart, tilted with one wheel missing and the other wheel cracked, weathered warm brown planks, a few pumpkins and a sack spilled beside it, chunky, low-poly feeling,
+A single broken wooden farm cart tilted on one wheel with a few pumpkins and a sack spilled beside it, for an autumn plain strategy game map. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+## 10. 추가 소품 — 설원 (1:1)
+### 10-A. 얼음 결정
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one cluster of large ice crystals growing from a snowy mound, five sharp angular pale blue and teal translucent crystals of different heights, white snow at the base, chunky, low-poly feeling,
+A single cluster of five large sharp pale-blue ice crystals rising from a small snowy mound, for a snowfield strategy game map. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 10-B. 눈 덮인 덤불
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one low round winter shrub, bare dark twigs with clusters of small red berries, thick white snow caps on top of the branches, snow piled at the base, chunky, low-poly feeling,
+A single low winter shrub with bare dark twigs, small red berries and thick white snow caps, for a snowfield strategy game map. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 10-C. 눈 덮인 통나무 더미
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one small pile of four cut logs stacked in a pyramid, dark brown bark, pale cut ends with rings, thick white snow on top, an axe stuck in a stump beside it, chunky, low-poly feeling,
+A small snow-covered pile of four stacked cut logs with an axe stuck in a stump beside it, for a snowfield strategy game map. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 10-D. 눈 덮인 돌무지
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, multiple buildings, ground, grass field, scenery, sky, text, realistic::,
+one stacked stone cairn, five flat grey-blue stones balanced on top of each other from large to small, snow caps on each stone, small icicles hanging, a snowy mound at the base, chunky, low-poly feeling,
+A single stacked stone cairn of five flat grey-blue stones with snow caps and small icicles on a snowy mound, for a snowfield strategy game map. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.

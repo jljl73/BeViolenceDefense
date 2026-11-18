@@ -1676,6 +1676,9 @@ MonoBehaviour:
     trim: {r: 0.69803923, g: 0.7764706, b: 0.78039217, a: 1}
     coreCharacterPrefab: {fileID: 4139517323781185027, guid: a9939411723c35a419584baa25b6e7ca, type: 3}
     coreCharacterScale: 2
+    corePlatformPrefab: {fileID: 2181583076233016362, guid: 12c81491b31c8bc40b7f621d4e4b674e, type: 3}
+    corePlatformScale: 1
+    corePlatformTop: 0.36
     tileGap: 0.06
     tileBevel: 0
     tileTexture: {fileID: 0}

@@ -39,7 +39,7 @@ public sealed class DefenseGrid
     public Vector3 Center => new((Width - 1) * 0.5f, 0, (Depth - 1) * 0.5f);
 
     // 기본 지형: 17x17, 가운데 한 칸만 열린 가로 벽.
-    public DefenseGrid() : this(DefaultSize, DefaultSize, new RectInt(DefaultSize / 2, DefaultSize - 2, 2, 2),
+    public DefenseGrid() : this(DefaultSize, DefaultSize, new RectInt(DefaultSize / 2 - 1, DefaultSize - 3, 3, 3),
         new[] { new Vector2Int(2, 2), new Vector2Int(DefaultSize - 3, 2) }, new[] { 0, 1 }, DefaultWalls())
     {
     }
@@ -85,6 +85,21 @@ public sealed class DefenseGrid
 
     public BuildResult TryPlace(Vector2Int cell)
     {
+        BuildResult result = CheckPlace(cell, out Vector3[][] updated);
+        if (result != BuildResult.Placed)
+            return result;
+
+        placed.Add(cell);
+        routes = updated;
+        return BuildResult.Placed;
+    }
+
+    /// <summary>벽을 놓지 않고 그 칸에 놓을 수 있는지만 본다. 놓을 수 있으면 <see cref="BuildResult.Placed"/>.</summary>
+    public BuildResult CheckPlace(Vector2Int cell) => CheckPlace(cell, out _);
+
+    private BuildResult CheckPlace(Vector2Int cell, out Vector3[][] updated)
+    {
+        updated = null;
         if (!InBounds(cell))
             return BuildResult.Outside;
         if (!IsWalkable(cell) || Array.IndexOf(spawns, cell) >= 0)
@@ -92,13 +107,8 @@ public sealed class DefenseGrid
         if (placed.Count >= WallLimit)
             return BuildResult.LimitReached;
 
-        Vector3[][] updated = FindRoutes(cell);
-        if (updated == null)
-            return BuildResult.BlocksRoute;
-
-        placed.Add(cell);
-        routes = updated;
-        return BuildResult.Placed;
+        updated = FindRoutes(cell);
+        return updated == null ? BuildResult.BlocksRoute : BuildResult.Placed;
     }
 
     public bool TryRemove(Vector2Int cell)

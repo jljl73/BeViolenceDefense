@@ -15,10 +15,10 @@ MonoBehaviour:
   width: 17
   depth: 17
   core:
-    x: 8
-    y: 15
-    width: 2
-    height: 2
+    x: 7
+    y: 14
+    width: 3
+    height: 3
   spawns:
   - cell: {x: 2, y: 2}
     faction: 0

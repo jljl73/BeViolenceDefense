@@ -24,10 +24,11 @@ public sealed class BoardTheme
     [Tooltip("코어 받침대 위에 표시할 캐릭터 프리팹")]
     public GameObject coreCharacterPrefab;
     [Min(0.01f)] public float coreCharacterScale = 1.6f;
-    [Tooltip("선택. 지정하면 기본 받침대 블록 대신 이 모델(성채 등)을 코어 자리에 놓는다. 모델 원점은 바닥 중심이어야 한다.")]
+    [Tooltip("선택. 지정하면 기본 받침대 블록 대신 이 모델(성채 등)을 코어 자리에 놓는다. 모델은 원점이 바닥 중심이고 가로·세로가 1이어야 하며, 코어 영역 크기에 맞춰 자동으로 커진다.")]
     public GameObject corePlatformPrefab;
+    [Tooltip("코어 영역에 맞춘 크기에 추가로 곱하는 배율")]
     [Min(0.01f)] public float corePlatformScale = 1f;
-    [Tooltip("받침 모델 위에서 캐릭터가 서는 높이 (corePlatformPrefab을 지정했을 때만 쓴다)")]
+    [Tooltip("받침 모델 위에서 캐릭터가 서는 높이. 모델 크기 1 기준 (corePlatformPrefab을 지정했을 때만 쓴다)")]
     [Min(0f)] public float corePlatformTop = 0.32f;
 
     [Header("타일 형태")]

@@ -392,6 +392,41 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         hud.Notify("");
     }
 
+    // 놓을 칸 미리보기: 건설 모드에서 놓기 도구일 때 마우스 아래 칸에 벽을 띄운다. 길 계산은 칸이나 벽 배치가 바뀔 때만 다시 한다.
+    private Vector2Int ghostCell = new(-1, -1);
+    private int ghostWallCount = -1;
+    private DefenseGrid.BuildResult ghostResult;
+
+    private void UpdateBuildGhost()
+    {
+        Mouse mouse = Mouse.current;
+        bool placing = buildModeHud != null && buildMode && buildTool == BuildModeHud.Tool.Place
+            && battle.CurrentPhase == DefenseBattle.Phase.Preparation && !ui.HasOpenPopup && mouse != null;
+        if (!placing)
+        {
+            view.HideBuildGhost();
+            return;
+        }
+
+        Vector2 pointer = mouse.position.ReadValue();
+        if (ui.BlocksBoardPointer(pointer) || !view.TryPickCell(pointer, out Vector2Int cell))
+        {
+            view.HideBuildGhost();
+            return;
+        }
+
+        if (cell != ghostCell || grid.WallCount != ghostWallCount)
+        {
+            ghostCell = cell;
+            ghostWallCount = grid.WallCount;
+            ghostResult = grid.CheckPlace(cell);
+        }
+        if (ghostResult is DefenseGrid.BuildResult.Outside or DefenseGrid.BuildResult.Occupied)
+            view.HideBuildGhost();
+        else
+            view.ShowBuildGhost(cell, ghostResult == DefenseGrid.BuildResult.Placed);
+    }
+
     private void ReadBuildInput()
     {
         // 건설 모드 HUD가 있는 씬에서는 모드가 켜져 있을 때만 보드 클릭이 벽을 바꾼다.
@@ -561,6 +596,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             if (!canBuild)
                 buildMode = false;
             buildModeHud.Refresh(canBuild, buildMode, DefenseGrid.WallLimit - grid.WallCount, DefenseGrid.WallLimit, buildTool);
+            UpdateBuildGhost();
         }
         if (battleInfoHud != null)
         {

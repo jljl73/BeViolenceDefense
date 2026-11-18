@@ -24,12 +24,25 @@ public sealed class DialogueHud : MonoBehaviour
         [TextArea] public string text;
     }
 
+    /// <summary>표정 하나의 움직이는 초상. 프레임을 격자로 이어 붙인 텍스처 한 장.</summary>
+    [Serializable]
+    public struct PortraitSheet
+    {
+        public Texture2D texture;
+        public int columns;
+        public int rows;
+        public int frames;
+    }
+
     [Header("Portrait (left)")]
     [SerializeField] private RectTransform portrait;
     [SerializeField] private RawImage portraitImage;
     [SerializeField] private CanvasGroup portraitGroup;
     [Tooltip("Expression 순서(Neutral, Happy, Surprised, Troubled, Pout)의 초상 그림")]
     [SerializeField] private Texture2D[] portraits = Array.Empty<Texture2D>();
+    [Tooltip("선택. Expression 순서의 움직이는 초상 시트. 해당 표정의 시트가 있으면 정지 그림 대신 반복 재생한다.")]
+    [SerializeField] private PortraitSheet[] portraitSheets = Array.Empty<PortraitSheet>();
+    [SerializeField] private float portraitFps = 14f;
 
     [Header("Box (bottom)")]
     [SerializeField] private RectTransform box;
@@ -56,6 +69,10 @@ public sealed class DialogueHud : MonoBehaviour
     private int totalCharacters;
     private Vector2 boxShown, portraitShown, nextShown;
     private bool initialized;
+    private PortraitSheet playingSheet;
+    private float sheetStart;
+    private int shownSheetFrame = -1;
+    private int shownFace = -1;
     private MotionHandle boxMove, boxFade, portraitMove, portraitFade, portraitHop, nextBob, tabPop, hudFade;
 
     public bool IsOpen => gameObject.activeSelf;
@@ -91,6 +108,7 @@ public sealed class DialogueHud : MonoBehaviour
         lines = dialogue;
         finished = onFinished;
         index = 0;
+        shownFace = -1;
         ui.ShowPopup((RectTransform)transform, dismissOnEscape: false);
 
         hudFade = Fade(hudGroup, 0f, 0.2f, 0f);
@@ -119,10 +137,19 @@ public sealed class DialogueHud : MonoBehaviour
         nameText.text = line.speaker;
         nameTab.gameObject.SetActive(!string.IsNullOrEmpty(line.speaker));
         int face = (int)line.expression;
-        Texture2D next = face < portraits.Length ? portraits[face] : null;
-        bool faceChanged = next != null && portraitImage.texture != next;
-        if (next != null)
+        bool hasSheet = face < portraitSheets.Length && portraitSheets[face].texture != null && portraitSheets[face].frames > 0;
+        Texture2D next = hasSheet ? portraitSheets[face].texture : face < portraits.Length ? portraits[face] : null;
+        bool faceChanged = next != null && face != shownFace;
+        if (faceChanged)
+        {
+            shownFace = face;
             portraitImage.texture = next;
+            portraitImage.uvRect = new Rect(0f, 0f, 1f, 1f);
+            playingSheet = hasSheet ? portraitSheets[face] : default;
+            sheetStart = Time.unscaledTime;
+            shownSheetFrame = -1;
+            PlayPortraitSheet();
+        }
 
         bodyText.text = line.text;
         bodyText.maxVisibleCharacters = 0;
@@ -150,8 +177,22 @@ public sealed class DialogueHud : MonoBehaviour
         }
     }
 
+    // 시트의 프레임은 왼쪽 위에서 오른쪽으로, 위에서 아래로 놓여 있다.
+    private void PlayPortraitSheet()
+    {
+        if (playingSheet.texture == null || playingSheet.frames <= 0)
+            return;
+        int frame = Mathf.FloorToInt((Time.unscaledTime - sheetStart) * portraitFps) % playingSheet.frames;
+        if (frame == shownSheetFrame)
+            return;
+        shownSheetFrame = frame;
+        float w = 1f / playingSheet.columns, h = 1f / playingSheet.rows;
+        portraitImage.uvRect = new Rect(frame % playingSheet.columns * w, 1f - (frame / playingSheet.columns + 1) * h, w, h);
+    }
+
     private void Update()
     {
+        PlayPortraitSheet();
         if (Typing)
         {
             shownCharacters = Mathf.Min(totalCharacters, shownCharacters + charactersPerSecond * Time.unscaledDeltaTime);

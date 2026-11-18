@@ -45,7 +45,7 @@ public sealed class StageData : ScriptableObject
 
     [Range(MinSize, MaxSize)] public int width = DefenseGrid.DefaultSize;
     [Range(MinSize, MaxSize)] public int depth = DefenseGrid.DefaultSize;
-    public RectInt core = new(DefenseGrid.DefaultSize / 2, DefenseGrid.DefaultSize - 2, 2, 2);
+    public RectInt core = new(DefenseGrid.DefaultSize / 2 - 1, DefenseGrid.DefaultSize - 3, 3, 3);
     public List<Spawn> spawns = new();
     public List<Obstacle> obstacles = new();
 
