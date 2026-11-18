@@ -13,7 +13,7 @@ internal sealed class EnemyCatalogEditor : Editor
         ("attackRange", new GUIContent("사거리", "공격 사거리(칸)")),
         ("awarenessRange", new GUIContent("인지", "인지 사거리(칸). 실제 인지 사거리는 공격 사거리 이상입니다.")),
         ("moveSpeed", new GUIContent("속도", "이동 속도(칸/초)")),
-        ("armor", new GUIContent("방어", "공격 1회마다 줄이는 피해. 최소 1은 들어갑니다."))
+        ("armor", new GUIContent("방어", "공격 1회마다 줄이는 피해. 공격력 이하가 되면 피해는 0입니다."))
     };
 
     public override void OnInspectorGUI()

@@ -83,10 +83,12 @@ internal sealed class DefenseBoardView
     private readonly Material attackBuffPreviewMaterial;
     private readonly Material moveSpeedBuffPreviewMaterial;
     private readonly Material healPreviewMaterial;
+    private readonly Material armorBuffPreviewMaterial;
     private readonly Material nearbyPreviewMaterial;
     private readonly Material attackOutlineMaterial;
     private readonly Material healOutlineMaterial;
     private readonly Material moveSpeedOutlineMaterial;
+    private readonly Material armorOutlineMaterial;
     private readonly Material nearbyOutlineMaterial;
     private readonly MeshRenderer areaSpellPreview;
     private readonly Mesh areaSpellPreviewMesh;
@@ -172,10 +174,12 @@ internal sealed class DefenseBoardView
         attackBuffPreviewMaterial = core;
         moveSpeedBuffPreviewMaterial = Palette(MoveSpeedBuffColor);
         healPreviewMaterial = Palette(UIPalette.Heal);
+        armorBuffPreviewMaterial = Palette(UIPalette.Armor);
         nearbyPreviewMaterial = Palette(UIPalette.TextPrimary);
         attackOutlineMaterial = UnlitPalette(UIPalette.Attack);
         healOutlineMaterial = UnlitPalette(UIPalette.Heal);
         moveSpeedOutlineMaterial = UnlitPalette(UIPalette.MoveSpeed);
+        armorOutlineMaterial = UnlitPalette(UIPalette.Armor);
         nearbyOutlineMaterial = UnlitPalette(UIPalette.TextPrimary);
         areaSpellPreview.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         areaSpellPreview.receiveShadows = false;
@@ -438,6 +442,7 @@ internal sealed class DefenseBoardView
             DefenseBattle.Spell.MoveSpeedBuff => moveSpeedBuffPreviewMaterial,
             DefenseBattle.Spell.Heal => healPreviewMaterial,
             DefenseBattle.Spell.AttackBuff => attackBuffPreviewMaterial,
+            DefenseBattle.Spell.ArmorBuff => armorBuffPreviewMaterial,
             _ => null
         } : null;
 
@@ -519,7 +524,8 @@ internal sealed class DefenseBoardView
         view.PreviewRing.transform.localScale = Vector3.one * (eligible ? 1.2f : 1f);
         view.PreviewOutline.sharedMaterial = eligible
             ? material == attackBuffPreviewMaterial ? attackOutlineMaterial
-                : material == healPreviewMaterial ? healOutlineMaterial : moveSpeedOutlineMaterial
+                : material == healPreviewMaterial ? healOutlineMaterial
+                : material == armorBuffPreviewMaterial ? armorOutlineMaterial : moveSpeedOutlineMaterial
             : nearbyOutlineMaterial;
         view.PreviewOutline.widthMultiplier = eligible ? 0.085f : 0.055f;
         PositionPreviewOutline(view);

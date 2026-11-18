@@ -26,7 +26,6 @@ internal sealed class DefenseHud
         public Sprite Lock;
     }
 
-    private const int LockedSpellCount = 3;
     private static readonly Vector2 SpellSlotSize = new(110, 124);
     private static readonly Vector2 ActionsSize = new(600, 184);
 
@@ -58,6 +57,7 @@ internal sealed class DefenseHud
     private readonly SpellSlot attackBuff;
     private readonly SpellSlot heal;
     private readonly SpellSlot moveSpeedBuff;
+    private readonly SpellSlot armorBuff;
     private readonly TextMeshProUGUI actionTip;
     private readonly HudButton help;
     private readonly TextMeshProUGUI helpTip;
@@ -143,10 +143,8 @@ internal sealed class DefenseHud
             DefenseBattle.Spell.Heal, UIPalette.Heal, cast);
         moveSpeedBuff = CreateSpellSlot("Move Speed Buff", 2, "3", this.art.MoveSpeedBuff,
             DefenseBattle.Spell.MoveSpeedBuff, UIPalette.MoveSpeed, cast);
-        AddIcon("Locked Spells", spellBar, this.art.Lock, new Vector2(550, -42), 17, UIPalette.TextSecondary);
-        TextMeshProUGUI locked = Label("Locked Count", spellBar, 573, -39, 40, 23, 19);
-        locked.text = $"×{LockedSpellCount}";
-        locked.color = UIPalette.TextSecondary;
+        armorBuff = CreateSpellSlot("Armor Buff", 3, "4", this.art.Wall,
+            DefenseBattle.Spell.ArmorBuff, UIPalette.Armor, cast);
 
         RectTransform manaGauge = Rect("Mana Gauge", spellBar, Vector2.up, Vector2.up,
             new Vector2(82, -138), new Vector2(436, 29));
@@ -261,7 +259,7 @@ internal sealed class DefenseHud
         help.Button.interactable = !blocked;
         StyleFlatButton(help, help.ShowTip ? UIPalette.TextPrimary : UIPalette.TextSecondary);
         SetTip(helpTip, !blocked && !defeated && (help.ShowTip || helpPinned)
-            ? (inCombat ? "1–3 aim · Left click casts · Esc cancels" : "Left click builds · Right click removes") +
+            ? (inCombat ? "1–4 aim · Left click casts · Esc cancels" : "Left click builds · Right click removes") +
               "\nWASD / RMB drag · " + (aimedSpell.HasValue ? "Wheel radius" : "Wheel zoom") + " · R restart"
             : null);
         StyleButton(restartButton, UIPalette.ButtonPrimary, UIPalette.TextOnAccent);
@@ -272,7 +270,7 @@ internal sealed class DefenseHud
         foreach (EnemyUnit enemy in battle.Enemies)
         {
             if (enemy.Health == enemy.MaxHealth && enemy.HealFlash <= 0 &&
-                enemy.AttackBuffStacks == 0 && enemy.MoveSpeedBuffStacks == 0)
+                enemy.AttackBuffStacks == 0 && enemy.MoveSpeedBuffStacks == 0 && enemy.ArmorBuffStacks == 0)
                 continue;
 
             AddMarker(view.ScreenPoint(enemy, 0.76f), enemy);
@@ -426,13 +424,21 @@ internal sealed class DefenseHud
 
         mana.text = $"{Mathf.FloorToInt(battle.Mana)} <size=80%>/ {DefenseBattle.MaxMana}</size>";
         SetBarFraction(manaFill, battle.Mana / DefenseBattle.MaxMana);
-        bool spellHovered = attackBuff.Control.Hovered || heal.Control.Hovered || moveSpeedBuff.Control.Hovered;
+        bool spellHovered = attackBuff.Control.Hovered || heal.Control.Hovered ||
+            moveSpeedBuff.Control.Hovered || armorBuff.Control.Hovered;
         string attackTip = RefreshSpell(attackBuff, battle, blocked, aimedSpell, rangeStep, spellHovered);
         string healTip = RefreshSpell(heal, battle, blocked, aimedSpell, rangeStep, spellHovered);
         string speedTip = RefreshSpell(moveSpeedBuff, battle, blocked, aimedSpell, rangeStep, spellHovered);
+        string armorTip = RefreshSpell(armorBuff, battle, blocked, aimedSpell, rangeStep, spellHovered);
         if (!blocked && aimedSpell is { } spell)
         {
-            SpellSlot slot = spell == attackBuff.Spell ? attackBuff : spell == heal.Spell ? heal : moveSpeedBuff;
+            SpellSlot slot = spell switch
+            {
+                DefenseBattle.Spell.AttackBuff => attackBuff,
+                DefenseBattle.Spell.Heal => heal,
+                DefenseBattle.Spell.MoveSpeedBuff => moveSpeedBuff,
+                _ => armorBuff
+            };
             float radius = DefenseBattle.AreaSpellRadius(rangeStep);
             int targets = 0;
             if (spellCenter is { } center)
@@ -450,7 +456,7 @@ internal sealed class DefenseHud
         }
         else
         {
-            SetTip(actionTip, attackTip ?? healTip ?? speedTip);
+            SetTip(actionTip, attackTip ?? healTip ?? speedTip ?? armorTip);
         }
     }
 
@@ -480,8 +486,8 @@ internal sealed class DefenseHud
     private SpellSlot CreateSpellSlot(string name, int index, string shortcut, Sprite sprite,
         DefenseBattle.Spell spell, Color tint, Action<DefenseBattle.Spell> cast)
     {
-        HudButton control = ActionButton(name, spellBar, new Vector2(77 + index * 168, 0), SpellSlotSize,
-            () => cast(spell), sprite, shortcut, 90, flat: true);
+        HudButton control = ActionButton(name, spellBar, new Vector2(37 + index * 140, 0), SpellSlotSize,
+            () => cast(spell), sprite, shortcut, 82, flat: true);
         RectTransform rect = (RectTransform)control.Button.transform;
         AddFocusRing(control, new Vector2(-3, 6), 116);
         control.Caption.rectTransform.anchoredPosition = new Vector2(99, 2);
@@ -493,8 +499,9 @@ internal sealed class DefenseHud
         string effect = spell switch
         {
             DefenseBattle.Spell.AttackBuff => $"Attack buff · +{EnemyUnit.AttackBonus} damage for {DefenseBattle.BuffDuration:0}s · Stacks",
-            DefenseBattle.Spell.Heal => $"Area heal · +{DefenseBattle.HealAmount} HP to injured enemies",
-            _ => $"Move speed · +{EnemyUnit.MoveSpeedBonus:0.0} tiles/s for {DefenseBattle.BuffDuration:0}s · Stacks"
+            DefenseBattle.Spell.Heal => $"Area heal · +{DefenseBattle.HealPercent:P0} max HP to injured enemies",
+            DefenseBattle.Spell.MoveSpeedBuff => $"Move speed · +{EnemyUnit.MoveSpeedBonusPercent:P0} per stack for {DefenseBattle.BuffDuration:0}s",
+            _ => $"Armor buff · +{EnemyUnit.ArmorBonus} armor for {DefenseBattle.BuffDuration:0}s · Stacks"
         };
         return new SpellSlot(control, spell, tint, cost, charges, name, effect);
     }
@@ -653,6 +660,10 @@ internal sealed class DefenseHud
         var speedBar = (RectTransform)marker.SpeedBuff.transform.parent;
         speedBar.anchoredPosition = new Vector2(0, enemy.AttackBuffStacks > 0 ? 20 : 13);
         SetBuffMarker(marker.SpeedBuff, marker.SpeedStacks, enemy.MoveSpeedBuffStacks, enemy.MoveSpeedBuffRemaining);
+        var armorBar = (RectTransform)marker.ArmorBuff.transform.parent;
+        armorBar.anchoredPosition = new Vector2(0, 13 + 7 *
+            ((enemy.AttackBuffStacks > 0 ? 1 : 0) + (enemy.MoveSpeedBuffStacks > 0 ? 1 : 0)));
+        SetBuffMarker(marker.ArmorBuff, marker.ArmorStacks, enemy.ArmorBuffStacks, enemy.ArmorBuffRemaining);
     }
 
     private static void SetBuffMarker(Image fill, TextMeshProUGUI stacks, int count, float remaining)
@@ -670,8 +681,10 @@ internal sealed class DefenseHud
         public readonly Image Health;
         public readonly Image AttackBuff;
         public readonly Image SpeedBuff;
+        public readonly Image ArmorBuff;
         public readonly TextMeshProUGUI AttackStacks;
         public readonly TextMeshProUGUI SpeedStacks;
+        public readonly TextMeshProUGUI ArmorStacks;
 
         public UnitMarker(RectTransform parent)
         {
@@ -682,11 +695,15 @@ internal sealed class DefenseHud
                 UIPalette.Attack);
             SpeedBuff = Bar("Move Speed Buff", Root, center, center, new Vector2(0, 13), new Vector2(26, 4),
                 UIPalette.MoveSpeed);
+            ArmorBuff = Bar("Armor Buff", Root, center, center, new Vector2(0, 13), new Vector2(26, 4),
+                UIPalette.Armor);
             AttackStacks = Label("Stacks", (RectTransform)AttackBuff.transform.parent, 29, 4, 21, 13, 11);
             AttackStacks.color = UIPalette.Attack;
             SpeedStacks = Label("Stacks", (RectTransform)SpeedBuff.transform.parent, -24, 4, 21, 13, 11,
                 TextAlignmentOptions.Right);
             SpeedStacks.color = UIPalette.MoveSpeed;
+            ArmorStacks = Label("Stacks", (RectTransform)ArmorBuff.transform.parent, 29, 4, 21, 13, 11);
+            ArmorStacks.color = UIPalette.Armor;
         }
     }
 

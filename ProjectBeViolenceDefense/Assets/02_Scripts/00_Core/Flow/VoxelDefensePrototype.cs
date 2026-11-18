@@ -350,6 +350,11 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             UseSpell(DefenseBattle.Spell.MoveSpeedBuff);
             return;
         }
+        if (keyboard?.digit4Key.wasPressedThisFrame == true)
+        {
+            UseSpell(DefenseBattle.Spell.ArmorBuff);
+            return;
+        }
 
         if (!trackingRightButton && aimedSpell is { } spell && mouse?.leftButton.wasPressedThisFrame == true &&
             TryPickAreaSpellCenter(mouse, out Vector3 center))

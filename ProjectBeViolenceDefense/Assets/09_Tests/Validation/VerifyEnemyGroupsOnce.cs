@@ -21,11 +21,34 @@ internal static class VerifyEnemyGroupsOnce
         positioning.Move(attacker, defender, 0.2f);
         Require(attacker.Position.Equals(attacker.RoutePosition), "An in-range attacker must not move to a different slot.");
 
+        var armoredFaction = new EnemyFaction("Armored", Color.gray, maxHealth: 100, armor: 3, moveSpeed: 2f);
+        var armored = new EnemyUnit(armoredFaction, 1,
+            new[] { Vector3.zero, Vector3.forward * 10f }, 0);
+        armored.QueueDamage(3);
+        armored.ResolveDamage();
+        Require(armored.Health == 100, "Attack minus armor must stop at zero damage.");
+        armored.ApplyArmorBuff(DefenseBattle.BuffDuration);
+        armored.QueueDamage(8);
+        armored.QueueDamage(10);
+        armored.ResolveDamage();
+        Require(armored.Health == 98, "Armor buff must add fixed armor per hit.");
+        armored.ApplyMoveSpeedBuff(DefenseBattle.BuffDuration);
+        Require(Mathf.Approximately(armored.StepToward(Vector3.forward * 10f, 1f).z, 3f),
+            "Move speed buff must scale the unit's base speed.");
+        armored.TickTimers(DefenseBattle.BuffDuration);
+        Require(armored.ArmorBuffStacks == 0 && armored.MoveSpeedBuffStacks == 0,
+            "Buffs must expire using battle delta time.");
+
         var battle = new DefenseBattle(grid, factions);
         battle.StartRound();
         battle.Tick(0.36f, false);
         Require(battle.Enemies.Count == 2 && battle.Enemies.Select(e => e.Faction).Distinct().Count() == 2,
             "Each spawn point must release one enemy at a time.");
+        EnemyUnit wounded = battle.Enemies[0];
+        wounded.QueueDamage(30);
+        wounded.ResolveDamage();
+        Require(battle.CastAreaSpell(DefenseBattle.Spell.Heal, wounded.Position, 0).StartsWith("Healed") &&
+            wounded.Health == 33, "Area heal must restore a rounded-up share of maximum health.");
         for (int i = 0; i < 40; i++) battle.Tick(1f / 60f, false);
         Require(battle.Enemies.Count == 4 && battle.Enemies.GroupBy(e => e.Faction).All(g => g.Count() == 2),
             "Each spawn point must release the next enemy after the interval.");

@@ -18,7 +18,7 @@ internal sealed class EnemyFaction
     public RuntimeAnimatorController Animations { get; }
     public Material Skin { get; }
     public float ModelScale { get; }
-    // 공격 1회마다 받는 피해를 고정으로 줄인다. 약한 공격일수록 덜 들어간다.
+    // 공격 1회마다 받는 피해를 고정으로 줄인다.
     public int Armor { get; }
     public string UnitId { get; }
 
@@ -47,12 +47,14 @@ internal sealed class EnemyFaction
 
 internal sealed class EnemyUnit
 {
-    public const int AttackBonus = 10;
-    public const float MoveSpeedBonus = 0.5f;
+    public const int AttackBonus = 15;
+    public const float MoveSpeedBonusPercent = 0.5f;
+    public const int ArmorBonus = 5;
 
     private readonly Vector3[] path;
     private readonly List<float> attackBuffTimers = new();
     private readonly List<float> moveSpeedBuffTimers = new();
+    private readonly List<float> armorBuffTimers = new();
     private int waypoint = 1;
     private int pendingDamage;
     private float cooldown;
@@ -70,8 +72,10 @@ internal sealed class EnemyUnit
     public Vector3 Heading { get; private set; }
     public int AttackBuffStacks => attackBuffTimers.Count;
     public int MoveSpeedBuffStacks => moveSpeedBuffTimers.Count;
+    public int ArmorBuffStacks => armorBuffTimers.Count;
     public float AttackBuffRemaining => NextBuffExpiry(attackBuffTimers);
     public float MoveSpeedBuffRemaining => NextBuffExpiry(moveSpeedBuffTimers);
+    public float ArmorBuffRemaining => NextBuffExpiry(armorBuffTimers);
     public float HealFlash { get; private set; }
     public float AttackFlash => attackFlash;
     public int AttacksPerformed { get; private set; }
@@ -104,6 +108,7 @@ internal sealed class EnemyUnit
         HealFlash = Mathf.Max(0, HealFlash - deltaTime);
         TickBuffs(attackBuffTimers, deltaTime);
         TickBuffs(moveSpeedBuffTimers, deltaTime);
+        TickBuffs(armorBuffTimers, deltaTime);
     }
 
     private static void TickBuffs(List<float> timers, float deltaTime)
@@ -145,8 +150,12 @@ internal sealed class EnemyUnit
         return (int)Math.Min(int.MaxValue, Faction.Damage + (long)AttackBonus * AttackBuffStacks);
     }
 
-    public void QueueDamage(int damage) =>
-        pendingDamage = (int)Math.Min(int.MaxValue, (long)pendingDamage + Math.Max(1, damage - Faction.Armor));
+    public void QueueDamage(int damage)
+    {
+        long armor = Faction.Armor + (long)ArmorBonus * ArmorBuffStacks;
+        long applied = Math.Max(0, (long)damage - armor);
+        pendingDamage = (int)Math.Min(int.MaxValue, pendingDamage + applied);
+    }
 
     public void ResolveDamage()
     {
@@ -160,6 +169,8 @@ internal sealed class EnemyUnit
 
     public void ApplyMoveSpeedBuff(float duration) => moveSpeedBuffTimers.Add(duration);
 
+    public void ApplyArmorBuff(float duration) => armorBuffTimers.Add(duration);
+
     public void Heal(int amount)
     {
         Health = Mathf.Min(MaxHealth, Health + amount);
@@ -171,7 +182,7 @@ internal sealed class EnemyUnit
 
     public Vector3 StepToward(Vector3 destination, float deltaTime)
     {
-        float speed = Faction.MoveSpeed + MoveSpeedBonus * MoveSpeedBuffStacks;
+        float speed = Faction.MoveSpeed * (1f + MoveSpeedBonusPercent * MoveSpeedBuffStacks);
         return Vector3.MoveTowards(Position, destination, speed * deltaTime);
     }
 

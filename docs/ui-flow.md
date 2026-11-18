@@ -20,11 +20,11 @@
 | 재시작 | `Button.png` 공용 버튼 | 128×64 |
 | 패배 팝업 | `Panel.png` 공용 패널 | 64×64 |
 | 준비·패배 | `Start.png`, `Restart.png` | 각 96×96 |
-| 전투 | `AttackBuff.png`, `Heal.png`, `MoveSpeedBuff.png` | 각 96×96 |
+| 전투 | `AttackBuff.png`, `Heal.png`, `MoveSpeedBuff.png`, 방어 버프에는 `Wall.png` 재사용 | 각 96×96 |
 | 상태와 자원 | `Core.png`, `Wall.png`, `Mana.png` | 각 96×96 |
 | 빈 스킬 슬롯 | `Lock.png` | 64×64 |
 
-투명 PNG는 `Assets/07_UI/01_Icons/Hud`에 둔다. 패배 팝업과 재시작 버튼은 Unity의 9-slice로 모서리 형태를 유지한다. 전투 시작과 재시작은 금색을 쓰고, 사용 가능한 스킬은 산호색·연두색·하늘색 아이콘으로 구분한다. 사용할 수 없는 스킬은 흐리게 표시하고 조준 중인 스킬에는 `OutlineFocus` 원형 테두리를 표시한다.
+투명 PNG는 `Assets/07_UI/01_Icons/Hud`에 둔다. 패배 팝업과 재시작 버튼은 Unity의 9-slice로 모서리 형태를 유지한다. 전투 시작과 재시작은 금색을 쓰고, 사용 가능한 스킬은 산호색·연두색·하늘색·보라색 아이콘으로 구분한다. 사용할 수 없는 스킬은 흐리게 표시하고 조준 중인 스킬에는 `OutlineFocus` 원형 테두리를 표시한다.
 
 ## 색상 규칙
 
@@ -49,7 +49,7 @@ UI 색은 `Assets/02_Scripts/06_UI/UIPalette.cs`의 토큰만 사용한다. 코�
 | | `ButtonSecondary` | `#4A3B5C` | 일반 행동 |
 | | `ButtonDisabled` | `#3A3148` | 사용 불가, 미선택 |
 | | `ButtonDanger` | `#E5484D` | 되돌릴 수 없는 행동 |
-| 게임 의미 | `Mana` · `Attack` · `Heal` · `MoveSpeed` | `#64C4FF` · `#FFA588` · `#99F5A0` · `#66DAFF` | 해당 기능을 가리킬 때만 사용 |
+| 게임 의미 | `Mana` · `Attack` · `Heal` · `MoveSpeed` · `Armor` | `#64C4FF` · `#FFA588` · `#99F5A0` · `#66DAFF` · `#C5A7FF` | 해당 기능을 가리킬 때만 사용 |
 
 - 깊이는 `Background` → `Panel` → `PanelRaised` 순으로 밝아진다. 위에 올라오는 요소일수록 한 단계 밝은 면을 쓴다.
 - 외곽선은 면보다 한 단계 밝게 쓰고, 선택·포커스에만 금색을 쓴다.

@@ -5,7 +5,7 @@ using UnityEngine;
 internal sealed class DefenseBattle
 {
     public const int CoreMaxHealth = 120;
-    public const int HealAmount = 10;
+    public const float HealPercent = 0.25f;
     public const float BuffDuration = 6f;
     public const float DefaultAreaSpellRadius = DefaultSpellRadiusTenths / 10f;
     public const int MinSpellRangeStep = -4;
@@ -27,7 +27,7 @@ internal sealed class DefenseBattle
     private const int ExtraReinforcements = 3;
 
     public enum Phase { Preparation, Combat, Defeat }
-    public enum Spell { AttackBuff, Heal, MoveSpeedBuff }
+    public enum Spell { AttackBuff, Heal, MoveSpeedBuff, ArmorBuff }
 
     private readonly DefenseGrid grid;
     private readonly EnemyFaction[] factions;
@@ -52,6 +52,7 @@ internal sealed class DefenseBattle
     public int EnemiesPerRound { get; private set; }
     public int AttackBuffsLeft { get; private set; }
     public int MoveSpeedBuffsLeft { get; private set; }
+    public int ArmorBuffsLeft { get; private set; }
     public int HealsLeft { get; private set; }
     public float Mana { get; private set; }
 
@@ -107,6 +108,7 @@ internal sealed class DefenseBattle
         untilCombatPlan = 0f;
         AttackBuffsLeft = CastsPerSpell;
         MoveSpeedBuffsLeft = CastsPerSpell;
+        ArmorBuffsLeft = CastsPerSpell;
         HealsLeft = CastsPerSpell;
         Mana = StartingMana;
     }
@@ -130,6 +132,7 @@ internal sealed class DefenseBattle
     {
         Spell.AttackBuff => AttackBuffsLeft,
         Spell.MoveSpeedBuff => MoveSpeedBuffsLeft,
+        Spell.ArmorBuff => ArmorBuffsLeft,
         _ => HealsLeft
     };
 
@@ -152,7 +155,7 @@ internal sealed class DefenseBattle
 
     public static bool CanReceiveAreaSpell(EnemyUnit enemy, Spell spell) => spell switch
     {
-        Spell.AttackBuff or Spell.MoveSpeedBuff => enemy.IsAlive,
+        Spell.AttackBuff or Spell.MoveSpeedBuff or Spell.ArmorBuff => enemy.IsAlive,
         Spell.Heal => enemy.Health < enemy.MaxHealth,
         _ => false
     };
@@ -178,8 +181,11 @@ internal sealed class DefenseBattle
                 case Spell.MoveSpeedBuff:
                     enemy.ApplyMoveSpeedBuff(BuffDuration);
                     break;
+                case Spell.ArmorBuff:
+                    enemy.ApplyArmorBuff(BuffDuration);
+                    break;
                 case Spell.Heal:
-                    enemy.Heal(HealAmount);
+                    enemy.Heal(Mathf.CeilToInt(enemy.MaxHealth * HealPercent));
                     break;
             }
             affected++;
@@ -196,6 +202,9 @@ internal sealed class DefenseBattle
                 break;
             case Spell.MoveSpeedBuff:
                 MoveSpeedBuffsLeft--;
+                break;
+            case Spell.ArmorBuff:
+                ArmorBuffsLeft--;
                 break;
             case Spell.Heal:
                 HealsLeft--;
