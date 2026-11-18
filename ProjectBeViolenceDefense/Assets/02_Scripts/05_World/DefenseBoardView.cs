@@ -436,8 +436,10 @@ internal sealed class DefenseBoardView
             // 테마가 받침 모델을 주면 기본 블록 받침대 대신 그것을 놓고, 캐릭터는 그 위에 세운다.
             GameObject platform = Object.Instantiate(theme.corePlatformPrefab, model, false);
             platform.name = "Core platform model";
-            platform.transform.localScale *= theme.corePlatformScale;
-            platformTop = theme.corePlatformTop;
+            // 모델은 가로·세로 1 기준으로 만들어 두고, 코어 영역의 짧은 변에 맞춰 키운다.
+            float fit = Mathf.Min(width, depth) * theme.corePlatformScale;
+            platform.transform.localScale *= fit;
+            platformTop = theme.corePlatformTop * fit;
         }
         else
             CreateCorePedestal(model, width, depth, rim, platformTop, platformThickness, foundation, wall);

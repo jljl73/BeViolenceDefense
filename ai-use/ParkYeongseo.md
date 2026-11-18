@@ -1813,3 +1813,37 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 초상은 993×1536 단일 텍스처(HUD 128px 제한 초과). 화자 이름 "Mage"와 대사는 임시
+
+### [20261119-keep-spawn-units] 원기둥형 성채(코어 3×3), 팩션 스폰 지점 4종, 고블린 2종, 캐릭터 조명 셰이더
+- 시각: 2026-11-19 03:00:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / NovelAI Diffusion V5 / OpenAI Images API (gpt-image-2.6-sunburst, 턴어라운드) / Meshy API / Blender(헤드리스 변환) / Unity CLI
+- 목적 및 적용 위치: 주인공이 올라서는 성채와 코어 영역 3×3 변경, 팩션별 스폰 지점 구조물, 밸런스 표에서 빠져 있던 유닛 보충, 주인공이 조명·그림자를 받지 않는 문제 수정
+- 사용 방식: NAI 원화 → (유닛은 GPT 4면 턴어라운드) → Meshy 메쉬 → 고블린은 Meshy 리깅·동작, 구조물은 헤드리스 Blender로 FBX 변환 → Unity 빌더로 머티리얼·프리팹 생성. `BoardTheme`에 선택 항목 `corePlatformPrefab`을 추가해 코어 영역 크기에 맞춰 놓음. 주인공 머티리얼은 Unlit에서 전용 셰이더(법선 없이 주 조명색·그림자만 반영)로 교체. 코어는 기본 격자·`StageData` 기본값·`Stage1.asset`에서 (7,14) 3×3으로 변경
+- 결과 및 확인 방법: 부분 성공 / 단풍 테마 씬 Play Mode 캡처로 성채·캐릭터 조명 확인, `Stage1` 검증 통과(스폰→코어 경로 있음), EditMode 테스트 3건 통과, 고블린 2종 필름스트립 확인, 콘솔 오류 0. 멧돼지·거대 늑대는 메쉬까지만 완료(리깅 진행 중). 스폰 지점과 신규 유닛은 프리팹만 있고 게임 로직·카탈로그에는 연결하지 않음
+- 사람의 개입: 성채를 사각에서 원기둥형·3×3으로 바꾸도록 지시, 코어 3×3 변경 결정, 캐릭터 조명 문제 지적. 원화 후보 선택은 AI가 수행
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Structures/ (CoreKeepRound, SpawnGoblinTent, SpawnUndeadCrypt, SpawnBeastDen, SpawnDragonNest) | NAI + Meshy + Blender 변환 | 생성 | FBX·텍스처·머티리얼, 수정 없음 / 성채만 씬 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/04_World/Struct_*.prefab (5종) | Unity CLI | 생성 | 가로 1 기준 정규화, 입구 -Z / 성채만 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Enemies/GoblinCharger, GoblinChief + 03_Prefabs/02_Enemies/ 프리팹 | NAI + GPT + Meshy | 생성 | 메쉬·리깅·동작 4개, 수정 없음 / 미연결 |
+| ProjectBeViolenceDefense/Assets/05_Art/02_Materials/CharacterFlatLit.shader | Claude Code | 생성 | 캐릭터용 평면 조명 셰이더 / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Heroes/Caster/Caster.mat | Unity CLI | 수정 | 셰이더 교체 / 사용 (GameScene에도 영향) |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/BoardTheme.cs, DefenseBoardView.cs | Claude Code | 수정 | 코어 받침 모델 선택 항목, 영역 크기 자동 맞춤 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseGrid.cs, StageData.cs, 04_Data/04_Stages/Stage1.asset, docs/prototype.md | Claude Code | 수정 | 코어 2×2 → 3×3 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/ (3종) | Unity CLI | 수정 | 성채 적용 |
+| Art Prompts/[Enemies] 01_Enemies.txt, [Environment] 05_StageProps.txt | Claude Code | 수정 | 1-P, 1-Q, 2-C, 2-D, 5-A, 5-B, 6-A~6-D 추가 (5-A 사각 성채는 미채택) |
+
+#### 증거
+- Tools/_out/corekeep/keep_round3_crop.jpg, Tools/_out/spawn/structs_unity.png, Tools/_out/units/goblins_strip.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 구조물·유닛 임포트와 프리팹 생성, 테마 적용과 씬 갱신, Play Mode 캡처, Stage1 검증, EditMode 테스트 실행
+- 활용 방식: `script eval --file` 빌더, `test run --mode EditMode`
+- 잘된 점: 코어 크기 변경 뒤 결정론 테스트와 스테이지 검증을 바로 확인
+- 잘 안된 점 및 개선 필요: 사용자가 Play Mode일 때 빌더가 거부되어 대기함
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 코어가 3×3이 되면서 Stage1의 코어 주변 동선이 의도와 맞는지. `Caster.mat` 변경으로 GameScene 주인공 모습이 달라짐. Meshy 크레딧 약 360 사용(메쉬 10건 300, 리깅·동작 28, 사각 성채 30 포함)

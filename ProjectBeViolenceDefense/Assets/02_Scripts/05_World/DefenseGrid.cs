@@ -39,7 +39,7 @@ public sealed class DefenseGrid
     public Vector3 Center => new((Width - 1) * 0.5f, 0, (Depth - 1) * 0.5f);
 
     // 기본 지형: 17x17, 가운데 한 칸만 열린 가로 벽.
-    public DefenseGrid() : this(DefaultSize, DefaultSize, new RectInt(DefaultSize / 2, DefaultSize - 2, 2, 2),
+    public DefenseGrid() : this(DefaultSize, DefaultSize, new RectInt(DefaultSize / 2 - 1, DefaultSize - 3, 3, 3),
         new[] { new Vector2Int(2, 2), new Vector2Int(DefaultSize - 3, 2) }, new[] { 0, 1 }, DefaultWalls())
     {
     }
