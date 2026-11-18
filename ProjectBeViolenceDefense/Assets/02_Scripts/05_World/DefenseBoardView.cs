@@ -13,7 +13,7 @@ internal sealed class DefenseBoardView
     private const float MaxZoomFrameTime = 0.05f;
     private const float ZoomSnapDistance = 0.0005f;
     private const float MinViewScale = 0.35f;
-    private const float MaxViewScale = 1.45f;
+    private const float MaxViewScale = 1.2f;
     private const float TileHeight = 0.28f;
     private const float RouteMarkerSize = 0.68f;
     private const float RouteLaneSpacing = 0.49f;
@@ -21,6 +21,7 @@ internal sealed class DefenseBoardView
     private const float SpawnPadHeight = 0.09f;
     private const float GoblinTurnSpeed = 1440f;
     private const float RunStopGrace = 0.08f;
+    private const float AnimationBlendTime = 0.08f;
     // Approximate planted-foot travel per second in the unscaled Run clip.
     private const float GoblinRunStrideSpeed = 1.55f;
     // 스킬 조준 중 화면 딤. 범위 표시는 딤보다 나중에 그려서 밝게 보이게 한다.
@@ -90,6 +91,8 @@ internal sealed class DefenseBoardView
         public bool Animated;
         public bool HasHit;
         public float Age;
+        public float AttackLength;
+        public float SampledPose;
         public int CoreDamage;
     }
 
@@ -418,7 +421,7 @@ internal sealed class DefenseBoardView
         if (coreAnimator == null || !coreAnimator.HasState(0, CoreHitState))
             return;
 
-        coreAnimator.Play(CoreHitState, 0, 0f);
+        coreAnimator.CrossFadeInFixedTime(CoreHitState, AnimationBlendTime, 0, 0f);
         coreHitPlaying = true;
     }
 
@@ -449,13 +452,13 @@ internal sealed class DefenseBoardView
         if (!coreHitPlaying)
             return;
 
-        AnimatorStateInfo state = coreAnimator.GetCurrentAnimatorStateInfo(0);
+        AnimatorStateInfo state = GetPlaybackState(coreAnimator);
         if (state.fullPathHash != CoreHitState || state.normalizedTime < 1f)
             return;
 
         coreHitPlaying = false;
         if (coreAnimator.HasState(0, IdleState))
-            coreAnimator.Play(IdleState, 0, 0f);
+            coreAnimator.CrossFadeInFixedTime(IdleState, AnimationBlendTime, 0, 0f);
     }
 
     public void FitCamera()
@@ -1084,8 +1087,6 @@ internal sealed class DefenseBoardView
         Vector3 heading = enemy.Heading.normalized;
         view.Root.localRotation = Quaternion.LookRotation(heading);
         bool animated = view.Animator != null && view.Animator.HasState(0, AttackState);
-        if (view.Animator != null)
-            view.Animator.speed = 0f;
 
         var strike = new CoreStrike
         {
@@ -1098,6 +1099,16 @@ internal sealed class DefenseBoardView
             Animated = animated,
             CoreDamage = coreDamage
         };
+        if (animated)
+        {
+            Animator animator = view.Animator;
+            animator.speed = 1f;
+            animator.CrossFadeInFixedTime(AttackState, AnimationBlendTime, 0, 0f);
+            animator.Update(0f);
+            strike.AttackLength = GetPlaybackState(animator).length;
+        }
+        if (view.Animator != null)
+            view.Animator.speed = 0f;
         PoseCoreStrike(strike, 0f);
         PendingCoreDamage += coreDamage;
         coreStrikes.Add(strike);
@@ -1149,9 +1160,13 @@ internal sealed class DefenseBoardView
         view.Root.localPosition = Vector3.Lerp(strike.From, strike.Stance, settle);
         if (strike.Animated)
         {
+            // Advance the blend and attack together on the scripted core impact timeline.
             float pose = HitImpactTime * impactProgress + 0.33f * fadeProgress;
-            view.Animator.Play(AttackState, 0, pose);
-            view.Animator.Update(0f);
+            Animator animator = view.Animator;
+            animator.speed = 1f;
+            animator.Update((pose - strike.SampledPose) * strike.AttackLength);
+            animator.speed = 0f;
+            strike.SampledPose = pose;
         }
         else
         {
@@ -1275,9 +1290,12 @@ internal sealed class DefenseBoardView
         if (view.Animator == null)
             return true;
 
-        AnimatorStateInfo state = view.Animator.GetCurrentAnimatorStateInfo(0);
+        AnimatorStateInfo state = GetPlaybackState(view.Animator);
         return state.fullPathHash != AttackState || state.normalizedTime >= HitImpactTime;
     }
+
+    private static AnimatorStateInfo GetPlaybackState(Animator animator) =>
+        animator.IsInTransition(0) ? animator.GetNextAnimatorStateInfo(0) : animator.GetCurrentAnimatorStateInfo(0);
 
     private void PlayHit(EnemyView view, EnemyUnit attacker)
     {
@@ -1316,7 +1334,7 @@ internal sealed class DefenseBoardView
     // 공격 클립이 공격 간격보다 길면 그만큼 빠르게 재생해서 다음 공격 전에 끝나게 한다.
     private static float AttackPlaybackScale(Animator animator, EnemyUnit enemy)
     {
-        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+        AnimatorStateInfo state = GetPlaybackState(animator);
         if (state.fullPathHash != AttackState || state.length <= 0f)
             return 1f;
         return Mathf.Max(1f, state.length / (enemy.Faction.AttackInterval * 0.9f));
@@ -1342,11 +1360,11 @@ internal sealed class DefenseBoardView
         if (newAttack)
         {
             view.AnimationState = AttackState;
-            animator.Play(AttackState, 0, 0f);
+            animator.CrossFadeInFixedTime(AttackState, AnimationBlendTime, 0, 0f);
         }
         else
         {
-            AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
+            AnimatorStateInfo currentState = GetPlaybackState(animator);
             bool attackFinished = currentState.fullPathHash == AttackState && currentState.normalizedTime >= 1f;
             if (moving || view.AnimationState != AttackState || attackFinished)
             {
@@ -1356,8 +1374,12 @@ internal sealed class DefenseBoardView
                     animator.HasState(0, IdleState) ? IdleState : WalkState;
                 if (view.AnimationState != state)
                 {
+                    // The first pose has no prior presentation state to blend from.
+                    if (view.AnimationState == 0)
+                        animator.Play(state, 0, 0f);
+                    else
+                        animator.CrossFadeInFixedTime(state, AnimationBlendTime, 0, 0f);
                     view.AnimationState = state;
-                    animator.Play(state, 0, 0f);
                 }
             }
         }

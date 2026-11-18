@@ -115,8 +115,11 @@ Shader "BeViolenceDefense/Spell Target Silhouette"
                 float alongStripe = dot(input.positionCS.xy, float2(-0.62, 1.0)) / (pitch * 4.8);
                 float phase = alongStripe + floor(lane) * 0.37 - _Time.y * 1.10;
                 half glint = 0.5h + 0.5h * cos(TWO_PI * phase);
-                half intensity = 0.51h + 0.15h * glint * glint;
-                return half4(lerp(detail, _SilhouetteColor.rgb, 0.10h + intensity * hatch), 1.0h);
+                half highlight = glint * glint;
+                half intensity = 0.51h + 0.15h * highlight;
+                half3 surface = lerp(detail, _SilhouetteColor.rgb, 0.10h + intensity * hatch);
+                surface += _SilhouetteColor.rgb * (0.12h * highlight * hatch);
+                return half4(surface, 1.0h);
             }
             ENDHLSL
         }
