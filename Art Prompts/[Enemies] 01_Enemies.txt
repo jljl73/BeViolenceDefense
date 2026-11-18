@@ -1,0 +1,42 @@
+# [Enemies] 01 — 적 컨셉 (NAI V5). 3D 모델로 넘길 원화라서 전신, 정면, 양팔을 몸에서 뗀 선 자세, 투명 배경.
+# 생성: python -I ~/.claude/skills/nai-image/scripts/nai_gen.py 01:1-A --n 4 --out Tools/_nai_out
+# 스타일 단어는 여기 적지 않는다. 화풍은 [Base Prompts].txt가 정한다.
+
+---
+
+## 1. 고블린
+### 1-A. 고블린 졸병 (1:1)
+1boy, solo, goblin, monster, full body, standing, straight-on, looking at viewer, arms at sides, {{black background, simple background}}, -2::1girl, human, weapon swing, dynamic pose::,
+green skin, pointy ears, large ears, big nose, sharp teeth, yellow eyes, bald, purple hood, torn crimson scarf, brown leather loincloth, rope belt, bare feet, holding club, wooden club,
+A small stocky goblin grunt enemy for a bright fantasy game, seen from the front in a neutral standing pose with both arms held slightly away from the body, the whole body visible from head to feet, isolated on a solid black background.
+
+### 1-B. 고블린 방패병 (1:1)
+1boy, solo, goblin, monster, full body, standing, straight-on, looking at viewer, arms at sides, {{black background, simple background}}, -2::1girl, human, weapon swing, dynamic pose::,
+green skin, pointy ears, large ears, big nose, sharp teeth, yellow eyes, dented iron pot helmet, purple tunic, crimson shoulder cloth, brown leather belt, bare feet, holding shield, wooden shield, holding dagger,
+A small stocky goblin shield bearer enemy for a bright fantasy game, seen from the front in a neutral standing pose with a patched wooden shield in one hand and a short rusty dagger in the other, the whole body visible from head to feet, isolated on a solid black background.
+
+### 1-C. 해골 병사 (1:1)
+1boy, solo, skeleton, undead, monster, full body, standing, straight-on, looking at viewer, arms at sides, {{black background, simple background}}, -2::1girl, human, skin, flesh, gore, blood, weapon swing, dynamic pose::,
+cartoon skeleton, round skull, big hollow eye sockets, glowing purple eyes, cracked skull, chipped teeth, rusty iron helmet, dented helmet, torn purple cape, crimson sash, leather belt, rusty breastplate over ribcage, bony hands, holding sword, short rusty sword, holding shield, small round wooden shield, bony feet,
+A small stocky cartoon skeleton soldier enemy for a bright fantasy game, more silly than scary, seen from the front in a neutral standing pose with both arms held slightly away from the body, a short rusty sword in one hand and a small round shield in the other, the whole body visible from head to feet. Isolated on a solid black background.
+
+### 1-D. 리빙 아머 (1:1)
+no humans, -3::1girl, 1boy, human, skin, face::, living armor, empty armor, monster, full body, standing, straight-on, looking at viewer, arms at sides, {{black background, simple background}}, -2::weapon swing, dynamic pose, gore::,
+full plate armor, chunky dented steel plates, large bucket great helm, dark visor slit, two glowing blue eyes inside the visor, tall red feather plume on top of the helmet, big round pauldrons, tattered blue tabard with a white emblem, steel gauntlets, steel sabatons, holding sword, broadsword, sword tip resting on the ground,
+A stocky empty suit of armor brought to life, an enemy for a bright fantasy game, more clumsy than scary, seen from the front in a neutral standing pose with both arms held slightly away from the body, a broadsword in one hand with its tip touching the ground, the whole body visible from head to feet. Two small glowing eyes shine in the dark visor and a tall red plume sticks up from the helmet. Isolated on a solid black background.
+
+### 1-E. 좀비 (1:1)
+1boy, solo, zombie, undead, monster, full body, standing, straight-on, looking at viewer, arms at sides, {{black background, simple background}}, -2::1girl, gore, blood, guts, exposed bone, weapon swing, dynamic pose::,
+pale green-grey skin, stitches on the face, one droopy eye, messy dark hair, wide torn straw hat, torn white shirt, patched brown overalls, one strap hanging down, rope belt, bare feet, bandaged arm,
+A shambling cartoon zombie farmer enemy for a bright fantasy game, goofy rather than scary, seen from the front in a neutral standing pose with both arms held slightly away from the body, the whole body visible from head to feet. A wide frayed straw hat makes a clear round shape on top. Isolated on a solid black background.
+
+### 1-F. 늑대인간 (1:1)
+1boy, solo, werewolf, furry, anthro, wolf head, monster, full body, standing, straight-on, looking at viewer, arms at sides, {{black background, simple background}}, -2::1girl, human face, gore, blood, weapon, dynamic pose, crouching, all fours::,
+brown fur, cream chest fur, big pointed ears, shaggy mane around the neck, yellow eyes, sharp fangs, big clawed hands, torn dark trousers, rope belt, bare clawed feet, bushy tail, broad shoulders, hunched,
+A big broad-shouldered werewolf brute enemy for a bright fantasy game, standing upright on two legs in a neutral pose with both clawed arms held slightly away from the body, the whole body visible from head to feet. Brown fur with a cream chest, big pointed ears and a shaggy mane make a clear shape from above. Isolated on a solid black background.
+
+## 2. 짐승
+### 2-A. 늑대 (3:2)
+no humans, -3::1girl, 1boy, human, rider, saddle::, animal, wolf, monster, full body, standing, from side, side view, profile, all fours, four legs, {{black background, simple background}}, -2::running, jumping, dynamic pose, sitting, lying, multiple animals::,
+dark grey fur, pale grey belly, shaggy mane, scruffy fur, large paws, bushy tail, pointed ears, yellow eyes, glaring, sharp fangs, bared teeth, torn ear, scar on face, crimson rag tied around neck,
+A stocky wild wolf enemy for a bright fantasy game, seen exactly from the side standing on all four legs with its head level and its tail held out behind, all four legs visible and slightly apart, the whole body visible from nose to tail tip. Its shaggy neck mane and big paws give it a chunky, slightly cartoonish shape. Isolated on a solid black background.

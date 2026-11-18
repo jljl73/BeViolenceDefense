@@ -1,0 +1,5 @@
+0.45::artist:dolman (dm) ::, 0.54::artist:onono imoko ::, 0.18::artist:some1else45 ::, 0.36::artist:channel (caststation) ::, 0.72::artist:oharu-chan ::, 0.27::artist:bkub ::, year 2026, year 2025, year 2024, 1::no lineart ::, 0.75::flat color ::, 1::pastel (medium) ::, 0.75::toon (style) ::, 1::deformed ::, 1::white outline ::, high complexity,
+
+
+
+1.25::redrawn ::, -0.75::multiple views ::, -1::censored ::, -1::bad anatomy ::, -1::upscaled ::, -2::blurry ::, 1::highres ::, 1::absurdres ::, 1::best quality ::, 1::masterpiece ::, 0.75::very aesthetic ::, -1.5::multiple views ::, -2::artist collaboration ::

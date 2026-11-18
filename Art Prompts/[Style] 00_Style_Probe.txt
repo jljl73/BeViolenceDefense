@@ -1,0 +1,22 @@
+# [Style] 00 — 그림체 확인용 (NAI V5). 게임에 넣는 그림이 아니라 Base Prompts가 어떻게 나오는지 보는 시험 항목.
+# 생성: python -I ~/.claude/skills/nai-image/scripts/nai_gen.py 00:1-A --n 2 --out Tools/_nai_out
+# 스타일 단어는 여기 적지 않는다. 화풍은 [Base Prompts].txt가 정한다.
+
+---
+
+## 1. 캐릭터
+### 1-A. 초상 (상반신, 2:3)
+1girl, solo, upper body, looking at viewer, smile, standing,
+blonde hair, single braid, hair over shoulder, blue eyes, leather breastplate, blue tunic, red neck ribbon, brown leather gloves,
+A cheerful young fantasy guard captain shown from the waist up, facing the viewer with a confident smile. A bright sunset sky over a green valley and a small village is behind her.
+
+### 1-B. 전장 유닛 (전신, 1:1)
+1girl, solo, full body, standing, holding sword, holding shield, {{black background, simple background}},
+blonde hair, single braid, blue eyes, leather breastplate, blue tunic, red neck ribbon, brown boots,
+A small fantasy guard captain game unit seen slightly from above, standing ready with a short sword and a round wooden shield, isolated on a solid black background.
+
+## 2. 사물
+### 2-A. 방어탑 (1:1)
+no humans, -3::1girl, 1boy, human, character::, game asset, prop, {{black background, simple background}}, single object, centered, isolated,
+small stone watchtower, wooden ballista on top, blue banner, moss, wooden door,
+A small stout fantasy stone watchtower with a wooden ballista mounted on top and a blue banner, seen slightly from above, standing on an invisible flat ground line, isolated on a solid black background.
