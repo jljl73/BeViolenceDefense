@@ -1,0 +1,82 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
+using Object = UnityEngine.Object;
+
+// 임시 확인용(프로젝트 복사본에만 둔다): 선택 팝업의 두 번째 버튼(단풍)이 Stage2 지형을 불러오는지 Play Mode에서 본다.
+[InitializeOnLoad]
+public static class Stage2PlayValidation
+{
+    const string Key = "Stage2PlayValidation.Running";
+    const string Scene = "Assets/01_Scenes/02_Gameplay/GameScene.unity";
+    const string Folder = "<캡처 폴더>";
+    static int phase, frames;
+    static double start;
+    static StageSelectionController controller;
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static Stage2PlayValidation() { EditorApplication.update += Update; }
+    public static void Run() { EditorSceneManager.OpenScene(Scene); SessionState.SetBool(Key, true); EditorApplication.EnterPlaymode(); }
+    static object Field(object obj, string name) => obj.GetType().GetField(name, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(obj);
+    static void Check(bool value, string message) { if (!value) throw new Exception(message); }
+    static void Update()
+    {
+        if (!SessionState.GetBool(Key, false) || !EditorApplication.isPlaying || EditorApplication.isCompiling) return;
+        try
+        {
+            if (start == 0) start = EditorApplication.timeSinceStartup;
+            if (EditorApplication.timeSinceStartup - start > 120) throw new Exception("Stage2 play validation timed out.");
+            if (controller == null)
+            {
+                controller = Object.FindFirstObjectByType<StageSelectionController>(); if (controller == null) return;
+                game = Object.FindFirstObjectByType<VoxelDefensePrototype>(); frames = 0;
+            }
+            frames++;
+            if (phase == 0)
+            {
+                if (frames < 8) return;
+                var popup = (StageSelectionPopup)Field(controller, "popup"); var buttons = (Button[])Field(popup, "buttons");
+                var labels = (TMPro.TextMeshProUGUI[])Field(popup, "labels");
+                Debug.Log("STAGE2_BUTTON_LABEL " + labels[1].text);
+                buttons[1].onClick.Invoke();
+                phase = 1; frames = 0; return;
+            }
+            if (phase == 1)
+            {
+                if (frames < 8) return;
+                var content = controller.CurrentStage;
+                Check(content != null && controller.SelectedStage == 1, "Second button did not load a stage");
+                Check(AssetDatabase.GetAssetPath(content.Data) == "Assets/04_Data/04_Stages/Stage2.asset", "Wrong stage data: " + AssetDatabase.GetAssetPath(content.Data));
+                var grid = (DefenseGrid)Field(game, "grid");
+                Check(grid.Width == 17 && grid.Depth == 17 && grid.FixedWalls.Count == 71, "Wrong terrain " + grid.FixedWalls.Count);
+                Check(grid.Routes.All(r => r.Length - 2 == 20), "Wrong routes");
+                battle = (DefenseBattle)Field(game, "battle"); Check(battle.CurrentPhase == DefenseBattle.Phase.Preparation, "Not in preparation");
+                Capture(content.BoardCamera, "stage2-maple.png");
+                typeof(VoxelDefensePrototype).GetMethod("StartBattle", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(game, null);
+                phase = 2; return;
+            }
+            if (phase == 2)
+            {
+                if (battle.TickIndex < 600) return;
+                Check(battle.Enemies.Count > 0, "No enemies spawned");
+                Capture(controller.CurrentStage.BoardCamera, "stage2-maple-battle.png");
+                Debug.Log($"STAGE2_PLAY_PASS stage={controller.CurrentStage.name} walls={((DefenseGrid)Field(game, "grid")).FixedWalls.Count} ticks={battle.TickIndex} units={battle.Enemies.Count}");
+                SessionState.SetBool(Key, false); EditorApplication.Exit(0);
+            }
+        }
+        catch (Exception e) { Debug.LogException(e); SessionState.SetBool(Key, false); EditorApplication.Exit(1); }
+    }
+    static void Capture(Camera camera, string name)
+    {
+        var rt = new RenderTexture(1280, 720, 24); var previous = camera.targetTexture; var active = RenderTexture.active;
+        camera.targetTexture = rt; camera.Render(); RenderTexture.active = rt;
+        var image = new Texture2D(1280, 720, TextureFormat.RGB24, false); image.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0); image.Apply();
+        File.WriteAllBytes(Folder + "/" + name, image.EncodeToPNG());
+        camera.targetTexture = previous; RenderTexture.active = active; Object.Destroy(image); rt.Release(); Object.Destroy(rt);
+    }
+}

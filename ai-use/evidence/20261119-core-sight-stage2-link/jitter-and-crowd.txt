@@ -1,0 +1,18 @@
+떨림 계측 합계 (24개 전투, Unity 밖 빌드)
+scenario               ticks fin core | engaged sees-noatk  noTgt  queue  appr inRngIdle | rev rapid hflip switch wiggle | atk  minClr cross
+고치기 전:
+TOTAL                  58561     2800 |  1791.1    1432.7   15.7  964.6 452.4      7.0 | 306    40   322    167  331.4 | 2382
+코어 시야만 고친 것(채택):
+TOTAL                  59109     2798 |  1780.3    1444.2   15.1  961.0 468.1      8.5 | 331    49   347    185  342.7 | 2373
+코어 시야 + 임의 타격 지점 탐색 대기 분리(미채택):
+TOTAL                  57196     2801 |  1767.3    1391.5   13.4  924.6 453.4      8.0 | 376    90   398    179  349.8 | 2363
+
+밀집 전투 (고친 뒤)
+crowd9 walls=False ticks 2023 fin True core 118 engaged 68.3 rev 11 switch 13 atk 108 minClr 0.000
+crowd9 walls=True ticks 2782 fin True core 110 engaged 34.4 rev 45 switch 5 atk 57 minClr 0.000
+crowd20 walls=False ticks 3715 fin True core 113 engaged 132.1 rev 47 switch 22 atk 211 minClr 0.000
+crowd20 walls=True ticks 4394 fin True core 106 engaged 106.8 rev 68 switch 14 atk 171 minClr 0.000
+crowd40 walls=False ticks 6362 fin True core 107 engaged 270.3 rev 83 switch 39 atk 420 minClr 0.000
+crowd40 walls=True ticks 8799 fin True core 98 engaged 221.6 rev 106 switch 17 atk 352 minClr 0.000
+crowd60 walls=False ticks 8530 fin True core 100 engaged 398.0 rev 121 switch 54 atk 619 minClr 0.000
+crowd60 walls=True ticks 12591 fin True core 92 engaged 351.1 rev 169 switch 40 atk 561 minClr 0.000

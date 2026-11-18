@@ -1,0 +1,5 @@
+수정 전 전투 소스(커밋 e49e0a8의 DefenseBattle·DefenseGrid·EnemyUnit·CombatPositioning·BattleClock) + 현재 테스트, Unity 밖 빌드
+FAIL CombatPositioningTests.CoreBlocksDetectionAndAttacksLikeAWall(): AssertionException The core must hide units on its far side. |   Expected: not same as <EnemyUnit> |   But was:  <EnemyUnit>
+FAIL CombatPositioningTests.ShootersOnOppositeFacesOfTheCoreWalkInInsteadOfWaitingOnEachOther(): AssertionException Seeing each other through the core held both columns for good. |   Expected: True |   But was:  False
+FAIL CombatPositioningTests.CrowdArrivingOnBothSidesOfTheCoreFinishes(): AssertionException Shooters waiting on each other across the core held the whole column. |   Expected: True |   But was:  False
+pass 61 fail 3

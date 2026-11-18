@@ -857,4 +857,111 @@ public sealed class CombatPositioningTests
         if (steps)
             Assert.That(destination.x, Is.LessThan(idle.Position.x), "It gives way on the side away from the neighbor.");
     }
+
+    // Rows from z = 16 down to z = 0. '#' is a fixed wall.
+    private static DefenseGrid MapGrid(Vector2Int[] spawns, params string[] rows)
+    {
+        var walls = new List<Vector2Int>();
+        for (int i = 0; i < rows.Length; i++)
+            for (int x = 0; x < rows[i].Length; x++)
+                if (rows[i][x] == '#') walls.Add(new Vector2Int(x, rows.Length - 1 - i));
+        return new DefenseGrid(17, 17, new RectInt(7, 14, 3, 3), spawns, new[] { 0, 1 }, walls);
+    }
+
+    private static EnemyFaction Kind(string name, int health, int damage, float interval, float speed, float radius,
+        bool shooter = false) =>
+        new(name, Color.white, attackRange: shooter ? 3f : 1.5f, maxHealth: health, damage: damage, attackInterval: interval,
+            spawnCount: 0, awarenessRange: shooter ? 4.3f : 3f, moveSpeed: speed, bodyRadius: radius);
+
+    private static IReadOnlyList<EnemyFaction>[] Lineup(params (EnemyFaction Unit, int Count)[][] sides) => sides
+        .Select(side => (IReadOnlyList<EnemyFaction>)side.SelectMany(e => Enumerable.Repeat(e.Unit, e.Count)).ToList())
+        .ToArray();
+
+    private static (bool Finished, int Attacks, int ReachedCore, int Spawned) RunToEnd(DefenseGrid grid,
+        IReadOnlyList<EnemyFaction>[] lineup, int tickLimit)
+    {
+        var battle = new DefenseBattle(grid, new[] { new EnemyFaction("A", Color.white), new EnemyFaction("B", Color.white) },
+            _ => lineup);
+        var all = new List<EnemyUnit>();
+        battle.EnemySpawned += all.Add;
+        battle.StartRound();
+        while (battle.CurrentPhase == DefenseBattle.Phase.Combat && battle.TickIndex < tickLimit)
+            battle.Tick(DefenseBattle.TickDuration, false);
+        return (battle.CurrentPhase != DefenseBattle.Phase.Combat, all.Sum(e => e.AttacksPerformed),
+            all.Count(e => e.ReachedCore), all.Count);
+    }
+
+    [Test]
+    public void CoreBlocksDetectionAndAttacksLikeAWall()
+    {
+        // OpenGrid's core covers x 7.5..9.5, z 14.5..16.5.
+        var left = Unit(0, 0, 6.8f, 15.5f, 4);
+        var right = Unit(1, 1, 10.2f, 15.5f, 4);
+        var below = Unit(1, 2, 6.8f, 13.2f, 4);
+        var grid = OpenGrid();
+        var combat = new CombatPositioning(grid, new[] { left, right, below });
+        combat.Plan();
+        Assert.That(right.Target, Is.Not.SameAs(left), "The core must hide units on its far side.");
+        Assert.That(combat.CanAttack(left, right), Is.False, "Shots do not pass through the core.");
+        Assert.That(left.Target, Is.SameAs(below), "Units on the same side of the core still see each other.");
+        Assert.That(grid.HasLineOfSight(new Vector3(7.2f, 0, 14.2f), new Vector3(9.8f, 0, 14.2f)), Is.True,
+            "A line along a face of the core is open.");
+    }
+
+    [Test]
+    public void ShootersOnOppositeFacesOfTheCoreWalkInInsteadOfWaitingOnEachOther()
+    {
+        // Two one-tile lanes that end on opposite faces of the core and meet only along the bottom
+        // row. The leaders stand within awareness of each other with the core in between; the only
+        // way round is through their own column, and nowhere in a lane is close enough to shoot from.
+        var grid = MapGrid(new[] { new Vector2Int(4, 2), new Vector2Int(12, 2) },
+            "#######...#######",
+            "###...........###",
+            "####.##...##.####",
+            "####.#######.####", "####.#######.####", "####.#######.####", "####.#######.####",
+            "####.#######.####", "####.#######.####", "####.#######.####", "####.#######.####",
+            "####.#######.####", "####.#######.####", "####.#######.####", "####.#######.####",
+            "####.#######.####",
+            "####.........####");
+        Assert.That(grid.Routes, Is.Not.Null);
+        var shooter = Kind("shooter", 55, 8, 0.8f, 1.7f, 0.3f, shooter: true);
+        var result = RunToEnd(grid, Lineup(new[] { (shooter, 3) }, new[] { (shooter, 3) }), 60 * 60);
+        Assert.That(result.Finished, Is.True, "Seeing each other through the core held both columns for good.");
+        Assert.That(result.ReachedCore, Is.EqualTo(result.Spawned));
+        Assert.That(result.Attacks, Is.Zero);
+    }
+
+    [Test]
+    public void CrowdArrivingOnBothSidesOfTheCoreFinishes()
+    {
+        // Side lanes that reach the core from the left and the right, joined by a one-tile band below it.
+        var grid = MapGrid(new[] { new Vector2Int(2, 2), new Vector2Int(14, 2) },
+            ".................", ".................", ".................",
+            ".....#.....#.....",
+            "###.#########.###",
+            "....#.......#....",
+            "##.....###.....##",
+            "....#.......#....",
+            "..######.######..",
+            "....#.......#....",
+            "##...#.###.#...##",
+            "....#.......#....",
+            "..######.######..",
+            "....#.......#....",
+            "....#.......#....",
+            ".......###.......",
+            "....#.......#....");
+        var result = RunToEnd(grid, Lineup(
+            new[]
+            {
+                (Kind("orc", 210, 22, 1.1f, 1.5f, 0.4f), 3), (Kind("grunt", 75, 10, 0.65f, 1.7f, 0.34f), 8),
+                (Kind("slinger", 55, 8, 0.8f, 1.7f, 0.28f * 1.2f, shooter: true), 4)
+            },
+            new[]
+            {
+                (Kind("skeleton", 70, 12, 0.8f, 1.6f, 0.22f * 1.3f), 8), (Kind("necromancer", 60, 8, 1.2f, 1.4f, 0.29f, shooter: true), 1),
+                (Kind("archer", 55, 10, 1f, 1.6f, 0.3f, shooter: true), 4), (Kind("zombie", 135, 15, 1f, 1.2f, 0.24f * 1.3f), 3)
+            }), 120 * 60);
+        Assert.That(result.Finished, Is.True, "Shooters waiting on each other across the core held the whole column.");
+    }
 }

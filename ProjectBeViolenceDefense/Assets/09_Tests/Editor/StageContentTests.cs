@@ -32,10 +32,10 @@ public sealed class StageContentTests
     }
 
     [Test]
-    public void ThemedStagesPreserveTheirPreviousDefaultTerrain()
+    public void SnowfieldAndGraveyardPreserveTheirPreviousDefaultTerrain()
     {
         var original = new DefenseGrid();
-        foreach (string name in Names.Skip(1))
+        foreach (string name in Names.Skip(2))
         {
             var stage = Load(name);
             var grid = stage.Data.CreateGrid();
@@ -48,6 +48,25 @@ public sealed class StageContentTests
             CollectionAssert.AreEquivalent(original.FixedWalls, grid.FixedWalls);
             Assert.That(stage.Data.waves, Is.Null, "Migration must not invent a wave lineup.");
         }
+    }
+
+    [Test]
+    public void GoldenMapleLoadsTheStage2LayoutOnTheFrameItsSceneryWasBuiltFor()
+    {
+        var original = new DefenseGrid();
+        var stage = Load("GoldenMaple");
+        Assert.That(AssetDatabase.GetAssetPath(stage.Data), Is.EqualTo("Assets/04_Data/04_Stages/Stage2.asset"));
+        var grid = stage.Data.CreateGrid();
+        Assert.That(grid.Width, Is.EqualTo(original.Width));
+        Assert.That(grid.Depth, Is.EqualTo(original.Depth));
+        Assert.That(grid.CorePosition, Is.EqualTo(original.CorePosition));
+        Assert.That(grid.CoreSize, Is.EqualTo(original.CoreSize));
+        CollectionAssert.AreEqual(original.SpawnCells, grid.SpawnCells);
+        CollectionAssert.AreEqual(original.SpawnFactions, grid.SpawnFactions);
+        Assert.That(grid.FixedWalls.Count, Is.EqualTo(71));
+        // Without player walls each side keeps to its own lane, 20 tiles to the core.
+        Assert.That(grid.Routes.Select(route => route.Length - 2), Is.EqualTo(new[] { 20, 20 }));
+        Assert.That(stage.Data.waves, Is.Null, "The layout draft comes without a wave lineup.");
     }
 
     [Test]

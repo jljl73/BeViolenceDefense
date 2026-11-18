@@ -16,11 +16,11 @@
 | 버튼 | 프리팹 | 지형 데이터 | 이관 원본 |
 | --- | --- | --- | --- |
 | 기본 전장 | Assets/03_Prefabs/05_Stages/Stage_Default.prefab | 기존 GameScene의 StageData 참조 유지, 25×25 | GameScene |
-| 단풍 | Assets/03_Prefabs/05_Stages/Stage_GoldenMaple.prefab | Assets/04_Data/04_Stages/Stage_GoldenMaple.asset, 17×17 | Stage_GoldenMaple |
+| 단풍 | Assets/03_Prefabs/05_Stages/Stage_GoldenMaple.prefab | Assets/04_Data/04_Stages/Stage2.asset, 17×17 ([2스테이지 길 구조 시안](level-stage2.md)) | Stage_GoldenMaple |
 | 설원 | Assets/03_Prefabs/05_Stages/Stage_Snowfield.prefab | Assets/04_Data/04_Stages/Stage_Snowfield.asset, 17×17 | Stage_Snowfield |
 | 묘지 | Assets/03_Prefabs/05_Stages/Stage_Graveyard.prefab | Assets/04_Data/04_Stages/Stage_Graveyard.asset, 17×17 | Stage_Graveyard |
 
-테마 씬3개는 원래 StageData가 비어 있어 기본 지형을 사용했다. 같은 크기·코어·스폰·장애물 구성을 명시적인 StageData로 옮겼다. 웨이브 에셋은 원래처럼 비어 있으며 기존 무한 증원 규칙을 유지한다. 신규 웨이브나 난이도는 추가하지 않았다. 공통 HUD는 GameScene을 기준으로 통일했다.
+테마 씬3개는 원래 StageData가 비어 있어 기본 지형을 사용했다. 같은 크기·코어·스폰·장애물 구성을 명시적인 StageData로 옮겼다. 이후 단풍은 같은 크기·코어·스폰을 쓰는 `Stage2.asset`으로 바꿔 연결했고, 기본 지형을 담은 `Stage_GoldenMaple.asset`은 참조 없이 남겨 두었다. 웨이브 에셋은 원래처럼 비어 있으며 기존 무한 증원 규칙을 유지한다. 신규 웨이브나 난이도는 추가하지 않았다. 공통 HUD는 GameScene을 기준으로 통일했다.
 
 원본 `03_Test` 씬들은 비교/테스트용으로 보존했다. 실제 게임 진입과 스테이지 선택은 이 씬들을 로드하지 않는다. `TestScene`과 `GameScene_LeftCoreHud`는 선택 목록에 넣지 않았다.
 

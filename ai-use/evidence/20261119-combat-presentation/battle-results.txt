@@ -1,0 +1,3 @@
+COMBAT_IMPACT_BATTLE_PASS phase=Preparation ticks=2384 deaths=8 peakCorpses=2 recoilFrames=5807 captures=28
+Unity 6000.3.28f1: related C# compilation passed.
+Observed editor startup warning: UnityEditor.Search.SearchDatabase ArgumentOutOfRangeException (no game presentation stack).

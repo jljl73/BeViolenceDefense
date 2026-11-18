@@ -1,0 +1,117 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using Object=UnityEngine.Object;
+[InitializeOnLoad]
+public static class CombatPresentationValidation
+{
+    const string Key="CombatPresentationValidation.Running";
+    const string Folder="/tmp/combat-presentation-captures";
+    static DefenseBoardView view;
+    static VoxelDefensePrototype game;
+    static EnemyCatalog catalog;
+    static Camera camera;
+    static EnemyUnit attacker,target;
+    static Transform reaction,targetRoot;
+    static int frame,phase,sounds;
+    static Vector3 targetPosition;
+    static int targetHealth;
+    static double start;
+    static CombatPresentationValidation(){EditorApplication.update+=Update;}
+    public static void Run(){EditorSceneManager.OpenScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");SessionState.SetBool(Key,true);EditorApplication.EnterPlaymode();}
+    static object Get(object obj,string field)=>obj.GetType().GetField(field,BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public).GetValue(obj);
+    static IList Deaths=>(IList)Get(view,"deathViews");
+    static IDictionary Living=>(IDictionary)Get(view,"enemyViews");
+    static void Check(bool valid,string text){if(!valid)throw new Exception(text);}
+    static EnemyUnit Unit(string id,int side,Vector3 p,int order)=>new(catalog.GetUnit(id,side==0?new Color(1,.45f,.34f):new Color(.27f,.87f,.81f),"presentation validation"),side,new[]{p,p+Vector3.forward*2},order);
+    static void Update()
+    {
+        if(!SessionState.GetBool(Key,false)||!EditorApplication.isPlaying||EditorApplication.isCompiling)return;
+        try
+        {
+            if(start==0)start=EditorApplication.timeSinceStartup;
+            Check(EditorApplication.timeSinceStartup-start<120,"Presentation validation timeout");
+            if(view==null)
+            {
+                var selection=Object.FindFirstObjectByType<StageSelectionController>();
+                if(selection==null)return;
+                if(selection.CurrentStage==null){selection.SelectStage(0);return;}
+                game=Object.FindFirstObjectByType<VoxelDefensePrototype>();
+                if(game==null||Get(game,"view")==null)return;
+                catalog=(EnemyCatalog)Get(game,"enemyCatalog");camera=selection.CurrentStage.BoardCamera;
+                game.gameObject.SetActive(false);
+                var root=new GameObject("Combat Presentation Validation").transform;
+                var grid=new DefenseGrid(11,11,new RectInt(4,9,3,2),new[]{new Vector2Int(1,1),new Vector2Int(9,1)},new[]{0,1},null);
+                var factions=new[]{catalog.GetUnit("goblin-grunt-1500",Color.red,"validation"),catalog.GetUnit("zombie",Color.cyan,"validation")};
+                view=new DefenseBoardView(root,camera,(Shader)Get(game,"voxelShader"),grid,factions,(Sprite)Get(game,"routeChevron"),(BoardTheme)Get(game,"boardTheme"),catalog,null,()=>sounds++);
+                attacker=Unit("goblin-grunt-1500",0,new Vector3(4,0,4),0);target=Unit("zombie",1,new Vector3(6,0,4),1);
+                attacker.Face(target.Position);target.Face(attacker.Position);
+                view.AddEnemy(attacker);view.AddEnemy(target);
+                var targetView=Living[target];reaction=(Transform)Get(targetView,"Body");targetRoot=(Transform)Get(targetView,"Root");
+                targetPosition=target.Position;targetHealth=target.Health;
+                Directory.CreateDirectory(Folder);
+                Capture("before.png");
+                attacker.Attack(target);view.SyncEnemy(attacker,.016f,0f);
+                var animator=(Animator)Get(Living[attacker],"Animator");animator.Play(Animator.StringToHash("Base Layer.Attack"),0,.5f);animator.Update(0f);view.SyncEnemy(attacker,0f,0f);
+                Check(sounds==1,"Real impact did not play one hit sound");
+                Check(reaction.localPosition.sqrMagnitude>0,"No visual recoil at impact");
+                Check(target.Position==targetPosition&&target.Health==targetHealth&&targetRoot.localPosition==targetPosition,"Presentation changed simulation/root position");
+                Check((float)Get(targetView,"HitRemaining")>0,"No impact flash");
+                var recoil=reaction.localPosition;view.AdvanceEffects(0f);Check(reaction.localPosition==recoil,"Pause advanced recoil");
+                Capture("impact.png");
+                phase=1;frame=0;return;
+            }
+            if(phase==1)
+            {
+                view.AdvanceEffects(1f/30f);Capture($"hit-{frame:D2}.png");
+                if(++frame<8)return;
+                Check(reaction.localPosition==Vector3.zero&&Quaternion.Angle(reaction.localRotation,Quaternion.identity)<.01f,"Recoil did not reset");
+                Check(target.Position==targetPosition&&target.Health==targetHealth,"Feedback changed simulation state");
+                Debug.Log("COMBAT_HIT_PASS impact callback, model-only recoil/flash, delta-zero pause and restore");
+                attacker.Die();target.Die();view.RemoveEnemy(attacker,DefenseBattle.CoreMaxHealth);view.RemoveEnemy(target,DefenseBattle.CoreMaxHealth);
+                Check(Living.Count==0&&Deaths.Count==2,"Dead models were deleted immediately or stayed in living views");
+                Check(!(bool)Get(Deaths[0],"Animated")&&(bool)Get(Deaths[1],"Animated"),"Fallback/Death animation detection failed");
+                float age=(float)Get(Deaths[1],"Age");view.AdvanceEffects(0);Check((float)Get(Deaths[1],"Age")==age,"Paused death advanced");
+                phase=2;frame=0;return;
+            }
+            if(phase==2)
+            {
+                view.AdvanceEffects(1f/30f);Capture($"death-{frame:D2}.png");
+                if(++frame<58)return;
+                Check(Deaths.Count==0,"Death models did not retire");
+                var entries=new SerializedObject(catalog).FindProperty("entries");int animated=0,fallback=0;
+                for(int i=0;i<entries.arraySize;i++)
+                {
+                    string id=entries.GetArrayElementAtIndex(i).FindPropertyRelative("id").stringValue;
+                    var unit=Unit(id,i%2,new Vector3(3+i%6,0,2+i/6),i+2);view.AddEnemy(unit);unit.Die();view.RemoveEnemy(unit,DefenseBattle.CoreMaxHealth);
+                    var dead=Deaths[Deaths.Count-1];bool hasDeath=(bool)Get(dead,"Animated");
+                    if(hasDeath)animated++;else fallback++;
+                    Check(!Living.Contains(unit),"Corpse stayed in targetable views");
+                    Debug.Log($"DEATH_CATALOG id={id} animated={hasDeath} duration={(float)Get(dead,"Duration"):0.000}");
+                }
+                view.AdvanceEffects(2f);Check(Deaths.Count==0,"Catalog deaths leaked");
+                // Burst deaths remain bounded even before time advances.
+                for(int i=0;i<45;i++){var unit=Unit("goblin-grunt-1500",0,new Vector3(3,0,3),100+i);view.AddEnemy(unit);unit.Die();view.RemoveEnemy(unit,DefenseBattle.CoreMaxHealth);}
+                Check(Deaths.Count==40,"Death visual cap failed");view.AdvanceEffects(2f);Check(Deaths.Count==0,"Bounded deaths did not clean up");
+                var coreUnit=Unit("zombie",1,new Vector3(5,0,6),200);view.AddEnemy(coreUnit);coreUnit.MoveOffRoute(new Vector3(5,0,8));view.RemoveEnemy(coreUnit,DefenseBattle.CoreMaxHealth-1);
+                Check(Deaths.Count==0&&((IList)Get(view,"coreStrikes")).Count==1,"Core arrival used combat death");view.AdvanceEffects(1f);Check(view.PendingCoreDamage==0,"Core damage animation did not finish");
+                Debug.Log($"COMBAT_DEATH_PASS animated={animated} fallback={fallback}; battle-clock sampling, cleanup, 40-view cap and core-arrival separation passed");
+                phase=3;return;
+            }
+            Check(Deaths.Count==0&&Living.Count==0,"Presentation did not clean up");
+            Debug.Log("COMBAT_PRESENTATION_PLAY_PASS");view.ReleaseMaterials();SessionState.SetBool(Key,false);EditorApplication.Exit(0);
+        }
+        catch(Exception e){Debug.LogException(e);SessionState.SetBool(Key,false);EditorApplication.Exit(1);}
+    }
+    static void Capture(string name)
+    {
+        camera.transform.position=new Vector3(5,0,4)-camera.transform.forward*20;camera.orthographicSize=2.1f;
+        var rt=new RenderTexture(960,640,24);var old=camera.targetTexture;var active=RenderTexture.active;camera.targetTexture=rt;camera.Render();RenderTexture.active=rt;
+        var texture=new Texture2D(960,640,TextureFormat.RGB24,false);texture.ReadPixels(new Rect(0,0,960,640),0,0);texture.Apply();File.WriteAllBytes(Folder+"/"+name,texture.EncodeToPNG());
+        camera.targetTexture=old;RenderTexture.active=active;Object.Destroy(texture);rt.Release();Object.Destroy(rt);
+    }
+}

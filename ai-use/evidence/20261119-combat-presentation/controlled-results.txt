@@ -1,0 +1,19 @@
+COMBAT_HIT_PASS impact callback, model-only recoil/flash, delta-zero pause and restore
+DEATH_CATALOG id=goblin-grunt-1500 animated=False duration=0.480
+DEATH_CATALOG id=zombie animated=True duration=1.250
+DEATH_CATALOG id=bat animated=True duration=1.250
+DEATH_CATALOG id=demon animated=True duration=1.250
+DEATH_CATALOG id=goblin-slinger animated=True duration=1.250
+DEATH_CATALOG id=hatchling animated=True duration=1.250
+DEATH_CATALOG id=living-armor animated=True duration=1.250
+DEATH_CATALOG id=necromancer animated=True duration=1.250
+DEATH_CATALOG id=orc animated=True duration=1.250
+DEATH_CATALOG id=reaper animated=True duration=1.250
+DEATH_CATALOG id=skeleton-archer animated=True duration=1.250
+DEATH_CATALOG id=wyvern animated=True duration=1.250
+DEATH_CATALOG id=skeleton animated=True duration=1.250
+DEATH_CATALOG id=werewolf animated=True duration=1.250
+DEATH_CATALOG id=wolf animated=True duration=1.250
+DEATH_CATALOG id=goblin-grunt animated=False duration=0.480
+COMBAT_DEATH_PASS animated=14 fallback=2; battle-clock sampling, cleanup, 40-view cap and core-arrival separation passed
+COMBAT_PRESENTATION_PLAY_PASS

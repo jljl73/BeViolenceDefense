@@ -45,6 +45,11 @@ internal sealed class DefenseBoardView
     private const float HitHeight = 0.5f;
     private const float HitForwardOffset = 0.2f;
     private const int MaxHitEffects = 24;
+    private const float HitReactionDuration = 0.16f;
+    private const float HitReactionCooldown = 0.2f;
+    private const float DeathHoldDuration = 0.12f;
+    private const float DeathFadeDuration = 0.3f;
+    private const int MaxDeathViews = 40;
     private const float CoreStrikeWindup = 0.24f;
     private const float CoreStrikeFadeDuration = 0.25f;
     private const float CoreStrikeFlashScale = 1.50f;
@@ -70,6 +75,7 @@ internal sealed class DefenseBoardView
     private static readonly int CoreHitState = Animator.StringToHash("Base Layer.Hit");
     private static readonly int RunState = Animator.StringToHash("Base Layer.Run");
     private static readonly int AttackState = Animator.StringToHash("Base Layer.Attack");
+    private static readonly int DeathState = Animator.StringToHash("Base Layer.Death");
 
     public static readonly Color32 CoreColor = new(255, 209, 112, 255);
     private static readonly Color CoreDamageColor = new Color32(255, 58, 66, 255);
@@ -78,6 +84,12 @@ internal sealed class DefenseBoardView
     private sealed class EnemyView
     {
         public Transform Root;
+        public Transform Body;
+        public Vector3 BodyScale;
+        public Vector3 HitDirection;
+        public float HitRemaining;
+        public float HitCooldown;
+        public float HitStrength;
         public Transform Head;
         public Renderer[] Renderers;
         public Renderer FactionRing;
@@ -114,6 +126,17 @@ internal sealed class DefenseBoardView
             Distance = distance;
             Color = color;
         }
+    }
+
+    private sealed class DeathView
+    {
+        public EnemyView View;
+        public Vector3 Position;
+        public Vector3 Scale;
+        public float Duration;
+        public float Age;
+        public bool Animated;
+        public bool Fading;
     }
 
     private sealed class CoreStrike
@@ -159,6 +182,7 @@ internal sealed class DefenseBoardView
     private readonly Dictionary<EnemyUnit, EnemyView> enemyViews = new();
     private readonly List<HitEffect> hitEffects = new();
     private readonly List<CoreStrike> coreStrikes = new();
+    private readonly List<DeathView> deathViews = new();
     private readonly Dictionary<Material, Material> fadeMaterials = new();
     private readonly SpellEffects spellEffects;
     private readonly MaterialPropertyBlock tintBlock = new();
@@ -1466,13 +1490,16 @@ internal sealed class DefenseBoardView
         Color flashTint = view.SpellFlashColor * SpellBodyFlashBrightness;
         foreach (var (renderer, slot, baseColor) in view.TintSlots)
         {
-            if (flashStrength == 0f)
+            float hitStrength = Mathf.Clamp01(view.HitRemaining / HitReactionDuration);
+            hitStrength *= hitStrength;
+            if (flashStrength == 0f && hitStrength == 0f)
             {
                 renderer.SetPropertyBlock(null, slot);
                 continue;
             }
 
             Color tint = Color.Lerp(baseColor, flashTint, flashStrength);
+            tint = Color.Lerp(tint, Color.white * 1.65f, hitStrength * 0.8f);
             tint.a = baseColor.a;
             tintBlock.SetColor(BaseColor, tint);
             renderer.SetPropertyBlock(tintBlock, slot);
@@ -1571,12 +1598,14 @@ internal sealed class DefenseBoardView
         Transform model = new GameObject($"{enemy.Faction.DisplayName} enemy").transform;
         model.SetParent(root, false);
         model.localPosition = enemy.Position;
+        Transform body = new GameObject("Body Reaction").transform;
+        body.SetParent(model, false);
         EnemyView view;
         EnemyCatalog.UnitVisual look = default;
         GameObject prefab = catalog != null && catalog.TryGetVisual(enemy.Faction.UnitId, out look) ? look.Model : null;
         if (prefab != null)
         {
-            GameObject visual = Object.Instantiate(prefab, model);
+            GameObject visual = Object.Instantiate(prefab, body);
             ApplyUnitVisual(visual, look);
 
             view = new EnemyView
@@ -1603,8 +1632,11 @@ internal sealed class DefenseBoardView
         }
         else
         {
-            view = CreateBlockEnemy(model, material, enemy.FactionIndex);
+            view = CreateBlockEnemy(body, material, enemy.FactionIndex);
         }
+        view.Root = model;
+        view.Body = body;
+        view.BodyScale = body.localScale;
         view.TintSlots = CollectTintSlots(view.Renderers);
         view.BaseScale = model.localScale;
         enemyViews.Add(enemy, view);
@@ -1705,13 +1737,87 @@ internal sealed class DefenseBoardView
             BeginCoreStrike(enemy, view, coreDamage);
             return;
         }
-        Object.Destroy(view.Root.gameObject);
+        BeginDeath(view);
+    }
+
+    private void BeginDeath(EnemyView view)
+    {
+        SetEnemyPreviewMaterial(view, null);
+        view.SpellFlashRemaining = 0f;
+        view.HitRemaining = 0f;
+        ApplyEnemyTint(view);
+        ResetBodyReaction(view);
+        if (view.FactionRing != null)
+            view.FactionRing.enabled = false;
+
+        bool animated = view.Animator != null && view.Animator.HasState(0, DeathState);
+        float duration = 0.48f;
+        if (view.Animator != null)
+        {
+            view.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            view.Animator.speed = 0f;
+            if (animated)
+            {
+                view.Animator.Play(DeathState, 0, 0f);
+                view.Animator.Update(0f);
+                duration = Mathf.Clamp(view.Animator.GetCurrentAnimatorStateInfo(0).length, 0.6f, 1.25f);
+            }
+        }
+        // Only presentation survives removal; it no longer occupies a combat slot or receives input.
+        if (deathViews.Count >= MaxDeathViews)
+        {
+            Object.Destroy(deathViews[0].View.Root.gameObject);
+            deathViews.RemoveAt(0);
+        }
+        deathViews.Add(new DeathView
+        {
+            View = view, Position = view.Root.localPosition,
+            Scale = view.Root.localScale, Duration = duration, Animated = animated
+        });
+    }
+
+    private void AdvanceDeaths(float deltaTime)
+    {
+        for (int i = deathViews.Count - 1; i >= 0; i--)
+        {
+            DeathView death = deathViews[i];
+            death.Age += deltaTime;
+            float pose = Mathf.Clamp01(death.Age / death.Duration);
+            if (death.Animated)
+            {
+                // Explicit sampling prevents Animator time from bypassing BattleClock pause/slow motion.
+                death.View.Animator.Play(DeathState, 0, Mathf.Min(pose, 0.999f));
+                death.View.Animator.Update(0f);
+            }
+            else
+            {
+                death.View.Body.localRotation = Quaternion.Euler(-82f * Mathf.SmoothStep(0f, 1f, pose), 0f, 10f * pose);
+            }
+            float fade = Mathf.Clamp01((death.Age - death.Duration - DeathHoldDuration) / DeathFadeDuration);
+            if (fade <= 0f)
+                continue;
+            if (!death.Fading)
+            {
+                PrepareEnemyFade(death.View);
+                death.Fading = true;
+            }
+            SetEnemyOpacity(death.View, 1f - fade);
+            death.View.Root.localPosition = death.Position + Vector3.down * (0.18f * fade);
+            // Also retire models whose shader does not support transparency.
+            death.View.Root.localScale = death.Scale * (1f - fade * fade);
+            if (fade < 1f)
+                continue;
+            Object.Destroy(death.View.Root.gameObject);
+            deathViews.RemoveAt(i);
+        }
     }
 
     private void BeginCoreStrike(EnemyUnit enemy, EnemyView view, int coreDamage)
     {
         SetEnemyPreviewMaterial(view, null);
         view.SpellFlashRemaining = 0f;
+        view.HitRemaining = 0f;
+        ResetBodyReaction(view);
         ApplyEnemyTint(view);
 
         Vector3 heading = enemy.Heading.normalized;
@@ -1762,14 +1868,14 @@ internal sealed class DefenseBoardView
                 coreImpacted = true;
                 NextHitEffect().Play(root.TransformPoint(strike.Impact), CoreDamageColor, CoreStrikeFlashScale,
                     colorEmphasis: 0.85f);
-                PrepareCoreStrikeFade(strike.View);
+                PrepareEnemyFade(strike.View);
             }
             if (!strike.HasHit)
                 continue;
 
             if (fadeProgress < 1f)
             {
-                SetCoreStrikeOpacity(strike.View, 1f - Mathf.SmoothStep(0f, 1f, fadeProgress));
+                SetEnemyOpacity(strike.View, 1f - Mathf.SmoothStep(0f, 1f, fadeProgress));
                 continue;
             }
 
@@ -1805,7 +1911,7 @@ internal sealed class DefenseBoardView
         }
     }
 
-    private void PrepareCoreStrikeFade(EnemyView view)
+    private void PrepareEnemyFade(EnemyView view)
     {
         if (view.FactionRing != null)
             view.FactionRing.enabled = false;
@@ -1840,7 +1946,7 @@ internal sealed class DefenseBoardView
         }
     }
 
-    private void SetCoreStrikeOpacity(EnemyView view, float opacity)
+    private void SetEnemyOpacity(EnemyView view, float opacity)
     {
         foreach (var (renderer, slot, baseColor) in view.TintSlots)
         {
@@ -1866,14 +1972,47 @@ internal sealed class DefenseBoardView
             ApplyCoreFlash();
         }
         AdvanceCoreStrikes(deltaTime);
+        AdvanceDeaths(deltaTime);
         foreach (EnemyView view in enemyViews.Values)
         {
-            if (view.SpellFlashRemaining <= 0f)
+            view.HitCooldown = Mathf.Max(0f, view.HitCooldown - deltaTime);
+            if (view.SpellFlashRemaining <= 0f && view.HitRemaining <= 0f)
                 continue;
-
             view.SpellFlashRemaining = Mathf.Max(0f, view.SpellFlashRemaining - deltaTime);
+            view.HitRemaining = Mathf.Max(0f, view.HitRemaining - deltaTime);
             ApplyEnemyTint(view);
+            ApplyBodyReaction(view);
         }
+    }
+
+    private void ReactToHit(EnemyUnit target, Vector3 direction, bool boosted, bool armored)
+    {
+        if (!enemyViews.TryGetValue(target, out EnemyView view) || view.HitCooldown > 0f)
+            return;
+        view.HitDirection = direction.sqrMagnitude > 0.0001f ? direction.normalized : -target.Heading;
+        view.HitStrength = armored ? 0.55f : boosted ? 1.2f : 1f;
+        view.HitRemaining = HitReactionDuration;
+        view.HitCooldown = HitReactionCooldown;
+        ApplyEnemyTint(view);
+        ApplyBodyReaction(view);
+    }
+
+    private static void ResetBodyReaction(EnemyView view)
+    {
+        view.Body.localPosition = Vector3.zero;
+        view.Body.localRotation = Quaternion.identity;
+        view.Body.localScale = view.BodyScale;
+    }
+
+    private static void ApplyBodyReaction(EnemyView view)
+    {
+        float recoil = Mathf.Clamp01(view.HitRemaining / HitReactionDuration);
+        recoil = recoil * recoil * view.HitStrength;
+        Vector3 localDirection = Quaternion.Inverse(view.Root.localRotation) * view.HitDirection;
+        view.Body.localPosition = localDirection * (0.065f * recoil);
+        view.Body.localRotation = Quaternion.AngleAxis(9f * recoil, Vector3.Cross(Vector3.up, localDirection));
+        view.Body.localScale = Vector3.Scale(view.BodyScale,
+            new Vector3(1f + 0.045f * recoil, 1f - 0.07f * recoil, 1f + 0.045f * recoil));
     }
 
     // interpolation: 직전 틱(0)과 현재 틱(1) 사이 어디를 그릴지. deltaTime 은 화면용 전투 시간이다.
@@ -2012,7 +2151,8 @@ internal sealed class DefenseBoardView
         Vector3 toAttacker = attacker.Position - target.Position;
         toAttacker.y = 0f;
         Vector3 point = target.Position + Vector3.up * HitHeight + Vector3.ClampMagnitude(toAttacker, HitForwardOffset);
-        NextHitEffect().Play(root.TransformPoint(point), attacker.Faction.Color);
+        NextHitEffect().Play(root.TransformPoint(point), attacker.Faction.Color, boosted ? 1.12f : 0.85f);
+        ReactToHit(target, -toAttacker, boosted, targetArmored);
         playHitSound?.Invoke();
         if (boosted)
             spellEffects.PlayAttack(attacker.Position, target.Position);
