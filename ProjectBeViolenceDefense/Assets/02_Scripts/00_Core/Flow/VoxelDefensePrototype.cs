@@ -33,6 +33,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private LeftCoreHud leftCoreHud;
     [Tooltip("선택. 연결하면 기존 마나 게이지 대신 하단 마나 바 아트를 쓴다.")]
     [SerializeField] private ManaBarHud manaBarHud;
+    [Tooltip("선택. 연결하면 상단 중앙 정보·우상단 설정/배속·우하단 웨이브 호출 버튼을 새 HUD로 쓴다.")]
+    [SerializeField] private BattleInfoHud battleInfoHud;
     [SerializeField] private BoardTheme boardTheme = new();
     [SerializeField] private FactionSlot coral;
     [SerializeField] private FactionSlot teal;
@@ -107,7 +109,12 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (leftCoreHud != null)
             hud.UseExternalCorePanel(new Vector2(320, -236));
         if (manaBarHud != null)
-            hud.UseExternalManaBar((RectTransform)manaBarHud.transform, new Vector2(33, -130));
+            hud.UseExternalManaBar((RectTransform)manaBarHud.transform, new Vector2(33, hudArt.SlotFrame != null ? -146 : -130));
+        if (battleInfoHud != null)
+        {
+            hud.UseExternalBattleInfo();
+            battleInfoHud.Bind(StartBattle, SetBattleSpeed, () => hud.Notify("Settings are not available yet."));
+        }
         RefreshPlanningTiles();
     }
 
@@ -450,6 +457,22 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             leftCoreHud.Refresh(battle.CoreHealth, DefenseBattle.CoreMaxHealth);
         if (manaBarHud != null)
             manaBarHud.Refresh(battle.Mana, DefenseBattle.MaxMana);
+        if (battleInfoHud != null)
+        {
+            int left = 0, right = 0;
+            foreach (EnemyUnit enemy in battle.Enemies)
+            {
+                if (!enemy.IsAlive)
+                    continue;
+                if (enemy.Faction == coral)
+                    left++;
+                else
+                    right++;
+            }
+            bool inCombat = battle.CurrentPhase == DefenseBattle.Phase.Combat;
+            bool canCallWave = !ui.HasOpenPopup && battle.CurrentPhase == DefenseBattle.Phase.Preparation;
+            battleInfoHud.Refresh(battle.Round, inCombat, canCallWave, left, right, coral.Color, teal.Color, battleSpeed);
+        }
     }
 
     private void OnApplicationFocus(bool focused)
