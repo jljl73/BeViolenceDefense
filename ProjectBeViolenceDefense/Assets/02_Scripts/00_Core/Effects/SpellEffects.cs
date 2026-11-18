@@ -89,15 +89,17 @@ internal sealed class SpellEffects
         if (trails == null)
         {
             trails = new[] { CreateStroke("Move Speed Trail", unit), CreateStroke("Move Speed Trail", unit) };
-            Color tail = UIPalette.MoveSpeed;
+            Color head = UIPalette.MoveSpeed;
+            head.a = 0.45f;
+            Color tail = head;
             tail.a = 0f;
             foreach (LineRenderer trail in trails)
             {
                 trail.useWorldSpace = true;
                 trail.positionCount = 2;
-                trail.startWidth = 0.095f;
-                trail.endWidth = 0.028f;
-                trail.startColor = UIPalette.MoveSpeed;
+                trail.startWidth = 0.055f;
+                trail.endWidth = 0.012f;
+                trail.startColor = head;
                 trail.endColor = tail;
             }
         }
@@ -110,7 +112,7 @@ internal sealed class SpellEffects
             LineRenderer trail = trails[i];
             Vector3 start = back + (i == 0 ? side : -side);
             trail.SetPosition(0, start);
-            trail.SetPosition(1, start - direction * 0.48f);
+            trail.SetPosition(1, start - direction * 0.30f);
             trail.enabled = true;
         }
     }

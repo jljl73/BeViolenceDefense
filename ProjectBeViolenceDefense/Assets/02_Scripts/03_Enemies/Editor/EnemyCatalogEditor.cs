@@ -88,6 +88,7 @@ internal sealed class EnemyCatalogEditor : Editor
             entry.FindPropertyRelative("animations").objectReferenceValue = null;
             entry.FindPropertyRelative("skin").objectReferenceValue = null;
             entry.FindPropertyRelative("modelScale").floatValue = 1f;
+            entry.FindPropertyRelative("bodyRadius").floatValue = 0.3f;
             entry.FindPropertyRelative("maxHealth").intValue = 50;
             entry.FindPropertyRelative("damage").intValue = 10;
             entry.FindPropertyRelative("attackInterval").floatValue = 0.65f;
@@ -112,6 +113,10 @@ internal sealed class EnemyCatalogEditor : Editor
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("skin"),
                 new GUIContent("머티리얼 오버라이드", "비어 있으면 모델의 기존 머티리얼을 사용합니다."));
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("modelScale"), new GUIContent("모델 배율"));
+            EditorGUILayout.PropertyField(entry.FindPropertyRelative("bodyRadius"),
+                new GUIContent("몸통 반경", "모델 배율 적용 전 반경(칸). 상대와의 간격은 두 실제 반경의 합 + 0.06칸입니다."));
+            float radius = entry.FindPropertyRelative("bodyRadius").floatValue * entry.FindPropertyRelative("modelScale").floatValue;
+            EditorGUILayout.LabelField("실제 점유 반경", $"{radius:0.###}칸");
             return GUILayout.Button("이 유닛 삭제");
         }
     }

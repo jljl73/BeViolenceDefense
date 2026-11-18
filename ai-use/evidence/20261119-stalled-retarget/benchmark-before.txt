@@ -1,0 +1,6 @@
+count=9 walls=False phase=Preparation ticks=2315 stalledReadySeconds=3.48 engagedSeconds=35.08 attacks=42 kills=6 core=108 clearanceMargin=0.00000 ms=67
+count=9 walls=True phase=Preparation ticks=2655 stalledReadySeconds=6.65 engagedSeconds=49.60 attacks=60 kills=8 core=110 clearanceMargin=0.00000 ms=59
+count=20 walls=False phase=Preparation ticks=5019 stalledReadySeconds=25.43 engagedSeconds=134.13 attacks=139 kills=22 core=102 clearanceMargin=0.00000 ms=100
+count=20 walls=True phase=Preparation ticks=4485 stalledReadySeconds=12.92 engagedSeconds=103.37 attacks=121 kills=18 core=98 clearanceMargin=0.00000 ms=36
+count=40 walls=False phase=Preparation ticks=8128 stalledReadySeconds=31.90 engagedSeconds=302.77 attacks=337 kills=54 core=94 clearanceMargin=0.00000 ms=75
+count=40 walls=True phase=Combat ticks=14400 stalledReadySeconds=64.32 engagedSeconds=301.22 attacks=307 kills=49 core=91 clearanceMargin=0.00000 ms=109

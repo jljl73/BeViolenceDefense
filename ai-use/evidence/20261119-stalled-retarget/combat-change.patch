@@ -1,0 +1,251 @@
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
+@@ -4,6 +4,8 @@
+ internal sealed class CombatPositioning
+ {
+     internal const int MaxAttackersPerTarget = 3;
++    internal const float StalledRetargetDelay = 0.6f;
++    private const float ApproachProgressThreshold = 0.05f;
+     private const int CurrentPositionSlot = -2;
+     private const int SlotCount = 8;
+     private const int DetourPointsPerSide = SlotCount / 2;
+@@ -42,6 +44,8 @@
+         foreach (EnemyUnit enemy in enemies)
+         {
+             EnemyUnit target = FindTarget(enemy);
++            if (target != enemy.CombatProgressTarget)
++                ResetApproachProgress(enemy, target);
+             if (target != enemy.Target)
+             {
+                 enemy.AttackSlot = -1;
+@@ -72,55 +76,109 @@
+ 
+             EnemyUnit target = enemy.Target;
+ 
++            // A local sidestep alone is not proof that this fight is reachable. Probe other
++            // complete approaches before renewing a stalled target's reservation.
++            if (enemy.CombatStalledTime >= StalledRetargetDelay)
++            {
++                ResetApproachProgress(enemy, target);
++                if (FindAlternative(enemy, target, false, out EnemyUnit reachable,
++                        out int reachableSlot, out Vector3 reachableWaypoint, out float reachableLength))
++                {
++                    Reserve(enemy, reachable, reachableSlot, reachableWaypoint, reachableLength);
++                    continue;
++                }
++            }
++
+             int slot = enemy.AttackSlot;
+-            if (slot >= 0 && TryApproachSlot(enemy, target, slot, true, out Vector3 waypoint, out _))
+-            {
+-                Reserve(enemy, target, slot, waypoint);
++            if (slot >= 0 && TryApproachSlot(enemy, target, slot, true, out Vector3 waypoint, out float length))
++            {
++                Reserve(enemy, target, slot, waypoint, length);
+                 continue;
+             }
+ 
+             enemy.AttackSlot = -1;
+-            if (FindSlot(enemy, target, out slot, out waypoint))
+-            {
+-                Reserve(enemy, target, slot, waypoint);
++            if (FindSlot(enemy, target, out slot, out waypoint, out length))
++            {
++                Reserve(enemy, target, slot, waypoint, length);
+                 continue;
+             }
+ 
+             // A full target or an unreachable slot sends the unit to another visible opponent.
+-            EnemyUnit alternative = null;
+-            float nearest = float.PositiveInfinity;
++            if (FindAlternative(enemy, target, false, out EnemyUnit alternative, out slot, out waypoint, out length) ||
++                FindAlternative(enemy, target, true, out alternative, out slot, out waypoint, out length))
++            {
++                Reserve(enemy, alternative, slot, waypoint, length);
++                continue;
++            }
++
+             EnemyUnit queueTarget = reservedSlots.ContainsKey(target) ? target : null;
+             foreach (EnemyUnit other in enemies)
+             {
+-                float distance = (other.Position - enemy.Position).sqrMagnitude;
+                 if (other == target || !CanDetect(enemy, other))
+                     continue;
+-
+-                if (IsNearer(other, distance, alternative, nearest) && FindSlot(enemy, other, out int otherSlot, out Vector3 otherWaypoint))
+-                {
+-                    alternative = other;
+-                    nearest = distance;
+-                    slot = otherSlot;
+-                    waypoint = otherWaypoint;
+-                }
+-                else if (queueTarget == null && reservedSlots.ContainsKey(other))
++                if (queueTarget == null && reservedSlots.ContainsKey(other))
+                 {
+                     queueTarget = other;
+                 }
+             }
+-            if (alternative != null)
+-            {
+-                Reserve(enemy, alternative, slot, waypoint);
+-            }
++            enemy.Target = null;
++            if (queueTarget != null)
++                QueueBehindFight(enemy, queueTarget);
+             else
+-            {
+-                enemy.Target = null;
+-                if (queueTarget != null)
+-                    QueueBehindFight(enemy, queueTarget);
+-                else
+-                    enemy.CombatQueue = null;
+-            }
+-        }
++                enemy.CombatQueue = null;
++        }
++    }
++
++    // Called with simulation delta before planning, so replanning/slot changes cannot
++    // erase the time already spent stuck. Cooldown while in striking position is not a stall.
++    public void TrackApproachProgress(EnemyUnit enemy, float deltaTime)
++    {
++        EnemyUnit target = enemy.Target ?? enemy.CombatQueue?.Target;
++        if (target == null || !target.IsAlive || target != enemy.CombatProgressTarget || CanAttack(enemy, target))
++            ResetApproachProgress(enemy, target);
++        if (target == null || !target.IsAlive || CanAttack(enemy, target))
++            return;
++
++        float remaining = enemy.CombatDestination is { } destination && enemy.Target != null
++            ? Vector3.Distance(enemy.Position, destination) + enemy.CombatApproachTailLength
++            : Vector3.Distance(enemy.Position, target.Position);
++        // Compare against the best remaining route, not distance moved: oscillation must
++        // not keep a blocked target alive. Include the tail so genuine detours make progress.
++        if (remaining <= enemy.CombatBestRemainingDistance - ApproachProgressThreshold)
++        {
++            enemy.CombatBestRemainingDistance = remaining;
++            enemy.CombatStalledTime = 0f;
++        }
++        else
++            enemy.CombatStalledTime += deltaTime;
++    }
++
++    private static void ResetApproachProgress(EnemyUnit enemy, EnemyUnit target)
++    {
++        enemy.CombatProgressTarget = target;
++        enemy.CombatBestRemainingDistance = float.PositiveInfinity;
++        enemy.CombatStalledTime = 0f;
++    }
++
++    private bool FindAlternative(EnemyUnit enemy, EnemyUnit current, bool allowLocalSteer,
++        out EnemyUnit alternative, out int slot, out Vector3 waypoint, out float length)
++    {
++        alternative = null;
++        slot = -1;
++        waypoint = default;
++        length = float.PositiveInfinity;
++        foreach (EnemyUnit other in enemies)
++        {
++            if (other == current || !CanDetect(enemy, other) ||
++                !FindSlot(enemy, other, out int candidateSlot, out Vector3 candidateWaypoint, out float candidateLength, allowLocalSteer) ||
++                !IsNearer(other, candidateLength, alternative, length))
++                continue;
++            alternative = other;
++            slot = candidateSlot;
++            waypoint = candidateWaypoint;
++            length = candidateLength;
++        }
++        return alternative != null;
+     }
+ 
+     public bool CanAttack(EnemyUnit enemy, EnemyUnit target) =>
+@@ -256,14 +314,17 @@
+         return distance != 0 ? distance : first.SpawnOrder.CompareTo(second.SpawnOrder);
+     }
+ 
+-    private void Reserve(EnemyUnit enemy, EnemyUnit target, int slot, Vector3 waypoint)
+-    {
++    private void Reserve(EnemyUnit enemy, EnemyUnit target, int slot, Vector3 waypoint, float length = 0f)
++    {
++        if (enemy.CombatProgressTarget != target || slot == CurrentPositionSlot)
++            ResetApproachProgress(enemy, target);
+         if (enemy.Target != target || slot == CurrentPositionSlot)
+             enemy.CombatSteerWaypoint = null;
+         enemy.Target = target;
+         enemy.CombatQueue = null;
+         enemy.AttackSlot = slot;
+         enemy.CombatDestination = waypoint;
++        enemy.CombatApproachTailLength = Mathf.Max(0f, length - Vector3.Distance(enemy.Position, waypoint));
+         enemy.RouteYieldDestination = null;
+         enemy.BlockedRouteTime = 0f;
+         reservedSlots.TryGetValue(target, out var reservation);
+@@ -292,14 +353,15 @@
+             enemy.CombatDestination = rear;
+     }
+ 
+-    private bool FindSlot(EnemyUnit enemy, EnemyUnit target, out int slot, out Vector3 waypoint)
++    private bool FindSlot(EnemyUnit enemy, EnemyUnit target, out int slot, out Vector3 waypoint,
++        out float shortest, bool allowLocalSteer = true)
+     {
+         slot = -1;
+         waypoint = default;
++        shortest = float.PositiveInfinity;
+         if (IsTargetFull(target))
+             return false;
+ 
+-        float shortest = float.PositiveInfinity;
+         for (int i = 0; i < SlotCount; i++)
+         {
+             if (!TryApproachSlot(enemy, target, i, false, out Vector3 next, out float length) || length >= shortest)
+@@ -313,7 +375,7 @@
+ 
+         for (int i = 0; i < SlotCount; i++)
+         {
+-            if (!TryApproachSlot(enemy, target, i, true, out Vector3 next, out float length) || length >= shortest)
++            if (!TryApproachSlot(enemy, target, i, true, out Vector3 next, out float length, allowLocalSteer) || length >= shortest)
+                 continue;
+             slot = i;
+             waypoint = next;
+@@ -326,7 +388,7 @@
+         reservedSlots.TryGetValue(target, out var reservation) && reservation.Count >= MaxAttackersPerTarget;
+ 
+     private bool TryApproachSlot(EnemyUnit enemy, EnemyUnit target, int slot, bool allowDetour,
+-        out Vector3 waypoint, out float length)
++        out Vector3 waypoint, out float length, bool allowLocalSteer = true)
+     {
+         waypoint = SlotPosition(enemy, target, slot);
+         length = float.PositiveInfinity;
+@@ -383,7 +445,7 @@
+ 
+         // A temporarily occupied corridor need not make a free attack slot unreachable.
+         // Only use local steering when the static route to that slot is clear.
+-        if (grid.CanPursue(enemy.Position, goal) && TryLocalSteer(enemy, target, goal, out Vector3 local))
++        if (allowLocalSteer && grid.CanPursue(enemy.Position, goal) && TryLocalSteer(enemy, target, goal, out Vector3 local))
+         {
+             waypoint = local;
+             length = Vector3.Distance(enemy.Position, local) + Vector3.Distance(local, goal);
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs
+@@ -85,6 +85,10 @@
+     public int AttackSlot { get; set; } = -1;
+     public Vector3? CombatDestination { get; set; }
+     public Vector3? CombatSteerWaypoint { get; set; }
++    public EnemyUnit CombatProgressTarget { get; set; }
++    public float CombatBestRemainingDistance { get; set; } = float.PositiveInfinity;
++    public float CombatApproachTailLength { get; set; }
++    public float CombatStalledTime { get; set; }
+     public Vector3? RouteYieldDestination { get; set; }
+     public float BlockedRouteTime { get; set; }
+     public bool ReachedCore => Position.Equals(path[^1]);
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
+@@ -347,6 +347,10 @@
+             untilCombatPlan = 0f;
+         }
+ 
++        if (!pauseMovement)
++            foreach (EnemyUnit enemy in enemies)
++                combat.TrackApproachProgress(enemy, deltaTime);
++
+         untilCombatPlan -= deltaTime;
+         if (untilCombatPlan <= 0f)
+         {

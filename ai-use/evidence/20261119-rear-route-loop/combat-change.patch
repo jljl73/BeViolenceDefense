@@ -1,0 +1,145 @@
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
+@@ -196,21 +196,35 @@
+     public bool CanFollowRoute(EnemyUnit enemy, Vector3 next) =>
+         ClearOfUnits(enemy, null, enemy.Position, next, attacking: false);
+ 
+-    public bool TryFindRouteYield(EnemyUnit enemy, out Vector3 destination)
++    public bool TryFindRouteYield(EnemyUnit enemy, int waypointCount, out Vector3 destination, out int routeOffset)
+     {
+         destination = default;
+-        float bestDistance = float.PositiveInfinity;
+-        foreach (Vector3 direction in Directions)
+-        {
+-            Vector3 point = enemy.Position + direction * (enemy.Faction.BodyRadius * 2f + BodyGap);
+-            float distance = (point - enemy.RouteWaypoint).sqrMagnitude;
+-            if (distance >= bestDistance || !CanMove(enemy, null, enemy.Position, point))
+-                continue;
+-            bestDistance = distance;
+-            destination = point;
+-        }
+-
+-        return !float.IsPositiveInfinity(bestDistance);
++        routeOffset = -1;
++        int count = Mathf.Min(waypointCount, enemy.RemainingRouteWaypoints);
++        // A sidestep is useful only if it connects to a forward route waypoint. A free
++        // patch beside a stationary queue otherwise causes endless leave/rejoin cycles.
++        for (int offset = count - 1; offset >= Mathf.Max(0, enemy.RouteBypassOffset); offset--)
++        {
++            Vector3 goal = enemy.GetRouteWaypoint(offset);
++            float shortest = float.PositiveInfinity;
++            foreach (Vector3 direction in Directions)
++            {
++                for (int width = 1; width <= 2; width++)
++                {
++                    Vector3 point = enemy.Position + direction * ((enemy.Faction.BodyRadius * 2f + BodyGap) * width);
++                    float distance = Vector3.Distance(enemy.Position, point) + Vector3.Distance(point, goal);
++                    if (distance >= shortest || !CanMove(enemy, null, enemy.Position, point) ||
++                        !CanMove(enemy, null, point, goal))
++                        continue;
++                    shortest = distance;
++                    destination = point;
++                    routeOffset = offset;
++                }
++            }
++            if (routeOffset >= 0)
++                return true;
++        }
++        return false;
+     }
+ 
+     public void Move(EnemyUnit enemy, EnemyUnit target, float deltaTime)
+@@ -326,6 +340,7 @@
+         enemy.CombatDestination = waypoint;
+         enemy.CombatApproachTailLength = Mathf.Max(0f, length - Vector3.Distance(enemy.Position, waypoint));
+         enemy.RouteYieldDestination = null;
++        enemy.RouteBypassOffset = -1;
+         enemy.BlockedRouteTime = 0f;
+         reservedSlots.TryGetValue(target, out var reservation);
+         int mask = slot == CurrentPositionSlot ? reservation.Mask : reservation.Mask | (1 << slot);
+@@ -339,6 +354,7 @@
+         if (enemy.CombatQueue?.Target != target)
+             enemy.CombatQueue = (target, nextQueueOrder++);
+         enemy.RouteYieldDestination = null;
++        enemy.RouteBypassOffset = -1;
+         enemy.BlockedRouteTime = 0f;
+ 
+         // Leave room for the attackers without stepping outside detection range.
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs
+@@ -90,6 +90,7 @@
+     public float CombatApproachTailLength { get; set; }
+     public float CombatStalledTime { get; set; }
+     public Vector3? RouteYieldDestination { get; set; }
++    public int RouteBypassOffset { get; set; } = -1;
+     public float BlockedRouteTime { get; set; }
+     public bool ReachedCore => Position.Equals(path[^1]);
+ 
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
+@@ -503,28 +503,38 @@
+         if (!enemy.Position.Equals(enemy.RoutePosition) && TryRejoinRoute(enemy, deltaTime))
+             return;
+ 
+-        Vector3 next = enemy.NextRoutePosition(deltaTime);
+-        enemy.Face(next);
+-        if (combat.CanFollowRoute(enemy, next))
+-        {
+-            enemy.FollowRoute(next);
+-            enemy.BlockedRouteTime = 0f;
+-            return;
++        // Off-route units wait for their forward connection, rather than walking back
++        // to the spot they just yielded from and immediately starting the same detour.
++        if (enemy.Position.Equals(enemy.RoutePosition))
++        {
++            Vector3 next = enemy.NextRoutePosition(deltaTime);
++            if (combat.CanFollowRoute(enemy, next))
++            {
++                enemy.Face(next);
++                enemy.FollowRoute(next);
++                enemy.BlockedRouteTime = 0f;
++                return;
++            }
+         }
+ 
+         enemy.BlockedRouteTime += deltaTime;
+         if (enemy.BlockedRouteTime < RouteYieldDelay)
+             return;
+         enemy.BlockedRouteTime = 0f;
+-        if (combat.TryFindRouteYield(enemy, out Vector3 destination))
++        if (TryRejoinRoute(enemy, deltaTime))
++            return;
++        if (combat.TryFindRouteYield(enemy, RouteRejoinWaypoints, out Vector3 destination, out int offset))
++        {
+             enemy.RouteYieldDestination = destination;
++            enemy.RouteBypassOffset = offset;
++        }
+     }
+ 
+     private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime)
+     {
+         // Skip a blocked return point only when the path to a forward waypoint is clear.
+         int count = Mathf.Min(RouteRejoinWaypoints, enemy.RemainingRouteWaypoints);
+-        for (int offset = 0; offset < count; offset++)
++        for (int offset = Mathf.Max(0, enemy.RouteBypassOffset); offset < count; offset++)
+         {
+             Vector3 waypoint = enemy.GetRouteWaypoint(offset);
+             if (!grid.CanPursue(enemy.Position, waypoint) || !combat.CanFollowRoute(enemy, waypoint))
+@@ -532,7 +542,16 @@
+ 
+             Vector3 next = enemy.StepToward(waypoint, deltaTime);
+             enemy.Face(next);
+-            enemy.FollowRoute(next, offset);
++            if (next.Equals(waypoint))
++            {
++                enemy.FollowRoute(next, offset);
++                enemy.RouteBypassOffset = -1;
++            }
++            else
++            {
++                enemy.MoveOffRoute(next);
++                enemy.RouteBypassOffset = offset;
++            }
+             enemy.BlockedRouteTime = 0f;
+             return true;
+         }

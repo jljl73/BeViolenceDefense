@@ -15,7 +15,7 @@ internal static class VerifyEnemyGroupsOnce
         var defender = new EnemyUnit(factions[1], 1, new[] { new Vector3(7, 0, 5), new Vector3(7, 0, 6) }, 1);
         attacker.Target = defender;
         attacker.AttackSlot = 0;
-        var positioning = new CombatPositioning(grid, new[] { attacker, defender }, DefenseBattle.UnitSpacing);
+        var positioning = new CombatPositioning(grid, new[] { attacker, defender });
         positioning.Plan();
         Require(positioning.CanAttack(attacker, defender), "A clear in-range attacker must be able to strike from its current position.");
         positioning.Move(attacker, defender, 0.2f);
@@ -96,7 +96,7 @@ internal static class VerifyEnemyGroupsOnce
                     Vector3.Distance(battle.Enemies[first].Position, battle.Enemies[second].Position));
         }
         Require(pursued, "Default groups must pursue enemies beyond attack range.");
-        Require(minimumSpacing >= DefenseBattle.UnitSpacing - 0.001f, "Units must keep their spacing through turns and merges.");
+        Require(minimumSpacing >= CombatPositioning.RequiredSpacing(factions[0], factions[1]) - 0.001f, "Units must keep their spacing through turns and merges.");
         Require(kills > 0 && forecast == 1, "Default groups must fight and forecast a single first encounter.");
         Require(battle.CurrentPhase == DefenseBattle.Phase.Preparation && kills + contacts == expectedEnemies &&
             battle.CoreHealth == DefenseBattle.CoreMaxHealth - contacts,

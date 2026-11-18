@@ -1,0 +1,142 @@
+/tmp/be-rear-before/unity-trace.csv {
+  "0": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 7
+  },
+  "1": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 4
+  },
+  "2": {
+    "route_turns_over_100": 2,
+    "ticks": [
+      423,
+      445
+    ],
+    "attacks": 7
+  },
+  "3": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 6
+  },
+  "4": {
+    "route_turns_over_100": 1,
+    "ticks": [
+      501
+    ],
+    "attacks": 9
+  },
+  "5": {
+    "route_turns_over_100": 3,
+    "ticks": [
+      430,
+      452,
+      476
+    ],
+    "attacks": 7
+  },
+  "6": {
+    "route_turns_over_100": 3,
+    "ticks": [
+      501,
+      594,
+      696
+    ],
+    "attacks": 9
+  },
+  "7": {
+    "route_turns_over_100": 12,
+    "ticks": [
+      525,
+      555,
+      579,
+      615,
+      639,
+      717,
+      741,
+      808,
+      832,
+      897,
+      947,
+      961
+    ],
+    "attacks": 3
+  },
+  "8": {
+    "route_turns_over_100": 1,
+    "ticks": [
+      505
+    ],
+    "attacks": 3
+  },
+  "9": {
+    "route_turns_over_100": 7,
+    "ticks": [
+      505,
+      579,
+      671,
+      695,
+      762,
+      786,
+      1145
+    ],
+    "attacks": 5
+  }
+}
+/tmp/be-rear-final/unity-trace.csv {
+  "0": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 8
+  },
+  "1": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 5
+  },
+  "2": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 7
+  },
+  "3": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 6
+  },
+  "4": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 5
+  },
+  "5": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 8
+  },
+  "6": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 8
+  },
+  "7": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 7
+  },
+  "8": {
+    "route_turns_over_100": 0,
+    "ticks": [],
+    "attacks": 1
+  },
+  "9": {
+    "route_turns_over_100": 1,
+    "ticks": [
+      1320
+    ],
+    "attacks": 1
+  }
+}

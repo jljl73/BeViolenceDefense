@@ -35,21 +35,7 @@ internal sealed class DefenseHud
 
     private static readonly Vector2 SpellSlotSize = new(110, 124);
     private static readonly Vector2 ActionsSize = new(600, 184);
-    private const float FirstBuffBarHeight = 13f;
-    private const float BuffBarSpacing = 7f;
-    private const float BuffBarThickness = 4f;
     private const float HealthBarThickness = 5f;
-
-    // GameScene scales the HUD against a 1080 px reference height.
-    public static float UnitMarkerViewportClearance(EnemyUnit enemy)
-    {
-        int buffCount = (enemy.AttackBuffStacks > 0 ? 1 : 0) + (enemy.MoveSpeedBuffStacks > 0 ? 1 : 0) +
-            (enemy.ArmorBuffStacks > 0 ? 1 : 0);
-        float top = buffCount > 0
-            ? FirstBuffBarHeight + (buffCount - 1) * BuffBarSpacing + BuffBarThickness * 0.5f
-            : HealthBarThickness * 0.5f;
-        return top / 1080f;
-    }
 
     private readonly UIManager ui;
     private readonly Art art;
@@ -89,7 +75,7 @@ internal sealed class DefenseHud
     private readonly TextMeshProUGUI actionTip;
     private readonly HudButton help;
     private readonly TextMeshProUGUI helpTip;
-    private readonly List<UnitMarker> unitMarkers = new();
+    private readonly List<Image> healthMarkers = new();
     private readonly Texture2D encounterIcon;
     private readonly List<RawImage> encounterMarkers = new();
     private int visibleMarkers;
@@ -359,14 +345,11 @@ internal sealed class DefenseHud
         visibleMarkers = 0;
         foreach (EnemyUnit enemy in battle.Enemies)
         {
-            if (enemy.Health == enemy.MaxHealth && enemy.HealFlash <= 0 &&
-                enemy.AttackBuffStacks == 0 && enemy.MoveSpeedBuffStacks == 0 && enemy.ArmorBuffStacks == 0)
-                continue;
-
-            AddMarker(view.ScreenPoint(enemy, 0.76f), enemy);
+            if (ShowsUnitHealth(enemy))
+                AddHealthMarker(view.ScreenPoint(enemy, 0.76f), enemy);
         }
-        for (int i = visibleMarkers; i < unitMarkers.Count; i++)
-            unitMarkers[i].Root.gameObject.SetActive(false);
+        for (int i = visibleMarkers; i < healthMarkers.Count; i++)
+            healthMarkers[i].transform.parent.gameObject.SetActive(false);
     }
 
     public void ShowDefeat() => ui.ShowPopup(defeatPopup, dismissOnEscape: false);
@@ -763,74 +746,27 @@ internal sealed class DefenseHud
         }
     }
 
-    private void AddMarker(Vector3 screen, EnemyUnit enemy)
+    private static bool ShowsUnitHealth(EnemyUnit enemy) => enemy.Health < enemy.MaxHealth || enemy.HealFlash > 0f;
+
+    private void AddHealthMarker(Vector3 screen, EnemyUnit enemy)
     {
         if (screen.z <= 0 ||
             !RectTransformUtility.ScreenPointToLocalPointInRectangle(markers, screen, null, out Vector2 position))
             return;
 
-        if (visibleMarkers == unitMarkers.Count)
-            unitMarkers.Add(new UnitMarker(markers));
-
-        UnitMarker marker = unitMarkers[visibleMarkers++];
-        marker.Root.anchoredPosition = position;
-        marker.Root.gameObject.SetActive(true);
-        SetBarFraction(marker.Health, (float)enemy.Health / enemy.MaxHealth);
-        marker.Health.color = enemy.HealFlash > 0 ? UIPalette.Heal : enemy.Faction.Color;
-        SetBuffMarker(marker.AttackBuff, marker.AttackStacks, enemy.AttackBuffStacks, enemy.AttackBuffRemaining);
-        var speedBar = (RectTransform)marker.SpeedBuff.transform.parent;
-        speedBar.anchoredPosition = new Vector2(0, FirstBuffBarHeight +
-            (enemy.AttackBuffStacks > 0 ? BuffBarSpacing : 0f));
-        SetBuffMarker(marker.SpeedBuff, marker.SpeedStacks, enemy.MoveSpeedBuffStacks, enemy.MoveSpeedBuffRemaining);
-        var armorBar = (RectTransform)marker.ArmorBuff.transform.parent;
-        armorBar.anchoredPosition = new Vector2(0, FirstBuffBarHeight + BuffBarSpacing *
-            ((enemy.AttackBuffStacks > 0 ? 1 : 0) + (enemy.MoveSpeedBuffStacks > 0 ? 1 : 0)));
-        SetBuffMarker(marker.ArmorBuff, marker.ArmorStacks, enemy.ArmorBuffStacks, enemy.ArmorBuffRemaining);
-    }
-
-    private static void SetBuffMarker(Image fill, TextMeshProUGUI stacks, int count, float remaining)
-    {
-        fill.transform.parent.gameObject.SetActive(count > 0);
-        SetBarFraction(fill, remaining / DefenseBattle.BuffDuration);
-        stacks.gameObject.SetActive(count > 1);
-        if (count > 1)
-            stacks.SetText("×{0}", count);
-    }
-
-    private sealed class UnitMarker
-    {
-        public readonly RectTransform Root;
-        public readonly Image Health;
-        public readonly Image AttackBuff;
-        public readonly Image SpeedBuff;
-        public readonly Image ArmorBuff;
-        public readonly TextMeshProUGUI AttackStacks;
-        public readonly TextMeshProUGUI SpeedStacks;
-        public readonly TextMeshProUGUI ArmorStacks;
-
-        public UnitMarker(RectTransform parent)
+        if (visibleMarkers == healthMarkers.Count)
         {
             Vector2 center = Vector2.one * 0.5f;
-            Root = Rect("Enemy Marker", parent, center, center, Vector2.zero, Vector2.zero);
-            Health = Bar("Health", Root, center, center, Vector2.zero, new Vector2(26, HealthBarThickness),
-                UIPalette.TextPrimary);
-            AttackBuff = Bar("Attack Buff", Root, center, center, new Vector2(0, FirstBuffBarHeight),
-                new Vector2(26, BuffBarThickness),
-                UIPalette.Attack);
-            SpeedBuff = Bar("Move Speed Buff", Root, center, center, new Vector2(0, FirstBuffBarHeight),
-                new Vector2(26, BuffBarThickness),
-                UIPalette.MoveSpeed);
-            ArmorBuff = Bar("Armor Buff", Root, center, center, new Vector2(0, FirstBuffBarHeight),
-                new Vector2(26, BuffBarThickness),
-                UIPalette.Armor);
-            AttackStacks = Label("Stacks", (RectTransform)AttackBuff.transform.parent, 29, 4, 21, 13, 11);
-            AttackStacks.color = UIPalette.Attack;
-            SpeedStacks = Label("Stacks", (RectTransform)SpeedBuff.transform.parent, -24, 4, 21, 13, 11,
-                TextAlignmentOptions.Right);
-            SpeedStacks.color = UIPalette.MoveSpeed;
-            ArmorStacks = Label("Stacks", (RectTransform)ArmorBuff.transform.parent, 29, 4, 21, 13, 11);
-            ArmorStacks.color = UIPalette.Armor;
+            healthMarkers.Add(Bar("Enemy Health", markers, center, center, Vector2.zero,
+                new Vector2(26, HealthBarThickness), UIPalette.TextPrimary));
         }
+
+        Image fill = healthMarkers[visibleMarkers++];
+        var track = (RectTransform)fill.transform.parent;
+        track.anchoredPosition = position;
+        track.gameObject.SetActive(true);
+        SetBarFraction(fill, (float)enemy.Health / enemy.MaxHealth);
+        fill.color = enemy.Faction.Color;
     }
 
     private static RectTransform Rect(string name, RectTransform parent, Vector2 anchor, Vector2 pivot,

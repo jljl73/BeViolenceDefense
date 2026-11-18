@@ -1,0 +1,137 @@
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
+@@ -5,6 +5,7 @@
+ {
+     internal const int MaxAttackersPerTarget = 3;
+     internal const float StalledRetargetDelay = 0.6f;
++    internal const float CombatJoinRange = 4.5f;
+     private const float ApproachProgressThreshold = 0.05f;
+     private const int CurrentPositionSlot = -2;
+     private const int SlotCount = 8;
+@@ -18,6 +19,7 @@
+         Vector3.left, new(-Diagonal, 0f, -Diagonal),
+         Vector3.back, new(Diagonal, 0f, -Diagonal)
+     };
++    private static readonly float[] BypassWidths = { 0.125f, 0.25f, 0.5f, 1f, 2f };
+ 
+     private readonly DefenseGrid grid;
+     private readonly IReadOnlyList<EnemyUnit> enemies;
+@@ -28,6 +30,8 @@
+     private readonly List<EnemyUnit> assignmentOrder = new();
+     private readonly Dictionary<EnemyUnit, (int Mask, int Count)> reservedSlots = new();
+     private readonly List<(Vector3 Position, float Radius)> reservedPositions = new();
++    private readonly HashSet<EnemyUnit> alertedUnits = new();
++    private readonly List<EnemyUnit> activeFighters = new();
+     private int nextQueueOrder;
+ 
+     public CombatPositioning(DefenseGrid grid, IReadOnlyList<EnemyUnit> enemies)
+@@ -38,6 +42,7 @@
+ 
+     public void Plan()
+     {
++        FindNearbyFights();
+         assignmentOrder.Clear();
+         reservedSlots.Clear();
+         reservedPositions.Clear();
+@@ -200,7 +205,7 @@
+     {
+         destination = default;
+         routeOffset = -1;
+-        int count = Mathf.Min(waypointCount, enemy.RemainingRouteWaypoints);
++        int count = Mathf.Min(Mathf.Max(waypointCount, enemy.RouteBypassOffset + 1), enemy.RemainingRouteWaypoints - 1);
+         // A sidestep is useful only if it connects to a forward route waypoint. A free
+         // patch beside a stationary queue otherwise causes endless leave/rejoin cycles.
+         for (int offset = count - 1; offset >= Mathf.Max(0, enemy.RouteBypassOffset); offset--)
+@@ -209,7 +214,7 @@
+             float shortest = float.PositiveInfinity;
+             foreach (Vector3 direction in Directions)
+             {
+-                for (int width = 1; width <= 2; width++)
++                foreach (float width in BypassWidths)
+                 {
+                     Vector3 point = enemy.Position + direction * ((enemy.Faction.BodyRadius * 2f + BodyGap) * width);
+                     float distance = Vector3.Distance(enemy.Position, point) + Vector3.Distance(point, goal);
+@@ -306,10 +311,30 @@
+ 
+     private bool CanDetect(EnemyUnit enemy, EnemyUnit other)
+     {
+-        float range = enemy.Faction.AwarenessRange;
++        float range = alertedUnits.Contains(enemy) || enemy.Target == other || enemy.CombatQueue?.Target == other
++            ? Mathf.Max(enemy.Faction.AwarenessRange, CombatJoinRange) : enemy.Faction.AwarenessRange;
+         return other.IsAlive && other.FactionIndex != enemy.FactionIndex &&
+             (other.Position - enemy.Position).sqrMagnitude <= range * range &&
+             grid.HasLineOfSight(enemy.Position, other.Position);
++    }
++
++    private void FindNearbyFights()
++    {
++        activeFighters.Clear();
++        alertedUnits.Clear();
++        // Snapshot established fights before assigning this plan. Merely acquiring a
++        // distant target must not relay awareness indefinitely through the whole army.
++        foreach (EnemyUnit enemy in enemies)
++            if (enemy.IsAlive && enemy.Target is { IsAlive: true } target && CanAttackFromHere(enemy, target))
++                activeFighters.Add(enemy);
++        foreach (EnemyUnit enemy in enemies)
++            foreach (EnemyUnit fighter in activeFighters)
++                if ((enemy.Position - fighter.Position).sqrMagnitude <= CombatJoinRange * CombatJoinRange &&
++                    grid.HasLineOfSight(enemy.Position, fighter.Position))
++                {
++                    alertedUnits.Add(enemy);
++                    break;
++                }
+     }
+ 
+     private static int CompareAttackers(EnemyUnit first, EnemyUnit second)
+@@ -502,8 +527,19 @@
+         grid.IsWalkable(DefenseGrid.PositionToCell(to)) &&
+         ClearOfUnits(enemy, target, from, to, attacking: false) &&
+         grid.CanPursue(from, to) &&
+-        // A unit that leaves the fight can return directly to its original route.
+-        grid.CanPursue(enemy.RoutePosition, to);
++        HasRouteConnection(enemy, to);
++
++    private bool HasRouteConnection(EnemyUnit enemy, Vector3 position)
++    {
++        if (grid.CanPursue(enemy.RoutePosition, position))
++            return true;
++        // Flanking may cross a bend or gate. A visible forward route tile is a valid
++        // return connection; requiring visibility to the old tile strands such units.
++        for (int offset = 0; offset < enemy.RemainingRouteWaypoints - 1; offset++)
++            if (grid.CanPursue(position, enemy.GetRouteWaypoint(offset)))
++                return true;
++        return false;
++    }
+ 
+     private bool ClearOfUnits(EnemyUnit enemy, EnemyUnit target, Vector3 from, Vector3 to, bool attacking)
+     {
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
+@@ -532,9 +532,24 @@
+ 
+     private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime)
+     {
+-        // Skip a blocked return point only when the path to a forward waypoint is clear.
+-        int count = Mathf.Min(RouteRejoinWaypoints, enemy.RemainingRouteWaypoints);
+-        for (int offset = Mathf.Max(0, enemy.RouteBypassOffset); offset < count; offset++)
++        // The final point is on the core boundary, not a navigation waypoint. Return
++        // to its approach tile; the normal route step then handles core contact.
++        if (enemy.RemainingRouteWaypoints == 1)
++        {
++            Vector3 approach = enemy.RoutePosition;
++            if (!grid.CanPursue(enemy.Position, approach) || !combat.CanFollowRoute(enemy, approach))
++                return false;
++            Vector3 step = enemy.StepToward(approach, deltaTime);
++            enemy.Face(step);
++            enemy.FollowRoute(step);
++            enemy.RouteBypassOffset = -1;
++            enemy.BlockedRouteTime = 0f;
++            return true;
++        }
++
++        // A fighter may have moved well beyond its old route index. Rejoin the furthest
++        // visible, unobstructed point ahead instead of walking backwards through the army.
++        for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= Mathf.Max(0, enemy.RouteBypassOffset); offset--)
+         {
+             Vector3 waypoint = enemy.GetRouteWaypoint(offset);
+             if (!grid.CanPursue(enemy.Position, waypoint) || !combat.CanFollowRoute(enemy, waypoint))

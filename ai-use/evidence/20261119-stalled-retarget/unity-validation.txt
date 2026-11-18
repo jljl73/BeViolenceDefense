@@ -1,0 +1,24 @@
+Unity 6000.3.28f1 / validation project: /tmp/be-victory-validation
+EditMode process exit: 0; XML: 30 passed, 0 failed.
+Play Mode process exit: 0.
+Compiler error CS lines: 0
+
+EditMode log excerpt:
+Saving results to: /Users/mignon/Library/Application Support/DefaultCompany/ProjectBeViolenceDefense/TestResults.xml
+Saving results to: /tmp/be-retarget-tests.xml
+Test run completed. Exiting with code 0 (Ok). Run completed.
+
+Play Mode log excerpt:
+CATALOG_RADII_PASS: goblin=0.340, zombie=0.312, spacing=0.712
+RETARGET_PLAYMODE_PASS: clearanceMargin=0.00032, round=2, core=118, remaining=0
+
+Observed editor exception (game test still completed):
+ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+  at System.Collections.Generic.List`1[T].get_Item (System.Int32 index) [0x00009] in <63da8c8c2a89417b88fd57669622fa05>:0
+  at UnityEditor.Search.SearchDatabase+<EnumerateAll>d__83.MoveNext () [0x00106] in /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/Indexing/SearchDatabase.cs:453
+  at System.Linq.Enumerable.TryGetFirst[TSource] (System.Collections.Generic.IEnumerable`1[T] source, System.Boolean& found) [0x00045] in <8952576100d3486f990edce1eb1f8689>:0
+  at System.Linq.Enumerable.First[TSource] (System.Collections.Generic.IEnumerable`1[T] source) [0x00000] in <8952576100d3486f990edce1eb1f8689>:0
+  at UnityEditor.Search.SearchDatabase.GetDefaultSearchDatabase () [0x00001] in /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/Indexing/SearchDatabase.cs:428
+  at UnityEditor.Search.SearchInit.IndexationOnStartup () [0x0000c] in /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/SearchInit.cs:109
+  at UnityEditor.EditorApplication.Internal_CallDelayFunctions () [0x0002c] in /Users/bokken/build/output/unity/unity/Editor/Mono/EditorApplication.cs:407

@@ -1,0 +1,48 @@
+ai-use/evidence/20261119-combat-join/before-trace.csv.gz {
+  "first_contact_tick": 365,
+  "first_attack_ticks": {
+    "0": 365,
+    "1": 365,
+    "3": 613,
+    "2": 677,
+    "5": 885,
+    "7": 939,
+    "4": 953,
+    "6": 1003,
+    "9": 1291,
+    "8": 1313
+  },
+  "attackers_in_first_5_seconds": [
+    0,
+    1,
+    3
+  ],
+  "last_first_attack_seconds_after_contact": 15.8
+}
+ai-use/evidence/20261119-combat-join/after-trace.csv.gz {
+  "first_contact_tick": 365,
+  "first_attack_ticks": {
+    "0": 365,
+    "1": 365,
+    "3": 418,
+    "2": 424,
+    "5": 463,
+    "4": 497,
+    "7": 535,
+    "8": 607,
+    "6": 709,
+    "9": 734
+  },
+  "attackers_in_first_5_seconds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    8
+  ],
+  "last_first_attack_seconds_after_contact": 6.15,
+  "maximum_attack_ready_in_first_5_seconds": 6
+}

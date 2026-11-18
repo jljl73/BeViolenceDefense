@@ -12,10 +12,10 @@ public sealed class SimulationDeterminismTests
 
     private static IReadOnlyList<EnemyFaction>[] Lineup()
     {
-        var grunt = new EnemyFaction("Grunt", CoralColor, 1.5f, 50, 10, 0.65f, 0, 2.2f, 1.7f, 0, "test-grunt");
-        var slinger = new EnemyFaction("Slinger", CoralColor, 3f, 35, 8, 0.8f, 0, 3.5f, 1.7f, 0, "test-slinger");
-        var zombie = new EnemyFaction("Zombie", TealColor, 1.5f, 90, 15, 1f, 0, 2.2f, 1.2f, 0, "test-zombie");
-        var armor = new EnemyFaction("Armor", TealColor, 1.5f, 180, 14, 1.2f, 0, 2.2f, 1.1f, 3, "test-armor");
+        var grunt = new EnemyFaction("Grunt", CoralColor, 1.5f, 50, 10, 0.65f, 0, 2.2f, 1.7f, 0, "test-grunt", bodyRadius: 0.34f);
+        var slinger = new EnemyFaction("Slinger", CoralColor, 3f, 35, 8, 0.8f, 0, 3.5f, 1.7f, 0, "test-slinger", bodyRadius: 0.28f);
+        var zombie = new EnemyFaction("Zombie", TealColor, 1.5f, 90, 15, 1f, 0, 2.2f, 1.2f, 0, "test-zombie", bodyRadius: 0.31f);
+        var armor = new EnemyFaction("Armor", TealColor, 1.5f, 180, 14, 1.2f, 0, 2.2f, 1.1f, 3, "test-armor", bodyRadius: 0.48f);
         var coral = new List<EnemyFaction> { grunt, grunt, slinger, grunt, slinger, grunt };
         var teal = new List<EnemyFaction> { zombie, armor, zombie, zombie };
         return new IReadOnlyList<EnemyFaction>[] { coral, teal };

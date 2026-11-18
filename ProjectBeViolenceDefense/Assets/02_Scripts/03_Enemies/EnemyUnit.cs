@@ -10,6 +10,7 @@ internal sealed class EnemyFaction
     public Color Color { get; }
     public float AttackRange { get; }
     public float AwarenessRange { get; }
+    public float BodyRadius { get; }
     public int MaxHealth { get; }
     public int Damage { get; }
     public float AttackInterval { get; }
@@ -22,7 +23,7 @@ internal sealed class EnemyFaction
 
     public EnemyFaction(string displayName, Color color, float attackRange = 1.5f, int maxHealth = 50,
         int damage = 10, float attackInterval = 0.65f, int spawnCount = 9, float awarenessRange = 2.2f,
-        float moveSpeed = 1.7f, int armor = 0, string unitId = null)
+        float moveSpeed = 1.7f, int armor = 0, string unitId = null, float bodyRadius = 0.3f)
     {
         DisplayName = displayName;
         Color = color;
@@ -35,6 +36,7 @@ internal sealed class EnemyFaction
         MoveSpeed = moveSpeed;
         Armor = armor;
         UnitId = unitId;
+        BodyRadius = Mathf.Max(0.05f, bodyRadius);
     }
 }
 
@@ -82,7 +84,13 @@ internal sealed class EnemyUnit
     public (EnemyUnit Target, int Order)? CombatQueue { get; set; }
     public int AttackSlot { get; set; } = -1;
     public Vector3? CombatDestination { get; set; }
+    public Vector3? CombatSteerWaypoint { get; set; }
+    public EnemyUnit CombatProgressTarget { get; set; }
+    public float CombatBestRemainingDistance { get; set; } = float.PositiveInfinity;
+    public float CombatApproachTailLength { get; set; }
+    public float CombatStalledTime { get; set; }
     public Vector3? RouteYieldDestination { get; set; }
+    public int RouteBypassOffset { get; set; } = -1;
     public float BlockedRouteTime { get; set; }
     public bool ReachedCore => Position.Equals(path[^1]);
 

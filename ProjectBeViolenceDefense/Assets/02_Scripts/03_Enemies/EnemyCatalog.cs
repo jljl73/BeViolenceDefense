@@ -24,6 +24,9 @@ public sealed class EnemyCatalog : ScriptableObject
         [SerializeField] private Material skin;
         [SerializeField, Min(0.01f)] private float modelScale = 1f;
 
+        [SerializeField, Min(0.05f), Tooltip("모델 배율 적용 전 몸통 점유 반경(칸). 무기·날개 끝은 제외합니다.")]
+        private float bodyRadius = 0.3f;
+
         [SerializeField, Min(1)] private int maxHealth = 50;
         [SerializeField, Min(0)] private int damage = 10;
         [SerializeField, Min(0.05f)] private float attackInterval = 0.65f;
@@ -38,7 +41,7 @@ public sealed class EnemyCatalog : ScriptableObject
 
         public EnemyFaction CreateFaction(string factionName, Color color, int spawnCount) =>
             new(factionName, color, attackRange, maxHealth, damage, attackInterval, spawnCount,
-                awarenessRange, moveSpeed, armor, id);
+                awarenessRange, moveSpeed, armor, id, bodyRadius * modelScale);
 
         public UnitVisual Visual => new(model, animations, skin, modelScale);
     }

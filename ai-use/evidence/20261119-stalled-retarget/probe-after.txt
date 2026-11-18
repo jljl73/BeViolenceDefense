@@ -1,0 +1,1 @@
+firstSwitchTick=48, firstAttackTick=78, finalTarget=2, totalTravel=2.238, finalPosition=(3.47, 0.00, 5.61)

@@ -306,7 +306,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         buildMode = false;
         battle.StartRound();
         battleClock.Reset();
-        view.ShowPlanningTiles();
+        view.ShowBattleRoutes(grid.Routes);
         hud.Notify("");
     }
 
@@ -537,6 +537,12 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Combat)
             SetAimedSpell(null);
 
+        view.AdvanceRouteMarkers(battle.CurrentPhase switch
+        {
+            DefenseBattle.Phase.Preparation => Time.unscaledDeltaTime,
+            DefenseBattle.Phase.Combat => battleClock.DeltaTime,
+            _ => 0f
+        });
         view.AdvanceEffects(battleClock.DeltaTime);
         view.AdvanceCoreAnimation(battleClock.DeltaTime, battleClock.PlaybackSpeed);
         Vector3? spellCenter = aimedSpell.HasValue && TryPickAreaSpellCenter(Mouse.current, out Vector3 center)

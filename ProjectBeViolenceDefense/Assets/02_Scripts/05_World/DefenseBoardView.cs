@@ -15,9 +15,14 @@ internal sealed class DefenseBoardView
     private const float MinViewScale = 0.35f;
     private const float MaxViewScale = 1.2f;
     private const float TileHeight = 0.28f;
-    private const float RouteMarkerSize = 0.68f;
     private const float RouteLaneSpacing = 0.49f;
     private const float RouteMarkerHeight = 0.02f;
+    private const float RouteMarkerTravel = 0.36f;
+    private const float RouteMarkerCyclesPerSecond = 0.5f;
+    private const float SingleLaneRouteWidth = 1.3f;
+    private const float RouteMarkerFadePortion = 0.18f;
+    private const float BattleRouteTileTint = 0.3f;
+    private const float BattleRouteMarkerTint = 0.6f;
     private const float SpawnPadHeight = 0.09f;
     private const float GoblinTurnSpeed = 1440f;
     private const float RunStopGrace = 0.08f;
@@ -46,6 +51,10 @@ internal sealed class DefenseBoardView
     private const float CoreShockwaveHeight = 0.44f;
     private const float SpellBodyFlashDuration = 0.26f;
     private const float SpellBodyFlashBrightness = 1.8f;
+    private const float BuffMarkSpacing = 0.20f;
+    private const float BuffMarkOffset = 0.32f;
+    private const float BuffMarkDarkeningPerStack = 0.14f;
+    private const float BuffMarkMinimumBrightness = 0.58f;
 
     private static readonly Plane BoardGround = new(Vector3.up, Vector3.zero);
     private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
@@ -74,11 +83,33 @@ internal sealed class DefenseBoardView
         public int HitsSeen;
         public (EnemyUnit Target, bool Boosted, bool TargetArmored) PendingHit;
         public LineRenderer[] MoveSpeedTrails;
+        public Transform BuffMarks;
+        public MeshRenderer[] BuffMarkRenderers;
+        public int[] BuffMarkStacks;
         public float StoppedTime;
         public Material PreviewMaterial;
         public (Renderer Renderer, Material[] Original, Material[] Preview, int Order)[] PreviewSurfaces;
         public Color SpellFlashColor;
         public float SpellFlashRemaining;
+    }
+
+    private readonly struct RouteMarkerMotion
+    {
+        public readonly Vector3 Center;
+        public readonly Vector3 Direction;
+        public readonly Color ArrowColor;
+        public readonly Color FloorColor;
+        public readonly float WidthScale;
+
+        public RouteMarkerMotion(Vector3 center, Vector3 direction, Color arrowColor, Color floorColor,
+            float widthScale)
+        {
+            Center = center;
+            Direction = direction;
+            ArrowColor = arrowColor;
+            FloorColor = floorColor;
+            WidthScale = widthScale;
+        }
     }
 
     private sealed class CoreStrike
@@ -107,7 +138,11 @@ internal sealed class DefenseBoardView
     private readonly IReadOnlyList<int> spawnFactions;
     private readonly int boardWidth;
     private readonly int boardDepth;
-    private readonly List<SpriteRenderer> routeMarkers = new();
+    private readonly List<MeshRenderer> routeMarkers = new();
+    private readonly List<RouteMarkerMotion> routeMarkerMotions = new();
+    private float routeMarkerPhase = 0.5f;
+    private readonly Mesh routeMarkerMesh;
+    private readonly Material routeMarkerMaterial;
     private readonly List<Material> materials = new();
     private readonly Dictionary<Material, Material> aimOverlayMaterials = new();
     private readonly SpriteRenderer aimDim;
@@ -119,12 +154,12 @@ internal sealed class DefenseBoardView
     private readonly List<CoreStrike> coreStrikes = new();
     private readonly Dictionary<Material, Material> fadeMaterials = new();
     private readonly SpellEffects spellEffects;
-    private readonly SpellCastMarkers spellCastMarkers;
     private readonly MaterialPropertyBlock tintBlock = new();
     private readonly Dictionary<EnemyFaction, Material> factionMaterials = new();
     private readonly MeshRenderer[,] floor;
     private readonly Material[] tiles;
     private readonly Material routeTile;
+    private readonly Material[] battleRouteTiles;
     private readonly Material encounterTile;
     private readonly Material buildWall;
     private readonly Material trim;
@@ -134,6 +169,10 @@ internal sealed class DefenseBoardView
     private readonly Material moveSpeedBuffPreviewMaterial;
     private readonly Material healPreviewMaterial;
     private readonly Material armorBuffPreviewMaterial;
+    private readonly Material attackBuffMarkMaterial;
+    private readonly Material moveSpeedBuffMarkMaterial;
+    private readonly Material armorBuffMarkMaterial;
+    private readonly Quaternion buffMarkRotation;
     private readonly Dictionary<DefenseBattle.Spell, Material> targetSilhouettes = new();
     private readonly Dictionary<(Material Preview, Material Source), Material> texturedSilhouettes = new();
     private readonly MeshRenderer areaSpellPreview;
@@ -172,6 +211,7 @@ internal sealed class DefenseBoardView
         floor = new MeshRenderer[boardWidth, boardDepth];
         // Aim slightly toward the near corner to leave room for the battle controls.
         Vector3 boardForward = root.InverseTransformDirection(camera.transform.forward);
+        buffMarkRotation = Quaternion.LookRotation(-Vector3.ProjectOnPlane(boardForward, Vector3.up));
         cameraFocus = grid.Center - Vector3.ProjectOnPlane(boardForward, Vector3.up).normalized * CameraFocusOffset;
         PositionCamera();
         camera.orthographic = true;
@@ -182,6 +222,15 @@ internal sealed class DefenseBoardView
         Material foundation = Palette(theme.foundation);
         tiles = new[] { Palette(theme.tileA, theme.tileTexture), Palette(theme.tileB, theme.tileTexture) };
         routeTile = Palette(theme.routeTile, theme.tileTexture);
+        battleRouteTiles = new[]
+        {
+            Palette(Color.Lerp(theme.tileA, theme.routeTile, BattleRouteTileTint), theme.tileTexture),
+            Palette(Color.Lerp(theme.tileB, theme.routeTile, BattleRouteTileTint), theme.tileTexture)
+        };
+        routeMarkerMesh = CreateRouteMarkerMesh();
+        meshes.Add(routeMarkerMesh);
+        routeMarkerMaterial = Palette(Color.white);
+        routeMarkerMaterial.enableInstancing = true;
         encounterTile = Palette(theme.encounterTile, theme.tileTexture);
         buildWall = Palette(theme.buildWall);
         Material fixedWall = Palette(theme.fixedWall);
@@ -235,6 +284,9 @@ internal sealed class DefenseBoardView
         moveSpeedBuffPreviewMaterial = Palette(MoveSpeedBuffColor);
         healPreviewMaterial = Palette(UIPalette.Heal);
         armorBuffPreviewMaterial = Palette(UIPalette.Armor);
+        attackBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.Attack, 0.72f));
+        moveSpeedBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.MoveSpeed, 0.72f));
+        armorBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.Armor, 0.72f));
         Shader silhouetteShader = Resources.Load<Shader>("SpellTargetSilhouette");
         foreach (DefenseBattle.Spell spell in System.Enum.GetValues(typeof(DefenseBattle.Spell)))
         {
@@ -251,7 +303,6 @@ internal sealed class DefenseBoardView
         var spellStroke = new Material(Shader.Find("Sprites/Default")) { name = "Spell Effect Stroke" };
         materials.Add(spellStroke);
         spellEffects = new SpellEffects(root, camera, spellStroke, AimDimSortingOrder + 1);
-        spellCastMarkers = new SpellCastMarkers(camera, root, AimDimSortingOrder + 2);
         aimDim = CreateAimDim();
     }
 
@@ -557,21 +608,50 @@ internal sealed class DefenseBoardView
 
     public void ShowPlanningTiles(IReadOnlyList<Vector3[]> routes = null,
         IReadOnlyCollection<Vector2Int> encounters = null)
+        => ShowRoutes(routes, encounters, false);
+
+    public void ShowBattleRoutes(IReadOnlyList<Vector3[]> routes)
+        => ShowRoutes(routes, null, true);
+
+    private void ShowRoutes(IReadOnlyList<Vector3[]> routes,
+        IReadOnlyCollection<Vector2Int> encounters, bool subdued)
     {
         PlannedEncounters = encounters ?? System.Array.Empty<Vector2Int>();
         for (int x = 0; x < boardWidth; x++)
             for (int z = 0; z < boardDepth; z++)
                 floor[x, z].sharedMaterial = tiles[(x + z) % tiles.Length];
 
-        int markerCount = routes == null ? 0 : DrawRoutes(routes);
+        int markerCount = routes == null ? 0 : DrawRoutes(routes, subdued);
         for (int i = markerCount; i < routeMarkers.Count; i++)
             routeMarkers[i].enabled = false;
 
         foreach (Vector2Int cell in PlannedEncounters)
             floor[cell.x, cell.y].sharedMaterial = encounterTile;
+        AdvanceRouteMarkers(0f);
     }
 
-    private int DrawRoutes(IReadOnlyList<Vector3[]> routes)
+    public void AdvanceRouteMarkers(float deltaTime)
+    {
+        routeMarkerPhase = Mathf.Repeat(routeMarkerPhase + deltaTime * RouteMarkerCyclesPerSecond, 1f);
+        for (int i = 0; i < routeMarkers.Count; i++)
+        {
+            MeshRenderer marker = routeMarkers[i];
+            if (!marker.enabled)
+                continue;
+
+            RouteMarkerMotion motion = routeMarkerMotions[i];
+            float phase = routeMarkerPhase;
+            float travel = Mathf.SmoothStep(0f, 1f, phase);
+            marker.transform.localPosition = motion.Center + motion.Direction * ((travel - 0.5f) * RouteMarkerTravel);
+            float fade = Mathf.SmoothStep(0f, 1f,
+                Mathf.Min(phase, 1f - phase) / RouteMarkerFadePortion);
+            marker.transform.localScale = new Vector3(motion.WidthScale * fade, fade, fade);
+            tintBlock.SetColor(BaseColor, Color.Lerp(motion.FloorColor, motion.ArrowColor, fade));
+            marker.SetPropertyBlock(tintBlock);
+        }
+    }
+
+    private int DrawRoutes(IReadOnlyList<Vector3[]> routes, bool subdued)
     {
         var stepsByCell = new Dictionary<Vector2Int, List<(int FactionIndex, Vector3 Direction)>>();
         // factionIndex는 여기서 스폰(경로) 인덱스이고, 색은 spawnFactions로 찾는다.
@@ -594,7 +674,9 @@ internal sealed class DefenseBoardView
         int markerCount = 0;
         foreach (var (cell, steps) in stepsByCell)
         {
-            floor[cell.x, cell.y].sharedMaterial = routeTile;
+            floor[cell.x, cell.y].sharedMaterial = subdued
+                ? battleRouteTiles[(cell.x + cell.y) % battleRouteTiles.Length]
+                : routeTile;
             if (routeChevron == null)
                 continue;
 
@@ -602,33 +684,83 @@ internal sealed class DefenseBoardView
             Vector3 side = Vector3.Cross(Vector3.up, steps[0].Direction);
             float height = RouteMarkerHeight + (spawnCells.Contains(cell) ? SpawnPadHeight : 0f);
             Vector3 center = DefenseGrid.CellPosition(cell) + Vector3.up * height;
+            Color floorColor = floor[cell.x, cell.y].sharedMaterial.color;
             for (int i = 0; i < steps.Count; i++)
             {
                 var (factionIndex, direction) = steps[i];
                 float offset = (i - (steps.Count - 1) * 0.5f) * RouteLaneSpacing;
-                SpriteRenderer marker = RouteMarker(markerCount++);
-                marker.transform.localPosition = center + side * offset;
-                marker.transform.localRotation = Quaternion.LookRotation(Vector3.down,
-                    Vector3.Cross(Vector3.down, direction));
-                marker.color = factions[spawnFactions[factionIndex]].Color;
+                int markerIndex = markerCount++;
+                MeshRenderer marker = RouteMarker(markerIndex);
+                Vector3 markerCenter = center + side * offset;
+                marker.transform.localPosition = markerCenter;
+                marker.transform.localRotation = Quaternion.LookRotation(direction, Vector3.up);
+                Color color = factions[spawnFactions[factionIndex]].Color;
+                if (subdued)
+                    color = Color.Lerp(floorColor, color, BattleRouteMarkerTint);
                 marker.enabled = true;
+                routeMarkerMotions[markerIndex] = new RouteMarkerMotion(markerCenter, direction, color, floorColor,
+                    steps.Count == 1 ? SingleLaneRouteWidth : 1f);
             }
         }
 
         return markerCount;
     }
 
-    private SpriteRenderer RouteMarker(int index)
+    private MeshRenderer RouteMarker(int index)
     {
         if (index < routeMarkers.Count)
             return routeMarkers[index];
 
-        var marker = new GameObject("Route Chevron").AddComponent<SpriteRenderer>();
+        var marker = new GameObject("Route Arrow", typeof(MeshFilter), typeof(MeshRenderer)).GetComponent<MeshRenderer>();
         marker.transform.SetParent(root, false);
-        marker.transform.localScale = Vector3.one * RouteMarkerSize;
-        marker.sprite = routeChevron;
+        marker.GetComponent<MeshFilter>().sharedMesh = routeMarkerMesh;
+        marker.sharedMaterial = routeMarkerMaterial;
+        marker.shadowCastingMode = ShadowCastingMode.Off;
+        marker.receiveShadows = false;
         routeMarkers.Add(marker);
+        routeMarkerMotions.Add(default);
         return marker;
+    }
+
+    private static Mesh CreateRouteMarkerMesh()
+    {
+        const float height = 0.08f;
+        // The old route icon was a hollow chevron. Extrude its two narrow arms instead of filling the middle.
+        Vector2[] outline =
+        {
+            new(-0.23f, -0.12f), new(-0.13f, -0.12f), new(0f, 0.05f),
+            new(0.13f, -0.12f), new(0.23f, -0.12f), new(0f, 0.15f)
+        };
+        var vertices = new List<Vector3>();
+        foreach (Vector2 point in outline)
+            vertices.Add(new Vector3(point.x, height, point.y));
+        var triangles = new List<int>
+        {
+            0, 2, 1, 0, 5, 2, // left arm
+            2, 4, 3, 2, 5, 4  // right arm
+        };
+
+        for (int i = 0; i < outline.Length; i++)
+        {
+            int next = (i + 1) % outline.Length;
+            int side = vertices.Count;
+            Vector2 a = outline[i];
+            Vector2 b = outline[next];
+            vertices.Add(new Vector3(a.x, 0f, a.y));
+            vertices.Add(new Vector3(b.x, 0f, b.y));
+            vertices.Add(new Vector3(b.x, height, b.y));
+            vertices.Add(new Vector3(a.x, height, a.y));
+            triangles.Add(side);
+            triangles.Add(side + 3);
+            triangles.Add(side + 2);
+            triangles.Add(side);
+            triangles.Add(side + 2);
+            triangles.Add(side + 1);
+        }
+
+        var mesh = new Mesh { name = "Route Arrow", vertices = vertices.ToArray(), triangles = triangles.ToArray() };
+        mesh.RecalculateNormals();
+        return mesh;
     }
 
     public void PlaceWall(Vector2Int cell) => wallViews.Add(cell, CreateWall(cell, $"Wall {cell.x},{cell.y}", buildWall));
@@ -706,8 +838,6 @@ internal sealed class DefenseBoardView
                 view.SpellFlashColor = flashColor;
                 view.SpellFlashRemaining = SpellBodyFlashDuration;
                 ApplyEnemyTint(view);
-                spellCastMarkers.Play(spell, view.Root, EnemyMarkerPoint(enemy, 0.76f),
-                    DefenseHud.UnitMarkerViewportClearance(enemy));
             }
         }
     }
@@ -1089,6 +1219,8 @@ internal sealed class DefenseBoardView
             foreach (LineRenderer trail in view.MoveSpeedTrails)
                 trail.enabled = false;
         }
+        if (view.BuffMarks != null)
+            view.BuffMarks.gameObject.SetActive(false);
         if (enemy.ReachedCore)
         {
             // 코어 피해를 처리한 적의 모델만 남겨 타격과 퇴장 연출을 재생한다.
@@ -1247,7 +1379,6 @@ internal sealed class DefenseBoardView
             if (effect.IsPlaying)
                 effect.Advance(deltaTime);
         spellEffects.Advance(deltaTime);
-        spellCastMarkers.Advance(deltaTime);
         if (deltaTime <= 0f)
             return;
 
@@ -1285,8 +1416,73 @@ internal sealed class DefenseBoardView
                 view.Head.localPosition = new Vector3(0, 0.62f, enemy.AttackFlash * 0.7f);
         }
         SyncHit(view, enemy);
+        SyncBuffMarks(view, enemy);
         bool movingWithBuff = enemy.MoveSpeedBuffStacks > 0 && IsMoving(step, deltaTime, playbackSpeed);
         spellEffects.SyncMoveTrail(view.Root, step, movingWithBuff, ref view.MoveSpeedTrails);
+    }
+
+    private void SyncBuffMarks(EnemyView view, EnemyUnit enemy)
+    {
+        int attack = enemy.AttackBuffStacks;
+        int speed = enemy.MoveSpeedBuffStacks;
+        int armor = enemy.ArmorBuffStacks;
+        if (attack == 0 && speed == 0 && armor == 0)
+        {
+            if (view.BuffMarks != null)
+                view.BuffMarks.gameObject.SetActive(false);
+            return;
+        }
+
+        if (view.BuffMarks == null)
+        {
+            var marks = new GameObject("Buff Marks").transform;
+            marks.SetParent(view.Root, false);
+            view.BuffMarkRenderers = new[]
+            {
+                AddBuffMark("Attack", marks, -BuffMarkSpacing, attackBuffMarkMaterial),
+                AddBuffMark("Move Speed", marks, 0f, moveSpeedBuffMarkMaterial),
+                AddBuffMark("Armor", marks, BuffMarkSpacing, armorBuffMarkMaterial)
+            };
+            view.BuffMarkStacks = new int[3];
+            view.BuffMarks = marks;
+        }
+
+        view.BuffMarks.localRotation = Quaternion.Inverse(view.Root.localRotation) * buffMarkRotation;
+        SyncBuffMark(view, 0, attack);
+        SyncBuffMark(view, 1, speed);
+        SyncBuffMark(view, 2, armor);
+        view.BuffMarks.gameObject.SetActive(true);
+    }
+
+    private void SyncBuffMark(EnemyView view, int index, int stacks)
+    {
+        MeshRenderer mark = view.BuffMarkRenderers[index];
+        mark.gameObject.SetActive(stacks > 0);
+        if (view.BuffMarkStacks[index] == stacks)
+            return;
+
+        view.BuffMarkStacks[index] = stacks;
+        if (stacks <= 1)
+        {
+            mark.SetPropertyBlock(null);
+            return;
+        }
+
+        float brightness = Mathf.Max(BuffMarkMinimumBrightness, 1f - (stacks - 1) * BuffMarkDarkeningPerStack);
+        Color baseColor = mark.sharedMaterial.color;
+        tintBlock.SetColor(BaseColor, new Color(baseColor.r * brightness, baseColor.g * brightness,
+            baseColor.b * brightness, baseColor.a));
+        mark.SetPropertyBlock(tintBlock);
+    }
+
+    private static MeshRenderer AddBuffMark(string label, Transform marks, float x, Material material)
+    {
+        Transform mark = Box(label, marks, new Vector3(x, SpawnPadHeight + 0.02f, BuffMarkOffset),
+            new Vector3(0.095f, 0.012f, 0.055f), material);
+        var renderer = mark.GetComponent<MeshRenderer>();
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        renderer.receiveShadows = false;
+        return renderer;
     }
 
     // 공격 애니메이션이 타격 지점에 닿는 순간 대상 위치에 이펙트를 띄운다.
@@ -1422,7 +1618,6 @@ internal sealed class DefenseBoardView
 
     public void ReleaseMaterials()
     {
-        spellCastMarkers.ReleaseSprites();
         Release(areaSpellPreviewMesh);
         Release(factionRingMesh);
         if (aimDim != null && aimDim.sprite != null)

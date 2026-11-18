@@ -22,7 +22,6 @@ internal sealed class DefenseBattle
     private const float ManaPerSecond = 7f;
     // 스폰 지점마다 이 간격으로 한 마리씩 줄지어 나온다.
     private const float SpawnInterval = 0.6f;
-    internal const float UnitSpacing = 0.44f;
     private const float CombatPlanInterval = 0.12f;
     private const float RouteYieldDelay = 0.35f;
     private const int RouteRejoinWaypoints = 3;
@@ -96,7 +95,7 @@ internal sealed class DefenseBattle
         this.grid = grid;
         this.factions = factions;
         this.roundLineup = roundLineup;
-        combat = new CombatPositioning(grid, enemies, UnitSpacing);
+        combat = new CombatPositioning(grid, enemies);
         spawnedPerFaction = new int[factions.Length];
         roundSpawnCounts = new int[factions.Length];
         factionSpawns = new int[factions.Length][];
@@ -353,6 +352,10 @@ internal sealed class DefenseBattle
             untilCombatPlan = 0f;
         }
 
+        if (!pauseMovement)
+            foreach (EnemyUnit enemy in enemies)
+                combat.TrackApproachProgress(enemy, deltaTime);
+
         untilCombatPlan -= deltaTime;
         if (untilCombatPlan <= 0f)
         {
@@ -439,6 +442,9 @@ internal sealed class DefenseBattle
             if (spawnedPerFaction[factionIndex] >= roundSpawnCounts[factionIndex])
                 continue;
 
+            // Earlier spawns in this batch already occupy space, including across factions.
+            if (!SpawnPointClear(factionIndex))
+                continue;
             var path = (Vector3[])NextRoute(factionIndex).Clone();
             spawnedPerFaction[factionIndex]++;
             var enemy = new EnemyUnit(RoundUnit(factionIndex, spawnedPerFaction[factionIndex] - 1), factionIndex, path,
@@ -458,15 +464,21 @@ internal sealed class DefenseBattle
 
     private bool SpawnPointsClear()
     {
-        for (int factionIndex = 0; factionIndex < factions.Length; factionIndex++)
-        {
-            if (spawnedPerFaction[factionIndex] >= roundSpawnCounts[factionIndex])
-                continue;
+        for (int side = 0; side < factions.Length; side++)
+            if (spawnedPerFaction[side] < roundSpawnCounts[side] && !SpawnPointClear(side))
+                return false;
+        return true;
+    }
 
-            Vector3 spawn = NextRoute(factionIndex)[0];
-            foreach (EnemyUnit enemy in enemies)
-                if ((enemy.Position - spawn).sqrMagnitude < UnitSpacing * UnitSpacing)
-                    return false;
+    private bool SpawnPointClear(int side)
+    {
+        Vector3 spawn = NextRoute(side)[0];
+        EnemyFaction incoming = RoundUnit(side, spawnedPerFaction[side]);
+        foreach (EnemyUnit enemy in enemies)
+        {
+            float spacing = CombatPositioning.RequiredSpacing(incoming, enemy.Faction);
+            if ((enemy.Position - spawn).sqrMagnitude < spacing * spacing)
+                return false;
         }
         return true;
     }
@@ -498,28 +510,53 @@ internal sealed class DefenseBattle
         if (!enemy.Position.Equals(enemy.RoutePosition) && TryRejoinRoute(enemy, deltaTime))
             return;
 
-        Vector3 next = enemy.NextRoutePosition(deltaTime);
-        enemy.Face(next);
-        if (combat.CanFollowRoute(enemy, next))
+        // Off-route units wait for their forward connection, rather than walking back
+        // to the spot they just yielded from and immediately starting the same detour.
+        if (enemy.Position.Equals(enemy.RoutePosition))
         {
-            enemy.FollowRoute(next);
-            enemy.BlockedRouteTime = 0f;
-            return;
+            Vector3 next = enemy.NextRoutePosition(deltaTime);
+            if (combat.CanFollowRoute(enemy, next))
+            {
+                enemy.Face(next);
+                enemy.FollowRoute(next);
+                enemy.BlockedRouteTime = 0f;
+                return;
+            }
         }
 
         enemy.BlockedRouteTime += deltaTime;
         if (enemy.BlockedRouteTime < RouteYieldDelay)
             return;
         enemy.BlockedRouteTime = 0f;
-        if (combat.TryFindRouteYield(enemy, out Vector3 destination))
+        if (TryRejoinRoute(enemy, deltaTime))
+            return;
+        if (combat.TryFindRouteYield(enemy, RouteRejoinWaypoints, out Vector3 destination, out int offset))
+        {
             enemy.RouteYieldDestination = destination;
+            enemy.RouteBypassOffset = offset;
+        }
     }
 
     private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime)
     {
-        // Skip a blocked return point only when the path to a forward waypoint is clear.
-        int count = Mathf.Min(RouteRejoinWaypoints, enemy.RemainingRouteWaypoints);
-        for (int offset = 0; offset < count; offset++)
+        // The final point is on the core boundary, not a navigation waypoint. Return
+        // to its approach tile; the normal route step then handles core contact.
+        if (enemy.RemainingRouteWaypoints == 1)
+        {
+            Vector3 approach = enemy.RoutePosition;
+            if (!grid.CanPursue(enemy.Position, approach) || !combat.CanFollowRoute(enemy, approach))
+                return false;
+            Vector3 step = enemy.StepToward(approach, deltaTime);
+            enemy.Face(step);
+            enemy.FollowRoute(step);
+            enemy.RouteBypassOffset = -1;
+            enemy.BlockedRouteTime = 0f;
+            return true;
+        }
+
+        // A fighter may have moved well beyond its old route index. Rejoin the furthest
+        // visible, unobstructed point ahead instead of walking backwards through the army.
+        for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= Mathf.Max(0, enemy.RouteBypassOffset); offset--)
         {
             Vector3 waypoint = enemy.GetRouteWaypoint(offset);
             if (!grid.CanPursue(enemy.Position, waypoint) || !combat.CanFollowRoute(enemy, waypoint))
@@ -527,7 +564,16 @@ internal sealed class DefenseBattle
 
             Vector3 next = enemy.StepToward(waypoint, deltaTime);
             enemy.Face(next);
-            enemy.FollowRoute(next, offset);
+            if (next.Equals(waypoint))
+            {
+                enemy.FollowRoute(next, offset);
+                enemy.RouteBypassOffset = -1;
+            }
+            else
+            {
+                enemy.MoveOffRoute(next);
+                enemy.RouteBypassOffset = offset;
+            }
             enemy.BlockedRouteTime = 0f;
             return true;
         }

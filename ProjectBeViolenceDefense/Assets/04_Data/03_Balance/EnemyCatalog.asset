@@ -20,6 +20,7 @@ MonoBehaviour:
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1
+    bodyRadius: 0.34
     maxHealth: 75
     damage: 10
     attackInterval: 0.65
@@ -34,6 +35,7 @@ MonoBehaviour:
     animations: {fileID: 9100000, guid: 540f004d4dada8344ba500c596233a98, type: 2}
     skin: {fileID: 2100000, guid: fc637a2448e415743b7c00a46b74d135, type: 2}
     modelScale: 1.3
+    bodyRadius: 0.24
     maxHealth: 135
     damage: 15
     attackInterval: 1
@@ -48,6 +50,7 @@ MonoBehaviour:
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1
+    bodyRadius: 0.23
     maxHealth: 45
     damage: 6
     attackInterval: 0.5
@@ -62,6 +65,7 @@ MonoBehaviour:
     animations: {fileID: 9100000, guid: b481ee71520a5aa448de50425f225b37, type: 2}
     skin: {fileID: 2100000, guid: 9b7b9ea496f1d114e98e9120e0f9b578, type: 2}
     modelScale: 1.5
+    bodyRadius: 0.3
     maxHealth: 180
     damage: 18
     attackInterval: 0.9
@@ -76,6 +80,7 @@ MonoBehaviour:
     animations: {fileID: 9100000, guid: 1818da51ac2a08e48b886e831995dcaf, type: 2}
     skin: {fileID: 2100000, guid: 24c4952b37de50d499781472544db53e, type: 2}
     modelScale: 1.2
+    bodyRadius: 0.28
     maxHealth: 55
     damage: 8
     attackInterval: 0.8
@@ -90,6 +95,7 @@ MonoBehaviour:
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1
+    bodyRadius: 0.38
     maxHealth: 105
     damage: 12
     attackInterval: 0.9
@@ -104,6 +110,7 @@ MonoBehaviour:
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1
+    bodyRadius: 0.36
     maxHealth: 270
     damage: 14
     attackInterval: 1.2
@@ -118,6 +125,7 @@ MonoBehaviour:
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1
+    bodyRadius: 0.29
     maxHealth: 60
     damage: 8
     attackInterval: 1.2
@@ -132,6 +140,7 @@ MonoBehaviour:
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1
+    bodyRadius: 0.4
     maxHealth: 210
     damage: 22
     attackInterval: 1.1
@@ -146,6 +155,7 @@ MonoBehaviour:
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1
+    bodyRadius: 0.35
     maxHealth: 165
     damage: 30
     attackInterval: 1.3
@@ -160,6 +170,7 @@ MonoBehaviour:
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1
+    bodyRadius: 0.3
     maxHealth: 55
     damage: 10
     attackInterval: 1
@@ -174,6 +185,7 @@ MonoBehaviour:
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1
+    bodyRadius: 0.5
     maxHealth: 390
     damage: 28
     attackInterval: 1.4
@@ -188,6 +200,7 @@ MonoBehaviour:
     animations: {fileID: 9100000, guid: fb00204cc67e22b48a664e92fbb7cf5c, type: 2}
     skin: {fileID: 2100000, guid: 95ed19e22b42a924fb3f35eaabf97c13, type: 2}
     modelScale: 1.3
+    bodyRadius: 0.22
     maxHealth: 70
     damage: 12
     attackInterval: 0.8
@@ -202,6 +215,7 @@ MonoBehaviour:
     animations: {fileID: 9100000, guid: b4e7b0c936910404284f23a2d8b542f6, type: 2}
     skin: {fileID: 2100000, guid: c549a8a7d07a26c4698a9e8f8781c9ad, type: 2}
     modelScale: 1.7
+    bodyRadius: 0.28
     maxHealth: 225
     damage: 20
     attackInterval: 0.8
@@ -216,6 +230,7 @@ MonoBehaviour:
     animations: {fileID: 9100000, guid: e10db4c737a2d7246854adba68c78e59, type: 2}
     skin: {fileID: 2100000, guid: fe2ccf3da61a7e94f9d885f26ee00a62, type: 2}
     modelScale: 1
+    bodyRadius: 0.36
     maxHealth: 60
     damage: 8
     attackInterval: 0.5
@@ -230,6 +245,7 @@ MonoBehaviour:
     animations: {fileID: 9100000, guid: 6f19d133efd6a6548846102a198a70f2, type: 2}
     skin: {fileID: 2100000, guid: e45168a647c3dfd4999443dbc29f0f03, type: 2}
     modelScale: 1
+    bodyRadius: 0.28
     maxHealth: 75
     damage: 10
     attackInterval: 0.65

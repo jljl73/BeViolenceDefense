@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="4" result="Failed(Child)" total="4" passed="2" failed="2" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-18 14:58:29Z" end-time="2026-11-18 14:58:29Z" duration="0.0285909">
+  <test-suite type="TestSuite" id="1000" name="ProjectBeViolenceDefense" fullname="ProjectBeViolenceDefense" runstate="Runnable" testcasecount="7" result="Failed" site="Child" start-time="2026-11-18 14:58:29Z" end-time="2026-11-18 14:58:29Z" duration="0.028591" total="4" passed="2" failed="2" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1011" name="Assembly-CSharp-Editor.dll" fullname="/private/tmp/be-victory-validation/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="7" result="Failed" site="Child" start-time="2026-11-18 14:58:29Z" end-time="2026-11-18 14:58:29Z" duration="0.025244" total="4" passed="2" failed="2" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="71941" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestFixture" id="1001" name="CombatPositioningTests" fullname="CombatPositioningTests" classname="CombatPositioningTests" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2026-11-18 14:58:29Z" end-time="2026-11-18 14:58:29Z" duration="0.024638" total="4" passed="2" failed="2" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1003" name="BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap" fullname="CombatPositioningTests.BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap" methodname="BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap" classname="CombatPositioningTests" runstate="Runnable" seed="1740170418" result="Failed" start-time="2026-11-18 14:58:29Z" end-time="2026-11-18 14:58:29Z" duration="0.010926" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  The unit should step around the temporary blocker instead of waiting indefinitely.
+  Expected: True
+  But was:  False
+]]></message>
+            <stack-trace><![CDATA[at CombatPositioningTests.BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap () [0x000f5] in /private/tmp/be-victory-validation/Assets/09_Tests/Editor/CombatPositioningTests.cs:44
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1002" name="ReadyAttackerTakesPriorityOverDistantReservations" fullname="CombatPositioningTests.ReadyAttackerTakesPriorityOverDistantReservations" methodname="ReadyAttackerTakesPriorityOverDistantReservations" classname="CombatPositioningTests" runstate="Runnable" seed="213249028" result="Failed" start-time="2026-11-18 14:58:29Z" end-time="2026-11-18 14:58:29Z" duration="0.003329" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  A distant reservation must not exclude a unit already in striking distance.
+  Expected: True
+  But was:  False
+]]></message>
+            <stack-trace><![CDATA[at CombatPositioningTests.ReadyAttackerTakesPriorityOverDistantReservations () [0x000ff] in /private/tmp/be-victory-validation/Assets/09_Tests/Editor/CombatPositioningTests.cs:25
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1005" name="ReadyFighterStaysPutAndAlternativeTargetIsUsedWhenFull" fullname="CombatPositioningTests.ReadyFighterStaysPutAndAlternativeTargetIsUsedWhenFull" methodname="ReadyFighterStaysPutAndAlternativeTargetIsUsedWhenFull" classname="CombatPositioningTests" runstate="Runnable" seed="688568413" result="Passed" start-time="2026-11-18 14:58:29Z" end-time="2026-11-18 14:58:29Z" duration="0.003063" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1004" name="WallStillBlocksDetectionAndAttacks" fullname="CombatPositioningTests.WallStillBlocksDetectionAndAttacks" methodname="WallStillBlocksDetectionAndAttacks" classname="CombatPositioningTests" runstate="Runnable" seed="952357574" result="Passed" start-time="2026-11-18 14:58:29Z" end-time="2026-11-18 14:58:29Z" duration="0.000808" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: /Users/mignon/Library/Application Support/DefaultCompany/ProjectBeViolenceDefense/TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

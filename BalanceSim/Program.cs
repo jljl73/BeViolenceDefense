@@ -377,7 +377,7 @@ internal static class Program
     {
         public string Id;
         public int Hp, Dmg, Armor;
-        public float Interval, Range, Aware, Speed;
+        public float Interval, Range, Aware, Speed, BodyRadius;
         public double Power => Hp * (Dmg / Interval) / 769.0;
     }
 
@@ -391,22 +391,23 @@ internal static class Program
     {
         var result = new Dictionary<string, UnitStats>();
         string text = System.IO.File.ReadAllText(path);
-        foreach (string block in text.Split("\n  - id: ").Skip(1))
+        foreach (string block in System.Text.RegularExpressions.Regex.Split(text, @"\n  - ").Skip(1))
         {
             string F(string key)
             {
-                var m = System.Text.RegularExpressions.Regex.Match(block, @"\n    " + key + @": ([^\n]*)");
+                var m = System.Text.RegularExpressions.Regex.Match(block, @"(?:^|\n    )" + key + @": ([^\n]*)");
                 return m.Success ? m.Groups[1].Value.Trim() : null;
             }
             var u = new UnitStats
             {
-                Id = block.Split('\n')[0].Trim(),
+                Id = F("id"),
                 Hp = int.Parse(F("maxHealth") ?? "50"),
                 Dmg = int.Parse(F("damage") ?? "10"),
                 Interval = float.Parse(F("attackInterval") ?? "0.65"),
                 Range = float.Parse(F("attackRange") ?? "1.5"),
                 Aware = float.Parse(F("awarenessRange") ?? "2.2"),
                 Speed = float.Parse(F("moveSpeed") ?? "1.7"),
+                BodyRadius = float.Parse(F("bodyRadius") ?? "0.3") * float.Parse(F("modelScale") ?? "1"),
                 Armor = int.Parse(F("armor") ?? "0"),
             };
             result[u.Id] = u;
@@ -485,7 +486,7 @@ internal static class Program
                     if (!catalog.TryGetValue(id, out UnitStats st)) { Console.WriteLine($"  알 수 없는 유닛: {id}"); missing = true; continue; }
                     if (!units.TryGetValue((id, side), out EnemyFaction f))
                         units[(id, side)] = f = new EnemyFaction(id, sideColors[side], st.Range, st.Hp, st.Dmg, st.Interval, 0,
-                            st.Aware, st.Speed, null, null, null, 1f, st.Armor, id);
+                            st.Aware, st.Speed, st.Armor, id, st.BodyRadius);
                     for (int i = 0; i < n; i++) q.Add(f);
                     totalHp[side] += st.Hp * n;
                     power[side] += st.Power * n;
@@ -570,7 +571,7 @@ internal static class Program
             {
                 UnitStats st = catalog[id];
                 var f = new EnemyFaction(id, sideColors[side], st.Range, st.Hp, st.Dmg, st.Interval, 0,
-                    st.Aware, st.Speed, null, null, null, 1f, st.Armor, id);
+                    st.Aware, st.Speed, st.Armor, id, st.BodyRadius);
                 for (int i = 0; i < n; i++) q.Add(f);
             }
             queues[side] = q;
@@ -619,7 +620,7 @@ internal static class Program
         Console.WriteLine("  [비교] 예전 방식(프레임 시간 = 틱 길이):");
         foreach (var (name, frame) in patterns.Take(3))
         {
-            var grid = new DefenseGrid(Board);
+            var grid = NewGrid();
             foreach (Vector2Int cell in walls) grid.TryPlace(cell);
             var battle = new DefenseBattle(grid, new[] { new EnemyFaction("Coral", sideColors[0]), new EnemyFaction("Teal", sideColors[1]) }, _ => queues);
             battle.StartRound();
@@ -634,7 +635,7 @@ internal static class Program
     private static (List<ulong> Hashes, string Outcome, int Frames) RunWithClock(IReadOnlyList<EnemyFaction>[] queues,
         Vector2Int[] walls, DefenseBattle.SpellCommand[] spells, Func<int, (float Dt, int Speed, bool Aim)> frame)
     {
-        var grid = new DefenseGrid(Board);
+        var grid = NewGrid();
         foreach (Vector2Int cell in walls) grid.TryPlace(cell);
         var sides = new[] { new EnemyFaction("Coral", new Color(1, 0, 0)), new EnemyFaction("Teal", new Color(0, 1, 1)) };
         var battle = new DefenseBattle(grid, sides, _ => queues);
