@@ -55,8 +55,8 @@ internal sealed class EnemyFaction
 
 internal sealed class EnemyUnit
 {
-    public const int AttackBonus = 10;
-    public const int MoveSpeedBonusPercent = 50;
+    public const int AttackBonusPercent = 50;
+    public const int MoveSpeedBonusPercent = 30;
     private const float MoveSpeed = 1.70f;
 
     private readonly Vector3[] path;
@@ -84,6 +84,7 @@ internal sealed class EnemyUnit
     public bool IsAlive => Health > 0;
     public bool CanAttack => cooldown <= 0;
     public EnemyUnit Target { get; set; }
+    public (EnemyUnit Target, int Order)? CombatQueue { get; set; }
     public int AttackSlot { get; set; } = -1;
     public Vector3? CombatDestination { get; set; }
     public Vector3? RouteYieldDestination { get; set; }
@@ -123,7 +124,11 @@ internal sealed class EnemyUnit
         attackFlash = 0.14f;
         AttacksPerformed++;
         AttackHeading = Heading;
-        return Faction.Damage + (AttackBuffRemaining > 0 ? AttackBonus : 0);
+        if (AttackBuffRemaining <= 0)
+            return Faction.Damage;
+
+        double damage = Faction.Damage * (1d + AttackBonusPercent / 100d);
+        return (int)Math.Min(int.MaxValue, Math.Round(damage, MidpointRounding.AwayFromZero));
     }
 
     public void QueueDamage(int damage) => pendingDamage += damage;

@@ -36,6 +36,7 @@ internal sealed class DefenseHud
     private readonly RectTransform defeatPopup;
     private readonly TextMeshProUGUI round;
     private readonly TextMeshProUGUI phase;
+    private readonly CombatBalance combatBalance;
     private readonly TextMeshProUGUI core;
     private readonly Image coreFill;
     private readonly RectTransform wallSupply;
@@ -67,7 +68,7 @@ internal sealed class DefenseHud
     private float noticeUntil;
 
     public DefenseHud(UIManager ui, UnityAction restart, UnityAction start, Action<DefenseBattle.Spell> cast,
-        Action<int> setBattleSpeed, Texture2D encounterIcon, Art art)
+        Action<int> setBattleSpeed, Texture2D encounterIcon, Art art, IReadOnlyList<EnemyFaction> factions)
     {
         this.ui = ui;
         this.encounterIcon = encounterIcon;
@@ -77,10 +78,11 @@ internal sealed class DefenseHud
 
         Vector2 topCenter = new(0.5f, 1f);
         RectTransform status = Rect("Round Status", ui.HudLayer, topCenter, topCenter,
-            new Vector2(0, -35), new Vector2(220, 75));
+            new Vector2(0, -22), new Vector2(220, 75));
         round = Label("Round", status, 0, 0, 220, 40, 30, TextAlignmentOptions.Center);
         phase = Label("Phase", status, 0, -41, 220, 28, 20, TextAlignmentOptions.Center);
         phase.color = UIPalette.TextSecondary;
+        combatBalance = new CombatBalance(status, factions[0], factions[1]);
 
         RectTransform coreStatus = Rect("Core Status", ui.HudLayer, Vector2.up, Vector2.up,
             new Vector2(55, -35), new Vector2(204, 72));
@@ -177,8 +179,9 @@ internal sealed class DefenseHud
         bool inCombat = battle.CurrentPhase == DefenseBattle.Phase.Combat;
         bool defeated = battle.CurrentPhase == DefenseBattle.Phase.Defeat;
         round.text = $"Round {battle.Round}";
-        phase.text = defeated ? "Defeat" : aimedSpell.HasValue ? "Paused" : inCombat ? "Battle" : "Build";
+        phase.text = defeated ? "Defeat" : aimedSpell.HasValue ? $"Slow {BattleClock.AimSpeed:0.0}×" : inCombat ? "Battle" : "Build";
         phase.color = aimedSpell.HasValue ? UIPalette.TextPrimary : UIPalette.TextSecondary;
+        combatBalance.Refresh(battle.Enemies, inCombat);
         core.text = $"{battle.CoreHealth} <size=65%>/ {DefenseBattle.CoreMaxHealth}</size>";
         coreFill.color = battle.CoreHealth <= DefenseBattle.CoreMaxHealth / 4 ? UIPalette.ButtonDanger : UIPalette.ButtonPrimary;
         SetBarFraction(coreFill, (float)battle.CoreHealth / DefenseBattle.CoreMaxHealth);
@@ -206,7 +209,7 @@ internal sealed class DefenseHud
         StyleFlatButton(help, help.ShowTip ? UIPalette.TextPrimary : UIPalette.TextSecondary);
         SetTip(helpTip, !blocked && !defeated && (help.ShowTip || helpPinned)
             ? (inCombat ? "1–3 aim · Left click casts · Esc cancels" : "Left click builds · Right click removes") +
-              "\nWASD pan · Wheel zoom · R restart"
+              "\nWASD / RMB drag · Wheel zoom · R restart"
             : null);
         StyleButton(restartButton, UIPalette.ButtonPrimary, UIPalette.TextOnAccent);
 
@@ -229,6 +232,76 @@ internal sealed class DefenseHud
     }
 
     public void ShowDefeat() => ui.ShowPopup(defeatPopup, dismissOnEscape: false);
+
+    private sealed class CombatBalance
+    {
+        private readonly RectTransform root;
+        private readonly Image leftFill;
+        private readonly Image rightFill;
+        private readonly Image divider;
+        private readonly TextMeshProUGUI leftCount;
+        private readonly TextMeshProUGUI rightCount;
+        private readonly string leftFormat;
+        private readonly string rightFormat;
+
+        public CombatBalance(RectTransform parent, EnemyFaction left, EnemyFaction right)
+        {
+            Vector2 topCenter = new(0.5f, 1f);
+            root = Rect("Combat Balance", parent, topCenter, topCenter, new Vector2(0, -70), new Vector2(500, 30));
+            leftCount = Label("Left Alive", root, 0, -4, 112, 25, 19, TextAlignmentOptions.Right);
+            rightCount = Label("Right Alive", root, 388, -4, 112, 25, 19);
+            leftFormat = left.DisplayName + "  {0}";
+            rightFormat = "{0}  " + right.DisplayName;
+            TextMeshProUGUI caption = Label("Metric", root, 122, 0, 256, 17, 15, TextAlignmentOptions.Center);
+            caption.text = "Field HP";
+            caption.color = UIPalette.TextSecondary;
+
+            leftFill = Bar("Field Health", root, Vector2.up, Vector2.up, new Vector2(122, -18),
+                new Vector2(256, 8), left.Color);
+            var track = (RectTransform)leftFill.transform.parent;
+            rightFill = Graphic("Right Fill", track, Vector2.one, Vector2.one, Vector2.zero, Vector2.zero, right.Color);
+            divider = Graphic("Divider", track, Vector2.zero, new Vector2(0.5f, 0),
+                new Vector2(0, -2), new Vector2(3, 12), UIPalette.TextPrimary);
+            root.gameObject.SetActive(false);
+        }
+
+        public void Refresh(IReadOnlyList<EnemyUnit> enemies, bool inCombat)
+        {
+            root.gameObject.SetActive(inCombat);
+            if (!inCombat)
+                return;
+
+            int leftAlive = 0;
+            int rightAlive = 0;
+            float leftHealth = 0f;
+            float rightHealth = 0f;
+            foreach (EnemyUnit enemy in enemies)
+            {
+                if (!enemy.IsAlive)
+                    continue;
+
+                if (enemy.FactionIndex == 0)
+                {
+                    leftAlive++;
+                    leftHealth += enemy.Health;
+                }
+                else
+                {
+                    rightAlive++;
+                    rightHealth += enemy.Health;
+                }
+            }
+
+            leftCount.SetText(leftFormat, leftAlive);
+            rightCount.SetText(rightFormat, rightAlive);
+            float totalHealth = leftHealth + rightHealth;
+            float split = totalHealth > 0f ? leftHealth / totalHealth : 0f;
+            SetBarFraction(leftFill, split);
+            rightFill.rectTransform.anchorMin = new Vector2(totalHealth > 0f ? split : 1f, 0f);
+            divider.enabled = totalHealth > 0f;
+            divider.rectTransform.anchorMin = divider.rectTransform.anchorMax = new Vector2(split, 0f);
+        }
+    }
 
     private static void RefreshSpeedButton(HudButton control, bool selected, bool blocked)
     {
@@ -363,7 +436,7 @@ internal sealed class DefenseHud
         TextMeshProUGUI charges = Label("Charges", rect, 60, -105, 40, 24, 21);
         string effect = spell switch
         {
-            DefenseBattle.Spell.AttackBuff => $"Attack buff · +{EnemyUnit.AttackBonus} damage",
+            DefenseBattle.Spell.AttackBuff => $"Attack buff · +{EnemyUnit.AttackBonusPercent}% damage",
             DefenseBattle.Spell.Heal => $"Area heal · +{DefenseBattle.HealAmount} HP to injured enemies",
             _ => $"Move speed · +{EnemyUnit.MoveSpeedBonusPercent}%"
         };

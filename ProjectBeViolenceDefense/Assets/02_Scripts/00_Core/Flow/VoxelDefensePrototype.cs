@@ -4,6 +4,8 @@ using UnityEngine.SceneManagement;
 
 public sealed class VoxelDefensePrototype : MonoBehaviour
 {
+    private const float RightDragThreshold = 6f;
+
     [SerializeField] private Camera boardCamera;
     [SerializeField] private Shader voxelShader;
     [SerializeField] private UIManager ui;
@@ -23,6 +25,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private readonly BattleClock battleClock = new();
     private DefenseBattle.Spell? aimedSpell;
     private int battleSpeed = 1;
+    private bool trackingRightButton;
+    private bool draggingCamera;
+    private Vector2 previousDragPointer;
+    private Vector2? rightClickPointer;
 
     private void Awake()
     {
@@ -32,13 +38,12 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         battle = new DefenseBattle(grid, factions);
         battle.EnemySpawned += view.AddEnemy;
         battle.EnemyRemoved += view.RemoveEnemy;
-        hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt);
+        hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions);
         RefreshPlanningTiles();
     }
 
     private void Update()
     {
-        battleClock.BeginFrame(Time.deltaTime, battleSpeed);
         view.FitCamera();
         Keyboard keyboard = Keyboard.current;
         bool boardInputAllowed = !ui.HasOpenPopup;
@@ -53,8 +58,15 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         {
             ReadCameraInput(keyboard);
             view.AdvanceZoom(Time.unscaledDeltaTime);
+            if (battle.CurrentPhase == DefenseBattle.Phase.Combat)
+                ReadCombatInput(keyboard);
+        }
+        else
+        {
+            ResetRightButton();
         }
 
+        battleClock.BeginFrame(Time.deltaTime, battleSpeed, aimedSpell.HasValue);
         switch (battle.CurrentPhase)
         {
             case DefenseBattle.Phase.Preparation:
@@ -66,9 +78,6 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                     StartBattle();
                 break;
             case DefenseBattle.Phase.Combat:
-                if (boardInputAllowed)
-                    ReadCombatInput(keyboard);
-
                 float deltaTime = battleClock.DeltaTime;
                 if (deltaTime <= 0f)
                     break;
@@ -79,7 +88,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                     battle.Tick(battleClock.StepDeltaTime, pauseMovement: false);
 
                 foreach (EnemyUnit enemy in battle.Enemies)
-                    view.SyncEnemy(enemy, deltaTime, battleClock.StepCount);
+                    view.SyncEnemy(enemy, deltaTime, battleClock.PlaybackSpeed);
                 if (battle.CurrentPhase == DefenseBattle.Phase.Preparation)
                 {
                     RefreshPlanningTiles();
@@ -111,6 +120,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
 
     private void ReadCameraInput(Keyboard keyboard)
     {
+        rightClickPointer = null;
         if (keyboard != null)
         {
             var input = new Vector2(
@@ -121,22 +131,75 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         }
 
         Mouse mouse = Mouse.current;
-        float scrollDelta = mouse?.scroll.ReadValue().y ?? 0f;
+        if (mouse == null)
+        {
+            ResetRightButton();
+            return;
+        }
+
+        Vector2 pointer = mouse.position.ReadValue();
+        ReadRightButton(mouse, pointer);
+        float scrollDelta = mouse.scroll.ReadValue().y;
         if (scrollDelta != 0f)
-            view.QueueZoom(scrollDelta, mouse.position.ReadValue());
+            view.QueueZoom(scrollDelta, pointer);
+    }
+
+    private void ReadRightButton(Mouse mouse, Vector2 pointer)
+    {
+        if (mouse.rightButton.wasPressedThisFrame)
+        {
+            trackingRightButton = boardCamera.pixelRect.Contains(pointer) && !ui.BlocksBoardPointer(pointer);
+            draggingCamera = false;
+            previousDragPointer = pointer;
+        }
+
+        if (!trackingRightButton)
+            return;
+
+        if (!mouse.rightButton.isPressed && !mouse.rightButton.wasReleasedThisFrame)
+        {
+            ResetRightButton();
+            return;
+        }
+
+        if ((pointer - previousDragPointer).sqrMagnitude >= RightDragThreshold * RightDragThreshold)
+            draggingCamera = true;
+
+        if (draggingCamera && pointer != previousDragPointer)
+        {
+            view.DragCamera(previousDragPointer, pointer);
+            previousDragPointer = pointer;
+        }
+
+        if (!mouse.rightButton.isPressed)
+        {
+            bool clicked = !draggingCamera && boardCamera.pixelRect.Contains(pointer) && !ui.BlocksBoardPointer(pointer);
+            ResetRightButton();
+            if (clicked)
+                rightClickPointer = previousDragPointer;
+        }
+    }
+
+    private void ResetRightButton()
+    {
+        trackingRightButton = false;
+        draggingCamera = false;
+        rightClickPointer = null;
     }
 
     private void ReadBuildInput()
     {
         Mouse mouse = Mouse.current;
-        if (mouse == null || (!mouse.leftButton.wasPressedThisFrame && !mouse.rightButton.wasPressedThisFrame) ||
-            ui.BlocksBoardPointer(mouse.position.ReadValue()) ||
-            !view.TryPickCell(mouse.position.ReadValue(), out Vector2Int cell))
+        if (trackingRightButton || mouse == null || (!mouse.leftButton.wasPressedThisFrame && !rightClickPointer.HasValue))
+            return;
+
+        Vector2 pointer = rightClickPointer ?? mouse.position.ReadValue();
+        if (ui.BlocksBoardPointer(pointer) || !view.TryPickCell(pointer, out Vector2Int cell))
         {
             return;
         }
 
-        if (mouse.rightButton.wasPressedThisFrame)
+        if (rightClickPointer.HasValue)
         {
             if (grid.TryRemove(cell))
             {
@@ -172,7 +235,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     {
         Mouse mouse = Mouse.current;
         if (aimedSpell.HasValue &&
-            (keyboard?.escapeKey.wasPressedThisFrame == true || mouse?.rightButton.wasPressedThisFrame == true))
+            (keyboard?.escapeKey.wasPressedThisFrame == true || rightClickPointer.HasValue))
         {
             SetAimedSpell(null);
             hud.Notify("");
@@ -195,7 +258,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             return;
         }
 
-        if (aimedSpell is { } spell && mouse?.leftButton.wasPressedThisFrame == true &&
+        if (!trackingRightButton && aimedSpell is { } spell && mouse?.leftButton.wasPressedThisFrame == true &&
             TryPickAreaSpellCenter(mouse, out Vector3 center))
         {
             hud.Notify(battle.CastAreaSpell(spell, center));
@@ -224,17 +287,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         hud.Notify(blocked ?? "");
     }
 
-    private void SetAimedSpell(DefenseBattle.Spell? spell)
-    {
-        if (spell.HasValue != aimedSpell.HasValue)
-        {
-            battleClock.SetPaused(spell.HasValue);
-            if (spell.HasValue)
-                view.PauseEnemyAnimations();
-        }
-
-        aimedSpell = spell;
-    }
+    private void SetAimedSpell(DefenseBattle.Spell? spell) => aimedSpell = spell;
 
     private void Restart() => SceneManager.LoadScene(gameObject.scene.buildIndex);
 
@@ -251,7 +304,17 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         hud.Refresh(battle, grid, view, aimedSpell, spellCenter, battleSpeed);
     }
 
-    private void OnDisable() => SetAimedSpell(null);
+    private void OnApplicationFocus(bool focused)
+    {
+        if (!focused)
+            ResetRightButton();
+    }
+
+    private void OnDisable()
+    {
+        ResetRightButton();
+        SetAimedSpell(null);
+    }
 
     private void OnDestroy() => view?.ReleaseMaterials();
 }

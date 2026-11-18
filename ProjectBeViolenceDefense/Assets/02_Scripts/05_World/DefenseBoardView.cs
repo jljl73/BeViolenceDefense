@@ -6,6 +6,7 @@ internal sealed class DefenseBoardView
     private const float CameraPanSpeed = 6f;
     private const float CameraDistance = 20f;
     private const float CameraFocusOffset = 0.9f;
+    private const float CameraPanInset = 4f;
     private const float ZoomStep = 0.9f;
     private const float ZoomResponse = 18f;
     private const float MaxZoomFrameTime = 0.05f;
@@ -90,6 +91,7 @@ internal sealed class DefenseBoardView
     private readonly Material nearbyOutlineMaterial;
     private readonly MeshRenderer areaSpellPreview;
     private readonly Mesh areaSpellPreviewMesh;
+    private readonly List<int> areaSpellTriangles = new(64 * 6);
     private readonly Mesh factionRingMesh;
     private readonly Mesh previewRingMesh;
     private int nextHitEffect;
@@ -238,7 +240,11 @@ internal sealed class DefenseBoardView
         crown.localRotation = Quaternion.Euler(0, 45, 0);
     }
 
-    public void FitCamera() => camera.orthographicSize = Mathf.Max(9.4f, 9.5f / camera.aspect) * viewScale;
+    public void FitCamera()
+    {
+        float boardScale = Mathf.Max(DefenseGrid.Width, DefenseGrid.Depth) / 12f;
+        camera.orthographicSize = Mathf.Max(9.4f, 9.5f / camera.aspect) * boardScale * viewScale;
+    }
 
     public void QueueZoom(float scrollDelta, Vector2 pointer)
     {
@@ -258,20 +264,19 @@ internal sealed class DefenseBoardView
         if (Mathf.Abs(targetViewScale - newScale) < ZoomSnapDistance)
             newScale = targetViewScale;
 
+        Vector3 offset = Vector3.zero;
         if (zoomAnchorViewport is Vector2 viewport)
         {
             Ray ray = BoardRay(camera.ViewportToScreenPoint(viewport));
             if (BoardGround.Raycast(ray, out float distance))
             {
                 // The orthographic ground offset scales with the view. Translate by the portion the zoom removes.
-                Vector3 offset = (ray.GetPoint(distance) - cameraFocus) * (1f - newScale / viewScale);
-                cameraFocus.x += offset.x;
-                cameraFocus.z += offset.z;
-                PositionCamera();
+                offset = (ray.GetPoint(distance) - cameraFocus) * (1f - newScale / viewScale);
             }
         }
 
         viewScale = newScale;
+        MoveCamera(offset);
         FitCamera();
     }
 
@@ -280,14 +285,30 @@ internal sealed class DefenseBoardView
         Vector2 direction = Vector2.ClampMagnitude(input, 1f);
         Quaternion yaw = Quaternion.Euler(0f, camera.transform.eulerAngles.y, 0f);
         Vector3 offset = root.InverseTransformDirection(yaw * new Vector3(direction.x, 0f, direction.y));
-        cameraFocus.x = PanAxis(cameraFocus.x, offset.x * CameraPanSpeed * deltaTime, DefenseGrid.Width - 1f);
-        cameraFocus.z = PanAxis(cameraFocus.z, offset.z * CameraPanSpeed * deltaTime, DefenseGrid.Depth - 1f);
+        MoveCamera(offset * (CameraPanSpeed * deltaTime));
+    }
+
+    public void DragCamera(Vector2 previousPointer, Vector2 pointer)
+    {
+        Ray previousRay = BoardRay(previousPointer);
+        Ray currentRay = BoardRay(pointer);
+        if (BoardGround.Raycast(previousRay, out float previousDistance) &&
+            BoardGround.Raycast(currentRay, out float currentDistance))
+            MoveCamera(previousRay.GetPoint(previousDistance) - currentRay.GetPoint(currentDistance));
+    }
+
+    private void MoveCamera(Vector3 offset)
+    {
+        cameraFocus.x = ClampPanAxis(cameraFocus.x + offset.x, DefenseGrid.Width - 1f);
+        cameraFocus.z = ClampPanAxis(cameraFocus.z + offset.z, DefenseGrid.Depth - 1f);
         PositionCamera();
     }
 
-    // An anchored zoom-out can put the focus past an edge. Pan inward from there without snapping.
-    private static float PanAxis(float focus, float delta, float max) =>
-        Mathf.Clamp(focus + delta, Mathf.Min(0f, focus), Mathf.Max(max, focus));
+    private float ClampPanAxis(float position, float lastTile)
+    {
+        float inset = Mathf.Min(CameraPanInset * viewScale, lastTile * 0.5f);
+        return Mathf.Clamp(position, inset, lastTile - inset);
+    }
 
     private void PositionCamera() =>
         camera.transform.position = root.TransformPoint(cameraFocus) - camera.transform.forward * CameraDistance;
@@ -384,6 +405,10 @@ internal sealed class DefenseBoardView
         if (!BoardGround.Raycast(ray, out float distance))
             return false;
 
+        foreach (Vector2Int wall in wallViews.Keys)
+            if (DefenseGrid.WallBounds(wall).IntersectRay(ray, out float wallDistance) && wallDistance < distance)
+                return false;
+
         point = ray.GetPoint(distance);
         return point.x >= -0.5f && point.x < DefenseGrid.Width - 0.5f &&
             point.z >= -0.5f && point.z < DefenseGrid.Depth - 0.5f;
@@ -406,6 +431,7 @@ internal sealed class DefenseBoardView
             if (areaSpellPreview.sharedMaterial != material)
                 areaSpellPreview.sharedMaterial = material;
             areaSpellPreview.transform.localPosition = point + Vector3.up * 0.04f;
+            UpdateAreaSpellRing(point);
         }
 
         foreach (var entry in enemyViews)
@@ -414,6 +440,44 @@ internal sealed class DefenseBoardView
             bool eligible = inRange && DefenseBattle.CanReceiveAreaSpell(entry.Key, spell.Value);
             SetEnemyPreviewTint(entry.Value, inRange ? material : null, eligible);
         }
+    }
+
+    private void UpdateAreaSpellRing(Vector3 center)
+    {
+        areaSpellTriangles.Clear();
+        const int segments = 64;
+        float radius = DefenseBattle.AreaSpellRadius;
+        for (int i = 0; i < segments; i++)
+        {
+            // Leave a small break where the ground ring passes through a wall footprint.
+            float angle = (i + 0.5f) * (2f * Mathf.PI / segments);
+            Vector3 midpoint = center + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+            bool onWall = false;
+            foreach (Vector2Int cell in wallViews.Keys)
+            {
+                Vector3 wall = DefenseGrid.CellPosition(cell);
+                float margin = DefenseGrid.WallWidth * 0.5f + 0.1f;
+                if (Mathf.Abs(midpoint.x - wall.x) <= margin && Mathf.Abs(midpoint.z - wall.z) <= margin)
+                {
+                    onWall = true;
+                    break;
+                }
+            }
+
+            if (onWall)
+                continue;
+
+            int inner = i * 2;
+            int next = (i + 1) % segments * 2;
+            areaSpellTriangles.Add(inner);
+            areaSpellTriangles.Add(next);
+            areaSpellTriangles.Add(inner + 1);
+            areaSpellTriangles.Add(inner + 1);
+            areaSpellTriangles.Add(next);
+            areaSpellTriangles.Add(next + 1);
+        }
+
+        areaSpellPreviewMesh.SetTriangles(areaSpellTriangles, 0, false);
     }
 
     private void SetEnemyPreviewTint(EnemyView view, Material material, bool eligible)
@@ -677,13 +741,6 @@ internal sealed class DefenseBoardView
         Object.Destroy(view.Root.gameObject);
     }
 
-    public void PauseEnemyAnimations()
-    {
-        foreach (EnemyView view in enemyViews.Values)
-            if (view.Animator != null)
-                view.Animator.speed = 0f;
-    }
-
     public void AdvanceHitEffects(float deltaTime)
     {
         foreach (HitEffect effect in hitEffects)
@@ -767,7 +824,8 @@ internal sealed class DefenseBoardView
     private static void SyncGoblinMotion(EnemyView view, EnemyUnit enemy, Vector3 step, float deltaTime, float playbackSpeed)
     {
         Animator animator = view.Animator;
-        bool moving = deltaTime > 0f && step.sqrMagnitude > 0.000001f;
+        float movementThreshold = 0.001f * Mathf.Min(1f, playbackSpeed);
+        bool moving = deltaTime > 0f && step.sqrMagnitude > movementThreshold * movementThreshold;
         view.StoppedTime = moving ? 0f : view.StoppedTime + deltaTime;
         bool newAttack = view.AttacksPlayed != enemy.AttacksPerformed;
         if (newAttack)
