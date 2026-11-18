@@ -501,82 +501,34 @@ MonoBehaviour:
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
     spawnCount: 4
   rounds:
-  - note: "R1 \uAE30\uC900: \uC878\uBCD1 vs \uB290\uB9B0 \uC880\uBE44"
+  - note: "W1 \uAD11\uC7A5\uC758 \uCCAB \uCDA9\uB3CC"
     coral:
     - unitId: goblin-grunt-1500
+      count: 4
+    teal:
+    - unitId: skeleton
+      count: 6
+  - note: "W2 \uC5C7\uAC08\uB9AC\uB294 \uBC1C\uAC78\uC74C"
+    coral:
+    - unitId: wolf
       count: 6
     teal:
     - unitId: zombie
-      count: 4
-  - note: "R2 \uBE60\uB978 \uC9D0\uC2B9\uB07C\uB9AC"
-    coral:
-    - unitId: wolf
-      count: 5
-    teal:
-    - unitId: bat
-      count: 9
-  - note: "R3 \uC6D0\uAC70\uB9AC \uCCAB \uB4F1\uC7A5"
-    coral:
-    - unitId: goblin-slinger
       count: 3
-    - unitId: goblin-grunt-1500
-      count: 3
-    teal:
-    - unitId: skeleton-archer
-      count: 3
-    - unitId: skeleton
-      count: 3
-  - note: "R4 \uC815\uC608\uC640 \uBC29\uBCBD"
+  - note: "W3 \uC131\uBB38 \uC55E \uACB0\uC804"
     coral:
     - unitId: orc
       count: 2
     - unitId: goblin-slinger
-      count: 2
-    teal:
-    - unitId: living-armor
-      count: 2
-  - note: "R5 \uC0C8\uB07C\uC6A9 vs \uC18C\uD658\uC0AC"
-    coral:
-    - unitId: hatchling
-      count: 4
+      count: 3
     teal:
     - unitId: skeleton
-      count: 3
-    - unitId: necromancer
       count: 2
-  - note: "R6 \uC9D0\uC2B9 \uC815\uC608 vs \uCC98\uD615\uC790"
-    coral:
-    - unitId: werewolf
-      count: 1
-    - unitId: wolf
-      count: 2
-    teal:
-    - unitId: skeleton
-      count: 3
-    - unitId: reaper
-      count: 1
-  - note: "R7 \uC545\uB9C8 vs \uC880\uBE44 \uBB34\uB9AC"
-    coral:
-    - unitId: demon
-      count: 3
-    teal:
-    - unitId: zombie
-      count: 4
-  - note: "R8 \uBCF4\uC2A4\uC804"
-    coral:
-    - unitId: wyvern
-      count: 1
-    - unitId: goblin-slinger
-      count: 2
-    - unitId: goblin-grunt-1500
-      count: 2
-    teal:
     - unitId: living-armor
-      count: 1
-    - unitId: reaper
       count: 1
     - unitId: skeleton-archer
-      count: 2
+      count: 3
+  boardLayout: "........CC.......\n........CC.......\n.................\n..###.......###..\n.#######.#######.\n...#.........#...\n##.#..#...#..#.##\n...#.........#...\n#.##.........##.#\n#.###.##.##.###.#\n.................\n.................\n........#........\n........#........\n........#........\n........#........\n........#........"
 --- !u!1 &310873186
 GameObject:
   m_ObjectHideFlags: 0

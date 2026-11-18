@@ -28,6 +28,21 @@ internal sealed class DefenseHud
 
     private static readonly Vector2 SpellSlotSize = new(110, 124);
     private static readonly Vector2 ActionsSize = new(600, 184);
+    private const float FirstBuffBarHeight = 13f;
+    private const float BuffBarSpacing = 7f;
+    private const float BuffBarThickness = 4f;
+    private const float HealthBarThickness = 5f;
+
+    // GameScene scales the HUD against a 1080 px reference height.
+    public static float UnitMarkerViewportClearance(EnemyUnit enemy)
+    {
+        int buffCount = (enemy.AttackBuffStacks > 0 ? 1 : 0) + (enemy.MoveSpeedBuffStacks > 0 ? 1 : 0) +
+            (enemy.ArmorBuffStacks > 0 ? 1 : 0);
+        float top = buffCount > 0
+            ? FirstBuffBarHeight + (buffCount - 1) * BuffBarSpacing + BuffBarThickness * 0.5f
+            : HealthBarThickness * 0.5f;
+        return top / 1080f;
+    }
 
     private readonly UIManager ui;
     private readonly Art art;
@@ -658,10 +673,11 @@ internal sealed class DefenseHud
         marker.Health.color = enemy.HealFlash > 0 ? UIPalette.Heal : enemy.Faction.Color;
         SetBuffMarker(marker.AttackBuff, marker.AttackStacks, enemy.AttackBuffStacks, enemy.AttackBuffRemaining);
         var speedBar = (RectTransform)marker.SpeedBuff.transform.parent;
-        speedBar.anchoredPosition = new Vector2(0, enemy.AttackBuffStacks > 0 ? 20 : 13);
+        speedBar.anchoredPosition = new Vector2(0, FirstBuffBarHeight +
+            (enemy.AttackBuffStacks > 0 ? BuffBarSpacing : 0f));
         SetBuffMarker(marker.SpeedBuff, marker.SpeedStacks, enemy.MoveSpeedBuffStacks, enemy.MoveSpeedBuffRemaining);
         var armorBar = (RectTransform)marker.ArmorBuff.transform.parent;
-        armorBar.anchoredPosition = new Vector2(0, 13 + 7 *
+        armorBar.anchoredPosition = new Vector2(0, FirstBuffBarHeight + BuffBarSpacing *
             ((enemy.AttackBuffStacks > 0 ? 1 : 0) + (enemy.MoveSpeedBuffStacks > 0 ? 1 : 0)));
         SetBuffMarker(marker.ArmorBuff, marker.ArmorStacks, enemy.ArmorBuffStacks, enemy.ArmorBuffRemaining);
     }
@@ -690,12 +706,16 @@ internal sealed class DefenseHud
         {
             Vector2 center = Vector2.one * 0.5f;
             Root = Rect("Enemy Marker", parent, center, center, Vector2.zero, Vector2.zero);
-            Health = Bar("Health", Root, center, center, Vector2.zero, new Vector2(26, 5), UIPalette.TextPrimary);
-            AttackBuff = Bar("Attack Buff", Root, center, center, new Vector2(0, 13), new Vector2(26, 4),
+            Health = Bar("Health", Root, center, center, Vector2.zero, new Vector2(26, HealthBarThickness),
+                UIPalette.TextPrimary);
+            AttackBuff = Bar("Attack Buff", Root, center, center, new Vector2(0, FirstBuffBarHeight),
+                new Vector2(26, BuffBarThickness),
                 UIPalette.Attack);
-            SpeedBuff = Bar("Move Speed Buff", Root, center, center, new Vector2(0, 13), new Vector2(26, 4),
+            SpeedBuff = Bar("Move Speed Buff", Root, center, center, new Vector2(0, FirstBuffBarHeight),
+                new Vector2(26, BuffBarThickness),
                 UIPalette.MoveSpeed);
-            ArmorBuff = Bar("Armor Buff", Root, center, center, new Vector2(0, 13), new Vector2(26, 4),
+            ArmorBuff = Bar("Armor Buff", Root, center, center, new Vector2(0, FirstBuffBarHeight),
+                new Vector2(26, BuffBarThickness),
                 UIPalette.Armor);
             AttackStacks = Label("Stacks", (RectTransform)AttackBuff.transform.parent, 29, 4, 21, 13, 11);
             AttackStacks.color = UIPalette.Attack;

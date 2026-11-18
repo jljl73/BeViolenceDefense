@@ -34,6 +34,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private FactionSlot teal;
     [SerializeField, Tooltip("라운드별 편성. 마지막 라운드 다음에는 처음부터 반복한다. 비어 있으면 Coral/Teal 슬롯과 기존 증원 규칙을 쓴다.")]
     private RoundLineup[] rounds = System.Array.Empty<RoundLineup>();
+    [SerializeField, TextArea(17, 17), Tooltip("17줄 x 17칸 글자 맵. 첫 줄이 코어 쪽이고 '#'이 고정 벽이다. 비우면 기본 지형을 쓴다.")]
+    private string boardLayout;
 
     [System.Serializable]
     private sealed class SpawnGroup
@@ -63,6 +65,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private DefenseBattle battle;
     private DefenseHud hud;
     private readonly BattleClock battleClock = new();
+    private readonly List<EnemyUnit> spellRecipients = new();
     private DefenseBattle.Spell? aimedSpell;
     private float aimedRangeScroll;
     private int battleSpeed = 1;
@@ -90,7 +93,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             return;
         }
 
-        grid = new DefenseGrid();
+        grid = new DefenseGrid(LoadBoardLayout());
         var factions = new[] { coralFaction, tealFaction };
         view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme);
         battle = new DefenseBattle(grid, factions, BuildRoundLineup());
@@ -98,6 +101,17 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         battle.EnemyRemoved += view.RemoveEnemy;
         hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions);
         RefreshPlanningTiles();
+    }
+
+    private List<Vector2Int> LoadBoardLayout()
+    {
+        if (string.IsNullOrWhiteSpace(boardLayout))
+            return null;
+        if (DefenseGrid.TryParseLayout(boardLayout, out List<Vector2Int> walls, out string error))
+            return walls;
+
+        Debug.LogError($"Board layout is invalid ({error}). Using the default terrain.", this);
+        return null;
     }
 
     // 라운드 편성을 진영(편)별 스폰 순서로 펼친다. 같은 유닛 종류는 한 객체를 공유한다.
@@ -371,7 +385,9 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             return;
         }
 
-        hud.Notify(battle.CastAreaSpell(spell, center, rangeStep));
+        hud.Notify(battle.CastAreaSpell(spell, center, rangeStep, spellRecipients));
+        view.PlayAreaSpell(spell, center, DefenseBattle.AreaSpellRadius(rangeStep), spellRecipients);
+        spellRecipients.Clear();
         SetAimedSpell(null);
     }
 
@@ -413,7 +429,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Combat)
             SetAimedSpell(null);
 
-        view.AdvanceHitEffects(battleClock.DeltaTime);
+        view.AdvanceEffects(battleClock.DeltaTime);
         Vector3? spellCenter = aimedSpell.HasValue && TryPickAreaSpellCenter(Mouse.current, out Vector3 center)
             ? center
             : null;

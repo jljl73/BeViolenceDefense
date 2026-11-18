@@ -11,7 +11,7 @@ internal sealed class DefenseBoardView
     private const float ZoomResponse = 18f;
     private const float MaxZoomFrameTime = 0.05f;
     private const float ZoomSnapDistance = 0.0005f;
-    private const float MinViewScale = 0.55f;
+    private const float MinViewScale = 0.35f;
     private const float MaxViewScale = 1.45f;
     private const float TileHeight = 0.28f;
     private const float RouteMarkerSize = 0.68f;
@@ -22,6 +22,11 @@ internal sealed class DefenseBoardView
     private const float RunStopGrace = 0.08f;
     // Approximate planted-foot travel per second in the unscaled Run clip.
     private const float GoblinRunStrideSpeed = 1.55f;
+    // 스킬 조준 중 화면 딤. 범위 표시는 딤보다 나중에 그려서 밝게 보이게 한다.
+    private const float AimDimAlpha = 0.55f;
+    private const float AimDimFadeTime = 0.12f;
+    private const int AimDimSortingOrder = 40;
+    private const int AimOverlayRenderQueue = 3100;
     // Run 상태가 없는 모델(좀비)은 Walk 클립으로 이동한다. 발이 미끄러지면 이 값을 조절한다.
     private const float WalkStrideSpeed = 0.9f;
     // 공격 애니메이션에서 무기가 닿는 지점 (0~1). 이펙트가 빠르거나 늦으면 이 값만 조절한다.
@@ -50,7 +55,8 @@ internal sealed class DefenseBoardView
         public float StrideSpeed;
         public int AttacksPlayed;
         public int HitsSeen;
-        public EnemyUnit HitTarget;
+        public (EnemyUnit Target, bool Boosted, bool TargetArmored) PendingHit;
+        public LineRenderer[] MoveSpeedTrails;
         public float StoppedTime;
         public Material PreviewMaterial;
         public bool PreviewEligible;
@@ -66,10 +72,15 @@ internal sealed class DefenseBoardView
     private readonly HashSet<Vector2Int> spawnCells;
     private readonly List<SpriteRenderer> routeMarkers = new();
     private readonly List<Material> materials = new();
+    private readonly Dictionary<Material, Material> aimOverlayMaterials = new();
+    private readonly SpriteRenderer aimDim;
+    private float aimDimAlpha;
     private readonly List<Mesh> meshes = new();
     private readonly Dictionary<Vector2Int, Transform> wallViews = new();
     private readonly Dictionary<EnemyUnit, EnemyView> enemyViews = new();
     private readonly List<HitEffect> hitEffects = new();
+    private readonly SpellEffects spellEffects;
+    private readonly SpellCastMarkers spellCastMarkers;
     private readonly MaterialPropertyBlock enemyTint = new();
     private readonly Dictionary<EnemyFaction, Material> factionMaterials = new();
     private readonly MeshRenderer[,] floor = new MeshRenderer[DefenseGrid.Width, DefenseGrid.Depth];
@@ -184,6 +195,11 @@ internal sealed class DefenseBoardView
         areaSpellPreview.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         areaSpellPreview.receiveShadows = false;
         areaSpellPreview.enabled = false;
+        var spellStroke = new Material(Shader.Find("Sprites/Default")) { name = "Spell Effect Stroke" };
+        materials.Add(spellStroke);
+        spellEffects = new SpellEffects(root, camera, spellStroke, AimDimSortingOrder + 1);
+        spellCastMarkers = new SpellCastMarkers(camera, root, AimDimSortingOrder + 2);
+        aimDim = CreateAimDim();
     }
 
     // 보드 바깥을 두르는 테두리. 칸 안쪽을 침범하지 않아 선택과 경로에 영향이 없다.
@@ -446,12 +462,14 @@ internal sealed class DefenseBoardView
             _ => null
         } : null;
 
+        UpdateAimDim(spell.HasValue);
         Vector3 point = center.GetValueOrDefault();
         areaSpellPreview.enabled = material != null;
         if (material != null)
         {
-            if (areaSpellPreview.sharedMaterial != material)
-                areaSpellPreview.sharedMaterial = material;
+            Material ring = AimOverlay(material);
+            if (areaSpellPreview.sharedMaterial != ring)
+                areaSpellPreview.sharedMaterial = ring;
             areaSpellPreview.transform.localPosition = point + Vector3.up * 0.04f;
             float scale = radius / DefenseBattle.DefaultAreaSpellRadius;
             areaSpellPreview.transform.localScale = new Vector3(scale, 1f, scale);
@@ -464,6 +482,70 @@ internal sealed class DefenseBoardView
             bool eligible = inRange && DefenseBattle.CanReceiveAreaSpell(entry.Key, spell.Value);
             SetEnemyPreviewTint(entry.Value, inRange ? material : null, eligible);
         }
+    }
+
+    public void PlayAreaSpell(DefenseBattle.Spell spell, Vector3 center, float radius,
+        IReadOnlyList<EnemyUnit> recipients)
+    {
+        if (recipients.Count == 0)
+            return;
+
+        spellEffects.PlayArea(spell, center, radius);
+        foreach (EnemyUnit enemy in recipients)
+        {
+            if (enemyViews.TryGetValue(enemy, out EnemyView view))
+                spellCastMarkers.Play(spell, view.Root, EnemyMarkerPoint(enemy, 0.76f),
+                    DefenseHud.UnitMarkerViewportClearance(enemy));
+        }
+    }
+
+    // 카메라 바로 앞에 화면을 덮는 반투명 판. HUD는 화면 오버레이라 영향을 받지 않는다.
+    private SpriteRenderer CreateAimDim()
+    {
+        var texture = new Texture2D(1, 1) { name = "Aim Dim" };
+        texture.SetPixel(0, 0, Color.white);
+        texture.Apply();
+        var dim = new GameObject("Aim Dim").AddComponent<SpriteRenderer>();
+        dim.sprite = Sprite.Create(texture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+        dim.transform.SetParent(camera.transform, false);
+        dim.sortingOrder = AimDimSortingOrder;
+        dim.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        dim.receiveShadows = false;
+        dim.enabled = false;
+        return dim;
+    }
+
+    // 조준 표시나 페이드는 UI처럼 실시간으로 움직여야 하므로 느려진 전투 시간 대신 unscaled 시간을 쓴다.
+    private void UpdateAimDim(bool aiming)
+    {
+        float target = aiming ? AimDimAlpha : 0f;
+        aimDimAlpha = Mathf.MoveTowards(aimDimAlpha, target, AimDimAlpha / AimDimFadeTime * Time.unscaledDeltaTime);
+        aimDim.enabled = aimDimAlpha > 0f;
+        if (!aimDim.enabled)
+            return;
+
+        Color color = UIPalette.Background;
+        color.a = aimDimAlpha;
+        aimDim.color = color;
+        float distance = camera.nearClipPlane + 0.05f;
+        float height = camera.orthographic
+            ? camera.orthographicSize * 2f
+            : 2f * distance * Mathf.Tan(camera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        aimDim.transform.localPosition = new Vector3(0f, 0f, distance);
+        aimDim.transform.localRotation = Quaternion.identity;
+        aimDim.transform.localScale = new Vector3(height * camera.aspect * 1.1f, height * 1.1f, 1f);
+    }
+
+    // 범위 원은 다른 오브젝트와 머티리얼을 공유하므로, 그리는 순서만 늦춘 복제본을 쓴다.
+    private Material AimOverlay(Material source)
+    {
+        if (!aimOverlayMaterials.TryGetValue(source, out Material overlay))
+        {
+            overlay = new Material(source) { name = source.name + " (Aim Overlay)", renderQueue = AimOverlayRenderQueue };
+            materials.Add(overlay);
+            aimOverlayMaterials.Add(source, overlay);
+        }
+        return overlay;
     }
 
     private void UpdateAreaSpellRing(Vector3 center, float radius)
@@ -595,7 +677,10 @@ internal sealed class DefenseBoardView
         return true;
     }
 
-    public Vector3 ScreenPoint(EnemyUnit enemy, float height)
+    public Vector3 ScreenPoint(EnemyUnit enemy, float height) =>
+        camera.WorldToScreenPoint(EnemyMarkerPoint(enemy, height));
+
+    private Vector3 EnemyMarkerPoint(EnemyUnit enemy, float height)
     {
         Vector3 worldPoint = root.TransformPoint(enemy.Position + Vector3.up * height);
         if (enemyViews.TryGetValue(enemy, out EnemyView view) && view.Animator != null)
@@ -603,7 +688,7 @@ internal sealed class DefenseBoardView
             foreach (Renderer renderer in view.Renderers)
                 worldPoint.y = Mathf.Max(worldPoint.y, renderer.bounds.max.y + 0.05f);
         }
-        return camera.WorldToScreenPoint(worldPoint);
+        return worldPoint;
     }
 
     public Vector3 ScreenPoint(Vector3 boardPosition) =>
@@ -758,17 +843,27 @@ internal sealed class DefenseBoardView
             return;
 
         // 공격과 동시에 쓰러진 경우에도 타격은 보여준다.
-        if (view.HitsSeen != enemy.AttacksPerformed)
-            view.HitTarget = enemy.Target;
         PlayHit(view, enemy);
+        if (view.HitsSeen != enemy.AttacksPerformed)
+        {
+            view.PendingHit = enemy.LastAttack;
+            PlayHit(view, enemy);
+        }
+        if (view.MoveSpeedTrails != null)
+        {
+            foreach (LineRenderer trail in view.MoveSpeedTrails)
+                trail.enabled = false;
+        }
         Object.Destroy(view.Root.gameObject);
     }
 
-    public void AdvanceHitEffects(float deltaTime)
+    public void AdvanceEffects(float deltaTime)
     {
         foreach (HitEffect effect in hitEffects)
             if (effect.IsPlaying)
                 effect.Advance(deltaTime);
+        spellEffects.Advance(deltaTime);
+        spellCastMarkers.Advance(deltaTime);
     }
 
     public void SyncEnemy(EnemyUnit enemy, float deltaTime = 0f, float playbackSpeed = 1f)
@@ -787,20 +882,22 @@ internal sealed class DefenseBoardView
                 view.Head.localPosition = new Vector3(0, 0.62f, enemy.AttackFlash * 0.7f);
         }
         SyncHit(view, enemy);
+        bool movingWithBuff = enemy.MoveSpeedBuffStacks > 0 && IsMoving(step, deltaTime, playbackSpeed);
+        spellEffects.SyncMoveTrail(view.Root, step, movingWithBuff, ref view.MoveSpeedTrails);
     }
 
     // 공격 애니메이션이 타격 지점에 닿는 순간 대상 위치에 이펙트를 띄운다.
     private void SyncHit(EnemyView view, EnemyUnit enemy)
     {
         bool attacked = view.HitsSeen != enemy.AttacksPerformed;
-        if (view.HitTarget != null && (attacked || ImpactReached(view)))
+        if (view.PendingHit.Target != null && (attacked || ImpactReached(view)))
             PlayHit(view, enemy);
 
         if (!attacked)
             return;
 
         view.HitsSeen = enemy.AttacksPerformed;
-        view.HitTarget = enemy.Target;
+        view.PendingHit = enemy.LastAttack;
         if (view.Animator == null)
             PlayHit(view, enemy);
     }
@@ -816,8 +913,8 @@ internal sealed class DefenseBoardView
 
     private void PlayHit(EnemyView view, EnemyUnit attacker)
     {
-        EnemyUnit target = view.HitTarget;
-        view.HitTarget = null;
+        var (target, boosted, targetArmored) = view.PendingHit;
+        view.PendingHit = default;
         if (target == null)
             return;
 
@@ -825,6 +922,10 @@ internal sealed class DefenseBoardView
         toAttacker.y = 0f;
         Vector3 point = target.Position + Vector3.up * HitHeight + Vector3.ClampMagnitude(toAttacker, HitForwardOffset);
         NextHitEffect().Play(root.TransformPoint(point), attacker.Faction.Color);
+        if (boosted)
+            spellEffects.PlayAttack(attacker.Position, target.Position);
+        if (targetArmored)
+            spellEffects.PlayArmorImpact(target.Position);
     }
 
     private HitEffect NextHitEffect()
@@ -853,11 +954,16 @@ internal sealed class DefenseBoardView
         return Mathf.Max(1f, state.length / (enemy.Faction.AttackInterval * 0.9f));
     }
 
+    private static bool IsMoving(Vector3 step, float deltaTime, float playbackSpeed)
+    {
+        float movementThreshold = 0.001f * Mathf.Min(1f, playbackSpeed);
+        return deltaTime > 0f && step.sqrMagnitude > movementThreshold * movementThreshold;
+    }
+
     private static void SyncGoblinMotion(EnemyView view, EnemyUnit enemy, Vector3 step, float deltaTime, float playbackSpeed)
     {
         Animator animator = view.Animator;
-        float movementThreshold = 0.001f * Mathf.Min(1f, playbackSpeed);
-        bool moving = deltaTime > 0f && step.sqrMagnitude > movementThreshold * movementThreshold;
+        bool moving = IsMoving(step, deltaTime, playbackSpeed);
         view.StoppedTime = moving ? 0f : view.StoppedTime + deltaTime;
         bool newAttack = view.AttacksPlayed != enemy.AttacksPerformed;
         if (newAttack)
@@ -895,8 +1001,14 @@ internal sealed class DefenseBoardView
 
     public void ReleaseMaterials()
     {
+        spellCastMarkers.ReleaseSprites();
         Object.Destroy(areaSpellPreviewMesh);
         Object.Destroy(factionRingMesh);
+        if (aimDim != null && aimDim.sprite != null)
+        {
+            Object.Destroy(aimDim.sprite.texture);
+            Object.Destroy(aimDim.sprite);
+        }
         Object.Destroy(previewRingMesh);
         foreach (Material material in materials)
             Object.Destroy(material);
