@@ -1,0 +1,11 @@
+# [Props] 03 — 무기 소품 (NAI V5). 한 장에 하나, 곧게 세운 정면, 투명 배경. 3D 소품 원화용.
+# 생성: python -I ~/.claude/skills/nai-image/scripts/nai_gen.py 03:1-A --n 3 --out Tools/_nai_out
+# 스타일 단어는 여기 적지 않는다. 화풍은 [Base Prompts].txt가 정한다.
+
+---
+
+## 1. 지팡이
+### 1-A. 술사 지팡이 — 나무 막대 + 하늘색 수정 (9:21)
+no humans, -3::1girl, 1boy, human, hand, holding::, game asset, prop, {{black background, simple background}}, single object, centered, isolated, {{flat front view}}, vertical, -3::isometric, three-quarter view, perspective, diagonal, tilted, multiple objects::,
+long wooden staff, magic staff, straight brown wooden shaft, slightly twisted wood near the top, wooden claws holding a crystal, pale blue crystal, elongated hexagonal crystal point, small leather wrap around the middle of the shaft, rounded bottom tip,
+A long plain wooden magic staff standing perfectly upright and straight, seen from the front, with a pale blue elongated crystal held by a few twisted wooden prongs at the top and a small leather grip wrap in the middle. The whole staff is visible from the crystal tip to the bottom end. Isolated on a solid black background.

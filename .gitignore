@@ -155,3 +155,19 @@ Desktop.ini
 .idea/
 *.swp
 *~
+
+# ===== Art pipeline: only finished models (in the Unity project) are tracked =====
+# Work folders: concepts, turnarounds, Meshy/Codex intermediates, mockups, generator output, local tools
+Art3D/
+ArtDirection/
+Tools/
+
+# Unity: test scenes and animation preview controllers built for checking units
+ProjectBeViolenceDefense/Assets/Scenes/Test_*
+ProjectBeViolenceDefense/Assets/Art/**/Preview/
+ProjectBeViolenceDefense/Assets/Art/**/Preview.meta
+
+# Codex art job leftovers (wherever they land)
+_codex_*.txt
+_deps/
+_generated*.png

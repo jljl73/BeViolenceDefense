@@ -1,0 +1,33 @@
+# [Characters] 02 — 용사 파티 지원 3인 컨셉 (NAI V5). 전원 여성. 전신, 정면, 선 자세, 투명 배경.
+# 생성 (고화질, Anlas 사용 — 사용자 승인 2026-11-18): python -I ~/.claude/skills/nai-image/scripts/nai_gen.py 02:1-A --n 2 --size 1024x1536 --steps 28 --out Tools/_nai_out
+# 스타일 단어는 여기 적지 않는다. 화풍은 [Base Prompts].txt가 정한다.
+# 게임 카메라가 거의 위에서 내려다보므로, 세 사람은 머리 실루엣(모자·베일·장식)과 대표색으로 구분되게 디자인한다.
+# 변경 이력: v1(02_1-A 2169974982 남성 궁정마술사 / 02_1-B 3182244931 후광 성녀 / 02_1-C 881135729) -> v2 전원 여성, 버퍼는 정통 마법사 복장, 성녀 후광 제거.
+
+---
+
+## 1. 지원 3인
+### 1-A. 버퍼 — 마법사 (2:3)
+1girl, solo, young woman, full body, standing, straight-on, looking at viewer, smile, {{black background, simple background}}, -2::1boy, male focus, weapon swing, dynamic pose, casting spell, magic attack, text, letters::,
+long wavy brown hair, round glasses, {{witch hat}}, large pointed navy hat, wide brim, gold hat band, star ornament on hat, navy wizard robe, long robe, gold star embroidery, wide sleeves, dark blue cape, high collar, holding staff, wooden staff, crystal on staff, small pouch on belt, brown boots,
+A cheerful young female wizard in a classic wizard outfit who supports her party with blessings and encouragement rather than battle magic. She wears a large pointed navy wizard hat with a wide brim, a long navy robe embroidered with gold stars and a dark blue cape, and holds a wooden staff topped with a pale blue crystal while raising her free hand in a cheering gesture. Her big pointed hat gives her a clear silhouette from above. Isolated on a solid black background.
+
+### 1-B. 성녀 (2:3)
+1girl, solo, young woman, full body, standing, straight-on, looking at viewer, gentle smile, closed mouth, {{black background, simple background}}, -3::halo, sunburst, light rays, aura, glowing background, sun behind head::, -2::1boy, weapon, dynamic pose, revealing clothes, see-through::,
+long straight platinum blonde hair, light blue eyes, white veil, long veil, opaque veil, gold circlet, white habit, light blue cape, gold trim, long sleeves, holding staff, tall golden staff, sun emblem on staff, hands together, white boots,
+A serene young saint of a sun goddess in a white habit with a long opaque white veil and a light blue cape, holding a tall golden staff topped with a small sun emblem in front of her. There is nothing behind her head: no halo, no light rays. Her long white veil spreads over her shoulders and makes a wide pale shape from above. Isolated on a solid black background.
+
+### 1-D. 소녀 술사 — 사용자 레퍼런스 분위기, 동물귀·꼬리 없음 (2:3)
+1girl, solo, petite, full body, standing, straight-on, looking at viewer, gentle smile, {{black background, simple background}}, -3::animal ears, fox ears, tail, fox tail, multiple tails, kemonomimi mode::, -2::1boy, weapon swing, dynamic pose, gun, mechanical parts, science fiction::,
+1.4::fluffy hair, voluminous hair::, {{multicolored hair, streaked hair}}, blonde hair, white streaks, white hair strands in front, short hair, twin braids, braided sidelocks, light blue hairband, green eyes, white off-shoulder blouse, frilled sleeves, lavender skirt, layered frilled skirt, white cape, light blue striped cape lining, brown leather belt, small leather pouches, white pantyhose, black ankle boots, holding staff, long simple wooden staff, small pale blue crystal on staff top,
+A small gentle girl spellcaster who supports her party. Her short blonde hair is very fluffy and soft with a few clearly visible white streaks in the front strands. She wears a white off-shoulder frilled blouse, a layered lavender frilled skirt and a white cape lined with light blue stripes, with a few small leather pouches on her belt. She holds a long plain wooden staff topped with a small pale blue crystal diagonally across her body with both hands. She has human ears only, no animal ears and no tail. Isolated on a solid black background.
+
+### 1-E. 주인공(소녀 술사) — 대화창 상반신 (2:3)
+1girl, solo, petite, upper body, looking at viewer, gentle smile, {{black background, simple background}}, -3::animal ears, fox ears, tail, fox tail, multiple tails, kemonomimi mode::, -2::1boy, full body, legs, feet, weapon swing, dynamic pose, gun, mechanical parts, science fiction, text::,
+1.4::fluffy hair, voluminous hair::, {{multicolored hair, streaked hair}}, blonde hair, white streaks, white hair strands in front, short hair, twin braids, braided sidelocks, light blue hairband, green eyes, white off-shoulder blouse, frilled sleeves, lavender skirt, layered frilled skirt, white cape, light blue striped cape lining, brown leather belt, small leather pouches, white pantyhose, black ankle boots, holding staff, long simple wooden staff, small pale blue crystal on staff top,
+A dialogue portrait of the same small gentle girl spellcaster, from the head down to the waist, facing the viewer with a soft smile and holding her long wooden staff with the pale blue crystal diagonally in both hands. Her short blonde hair is very fluffy and soft with a few clearly visible white streaks in the front strands. She has human ears only, no animal ears. Isolated on a solid black background.
+
+### 1-C. 힐러 — 약초 치유사 (2:3)
+1girl, solo, young woman, full body, standing, straight-on, looking at viewer, smile, {{black background, simple background}}, -2::1boy, weapon, dynamic pose, nun, veil::,
+short orange hair, freckles, green eyes, green hood, hood up, flower on hood, cream blouse, brown corset, green apron, rolled up sleeves, satchel, herb pouches, glass potion bottles on belt, holding potion bottle, bandage roll, brown boots,
+A lively young field healer and herbalist who patches up the party with potions and bandages. She wears a green hood decorated with a small flower, an apron and a belt full of herb pouches and glass potion bottles, and holds up a glowing green potion. Her pointed green hood gives her a clear silhouette from above. Isolated on a solid black background.
