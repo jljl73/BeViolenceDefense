@@ -26,14 +26,9 @@ internal sealed class DefenseHud
         public Sprite Lock;
     }
 
-    private const int SpellSlotCount = 6;
-    private const int SpellSlotWidth = 108;
-    private const int SpellSlotHeight = 114;
-    private const int SpellSlotGap = 10;
-    private const int SpellRowWidth = SpellSlotCount * (SpellSlotWidth + SpellSlotGap) - SpellSlotGap;
-    private static readonly Vector2 SpellSlotSize = new(SpellSlotWidth, SpellSlotHeight);
-    private static readonly Vector2 SpellBarSize = new(SpellRowWidth, 160);
-    private static readonly Vector2 PrepareSize = new(110, 110);
+    private const int LockedSpellCount = 3;
+    private static readonly Vector2 SpellSlotSize = new(110, 124);
+    private static readonly Vector2 ActionsSize = new(600, 184);
 
     private readonly UIManager ui;
     private readonly Art art;
@@ -43,8 +38,9 @@ internal sealed class DefenseHud
     private readonly TextMeshProUGUI phase;
     private readonly TextMeshProUGUI core;
     private readonly Image coreFill;
-    private readonly Image countIcon;
-    private readonly TextMeshProUGUI count;
+    private readonly RectTransform wallSupply;
+    private readonly Image[] wallIcons = new Image[DefenseGrid.WallLimit];
+    private readonly TextMeshProUGUI wallCount;
     private readonly TextMeshProUGUI notice;
     private readonly RectTransform actionBar;
     private readonly RectTransform preparePanel;
@@ -79,72 +75,87 @@ internal sealed class DefenseHud
         markers = Rect("Board Markers", ui.HudLayer, Vector2.zero, Vector2.one * 0.5f, Vector2.zero, Vector2.zero);
         Stretch(markers);
 
-        RectTransform status = Panel("Status", ui.HudLayer, Vector2.up, new Vector2(28, -24), new Vector2(254, 108));
-        AddIcon("Round Flag", status, this.art.Round, new Vector2(13, -10), 27, UIPalette.TextPrimary);
-        round = Label("Round", status, 45, -9, 65, 28, 23);
-        phase = Label("Phase", status, 111, -9, 129, 28, 17, TextAlignmentOptions.Right);
+        Vector2 topCenter = new(0.5f, 1f);
+        RectTransform status = Rect("Round Status", ui.HudLayer, topCenter, topCenter,
+            new Vector2(0, -35), new Vector2(220, 75));
+        round = Label("Round", status, 0, 0, 220, 40, 30, TextAlignmentOptions.Center);
+        phase = Label("Phase", status, 0, -41, 220, 28, 20, TextAlignmentOptions.Center);
         phase.color = UIPalette.TextSecondary;
 
-        AddIcon("Core Gem", status, this.art.Core, new Vector2(13, -48), 32, UIPalette.ButtonPrimary);
-        core = Label("Core", status, 46, -49, 192, 22, 18, TextAlignmentOptions.Right);
-        coreFill = Bar("Core Health", status, Vector2.up, Vector2.up,
-            new Vector2(56, -77), new Vector2(182, 10), UIPalette.ButtonPrimary);
+        RectTransform coreStatus = Rect("Core Status", ui.HudLayer, Vector2.up, Vector2.up,
+            new Vector2(55, -35), new Vector2(204, 72));
+        AddIcon("Core Gem", coreStatus, this.art.Core, new Vector2(0, -3), 46, UIPalette.ButtonPrimary);
+        core = Label("Core", coreStatus, 62, 0, 142, 42, 31);
+        coreFill = Bar("Core Health", coreStatus, Vector2.up, Vector2.up,
+            new Vector2(62, -48), new Vector2(120, 5), UIPalette.ButtonPrimary);
 
-        RectTransform counter = Panel("Phase Counter", ui.HudLayer, Vector2.up, new Vector2(28, -140),
-            new Vector2(126, 50));
-        countIcon = AddIcon("Counter Icon", counter, this.art.Wall, new Vector2(10, -9), 32, UIPalette.TextSecondary);
-        count = Label("Count", counter, 49, -10, 65, 30, 20, TextAlignmentOptions.Center);
+        wallSupply = Rect("Wall Supply", ui.HudLayer, Vector2.one, Vector2.one,
+            new Vector2(-55, -33), new Vector2(150, 84));
+        for (int i = 0; i < wallIcons.Length; i++)
+            wallIcons[i] = AddIcon($"Wall {i + 1}", wallSupply, this.art.Wall,
+                new Vector2(64 + (i % 4) * 21, -(i / 4) * 16), 16, UIPalette.TextPrimary);
+        wallCount = Label("Walls Left", wallSupply, 0, -35, 150, 28, 20, TextAlignmentOptions.Right);
 
-        RectTransform noticePanel = Panel("Notice", ui.HudLayer, Vector2.up, new Vector2(28, -199),
-            new Vector2(414, 48), UIPalette.PanelBrown);
-        notice = Label("Message", noticePanel, 12, -2, 390, 43, 17, TextAlignmentOptions.Center);
-        noticePanel.gameObject.SetActive(false);
+        RectTransform noticeArea = Rect("Notice", ui.HudLayer, Vector2.up, Vector2.up,
+            new Vector2(55, -110), new Vector2(500, 50));
+        notice = Label("Message", noticeArea, 0, 0, 500, 50, 20);
+        noticeArea.gameObject.SetActive(false);
 
-        speedPanel = Panel("Battle Speed", ui.HudLayer, Vector2.one, new Vector2(-28, -24),
-            new Vector2(156, 58));
-        normalSpeed = ActionButton("1x", speedPanel, new Vector2(8, -8), new Vector2(66, 42),
-            () => setBattleSpeed(1), caption: "1×");
-        doubleSpeed = ActionButton("2x", speedPanel, new Vector2(82, -8), new Vector2(66, 42),
-            () => setBattleSpeed(2), caption: "2×");
+        speedPanel = Rect("Battle Speed", ui.HudLayer, Vector2.one, Vector2.one,
+            new Vector2(-50, -32), new Vector2(132, 60));
+        normalSpeed = ActionButton("1x", speedPanel, Vector2.zero, new Vector2(56, 60),
+            () => setBattleSpeed(1), caption: "1×", flat: true);
+        doubleSpeed = ActionButton("2x", speedPanel, new Vector2(70, 0), new Vector2(56, 60),
+            () => setBattleSpeed(2), caption: "2×", flat: true);
+        AddSpeedUnderline(normalSpeed);
+        AddSpeedUnderline(doubleSpeed);
 
         RectTransform helpDock = Rect("Help Dock", ui.HudLayer, Vector2.zero, Vector2.zero,
-            new Vector2(28, 24), new Vector2(47, 47));
+            new Vector2(46, 38), new Vector2(50, 50));
         help = ActionButton("Controls", helpDock, Vector2.zero, helpDock.sizeDelta,
-            () => helpPinned = !helpPinned, caption: "?");
-        helpTip = Tip("Controls Tip", helpDock, Vector2.up, Vector2.zero, new Vector2(0, 8), new Vector2(360, 82));
+            () => helpPinned = !helpPinned, caption: "?", flat: true);
+        helpTip = Tip("Controls Tip", helpDock, Vector2.up, Vector2.zero, new Vector2(0, 8), new Vector2(420, 82),
+            TextAlignmentOptions.Left);
 
         Vector2 bottomCenter = new(0.5f, 0f);
-        actionBar = Rect("Actions", ui.HudLayer, bottomCenter, bottomCenter, new Vector2(0, 24), PrepareSize);
-        preparePanel = Panel("Prepare", actionBar, Vector2.up, Vector2.zero, PrepareSize);
-        startBattle = ActionButton("Start Battle", preparePanel, new Vector2(12, -12), new Vector2(86, 86),
-            start, this.art.Start, "Space", 48);
+        actionBar = Rect("Actions", ui.HudLayer, bottomCenter, bottomCenter, new Vector2(0, 46), ActionsSize);
+        preparePanel = Rect("Prepare", actionBar, Vector2.up, Vector2.up, Vector2.zero, ActionsSize);
+        startBattle = ActionButton("Start Battle", preparePanel, new Vector2(222, -44), new Vector2(156, 140),
+            start, this.art.Start, "Space", 43, flat: true);
+        RectTransform startRect = startBattle.Button.image.rectTransform;
+        startBattle.Icon.rectTransform.anchoredPosition = new Vector2(56.5f, -19);
+        startBattle.Caption.rectTransform.anchoredPosition = new Vector2(0, -103);
+        startBattle.Caption.fontSize = 19;
+        TextMeshProUGUI startLabel = Label("Start Label", startRect, 0, -76, 156, 29, 23, TextAlignmentOptions.Center);
+        startLabel.text = "Start battle";
+        startLabel.color = UIPalette.ButtonPrimary;
+        AddFocusRing(startBattle, new Vector2(43, -6), 70);
 
-        spellBar = Rect("Spell Bar", actionBar, Vector2.up, Vector2.up, Vector2.zero, SpellBarSize);
+        spellBar = Rect("Spell Bar", actionBar, Vector2.up, Vector2.up, Vector2.zero, ActionsSize);
         attackBuff = CreateSpellSlot("Attack Buff", 0, "1", this.art.AttackBuff,
             DefenseBattle.Spell.AttackBuff, UIPalette.Attack, cast);
         heal = CreateSpellSlot("Heal", 1, "2", this.art.Heal,
             DefenseBattle.Spell.Heal, UIPalette.Heal, cast);
         moveSpeedBuff = CreateSpellSlot("Move Speed Buff", 2, "3", this.art.MoveSpeedBuff,
             DefenseBattle.Spell.MoveSpeedBuff, UIPalette.MoveSpeed, cast);
-        for (int i = 3; i < SpellSlotCount; i++)
-            CreateLockedSlot(i);
+        AddIcon("Locked Spells", spellBar, this.art.Lock, new Vector2(550, -42), 17, UIPalette.TextSecondary);
+        TextMeshProUGUI locked = Label("Locked Count", spellBar, 573, -39, 40, 23, 19);
+        locked.text = $"×{LockedSpellCount}";
+        locked.color = UIPalette.TextSecondary;
 
         RectTransform manaGauge = Rect("Mana Gauge", spellBar, Vector2.up, Vector2.up,
-            new Vector2(0, -SpellSlotHeight - 8), new Vector2(SpellRowWidth, 38));
-        AddIcon("Mana Drop", manaGauge, this.art.Mana, new Vector2(0, -1), 36, UIPalette.Mana);
-        int frameWidth = SpellRowWidth - 138;
-        Image manaFrame = Graphic("Mana Frame", manaGauge, Vector2.up, Vector2.up,
-            new Vector2(41, -2), new Vector2(frameWidth, 34), UIPalette.Outline, this.art.Button);
-        manaFrame.pixelsPerUnitMultiplier = 1.8f;
-        manaFill = Bar("Track", manaFrame.rectTransform, Vector2.up, Vector2.up,
-            new Vector2(2, -2), new Vector2(frameWidth - 4, 30), UIPalette.Mana, this.art.Button);
-        mana = Label("Mana", manaGauge, SpellRowWidth - 93, 0, 93, 38, 23, TextAlignmentOptions.Right);
+            new Vector2(82, -138), new Vector2(436, 29));
+        AddIcon("Mana Drop", manaGauge, this.art.Mana, new Vector2(0, -4), 20, UIPalette.Mana);
+        manaFill = Bar("Track", manaGauge, Vector2.up, Vector2.up,
+            new Vector2(28, -12), new Vector2(294, 5), UIPalette.Mana);
+        mana = Label("Mana", manaGauge, 333, 0, 103, 28, 23);
         mana.color = UIPalette.Mana;
 
-        actionTip = Tip("Action Tip", actionBar, new Vector2(0.5f, 1), bottomCenter,
-            new Vector2(0, 8), new Vector2(354, 60));
+        actionTip = Tip("Action Tip", actionBar, topCenter, bottomCenter,
+            new Vector2(0, 5), new Vector2(520, 52), TextAlignmentOptions.Bottom);
 
-        defeatPopup = Panel("Defeat", ui.PopupLayer, Vector2.one * 0.5f, Vector2.zero,
+        Vector2 center = Vector2.one * 0.5f;
+        defeatPopup = Panel("Defeat", ui.PopupLayer, center, center, Vector2.zero,
             new Vector2(290, 196), UIPalette.PanelRaised);
         defeatPopup.gameObject.SetActive(false);
         AddIcon("Broken Core", defeatPopup, this.art.Core, new Vector2(120, -13), 50, UIPalette.ButtonDanger);
@@ -160,36 +171,41 @@ internal sealed class DefenseHud
         noticeUntil = Time.unscaledTime + 2.5f;
     }
 
-    public void Refresh(DefenseBattle battle, DefenseGrid grid, DefenseBoardView view, EnemyUnit selected,
-        DefenseBattle.Spell? aimedSpell, int battleSpeed)
+    public void Refresh(DefenseBattle battle, DefenseGrid grid, DefenseBoardView view,
+        DefenseBattle.Spell? aimedSpell, Vector3? spellCenter, int battleSpeed)
     {
         bool inCombat = battle.CurrentPhase == DefenseBattle.Phase.Combat;
         bool defeated = battle.CurrentPhase == DefenseBattle.Phase.Defeat;
-        round.text = battle.Round.ToString();
-        phase.text = defeated ? "Defeat" : inCombat ? "Battle" : "Build";
-        core.text = $"{battle.CoreHealth}/{DefenseBattle.CoreMaxHealth}";
+        round.text = $"Round {battle.Round}";
+        phase.text = defeated ? "Defeat" : aimedSpell.HasValue ? "Paused" : inCombat ? "Battle" : "Build";
+        phase.color = aimedSpell.HasValue ? UIPalette.TextPrimary : UIPalette.TextSecondary;
+        core.text = $"{battle.CoreHealth} <size=65%>/ {DefenseBattle.CoreMaxHealth}</size>";
         coreFill.color = battle.CoreHealth <= DefenseBattle.CoreMaxHealth / 4 ? UIPalette.ButtonDanger : UIPalette.ButtonPrimary;
         SetBarFraction(coreFill, (float)battle.CoreHealth / DefenseBattle.CoreMaxHealth);
-        countIcon.sprite = inCombat ? art.Enemy : art.Wall;
-        countIcon.enabled = countIcon.sprite != null;
-        count.transform.parent.gameObject.SetActive(!defeated);
-        count.text = inCombat ? $"{battle.SpawnCount}/{DefenseBattle.EnemiesPerRound}" : $"{grid.WallCount}/{DefenseGrid.WallLimit}";
+        wallSupply.gameObject.SetActive(!inCombat && !defeated);
+        if (!inCombat && !defeated)
+        {
+            int wallsLeft = DefenseGrid.WallLimit - grid.WallCount;
+            wallCount.text = $"Walls {wallsLeft} / {DefenseGrid.WallLimit}";
+            for (int i = 0; i < wallIcons.Length; i++)
+                wallIcons[i].color = i < wallsLeft ? UIPalette.TextPrimary : UIPalette.TextDisabled;
+        }
         bool showNotice = !defeated && Time.unscaledTime < noticeUntil && noticeText.Length > 0;
         notice.transform.parent.gameObject.SetActive(showNotice);
         if (showNotice)
             notice.text = noticeText;
 
         bool blocked = ui.HasOpenPopup;
-        RefreshActions(battle, selected, aimedSpell, inCombat, defeated, blocked);
-        speedPanel.gameObject.SetActive(!defeated);
+        RefreshActions(battle, aimedSpell, spellCenter, inCombat, defeated, blocked);
+        speedPanel.gameObject.SetActive(inCombat);
         RefreshSpeedButton(normalSpeed, battleSpeed == 1, blocked);
         RefreshSpeedButton(doubleSpeed, battleSpeed == 2, blocked);
 
         help.Button.gameObject.SetActive(!defeated);
         help.Button.interactable = !blocked;
-        StyleButton(help, UIPalette.ButtonSecondary, UIPalette.TextPrimary);
+        StyleFlatButton(help, help.ShowTip ? UIPalette.TextPrimary : UIPalette.TextSecondary);
         SetTip(helpTip, !blocked && !defeated && (help.ShowTip || helpPinned)
-            ? (inCombat ? "Click an enemy to target Heal" : "Left click builds · Right click removes") +
+            ? (inCombat ? "1–3 aim · Left click casts · Esc cancels" : "Left click builds · Right click removes") +
               "\nWASD pan · Wheel zoom · R restart"
             : null);
         StyleButton(restartButton, UIPalette.ButtonPrimary, UIPalette.TextOnAccent);
@@ -199,14 +215,14 @@ internal sealed class DefenseHud
         visibleMarkers = 0;
         foreach (EnemyUnit enemy in battle.Enemies)
         {
-            if (enemy.Health == EnemyUnit.MaxHealth && enemy.HealFlash <= 0 &&
-                enemy.AttackBuffRemaining <= 0 && enemy.MoveSpeedBuffRemaining <= 0 && enemy != selected)
+            if (enemy.Health == enemy.MaxHealth && enemy.HealFlash <= 0 &&
+                enemy.AttackBuffRemaining <= 0 && enemy.MoveSpeedBuffRemaining <= 0)
                 continue;
 
             Color color = enemy.HealFlash > 0 ? UIPalette.Heal : enemy.Faction.Color;
-            AddMarker(view.ScreenPoint(enemy, 0.76f), (float)enemy.Health / EnemyUnit.MaxHealth, color,
+            AddMarker(view.ScreenPoint(enemy, 0.76f), (float)enemy.Health / enemy.MaxHealth, color,
                 enemy.AttackBuffRemaining / DefenseBattle.BuffDuration,
-                enemy.MoveSpeedBuffRemaining / DefenseBattle.BuffDuration, enemy == selected);
+                enemy.MoveSpeedBuffRemaining / DefenseBattle.BuffDuration);
         }
         for (int i = visibleMarkers; i < unitMarkers.Count; i++)
             unitMarkers[i].Root.gameObject.SetActive(false);
@@ -217,8 +233,23 @@ internal sealed class DefenseHud
     private static void RefreshSpeedButton(HudButton control, bool selected, bool blocked)
     {
         control.Button.interactable = !blocked;
-        StyleButton(control, selected ? UIPalette.PanelRaised : UIPalette.ButtonDisabled,
-            selected ? UIPalette.TextPrimary : UIPalette.TextSecondary, selected);
+        StyleFlatButton(control, selected || control.Focused ? UIPalette.OutlineFocus : UIPalette.TextSecondary, selected);
+    }
+
+    private static void AddSpeedUnderline(HudButton control)
+    {
+        control.Decoration = Graphic("Selected Speed", control.Button.image.rectTransform, Vector2.up, Vector2.up,
+            new Vector2(3, -56), new Vector2(50, 3), UIPalette.OutlineFocus);
+    }
+
+    private static void AddFocusRing(HudButton control, Vector2 position, int diameter)
+    {
+        RectTransform rect = Rect("Focus Ring", control.Button.image.rectTransform, Vector2.up, Vector2.up,
+            position, new Vector2(diameter, diameter));
+        var ring = rect.gameObject.AddComponent<HudRing>();
+        ring.color = UIPalette.OutlineFocus;
+        ring.raycastTarget = false;
+        control.Decoration = ring;
     }
 
     private void RefreshEncounterMarkers(DefenseBattle battle, DefenseBoardView view)
@@ -255,127 +286,128 @@ internal sealed class DefenseHud
             encounterMarkers[i].gameObject.SetActive(false);
     }
 
-    private void RefreshActions(DefenseBattle battle, EnemyUnit selected, DefenseBattle.Spell? aimedSpell,
+    private void RefreshActions(DefenseBattle battle, DefenseBattle.Spell? aimedSpell, Vector3? spellCenter,
         bool inCombat, bool defeated, bool blocked)
     {
         actionBar.gameObject.SetActive(!defeated);
-        actionBar.sizeDelta = inCombat ? SpellBarSize : PrepareSize;
         preparePanel.gameObject.SetActive(!inCombat);
         startBattle.Button.interactable = !blocked;
-        StyleButton(startBattle, UIPalette.ButtonPrimary, UIPalette.TextOnAccent);
+        StyleFlatButton(startBattle, UIPalette.ButtonPrimary, marked: true, shortcut: UIPalette.TextSecondary);
         spellBar.gameObject.SetActive(inCombat);
 
         if (!inCombat)
         {
-            SetTip(actionTip, !blocked && startBattle.ShowTip ? "Start battle" : null);
+            SetTip(actionTip, null);
             return;
         }
 
-        mana.text = $"{Mathf.FloorToInt(battle.Mana)}/{DefenseBattle.MaxMana}";
+        mana.text = $"{Mathf.FloorToInt(battle.Mana)} <size=80%>/ {DefenseBattle.MaxMana}</size>";
         SetBarFraction(manaFill, battle.Mana / DefenseBattle.MaxMana);
         bool spellHovered = attackBuff.Control.Hovered || heal.Control.Hovered || moveSpeedBuff.Control.Hovered;
-        string attackTip = RefreshSpell(attackBuff, battle, selected, blocked, aimedSpell, spellHovered);
-        string healTip = RefreshSpell(heal, battle, selected, blocked, aimedSpell, spellHovered);
-        string speedTip = RefreshSpell(moveSpeedBuff, battle, selected, blocked, aimedSpell, spellHovered);
-        SetTip(actionTip, attackTip ?? healTip ?? speedTip ??
-            (!blocked && aimedSpell.HasValue ? "Click to cast · Esc to cancel" : null));
+        string attackTip = RefreshSpell(attackBuff, battle, blocked, aimedSpell, spellHovered);
+        string healTip = RefreshSpell(heal, battle, blocked, aimedSpell, spellHovered);
+        string speedTip = RefreshSpell(moveSpeedBuff, battle, blocked, aimedSpell, spellHovered);
+        if (!blocked && aimedSpell is { } spell)
+        {
+            SpellSlot slot = spell == attackBuff.Spell ? attackBuff : spell == heal.Spell ? heal : moveSpeedBuff;
+            int targets = 0;
+            if (spellCenter is { } center)
+            {
+                foreach (EnemyUnit enemy in battle.Enemies)
+                    if (DefenseBattle.IsInAreaSpellRange(enemy, center) && DefenseBattle.CanReceiveAreaSpell(enemy, spell))
+                        targets++;
+            }
+
+            string tint = ColorUtility.ToHtmlStringRGB(slot.Tint);
+            SetTip(actionTip, $"<color=#{tint}>◆ {slot.Name}</color>  ·  Targets {targets}  ·  Click to cast  ·  Esc");
+        }
+        else
+        {
+            SetTip(actionTip, attackTip ?? healTip ?? speedTip);
+        }
     }
 
-    private static string RefreshSpell(SpellSlot slot, DefenseBattle battle, EnemyUnit selected, bool blocked,
+    private static string RefreshSpell(SpellSlot slot, DefenseBattle battle, bool blocked,
         DefenseBattle.Spell? aimedSpell, bool spellHovered)
     {
-        string reason = battle.SpellBlockReason(selected, slot.Spell);
+        string reason = battle.SpellBlockReason(slot.Spell);
         bool ready = !blocked && reason == null;
         bool aimed = ready && aimedSpell == slot.Spell;
         slot.Control.Button.interactable = ready;
-        StyleButton(slot.Control, ready ? UIPalette.PanelRaised : UIPalette.ButtonDisabled,
-            ready ? slot.Tint : UIPalette.TextSecondary, aimed,
-            ready ? UIPalette.TextSecondary : UIPalette.TextDisabled);
+        StyleFlatButton(slot.Control, ready ? slot.Tint : UIPalette.TextDisabled, aimed,
+            ready ? UIPalette.TextPrimary : UIPalette.TextDisabled);
         slot.Cost.color = ready ? UIPalette.Mana : UIPalette.TextSecondary;
-        slot.Charges.color = ready ? UIPalette.TextPrimary : UIPalette.TextSecondary;
+        slot.Charges.color = ready ? UIPalette.TextSecondary : UIPalette.TextDisabled;
         slot.Charges.text = $"×{battle.CastsLeft(slot.Spell)}";
 
         if (blocked || !(spellHovered ? slot.Control.Hovered : slot.Control.Focused))
             return null;
 
-        if (aimed)
-            return $"{slot.Effect}\nClick to cast · Esc to cancel";
         if (reason != null)
             return $"{slot.Effect}\n{reason}";
         return slot.Effect;
     }
 
-    private static Vector2 SpellSlotPosition(int index) => new(index * (SpellSlotWidth + SpellSlotGap), 0);
-
-    private void CreateLockedSlot(int index)
-    {
-        Image outline = Graphic($"Locked Slot {index + 1}", spellBar, Vector2.up, Vector2.up,
-            SpellSlotPosition(index), SpellSlotSize, UIPalette.Outline, art.Button);
-        outline.raycastTarget = true;
-        Inset(outline.rectTransform, UIPalette.Panel, art.Button);
-        const int iconSize = 38;
-        AddIcon("Lock", outline.rectTransform, art.Lock,
-            new Vector2((SpellSlotWidth - iconSize) * 0.5f, (iconSize - SpellSlotHeight) * 0.5f),
-            iconSize, UIPalette.TextDisabled);
-    }
-
     private SpellSlot CreateSpellSlot(string name, int index, string shortcut, Sprite sprite,
         DefenseBattle.Spell spell, Color tint, Action<DefenseBattle.Spell> cast)
     {
-        HudButton control = ActionButton(name, spellBar, SpellSlotPosition(index), SpellSlotSize,
-            () => cast(spell), sprite, shortcut, 61);
+        HudButton control = ActionButton(name, spellBar, new Vector2(77 + index * 168, 0), SpellSlotSize,
+            () => cast(spell), sprite, shortcut, 90, flat: true);
         RectTransform rect = (RectTransform)control.Button.transform;
-        control.Caption.rectTransform.anchoredPosition = new Vector2(10, -7);
-        control.Caption.rectTransform.sizeDelta = new Vector2(18, 20);
-        control.Icon.rectTransform.anchoredPosition = new Vector2(24, -15);
-        RectTransform stats = Graphic("Spell Stats", rect, Vector2.up, Vector2.up,
-            new Vector2(7, -80), new Vector2(94, 26), UIPalette.BarTrack, art.Button).rectTransform;
-        stats.GetComponent<Image>().pixelsPerUnitMultiplier = 2.4f;
-        AddIcon("Mana Cost", stats, art.Mana, new Vector2(7, -5), 16, UIPalette.Mana);
-        TextMeshProUGUI cost = Label("Cost", stats, 25, -2, 28, 21, 16);
+        AddFocusRing(control, new Vector2(-3, 6), 116);
+        control.Caption.rectTransform.anchoredPosition = new Vector2(99, 2);
+        control.Caption.rectTransform.sizeDelta = new Vector2(18, 22);
+        control.Caption.fontSize = 19;
+        TextMeshProUGUI cost = Label("Cost", rect, 13, -105, 38, 24, 21, TextAlignmentOptions.Right);
         cost.text = DefenseBattle.ManaCost(spell).ToString();
-        TextMeshProUGUI charges = Label("Charges", stats, 56, -2, 30, 21, 16, TextAlignmentOptions.Right);
+        TextMeshProUGUI charges = Label("Charges", rect, 60, -105, 40, 24, 21);
         string effect = spell switch
         {
             DefenseBattle.Spell.AttackBuff => $"Attack buff · +{EnemyUnit.AttackBonus} damage",
-            DefenseBattle.Spell.Heal => $"Heal · +{DefenseBattle.HealAmount} HP",
+            DefenseBattle.Spell.Heal => $"Area heal · +{DefenseBattle.HealAmount} HP to injured enemies",
             _ => $"Move speed · +{EnemyUnit.MoveSpeedBonusPercent}%"
         };
-        return new SpellSlot(control, spell, tint, cost, charges, effect);
+        return new SpellSlot(control, spell, tint, cost, charges, name, effect);
     }
 
     private HudButton ActionButton(string name, RectTransform parent, Vector2 position, Vector2 size,
-        UnityAction onClick = null, Sprite sprite = null, string caption = "", int iconSize = 0)
+        UnityAction onClick = null, Sprite sprite = null, string caption = "", int iconSize = 0, bool flat = false)
     {
-        Image outline = Graphic(name, parent, Vector2.up, Vector2.up, position, size, UIPalette.Outline, art.Button);
+        Image outline = Graphic(name, parent, Vector2.up, Vector2.up, position, size,
+            flat ? Color.clear : UIPalette.Outline, flat ? null : art.Button);
         outline.raycastTarget = true;
         var button = outline.gameObject.AddComponent<Button>();
         button.targetGraphic = outline;
         button.transition = Selectable.Transition.None;
         if (onClick != null)
             button.onClick.AddListener(onClick);
-        Image face = Inset(outline.rectTransform, UIPalette.ButtonSecondary, art.Button);
+        Image face = flat ? null : Inset(outline.rectTransform, UIPalette.ButtonSecondary, art.Button);
         Image icon = AddIcon("Icon", outline.rectTransform, sprite,
             new Vector2((size.x - iconSize) * 0.5f, -7), iconSize, UIPalette.TextPrimary);
         TextMeshProUGUI label = sprite != null
             ? Label("Shortcut", outline.rectTransform, 0, 23 - size.y, size.x, 18, 15, TextAlignmentOptions.Center)
             : Label("Label", outline.rectTransform, 0, 0, size.x, size.y, 22, TextAlignmentOptions.Center);
-        label.text = sprite != null || iconSize == 0 ? caption : name;
+        label.text = caption;
         return new HudButton(button, face, icon, label);
     }
 
-    private static void StyleButton(HudButton control, Color face, Color ink, bool marked = false, Color? shortcut = null)
+    private static void StyleButton(HudButton control, Color face, Color ink)
     {
-        control.Button.image.color = marked || (control.Focused && control.Button.interactable)
+        control.Button.image.color = control.Focused && control.Button.interactable
             ? UIPalette.OutlineFocus
             : control.Hovered ? UIPalette.OutlineStrong : UIPalette.Outline;
         control.Face.color = face;
         control.Icon.color = ink;
-        control.Caption.color = shortcut ?? ink;
+        control.Caption.color = ink;
     }
 
-    private RectTransform Panel(string name, RectTransform parent, Vector2 anchor, Vector2 position, Vector2 size,
-        Color? color = null) => Panel(name, parent, anchor, anchor, position, size, color ?? UIPalette.Panel);
+    private static void StyleFlatButton(HudButton control, Color ink, bool marked = false, Color? shortcut = null)
+    {
+        if (control.Decoration != null)
+            control.Decoration.enabled = marked || (control.Focused && control.Button.interactable);
+        control.Icon.color = ink;
+        control.Caption.color = shortcut ?? ink;
+    }
 
     private RectTransform Panel(string name, RectTransform parent, Vector2 anchor, Vector2 pivot, Vector2 position,
         Vector2 size, Color color)
@@ -394,11 +426,12 @@ internal sealed class DefenseHud
         return face;
     }
 
-    private TextMeshProUGUI Tip(string name, RectTransform parent, Vector2 anchor, Vector2 pivot, Vector2 position, Vector2 size)
+    private static TextMeshProUGUI Tip(string name, RectTransform parent, Vector2 anchor, Vector2 pivot,
+        Vector2 position, Vector2 size, TextAlignmentOptions alignment)
     {
-        RectTransform panel = Panel(name, parent, anchor, pivot, position, size, UIPalette.PanelRaised);
-        TextMeshProUGUI label = Label("Tip Text", panel, 10, -4, size.x - 20, size.y - 8, 17, TextAlignmentOptions.Center);
-        panel.gameObject.SetActive(false);
+        RectTransform area = Rect(name, parent, anchor, pivot, position, size);
+        TextMeshProUGUI label = Label("Tip Text", area, 0, 0, size.x, size.y, 21, alignment);
+        area.gameObject.SetActive(false);
         return label;
     }
 
@@ -424,6 +457,7 @@ internal sealed class DefenseHud
         public readonly Image Face;
         public readonly Image Icon;
         public readonly TextMeshProUGUI Caption;
+        public MaskableGraphic Decoration;
         public bool Hovered { get; private set; }
         public bool Focused { get; private set; }
         public bool ShowTip => Button.gameObject.activeInHierarchy && (Hovered || Focused);
@@ -456,20 +490,23 @@ internal sealed class DefenseHud
         public readonly Color Tint;
         public readonly TextMeshProUGUI Cost;
         public readonly TextMeshProUGUI Charges;
+        public readonly string Name;
         public readonly string Effect;
 
-        public SpellSlot(HudButton control, DefenseBattle.Spell spell, Color tint, TextMeshProUGUI cost, TextMeshProUGUI charges, string effect)
+        public SpellSlot(HudButton control, DefenseBattle.Spell spell, Color tint, TextMeshProUGUI cost,
+            TextMeshProUGUI charges, string name, string effect)
         {
             Control = control;
             Spell = spell;
             Tint = tint;
             Cost = cost;
             Charges = charges;
+            Name = name;
             Effect = effect;
         }
     }
 
-    private void AddMarker(Vector3 screen, float health, Color healthColor, float attackBuff, float speedBuff, bool selected)
+    private void AddMarker(Vector3 screen, float health, Color healthColor, float attackBuff, float speedBuff)
     {
         if (screen.z <= 0 ||
             !RectTransformUtility.ScreenPointToLocalPointInRectangle(markers, screen, null, out Vector2 position))
@@ -483,7 +520,6 @@ internal sealed class DefenseHud
         marker.Root.gameObject.SetActive(true);
         SetBarFraction(marker.Health, health);
         marker.Health.color = healthColor;
-        marker.Highlight.SetActive(selected);
         marker.AttackBuff.transform.parent.gameObject.SetActive(attackBuff > 0);
         SetBarFraction(marker.AttackBuff, attackBuff);
         var speedBar = (RectTransform)marker.SpeedBuff.transform.parent;
@@ -495,7 +531,6 @@ internal sealed class DefenseHud
     private sealed class UnitMarker
     {
         public readonly RectTransform Root;
-        public readonly GameObject Highlight;
         public readonly Image Health;
         public readonly Image AttackBuff;
         public readonly Image SpeedBuff;
@@ -504,8 +539,6 @@ internal sealed class DefenseHud
         {
             Vector2 center = Vector2.one * 0.5f;
             Root = Rect("Enemy Marker", parent, center, center, Vector2.zero, Vector2.zero);
-            Highlight = Graphic("Selected", Root, center, center, Vector2.zero,
-                new Vector2(30, 11), UIPalette.OutlineFocus).gameObject;
             Health = Bar("Health", Root, center, center, Vector2.zero, new Vector2(26, 5), UIPalette.TextPrimary);
             AttackBuff = Bar("Attack Buff", Root, center, center, new Vector2(0, 13), new Vector2(26, 4),
                 UIPalette.Attack);
@@ -541,14 +574,9 @@ internal sealed class DefenseHud
     }
 
     private static Image Bar(string name, RectTransform parent, Vector2 anchor, Vector2 pivot,
-        Vector2 position, Vector2 size, Color color, Sprite surface = null)
+        Vector2 position, Vector2 size, Color color)
     {
-        Image background = Graphic(name, parent, anchor, pivot, position, size, UIPalette.BarTrack, surface);
-        if (surface != null)
-        {
-            background.pixelsPerUnitMultiplier = 2f;
-            background.gameObject.AddComponent<Mask>();
-        }
+        Image background = Graphic(name, parent, anchor, pivot, position, size, UIPalette.BarTrack);
         Image fill = Graphic("Fill", background.rectTransform, Vector2.zero, Vector2.zero,
             Vector2.zero, Vector2.zero, color);
         fill.rectTransform.anchorMax = Vector2.one;
@@ -576,5 +604,36 @@ internal sealed class DefenseHud
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
         rect.offsetMin = rect.offsetMax = Vector2.zero;
+    }
+}
+
+internal sealed class HudRing : Image
+{
+    protected override void OnPopulateMesh(VertexHelper vertices)
+    {
+        const int segments = 48;
+        const float thickness = 2.5f;
+        Rect bounds = GetPixelAdjustedRect();
+        float radius = Mathf.Min(bounds.width, bounds.height) * 0.5f;
+        Vector2 center = bounds.center;
+        Color32 tint = color;
+        vertices.Clear();
+
+        for (int segment = 0; segment < segments; segment++)
+        {
+            float angle = segment * (2f * Mathf.PI / segments);
+            Vector2 direction = new(Mathf.Cos(angle), Mathf.Sin(angle));
+            Vector2 uv = Vector2.one * 0.5f;
+            vertices.AddVert(center + direction * radius, tint, uv + direction * 0.5f);
+            vertices.AddVert(center + direction * (radius - thickness), tint, uv + direction * (0.5f - thickness / bounds.width));
+        }
+
+        for (int segment = 0; segment < segments; segment++)
+        {
+            int outer = segment * 2;
+            int next = ((segment + 1) % segments) * 2;
+            vertices.AddTriangle(outer, outer + 1, next);
+            vertices.AddTriangle(next, outer + 1, next + 1);
+        }
     }
 }

@@ -9,15 +9,17 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private UIManager ui;
     [SerializeField] private Texture2D encounterIcon;
     [SerializeField] private Sprite routeChevron;
+    [SerializeField] private GameObject goblinPrefab;
     [SerializeField] private DefenseHud.Art hudArt = new();
-    [SerializeField] private EnemyFaction coral = new("Coral", new Color32(255, 115, 87, 255), 0.9f);
-    [SerializeField] private EnemyFaction teal = new("Teal", new Color32(69, 222, 206, 255), 0.9f);
+    // 1스테이지 임시 밸런스: 고블린 6 vs 좀비 4가 비슷한 전력으로 맞부딪치도록 맞춘 값 (docs/prototype.md 참고).
+    [SerializeField] private EnemyFaction coral = new("Coral", new Color32(255, 115, 87, 255), 1.5f, 50, 10, 0.65f, 6);
+    [SerializeField] private EnemyFaction teal = new("Teal", new Color32(69, 222, 206, 255), 1.5f, 90, 15, 1f, 4);
 
     private DefenseGrid grid;
     private DefenseBoardView view;
     private DefenseBattle battle;
     private DefenseHud hud;
-    private EnemyUnit selected;
+    private readonly BattleClock battleClock = new();
     private DefenseBattle.Spell? aimedSpell;
     private int battleSpeed = 1;
 
@@ -25,16 +27,17 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     {
         grid = new DefenseGrid();
         var factions = new[] { coral, teal };
-        view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron);
+        view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, goblinPrefab);
         battle = new DefenseBattle(grid, factions);
         battle.EnemySpawned += view.AddEnemy;
-        battle.EnemyRemoved += RemoveEnemy;
+        battle.EnemyRemoved += view.RemoveEnemy;
         hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt);
         RefreshPlanningTiles();
     }
 
     private void Update()
     {
+        battleClock.BeginFrame(Time.deltaTime, battleSpeed);
         view.FitCamera();
         Keyboard keyboard = Keyboard.current;
         bool boardInputAllowed = !ui.HasOpenPopup;
@@ -62,17 +65,20 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                     StartBattle();
                 break;
             case DefenseBattle.Phase.Combat:
-                battle.RecoverMana(Time.deltaTime * battleSpeed);
                 if (boardInputAllowed)
                     ReadCombatInput(keyboard);
 
-                bool pauseMovement = boardInputAllowed && aimedSpell.HasValue;
+                float deltaTime = battleClock.DeltaTime;
+                if (deltaTime <= 0f)
+                    break;
+
+                battle.RecoverMana(deltaTime);
                 // Use separate ticks so 2x runs the same movement and attack checks twice.
-                for (int tick = 0; tick < battleSpeed && battle.CurrentPhase == DefenseBattle.Phase.Combat; tick++)
-                    battle.Tick(Time.deltaTime, pauseMovement);
+                for (int tick = 0; tick < battleClock.StepCount && battle.CurrentPhase == DefenseBattle.Phase.Combat; tick++)
+                    battle.Tick(battleClock.StepDeltaTime, pauseMovement: false);
 
                 foreach (EnemyUnit enemy in battle.Enemies)
-                    view.SyncEnemy(enemy);
+                    view.SyncEnemy(enemy, deltaTime, battleClock.StepCount);
                 if (battle.CurrentPhase == DefenseBattle.Phase.Preparation)
                 {
                     RefreshPlanningTiles();
@@ -167,7 +173,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (aimedSpell.HasValue &&
             (keyboard?.escapeKey.wasPressedThisFrame == true || mouse?.rightButton.wasPressedThisFrame == true))
         {
-            aimedSpell = null;
+            SetAimedSpell(null);
             hud.Notify("");
             return;
         }
@@ -177,47 +183,26 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             UseSpell(DefenseBattle.Spell.AttackBuff);
             return;
         }
+        if (keyboard?.digit2Key.wasPressedThisFrame == true)
+        {
+            UseSpell(DefenseBattle.Spell.Heal);
+            return;
+        }
         if (keyboard?.digit3Key.wasPressedThisFrame == true)
         {
             UseSpell(DefenseBattle.Spell.MoveSpeedBuff);
             return;
         }
 
-        if (aimedSpell is { } spell)
+        if (aimedSpell is { } spell && mouse?.leftButton.wasPressedThisFrame == true &&
+            TryPickAreaSpellCenter(mouse, out Vector3 center))
         {
-            if (keyboard?.digit2Key.wasPressedThisFrame == true)
-                UseSpell(DefenseBattle.Spell.Heal);
-            else if (mouse?.leftButton.wasPressedThisFrame == true && TryPickAreaBuffCenter(mouse, out Vector3 center))
-            {
-                aimedSpell = null;
-                hud.Notify(battle.CastAreaBuff(spell, center));
-            }
-            return;
+            hud.Notify(battle.CastAreaSpell(spell, center));
+            SetAimedSpell(null);
         }
-
-        if (mouse?.leftButton.wasPressedThisFrame == true && !ui.BlocksBoardPointer(mouse.position.ReadValue()))
-        {
-            selected = null;
-            Vector2 pointer = mouse.position.ReadValue();
-            float radius = Mathf.Clamp(Screen.height * 0.027f, 12, 32);
-            float nearest = radius * radius;
-            foreach (EnemyUnit enemy in battle.Enemies)
-            {
-                Vector3 screen = view.ScreenPoint(enemy, 0.48f);
-                float distance = ((Vector2)screen - pointer).sqrMagnitude;
-                if (screen.z > 0 && distance < nearest)
-                {
-                    selected = enemy;
-                    nearest = distance;
-                }
-            }
-        }
-
-        if (keyboard?.digit2Key.wasPressedThisFrame == true)
-            UseSpell(DefenseBattle.Spell.Heal);
     }
 
-    private bool TryPickAreaBuffCenter(Mouse mouse, out Vector3 center)
+    private bool TryPickAreaSpellCenter(Mouse mouse, out Vector3 center)
     {
         center = default;
         if (mouse == null)
@@ -232,24 +217,22 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Combat)
             return;
 
-        if (spell == DefenseBattle.Spell.Heal)
-        {
-            aimedSpell = null;
-            hud.Notify(battle.CastHeal(selected));
-            return;
-        }
-
-        string blocked = battle.SpellBlockReason(null, spell);
+        string blocked = battle.SpellBlockReason(spell);
         if (blocked == null)
-            aimedSpell = spell;
+            SetAimedSpell(spell);
         hud.Notify(blocked ?? "");
     }
 
-    private void RemoveEnemy(EnemyUnit enemy)
+    private void SetAimedSpell(DefenseBattle.Spell? spell)
     {
-        if (selected == enemy)
-            selected = null;
-        view.RemoveEnemy(enemy);
+        if (spell.HasValue != aimedSpell.HasValue)
+        {
+            battleClock.SetPaused(spell.HasValue);
+            if (spell.HasValue)
+                view.PauseEnemyAnimations();
+        }
+
+        aimedSpell = spell;
     }
 
     private void Restart() => SceneManager.LoadScene(gameObject.scene.buildIndex);
@@ -257,13 +240,17 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private void LateUpdate()
     {
         if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Combat)
-            aimedSpell = null;
+            SetAimedSpell(null);
 
-        view.ShowAreaBuffPreview(aimedSpell, aimedSpell.HasValue && TryPickAreaBuffCenter(Mouse.current, out Vector3 center)
+        view.AdvanceHitEffects(battleClock.DeltaTime);
+        Vector3? spellCenter = aimedSpell.HasValue && TryPickAreaSpellCenter(Mouse.current, out Vector3 center)
             ? center
-            : null);
-        hud.Refresh(battle, grid, view, selected, aimedSpell, battleSpeed);
+            : null;
+        view.ShowAreaSpellPreview(aimedSpell, spellCenter);
+        hud.Refresh(battle, grid, view, aimedSpell, spellCenter, battleSpeed);
     }
+
+    private void OnDisable() => SetAimedSpell(null);
 
     private void OnDestroy() => view?.ReleaseMaterials();
 }

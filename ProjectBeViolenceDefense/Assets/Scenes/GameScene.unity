@@ -472,6 +472,7 @@ MonoBehaviour:
   ui: {fileID: 1670040552}
   encounterIcon: {fileID: 2800000, guid: c37be215002b4edea1fa17f08c0cee92, type: 3}
   routeChevron: {fileID: 21300000, guid: 46ebbe5b08e24fc9841b086637f821aa, type: 3}
+  goblinPrefab: {fileID: 6069468936470726084, guid: 218af73703ffe4b5ca096770dcbf9665, type: 3}
   hudArt:
     Panel: {fileID: 21300000, guid: 71d454b5c2b146bb850d3f0c894ac591, type: 3}
     Button: {fileID: 21300000, guid: 63e057d7b44c4882803a83059acff73f, type: 3}
@@ -489,13 +490,25 @@ MonoBehaviour:
   coral:
     displayName: Coral
     color: {r: 1, g: 0.4509804, b: 0.34117648, a: 1}
-    attackRange: 0.9
+    attackRange: 1.5
     awarenessRange: 2.2
+    maxHealth: 50
+    damage: 10
+    attackInterval: 0.65
+    spawnCount: 6
   teal:
     displayName: Teal
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
-    attackRange: 0.9
+    attackRange: 1.5
     awarenessRange: 2.2
+    maxHealth: 90
+    damage: 15
+    attackInterval: 1
+    spawnCount: 4
+    model: {fileID: 919132149155446097, guid: ae4a287ea2455b04c98140f1d60b3e6b, type: 3}
+    animations: {fileID: 9100000, guid: 540f004d4dada8344ba500c596233a98, type: 2}
+    skin: {fileID: 2100000, guid: fc637a2448e415743b7c00a46b74d135, type: 2}
+    modelScale: 1.3
 --- !u!1 &310873186
 GameObject:
   m_ObjectHideFlags: 0
