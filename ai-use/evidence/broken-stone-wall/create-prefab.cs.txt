@@ -1,0 +1,46 @@
+using UnityEngine;
+using UnityEditor;
+var dir = "Assets/05_Art/05_Meshes/BrokenStoneWall/";
+var importer = (ModelImporter)AssetImporter.GetAtPath(dir + "BrokenStoneWall.fbx");
+importer.importAnimation = false;
+importer.materialImportMode = ModelImporterMaterialImportMode.None;
+importer.SaveAndReimport();
+var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(dir + "BrokenStoneWall_BaseColor.png");
+var material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+material.name = "BrokenStoneWall";
+material.SetTexture("_BaseMap", texture);
+material.SetColor("_BaseColor", Color.white);
+material.SetFloat("_Smoothness", 0.15f);
+material.SetFloat("_Metallic", 0f);
+AssetDatabase.CreateAsset(material, "Assets/05_Art/02_Materials/BrokenStoneWall.mat");
+var root = new GameObject("BrokenStoneWall");
+try {
+    var model = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(dir + "BrokenStoneWall.fbx"));
+    model.transform.SetParent(root.transform, false);
+    model.name = "Visual";
+    var renderers = model.GetComponentsInChildren<Renderer>();
+    var bounds = renderers[0].bounds;
+    foreach(var r in renderers) {
+        bounds.Encapsulate(r.bounds);
+        var slots = r.sharedMaterials;
+        for (int i=0;i<slots.Length;i++) slots[i]=material;
+        r.sharedMaterials=slots;
+    }
+    var originalSize = bounds.size;
+    float horizontalScale = 0.92f / Mathf.Max(bounds.size.x, bounds.size.z);
+    var scale = new Vector3(horizontalScale, 0.8f / bounds.size.y, horizontalScale);
+    model.transform.localScale = Vector3.Scale(model.transform.localScale, scale);
+    model.transform.localPosition -= Vector3.Scale(new Vector3(bounds.center.x, bounds.min.y, bounds.center.z), scale);
+    var box = root.AddComponent<BoxCollider>();
+    box.center = new Vector3(0,0.4f,0);
+    box.size = new Vector3(0.92f,0.8f,0.92f);
+    var prefab = PrefabUtility.SaveAsPrefabAsset(root, "Assets/Resources/Prefabs/BrokenStoneWall.prefab");
+    AssetDatabase.SaveAssets();
+    bounds = renderers[0].bounds;
+    foreach(var r in renderers) bounds.Encapsulate(r.bounds);
+    if(bounds.size.x > 0.9201f || bounds.size.z > 0.9201f || Mathf.Abs(bounds.min.y)>0.0001f || Mathf.Abs(bounds.size.y-0.8f)>0.0001f) throw new System.Exception("Bounds validation failed");
+    Selection.activeObject = prefab;
+    var report = "Original mesh bounds: " + originalSize.ToString("F6") + "\nVisual bounds: " + bounds.size.ToString("F6") + "\nVisual center: " + bounds.center.ToString("F6") + "\nVisual scale: " + model.transform.localScale.ToString("F6") + "\nCollider: " + box.size + " center: " + box.center + "\nRoot scale: " + root.transform.localScale + "\nShader: " + material.shader.name + "\nTexture: " + texture.width + "x" + texture.height + "\nValidation: PASS\n";
+    System.IO.File.WriteAllText("../ai-use/evidence/broken-stone-wall/validation.txt", report);
+    return report;
+} finally { Object.DestroyImmediate(root); }

@@ -399,3 +399,39 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 최종 외형의 취향·게임 배치 위치. 프리팹 크기와 충돌 범위를 2칸에 맞춘 작업이며 DefenseGrid 점유 데이터·경로 차단에 자동 연결하지 않음. 실제 고정 장애물로 채택 시 두 셀 등록 필요. Windows 빌드 미실행.
+
+### [20261118-2222] Meshy 돌벽 임포트 및 1칸 프리팹 제작
+- 시각: 2026-11-18 22:22:00 +09:00
+- 작업자: ppzepi (git config user.name)
+- 사용 도구: Codex / Unity CLI 1.0.0 / Unity Editor 6000.3.28f1 / PowerShell
+- 목적 및 적용 위치: 사용자 제공 돌벽 FBX를 현재 프로젝트의 1칸 벽 규격에 맞춘 재사용 프리팹으로 제작.
+- 사용 방식: 실제 그리드·벽 생성·URP·Input System·uGUI 확인, ZIP의 FBX/PNG 추출, Unity API로 재질과 프리팹 생성, 축 보정 후 저장된 프리팹 재검증.
+- 결과 및 확인 방법: 성공. 시각 bounds 0.92×0.8×0.314797, 바닥 중앙 피벗, 콜라이더 0.92×0.8×0.92 확인. 미리보기 육안 확인, compilationFailed=false. 씬 연결 및 Play Mode는 미실행.
+- 사람의 개입: 사용자가 원본 ZIP 지정 및 Unity 창 활성화. 최종 시각·사용 선택 검토는 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/BrokenStoneWall/ 및 폴더 .meta | PowerShell / Unity | 생성 | 제공 FBX·PNG 임포트 및 Unity 메타 생성, 프리팹에 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/02_Materials/BrokenStoneWall.mat 및 .meta | Unity CLI | 생성 | URP/Lit 텍스처 재질, 프리팹에 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/Prefabs/BrokenStoneWall.prefab 및 .meta | Unity CLI | 생성 | 1칸 벽 프리팹, 프로젝트 저장 완료·씬 적용 미선택 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/AssetLoading/AssetPaths.g.cs | 기존 Unity 경로 생성기 | 자동 수정 | 새 Resources 프리팹 경로 추가 |
+| docs/broken-stone-wall.md | Codex | 생성 | 규격·사용법·검증 범위 |
+| ai-use/evidence/broken-stone-wall/ | Codex / Unity CLI | 생성 | 생성·보정·검증 스크립트 기록, 치수 결과, 미리보기 |
+
+#### 증거
+- ai-use/evidence/broken-stone-wall/validation.txt
+- ai-use/evidence/broken-stone-wall/preview.png
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 임포트, 재질·프리팹 생성, bounds 보정, 미리보기 렌더 및 컴파일 상태 확인.
+- 활용 방식: Codex가 스크립트 작성 및 명령 조율, Unity CLI의 script eval이 열린 프로젝트의 Unity API 실행.
+- 잘된 점: 원본 모델 참조와 .meta 보존, 실제 저장 프리팹의 규격 검증.
+- 잘 안된 점 및 개선 필요: 샌드박스에서 CLI 경로가 보이지 않아 승인된 외부 실행 사용. 첫 파일 실행 시간 초과 후 사용자 창 활성화로 복구. FBX 축 변환에 따른 높이 불일치를 GridFit으로 보정. 콘솔 오류 2건은 Pipeline GET /api/commands의 HttpListenerResponse disposed 오류임을 확인했으며 컴파일 오류는 아님. CLI 1.0.1 업데이트는 미실행.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex의 셸·Unity CLI 조율 및 이미지 검사.
+- 사용 방식: 파일 생성, Unity 실행 결과 검토 및 최종 프리팹 치수 확인. Computer Use는 Unity 접근 미승인으로 창 확인 불가.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: BoardTheme.wallPrefab 선택 후 Play Mode에서 배치·철거 및 기존 벽과 시각 비교.

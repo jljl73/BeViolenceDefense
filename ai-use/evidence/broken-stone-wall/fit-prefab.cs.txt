@@ -1,0 +1,14 @@
+using UnityEngine;
+using UnityEditor;
+var path="Assets/Resources/Prefabs/BrokenStoneWall.prefab";
+var root=PrefabUtility.LoadPrefabContents(path);
+try {
+ var r=root.GetComponentsInChildren<Renderer>();
+ var b=r[0].bounds; foreach(var x in r) b.Encapsulate(x.bounds);
+ var wrapper=new GameObject("GridFit").transform; wrapper.SetParent(root.transform,false);
+ root.transform.GetChild(0).SetParent(wrapper,true);
+ wrapper.localScale=new Vector3(1,0.8f/b.size.y,1);
+ wrapper.localPosition=new Vector3(-b.center.x,-b.min.y*wrapper.localScale.y,-b.center.z);
+ PrefabUtility.SaveAsPrefabAsset(root,path);
+} finally {PrefabUtility.UnloadPrefabContents(root);}
+return "GridFit saved";

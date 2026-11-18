@@ -1,0 +1,27 @@
+using UnityEngine;
+using UnityEditor;
+var prefab=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Prefabs/BrokenStoneWall.prefab");
+var root=Object.Instantiate(prefab);
+try {
+ var rs=root.GetComponentsInChildren<Renderer>(); var b=rs[0].bounds;
+ foreach(var r in rs)b.Encapsulate(r.bounds);
+ bool valid=b.size.x<=0.9201f && b.size.z<=0.9201f && Mathf.Abs(b.size.y-0.8f)<0.0001f && Mathf.Abs(b.min.y)<0.0001f && Mathf.Abs(b.center.x)<0.0001f && Mathf.Abs(b.center.z)<0.0001f;
+ var report="Validation: "+(valid?"PASS":"FAIL")+"\nSize: "+b.size.ToString("F6")+"\nCenter: "+b.center.ToString("F6")+"\nMin Y: "+b.min.y+"\nRoot scale: "+root.transform.localScale+"\nCollider: "+root.GetComponent<BoxCollider>().size+"\n";
+ System.IO.File.WriteAllText("../ai-use/evidence/broken-stone-wall/validation.txt",report);
+ if(!valid)throw new System.Exception(report);
+ Selection.activeObject=prefab;
+ var preview=new PreviewRenderUtility();
+ try {
+  preview.AddSingleGO(Object.Instantiate(prefab));
+  preview.camera.transform.position=new Vector3(1.5f,1.7f,-2.5f);
+  preview.camera.transform.LookAt(new Vector3(0,0.4f,0));
+  preview.camera.orthographic=true; preview.camera.orthographicSize=0.75f;
+  preview.camera.nearClipPlane=0.01f; preview.camera.farClipPlane=20;
+  preview.camera.clearFlags=CameraClearFlags.SolidColor; preview.camera.backgroundColor=new Color(0.12f,0.15f,0.19f);
+  preview.lights[0].intensity=1.3f; preview.lights[0].transform.rotation=Quaternion.Euler(45,35,0);
+  preview.lights[1].intensity=0.7f;
+  preview.BeginStaticPreview(new Rect(0,0,512,512)); preview.Render(true);
+  var image=preview.EndStaticPreview(); System.IO.File.WriteAllBytes("../ai-use/evidence/broken-stone-wall/preview.png",image.EncodeToPNG()); Object.DestroyImmediate(image);
+ } finally {preview.Cleanup();}
+ return report;
+} finally {Object.DestroyImmediate(root);}
