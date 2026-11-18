@@ -764,6 +764,13 @@ MonoBehaviour:
     Enemy: {fileID: 21300000, guid: 9dce938c5e2c4b3c91272d1e3834d2f7, type: 3}
     Mana: {fileID: 21300000, guid: bddccabed31f41598fd449b1dc6bf524, type: 3}
     Lock: {fileID: 21300000, guid: 4ff7c9dc22374be0a4bfb9b29de52b0d, type: 3}
+    ArmorBuff: {fileID: 0}
+    SlotFrame: {fileID: 0}
+    SlotFrameSelected: {fileID: 0}
+    ColoredSkillIcons: 0
+  leftCoreHud: {fileID: 0}
+  manaBarHud: {fileID: 0}
+  battleInfoHud: {fileID: 0}
   boardTheme:
     background: {r: 0.043137256, g: 0.050980393, b: 0.16862746, a: 1}
     foundation: {r: 0.15686275, g: 0.21176471, b: 0.27058825, a: 1}
@@ -783,45 +790,61 @@ MonoBehaviour:
     tileTexture: {fileID: 0}
     borderWidth: 0
     border: {r: 0.15686275, g: 0.21176471, b: 0.27058825, a: 1}
-  coral:
+  greenHorde:
     unitId: goblin-grunt-1500
     displayName: Goblin
     color: {r: 1, g: 0.4509804, b: 0.34117648, a: 1}
     spawnCount: 6
-  teal:
+  undead:
     unitId: zombie
     displayName: Undead
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
     spawnCount: 4
+  beasts:
+    unitId: 
+    displayName: Beasts
+    color: {r: 0.95, g: 0.78, b: 0.3, a: 1}
+    spawnCount: 0
+  dragonAndDemon:
+    unitId: 
+    displayName: Dragon
+    color: {r: 0.68, g: 0.45, b: 0.95, a: 1}
+    spawnCount: 0
   rounds:
   - note: "W1 \uAD11\uC7A5\uC758 \uCCAB \uCDA9\uB3CC"
-    coral:
+    greenHorde:
     - unitId: goblin-grunt-1500
       count: 4
-    teal:
+    undead:
     - unitId: skeleton
       count: 6
+    beasts: []
+    dragonAndDemon: []
   - note: "W2 \uC5C7\uAC08\uB9AC\uB294 \uBC1C\uAC78\uC74C"
-    coral:
+    greenHorde:
     - unitId: wolf
       count: 6
-    teal:
+    undead:
     - unitId: zombie
       count: 3
+    beasts: []
+    dragonAndDemon: []
   - note: "W3 \uC131\uBB38 \uC55E \uACB0\uC804"
-    coral:
+    greenHorde:
     - unitId: orc
       count: 2
     - unitId: goblin-slinger
       count: 3
-    teal:
+    undead:
     - unitId: skeleton
       count: 2
     - unitId: living-armor
       count: 1
     - unitId: skeleton-archer
       count: 3
-  stage: {fileID: 11400000, guid: b2b7d047661ba6243bc72b1ee554acf5, type: 2}
+    beasts: []
+    dragonAndDemon: []
+  stage: {fileID: 11400000, guid: 851ed955543d64d46b3e858f7a9cb1c1, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
