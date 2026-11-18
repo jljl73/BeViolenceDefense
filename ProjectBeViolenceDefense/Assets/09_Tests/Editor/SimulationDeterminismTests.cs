@@ -23,6 +23,7 @@ public sealed class SimulationDeterminismTests
 
     private static readonly DefenseBattle.SpellCommand[] Spells =
     {
+        new(60, DefenseBattle.Spell.ArmorBuff, new Vector3(2f, 0f, 3f), 0),
         new(240, DefenseBattle.Spell.AttackBuff, new Vector3(8f, 0f, 9f), 0),
         new(600, DefenseBattle.Spell.Heal, new Vector3(8f, 0f, 10f), 0),
         new(420, DefenseBattle.Spell.Taunt, default, 0, targetSpawnOrder: 2),
@@ -85,6 +86,7 @@ public sealed class SimulationDeterminismTests
             Mix(enemy.Health);
             Mix(enemy.AttacksPerformed);
             Mix(enemy.AttackBuffStacks);
+            Mix(BitConverter.SingleToInt32Bits(enemy.ArmorBuffRemaining));
             Mix(enemy.MaxHealth);
             Mix(BitConverter.SingleToInt32Bits(enemy.TauntRemaining));
             Mix(enemy.ActiveTaunter?.SpawnOrder ?? -1);

@@ -44,7 +44,7 @@ internal sealed class EnemyUnit
 {
     public const int AttackBonus = 15;
     public const float MoveSpeedBonusPercent = 0.5f;
-    public const int ArmorBonus = 5;
+    public const int ShieldDamageReductionPercent = 80;
     // 도발로 거대해진 유닛이 얻는 추가 최대 체력(기본 최대 체력 대비). 첫 테스트용 임시 값.
     public const float TauntHealthBonusPercent = 0.5f;
     internal const float RetaliationDuration = 4f;
@@ -52,7 +52,6 @@ internal sealed class EnemyUnit
     private readonly Vector3[] path;
     private readonly List<float> attackBuffTimers = new();
     private readonly List<float> moveSpeedBuffTimers = new();
-    private readonly List<float> armorBuffTimers = new();
     private int waypoint = 1;
     private int pendingDamage;
     private EnemyUnit pendingAttacker;
@@ -83,10 +82,11 @@ internal sealed class EnemyUnit
     public Vector3 Heading { get; private set; }
     public int AttackBuffStacks => attackBuffTimers.Count;
     public int MoveSpeedBuffStacks => moveSpeedBuffTimers.Count;
-    public int ArmorBuffStacks => armorBuffTimers.Count;
+    // 기존 화면 표식에는 방어막의 활성 여부를 0/1로 전달한다. 효과는 중첩하지 않는다.
+    public int ArmorBuffStacks => ArmorBuffRemaining > 0f ? 1 : 0;
     public float AttackBuffRemaining => NextBuffExpiry(attackBuffTimers);
     public float MoveSpeedBuffRemaining => NextBuffExpiry(moveSpeedBuffTimers);
-    public float ArmorBuffRemaining => NextBuffExpiry(armorBuffTimers);
+    public float ArmorBuffRemaining { get; private set; }
     public float HealFlash { get; private set; }
     public float AttackFlash => attackFlash;
     public int AttacksPerformed { get; private set; }
@@ -157,7 +157,7 @@ internal sealed class EnemyUnit
         }
         TickBuffs(attackBuffTimers, deltaTime);
         TickBuffs(moveSpeedBuffTimers, deltaTime);
-        TickBuffs(armorBuffTimers, deltaTime);
+        ArmorBuffRemaining = Mathf.Max(0f, ArmorBuffRemaining - deltaTime);
         if (TauntRemaining > 0f)
         {
             TauntRemaining = Mathf.Max(0f, TauntRemaining - deltaTime);
@@ -237,8 +237,11 @@ internal sealed class EnemyUnit
 
     public void QueueDamage(int damage, EnemyUnit attacker = null)
     {
-        long armor = Faction.Armor + (long)ArmorBonus * ArmorBuffStacks;
-        long applied = Math.Max(0, (long)damage - armor);
+        long applied = Math.Max(0, (long)damage - Faction.Armor);
+        // 기본 방어력을 먼저 적용하고 남은 피해를 줄인다. 정수 올림으로 작은 공격도
+        // 양수 피해를 유지하며, 중간 곱셈은 long으로 계산해 오버플로를 막는다.
+        if (ArmorBuffRemaining > 0f)
+            applied = (applied * (100 - ShieldDamageReductionPercent) + 99) / 100;
         pendingDamage = (int)Math.Min(int.MaxValue, pendingDamage + applied);
         // Even armor absorbing a hit must reveal its source. Select simultaneous
         // attackers independently of iteration order, retaining an existing aggressor.
@@ -283,7 +286,7 @@ internal sealed class EnemyUnit
 
     public void ApplyMoveSpeedBuff(float duration) => moveSpeedBuffTimers.Add(duration);
 
-    public void ApplyArmorBuff(float duration) => armorBuffTimers.Add(duration);
+    public void ApplyArmorBuff(float duration) => ArmorBuffRemaining = Mathf.Max(ArmorBuffRemaining, duration);
 
     public void Heal(int amount)
     {

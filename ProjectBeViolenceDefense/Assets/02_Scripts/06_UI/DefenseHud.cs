@@ -24,7 +24,7 @@ internal sealed class DefenseHud
         public Sprite Enemy;
         public Sprite Mana;
         public Sprite Lock;
-        [Tooltip("선택. 비우면 방어력 버프 슬롯은 Wall 아이콘을 쓴다.")]
+        [Tooltip("선택. 비우면 방어막 슬롯은 Wall 아이콘을 쓴다.")]
         public Sprite ArmorBuff;
         [Tooltip("선택. 비우면 도발 슬롯은 Enemy 아이콘에 도발 색을 입혀 쓴다.")]
         public Sprite Taunt;
@@ -627,7 +627,7 @@ internal sealed class DefenseHud
             DefenseBattle.Spell.MoveSpeedBuff => (GameText.Get("spell.move_speed.name"),
                 GameText.Format("spell.move_speed.description", DefenseBattle.BuffDuration, EnemyUnit.MoveSpeedBonusPercent * 100)),
             DefenseBattle.Spell.ArmorBuff => (GameText.Get("spell.armor.name"),
-                GameText.Format("spell.armor.description", DefenseBattle.BuffDuration, EnemyUnit.ArmorBonus)),
+                GameText.Format("spell.armor.description", DefenseBattle.BuffDuration, EnemyUnit.ShieldDamageReductionPercent)),
             _ => (GameText.Get("spell.taunt.name"),
                 GameText.Format("spell.taunt.description", DefenseBattle.TauntDuration,
                     EnemyUnit.TauntHealthBonusPercent * 100, DefenseBattle.TauntRadius))

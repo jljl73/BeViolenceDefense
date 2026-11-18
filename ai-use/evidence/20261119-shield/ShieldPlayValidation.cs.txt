@@ -1,0 +1,90 @@
+using System;
+using System.Collections;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
+[InitializeOnLoad]
+public static class ShieldPlayValidation
+{
+    const string Key = "ShieldPlayValidation.Running";
+    static double start;
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static object Field(object owner, string name) => owner.GetType().GetField(name,
+        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(owner);
+    static void Check(bool condition, string message) { if (!condition) throw new Exception(message); }
+    static ShieldPlayValidation() { EditorApplication.update += Update; }
+    public static void Run()
+    {
+        EditorSceneManager.OpenScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");
+        SessionState.SetBool(Key, true);
+        EditorApplication.EnterPlaymode();
+    }
+    static void Update()
+    {
+        if (!SessionState.GetBool(Key, false) || !EditorApplication.isPlaying || EditorApplication.isCompiling) return;
+        try
+        {
+            if (start == 0) start = EditorApplication.timeSinceStartup;
+            Check(EditorApplication.timeSinceStartup - start < 90, "Play validation timeout");
+            var selector = Object.FindFirstObjectByType<StageSelectionController>();
+            if (selector == null) return;
+            if (selector.CurrentStage == null)
+            {
+                var ui = Object.FindFirstObjectByType<UIManager>();
+                if (ui != null && ui.HasOpenPopup) selector.SelectStage(0);
+                return;
+            }
+            if (game == null)
+            {
+                game = Object.FindFirstObjectByType<VoxelDefensePrototype>();
+                battle = (DefenseBattle)Field(game, "battle");
+                if (battle == null) { game = null; return; }
+                typeof(VoxelDefensePrototype).GetMethod("StartBattle", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(game, null);
+                return;
+            }
+            if (battle.Enemies.Count == 0) return;
+            game.enabled = false;
+            var view = (DefenseBoardView)Field(game, "view");
+            var slot = Field(Field(game, "hud"), "armorBuff");
+            Check((string)Field(slot, "Name") == "방어막", "Shield slot name mismatch");
+            string effect = (string)Field(slot, "Effect");
+            Check(effect.Contains("80%") && effect.Contains("6초") && effect.Contains("시간 갱신"), "Shield tooltip mismatch: " + effect);
+            EnemyUnit target = battle.Enemies[0];
+            float mana = battle.Mana;
+            battle.QueueSpell(DefenseBattle.Spell.ArmorBuff, target.Position, 0);
+            Check(target.ArmorBuffStacks == 0, "Shield applied before simulation tick");
+            battle.Tick(DefenseBattle.TickDuration, false);
+            Check(target.ArmorBuffStacks == 1 && battle.Mana < mana - 23, "Queued cast or mana charge failed");
+            view.SyncEnemy(target, 0f, 0f);
+            object visual = ((IDictionary)Field(view, "enemyViews"))[target];
+            var marks = (Transform)Field(visual, "BuffMarks");
+            Check(marks.gameObject.activeSelf && marks.Find("Armor").gameObject.activeSelf, "Shield buff mark not visible");
+            Check((float)Field(visual, "SpellFlashRemaining") > 0, "Shield cast flash did not trigger");
+            int before = target.Health;
+            target.QueueDamage(25);
+            target.ResolveDamage();
+            int expected = Mathf.CeilToInt(Mathf.Max(0, 25 - target.Faction.Armor) * .2f);
+            Check(before - target.Health == expected, "Scene unit damage reduction failed");
+            target.TickTimers(4f);
+            target.ApplyArmorBuff(6f);
+            view.SyncEnemy(target, 0f, 0f);
+            Check(target.ArmorBuffStacks == 1 && target.ArmorBuffRemaining == 6f, "Recast stacked or failed to refresh");
+            target.TickTimers(6.1f);
+            view.SyncEnemy(target, 0f, 0f);
+            Check(target.ArmorBuffStacks == 0 && !marks.gameObject.activeSelf, "Expired shield mark remains visible");
+            Debug.Log("SHIELD_PLAY_PASS GameScene selection, HUD name/tooltip, queued cast, mana, actual-unit damage, cast flash, active/expired buff mark, duration refresh");
+            SessionState.SetBool(Key, false);
+            EditorApplication.Exit(0);
+        }
+        catch (Exception error)
+        {
+            Debug.LogException(error);
+            SessionState.SetBool(Key, false);
+            EditorApplication.Exit(1);
+        }
+    }
+}
