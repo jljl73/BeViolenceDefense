@@ -1,0 +1,5 @@
+SPELL_FLASH_PLAY_PASS queued cast integration, five skill colors, zero-delta pause, radius scaling, expiration, 16-burst cap, resource cleanup and shader compilation
+
+Editor diagnostics observed:
+UnityEditor.Search.SearchDatabase: ArgumentOutOfRangeException on startup.
+Persistent allocates 9 individual allocations at shutdown (same warning in previous /tmp/shield-playmode.log).

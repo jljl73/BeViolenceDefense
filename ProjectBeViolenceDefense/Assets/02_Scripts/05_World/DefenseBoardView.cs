@@ -2254,6 +2254,7 @@ internal sealed class DefenseBoardView
 
     public void ReleaseMaterials()
     {
+        spellEffects.Release();
         Release(areaSpellPreviewMesh);
         Release(factionRingMesh);
         if (aimDim != null && aimDim.sprite != null)

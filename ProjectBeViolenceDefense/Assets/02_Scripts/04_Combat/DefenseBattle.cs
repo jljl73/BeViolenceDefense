@@ -522,10 +522,16 @@ internal sealed class DefenseBattle
                     if (enemy.Target == null)
                         enemy.Face(grid.HasLineOfSight(enemy.Position, target.Position) ? target.Position : enemy.LastKnownTargetPosition);
                     combat.Move(enemy, target, deltaTime);
+                    enemy.WasEngaged = true;
                     continue;
                 }
 
                 enemy.CombatQueue = null;
+                if (enemy.WasEngaged)
+                {
+                    enemy.WasEngaged = false;
+                    RerouteFromHere(enemy);
+                }
                 AdvanceUnit(enemy, deltaTime);
             }
 
@@ -695,6 +701,16 @@ internal sealed class DefenseBattle
         }
         else if (offRoute && combat.TryStepAside(enemy, out destination))
             enemy.RouteYieldDestination = destination;
+    }
+
+    // 교전이 끝나 경로를 벗어난 유닛은 원래 경로로 되돌아가지 않고, 지금 위치에서 코어로 가는
+    // 최단 경로를 새로 잡는다. 원래 경로가 멀리 돌아가는 쪽이면 뺑 돌아 복귀하는 것이 어색하다.
+    private void RerouteFromHere(EnemyUnit enemy)
+    {
+        if (enemy.Position.Equals(enemy.RoutePosition))
+            return;
+        if (grid.RouteFrom(enemy.Position) is { } route)
+            enemy.Reroute(route);
     }
 
     private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime)

@@ -1,0 +1,4 @@
+SHIELD_PLAY_PASS GameScene selection, HUD name/tooltip, queued cast, mana, actual-unit damage, cast flash, active/expired buff mark, duration refresh
+
+Unity Editor startup issue observed (validation still exited 0):
+UnityEditor.Search.SearchDatabase.EnumerateAll: ArgumentOutOfRangeException

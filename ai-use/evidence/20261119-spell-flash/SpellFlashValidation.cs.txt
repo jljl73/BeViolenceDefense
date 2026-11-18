@@ -1,0 +1,150 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
+[InitializeOnLoad]
+public static class SpellFlashValidation
+{
+    const string Key = "SpellFlashValidation.Running";
+    const string Folder = "/tmp/spell-flash-captures";
+    static readonly DefenseBattle.Spell[] Spells = { DefenseBattle.Spell.AttackBuff, DefenseBattle.Spell.Heal,
+        DefenseBattle.Spell.MoveSpeedBuff, DefenseBattle.Spell.ArmorBuff, DefenseBattle.Spell.Taunt };
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static DefenseBoardView view;
+    static SpellEffects effects;
+    static Camera camera;
+    static EnemyUnit target;
+    static Vector3 center;
+    static int phase, spellIndex, frame;
+    static double start;
+    static object Field(object obj, string name) => obj.GetType().GetField(name,
+        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(obj);
+    static IList Bursts => (IList)Field(effects, "bursts");
+    static void Check(bool pass, string message) { if (!pass) throw new Exception(message); }
+    static SpellFlashValidation() { EditorApplication.update += Update; }
+    public static void Run()
+    {
+        EditorSceneManager.OpenScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");
+        Directory.CreateDirectory(Folder);
+        SessionState.SetBool(Key, true);
+        EditorApplication.EnterPlaymode();
+    }
+    static void Update()
+    {
+        if (!SessionState.GetBool(Key, false) || !EditorApplication.isPlaying || EditorApplication.isCompiling) return;
+        try
+        {
+            if (start == 0) start = EditorApplication.timeSinceStartup;
+            Check(EditorApplication.timeSinceStartup - start < 120, "Validation timeout");
+            if (phase == 0)
+            {
+                var selection = Object.FindFirstObjectByType<StageSelectionController>();
+                if (selection == null) return;
+                if (selection.CurrentStage == null)
+                {
+                    var ui = Object.FindFirstObjectByType<UIManager>();
+                    if (ui != null && ui.HasOpenPopup) selection.SelectStage(1);
+                    return;
+                }
+                if (game == null)
+                {
+                    game = Object.FindFirstObjectByType<VoxelDefensePrototype>();
+                    battle = (DefenseBattle)Field(game, "battle");
+                    if (battle == null) { game = null; return; }
+                    typeof(VoxelDefensePrototype).GetMethod("StartBattle", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(game, null);
+                    return;
+                }
+                if (battle.Enemies.Count == 0) return;
+                game.enabled = false;
+                view = (DefenseBoardView)Field(game, "view");
+                effects = (SpellEffects)Field(view, "spellEffects");
+                camera = (Camera)Field(game, "boardCamera");
+                target = battle.Enemies[0];
+                center = target.Position;
+                camera.orthographicSize = 3.1f;
+                camera.transform.position = game.transform.TransformPoint(center) - camera.transform.forward * 18f;
+                Capture("before.png");
+                int health = target.Health;
+                battle.QueueSpell(DefenseBattle.Spell.ArmorBuff, center, 0);
+                battle.Tick(DefenseBattle.TickDuration, false);
+                Check(Bursts.Count == 1, "Successful queued cast must launch one area flash");
+                Check(target.ArmorBuffStacks == 1 && target.Health == health, "Presentation affected simulation");
+                var burst = Bursts[0];
+                Check((float)Field(burst, "Age") == 0f, "Burst did not start at full flash");
+                effects.Advance(0f);
+                Check((float)Field(burst, "Age") == 0f, "Pause advanced burst");
+                effects.Advance(.56f);
+                Check(Bursts.Count == 0, "Burst did not expire");
+                view.AdvanceEffects(1f);
+                phase = 1;
+                return;
+            }
+            if (phase == 1)
+            {
+                if (frame == 0)
+                    view.PlayAreaSpell(Spells[spellIndex], center, 1.4f, new[] { target });
+                Capture($"{spellIndex}-{frame:D2}.png");
+                view.AdvanceEffects(1f / 30f);
+                frame++;
+                if (frame < 21) return;
+                Check(Bursts.Count == 0, "Effect failed to expire");
+                frame = 0;
+                if (++spellIndex < Spells.Length) return;
+                phase = 2;
+                return;
+            }
+            if (phase == 2)
+            {
+                effects.PlayArea(DefenseBattle.Spell.ArmorBuff, center, 2.4f);
+                var burst = Bursts[0];
+                Check(Mathf.Abs(((MeshRenderer)Field(burst, "Renderer")).transform.localScale.x - 2.4f) < .001f,
+                    "Visual radius did not follow spell radius");
+                for (int i = 0; i < 50; i++) effects.PlayArea(Spells[i % 5], center, 1.4f);
+                Check(Bursts.Count == 16, "Burst pool cap failed");
+                effects.Advance(1f);
+                Check(Bursts.Count == 0, "Burst pool failed to retire");
+                var shader = Resources.Load<Shader>("SpellAreaBurst");
+                Check(shader != null && shader.isSupported && !ShaderUtil.ShaderHasError(shader), "Burst shader failed compilation/support");
+                effects.Release();
+                phase = 3;
+                return;
+            }
+            Check(game.GetComponentsInChildren<MeshRenderer>(true).Length > 0, "Scene lost its renderers");
+            foreach (var renderer in game.GetComponentsInChildren<MeshRenderer>(true))
+                Check(renderer.name != "Spell Area Flash", "Burst objects leaked after release");
+            Debug.Log("SPELL_FLASH_PLAY_PASS queued cast integration, five skill colors, zero-delta pause, radius scaling, expiration, 16-burst cap, resource cleanup and shader compilation");
+            SessionState.SetBool(Key, false);
+            EditorApplication.Exit(0);
+        }
+        catch (Exception error)
+        {
+            Debug.LogException(error);
+            SessionState.SetBool(Key, false);
+            EditorApplication.Exit(1);
+        }
+    }
+    static void Capture(string name)
+    {
+        var rt = new RenderTexture(960, 640, 24);
+        var previous = camera.targetTexture;
+        var active = RenderTexture.active;
+        camera.targetTexture = rt;
+        camera.Render();
+        RenderTexture.active = rt;
+        var image = new Texture2D(960, 640, TextureFormat.RGB24, false);
+        image.ReadPixels(new Rect(0, 0, 960, 640), 0, 0);
+        image.Apply();
+        File.WriteAllBytes(Path.Combine(Folder, name), image.EncodeToPNG());
+        camera.targetTexture = previous;
+        RenderTexture.active = active;
+        Object.Destroy(image);
+        rt.Release();
+        Object.Destroy(rt);
+    }
+}

@@ -31,23 +31,41 @@ public sealed class StageContentTests
         }
     }
 
-    [Test]
-    public void SnowfieldAndGraveyardPreserveTheirPreviousDefaultTerrain()
+    // 설원·묘지 길 구조 시안: 테마 장식이 맞춰진 틀(크기·코어·스폰)은 그대로 두고, 벽 없이는
+    // 두 진영이 각자 길로만 가며, 길목을 막으면 가운데로 돌아가 경로가 길어진다.
+    [TestCase("Snowfield", 45, 18, "2,11 14,11", 19, "0,7 1,7 15,7 16,7", 25)]
+    [TestCase("Graveyard", 41, 16, "4,12 5,12 11,12 12,12", 17, "4,6 5,6 11,6 12,6", 21)]
+    public void SnowfieldAndGraveyardLayoutsKeepTheSceneryFrameAndLengthenRoutesWhenTheirGatesAreWalled(
+        string name, int fixedWalls, int openRoute, string upperGates, int upperRoute, string lowerGates, int lowerRoute)
     {
         var original = new DefenseGrid();
-        foreach (string name in Names.Skip(2))
+        var stage = Load(name);
+        var grid = stage.Data.CreateGrid();
+        Assert.That(grid.Width, Is.EqualTo(original.Width));
+        Assert.That(grid.Depth, Is.EqualTo(original.Depth));
+        Assert.That(grid.CorePosition, Is.EqualTo(original.CorePosition));
+        Assert.That(grid.CoreSize, Is.EqualTo(original.CoreSize));
+        CollectionAssert.AreEqual(original.SpawnCells, grid.SpawnCells);
+        CollectionAssert.AreEqual(original.SpawnFactions, grid.SpawnFactions);
+        Assert.That(grid.FixedWalls.Count, Is.EqualTo(fixedWalls));
+        Assert.That(stage.Data.waves, Is.Null, "The layout draft comes without a wave lineup.");
+        Assert.That(RouteLengths(grid), Is.EqualTo(new[] { openRoute, openRoute }));
+
+        Assert.That(RouteLengths(WithWalls(stage, upperGates)), Is.EqualTo(new[] { upperRoute, upperRoute }));
+        Assert.That(RouteLengths(WithWalls(stage, lowerGates)), Is.EqualTo(new[] { lowerRoute, lowerRoute }));
+    }
+
+    private static int[] RouteLengths(DefenseGrid grid) => grid.Routes.Select(route => route.Length - 2).ToArray();
+
+    private static DefenseGrid WithWalls(StageContent stage, string cells)
+    {
+        var grid = stage.Data.CreateGrid();
+        foreach (string cell in cells.Split(' '))
         {
-            var stage = Load(name);
-            var grid = stage.Data.CreateGrid();
-            Assert.That(grid.Width, Is.EqualTo(original.Width));
-            Assert.That(grid.Depth, Is.EqualTo(original.Depth));
-            Assert.That(grid.CorePosition, Is.EqualTo(original.CorePosition));
-            Assert.That(grid.CoreSize, Is.EqualTo(original.CoreSize));
-            CollectionAssert.AreEqual(original.SpawnCells, grid.SpawnCells);
-            CollectionAssert.AreEqual(original.SpawnFactions, grid.SpawnFactions);
-            CollectionAssert.AreEquivalent(original.FixedWalls, grid.FixedWalls);
-            Assert.That(stage.Data.waves, Is.Null, "Migration must not invent a wave lineup.");
+            string[] xy = cell.Split(',');
+            Assert.That(grid.TryPlace(new Vector2Int(int.Parse(xy[0]), int.Parse(xy[1]))), Is.EqualTo(DefenseGrid.BuildResult.Placed), cell);
         }
+        return grid;
     }
 
     [Test]
