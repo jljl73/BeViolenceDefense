@@ -39,6 +39,10 @@ internal sealed class DefenseBattle
     private readonly int[] roundSpawnCounts;
     // 진영 -> 그 진영 스폰의 경로 인덱스. 진영 안에서는 스폰을 번갈아 쓴다.
     private readonly int[][] factionSpawns;
+    // 진영 -> 이번 라운드에 쓰는 경로 인덱스. -1 이면 그 진영의 스폰을 번갈아 쓴다.
+    private readonly int[] roundRoute;
+    // 스폰이 여럿인 진영에서 라운드마다 하나를 고른다. pick(n) 은 0..n-1. null 이면 번갈아 쓴다.
+    private readonly Func<int, int> pickSpawn;
     // 라운드 번호 -> 진영(편)별 스폰 순서. null 이면 진영 하나를 기존 증원 규칙대로 반복한다.
     private readonly Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup;
     // 이 라운드를 클리어하면 승리. 0 이면 끝없이 이어진다.
@@ -92,12 +96,15 @@ internal sealed class DefenseBattle
     public float Mana { get; private set; }
 
     public DefenseBattle(DefenseGrid grid, EnemyFaction[] factions,
-        Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup = null, int roundLimit = 0)
+        Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup = null, int roundLimit = 0,
+        Func<int, int> pickSpawn = null)
     {
         this.grid = grid;
         this.factions = factions;
         this.roundLineup = roundLineup;
         this.roundLimit = roundLimit;
+        this.pickSpawn = pickSpawn;
+        roundRoute = new int[factions.Length];
         combat = new CombatPositioning(grid, enemies);
         spawnedPerFaction = new int[factions.Length];
         roundSpawnCounts = new int[factions.Length];
@@ -117,6 +124,11 @@ internal sealed class DefenseBattle
     {
         int roundsCleared = Round - 1;
         EnemiesPerRound = 0;
+        for (int i = 0; i < factions.Length; i++)
+        {
+            int[] spawns = factionSpawns[i];
+            roundRoute[i] = pickSpawn != null && spawns.Length > 1 ? spawns[pickSpawn(spawns.Length)] : -1;
+        }
         if (roundLineup != null)
         {
             roundQueues = roundLineup(Round);
@@ -303,8 +315,8 @@ internal sealed class DefenseBattle
             if (roundSpawnCounts[a] == 0 || roundSpawnCounts[b] == 0)
                 continue;
             float range = Mathf.Max(RoundUnit(a, 0).AttackRange, RoundUnit(b, 0).AttackRange);
-            foreach (int first in factionSpawns[a])
-                foreach (int second in factionSpawns[b])
+            foreach (int first in RoundSpawns(a))
+                foreach (int second in RoundSpawns(b))
                     if (ForecastEncounter(grid.Routes[first], grid.Routes[second], range) is { } cell)
                         cells.Add(cell);
         }
@@ -483,8 +495,24 @@ internal sealed class DefenseBattle
     // 이 진영의 다음 유닛이 출발할 경로.
     private Vector3[] NextRoute(int factionIndex)
     {
+        if (roundRoute[factionIndex] >= 0)
+            return grid.Routes[roundRoute[factionIndex]];
         int[] spawns = factionSpawns[factionIndex];
         return grid.Routes[spawns[spawnedPerFaction[factionIndex] % spawns.Length]];
+    }
+
+    // 이번 라운드에 이 진영이 쓰는 스폰(경로 인덱스).
+    private int[] RoundSpawns(int factionIndex) =>
+        roundRoute[factionIndex] >= 0 ? new[] { roundRoute[factionIndex] } : factionSpawns[factionIndex];
+
+    // 이번 라운드에 쓰는 스폰의 경로. 인덱스는 grid.Routes 와 같고, 쓰지 않는 스폰은 null 이다.
+    public Vector3[][] RoundRoutes()
+    {
+        var routes = new Vector3[grid.Routes.Count][];
+        for (int f = 0; f < factions.Length; f++)
+            foreach (int route in RoundSpawns(f))
+                routes[route] = grid.Routes[route];
+        return routes;
     }
 
     private bool SpawnPointsClear()

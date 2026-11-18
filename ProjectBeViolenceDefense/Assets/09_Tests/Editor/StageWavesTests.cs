@@ -93,6 +93,41 @@ public sealed class StageWavesTests
     }
 
     [Test]
+    public void FactionWithSeveralSpawnsUsesOnlyThePickedOne()
+    {
+        EnemyFaction[] sides = Enumerable.Range(0, StageData.FactionCount)
+            .Select(i => new EnemyFaction(StageData.FactionNames[i], StageData.FactionColors[i], spawnCount: 0))
+            .ToArray();
+        // 고블린(0) 스폰 2개, 언데드(1) 스폰 1개.
+        var cells = new[] { new Vector2Int(3, 2), new Vector2Int(13, 2), new Vector2Int(8, 2) };
+        var grid = new DefenseGrid(17, 17, new RectInt(8, 15, 2, 2), cells, new[] { 0, 0, 1 }, null);
+        var asked = new List<int>();
+        var battle = new DefenseBattle(grid, sides, _ => sides
+            .Select(side => (IReadOnlyList<EnemyFaction>)new List<EnemyFaction> { side, side, side })
+            .ToArray(), pickSpawn: n =>
+            {
+                asked.Add(n);
+                return 1;
+            });
+
+        Assert.That(asked, Is.EqualTo(new[] { 2 }), "스폰이 여럿인 진영에서만 고른다.");
+        Vector3[][] routes = battle.RoundRoutes();
+        Assert.That(routes[0], Is.Null, "고르지 않은 스폰");
+        Assert.That(routes[1], Is.Not.Null);
+        Assert.That(routes[2], Is.Not.Null, "스폰이 하나인 진영");
+
+        var goblinStarts = new HashSet<Vector2Int>();
+        battle.EnemySpawned += enemy =>
+        {
+            if (enemy.FactionIndex == 0)
+                goblinStarts.Add(DefenseGrid.PositionToCell(enemy.Position));
+        };
+        PlayRound(battle);
+        Assert.That(goblinStarts, Is.EqualTo(new HashSet<Vector2Int> { cells[1] }));
+        Assert.That(asked, Is.EqualTo(new[] { 2, 2 }), "다음 라운드 준비 단계에서 다시 고른다.");
+    }
+
+    [Test]
     public void NoRoundLimitKeepsGoing()
     {
         DefenseBattle battle = Battle(roundLimit: 0);

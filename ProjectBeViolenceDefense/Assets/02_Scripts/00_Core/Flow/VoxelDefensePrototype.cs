@@ -109,7 +109,9 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme,
             enemyCatalog, usedStage, soundPlayer.PlayHit);
         StageWaves waves = UsableWaves();
-        battle = new DefenseBattle(grid, factions, BuildRoundLineup(waves), waves != null ? waves.waves.Count : 0);
+        // 같은 진영 스폰이 여럿이면 라운드마다 하나만 무작위로 쓴다. 전투 입력을 정할 때만 무작위를 쓴다.
+        battle = new DefenseBattle(grid, factions, BuildRoundLineup(waves), waves != null ? waves.waves.Count : 0,
+            pickSpawn: n => Random.Range(0, n));
         battle.EnemySpawned += view.AddEnemy;
         battle.EnemyRemoved += enemy => view.RemoveEnemy(enemy, battle.CoreHealth);
         battle.EnemyRemoved += enemy =>
@@ -327,7 +329,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         buildMode = false;
         battle.StartRound();
         battleClock.Reset();
-        view.ShowBattleRoutes(grid.Routes);
+        view.ShowBattleRoutes(battle.RoundRoutes());
         hud.Notify("");
     }
 
@@ -494,7 +496,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         }
     }
 
-    private void RefreshPlanningTiles() => view.ShowPlanningTiles(grid.Routes, battle.ForecastEncounterCells());
+    private void RefreshPlanningTiles() => view.ShowPlanningTiles(battle.RoundRoutes(), battle.ForecastEncounterCells());
 
     private void ReadCombatInput(Keyboard keyboard)
     {

@@ -666,6 +666,9 @@ internal sealed class DefenseBoardView
         for (int factionIndex = 0; factionIndex < routes.Count; factionIndex++)
         {
             Vector3[] path = routes[factionIndex];
+            // 이번 라운드에 쓰지 않는 스폰.
+            if (path == null)
+                continue;
             // The last waypoint is the contact point on the core, not a floor tile.
             for (int i = 0; i < path.Length - 1; i++)
             {

@@ -767,3 +767,58 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 실제 밸런스 작업에서 이름/ID 검색 입력과 유닛 선택의 전체 UI 흐름, 다양한 화면 크기·Unity 밝은 테마 사용성. 자동 UI 입력은 팝업 포커스 제약으로 검색 입력 완료를 확인하지 못함. 전투 전체 플레이와 Player 빌드는 미실행.
+
+### [20261119-0448-wave-spawn-pick] 같은 팩션 스폰이 여럿이면 웨이브마다 하나만 무작위 사용
+- 시각: 2026-11-19 04:48:34 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (Claude Opus 5.5, claude-opus-5-5) / Unity CLI(시도)
+- 목적 및 적용 위치: 맵에 같은 팩션 스폰 지점이 2개 이상이면 준비 단계마다 하나를 무작위로 골라 그 웨이브에는 그 지점에서만 나오게 함. 준비·전투 경로 표시와 예상 교전 칸도 고른 스폰 기준으로 표시.
+- 사용 방식: AI가 `DefenseBattle`에 스폰 선택 함수(`pickSpawn`)를 주입받는 방식으로 구현(전투 로직에 `Random` 없음, 흐름 계층에서 `Random.Range` 전달). 이전에는 같은 팩션 스폰을 번갈아 사용.
+- 결과 및 확인 방법: 부분 성공 / 코드와 EditMode 테스트(`FactionWithSeveralSpawnsUsesOnlyThePickedOne`) 작성. Unity Editor가 응답하지 않아(`unity recompile` 30초 시간 초과, `unity status` = unreachable) 컴파일·테스트·Play Mode 확인을 하지 못함.
+- 사람의 개입: 요구사항 제시. 결과 검토는 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs | Claude Code | 수정 | `pickSpawn`, 라운드별 `roundRoute`, `RoundRoutes()`, 예상 교전 칸을 고른 스폰 기준으로 / 확인 필요 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | `Random.Range` 선택 함수 전달, 경로 표시에 `RoundRoutes()` 사용 / 확인 필요 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Claude Code | 수정 | 쓰지 않는 스폰(null 경로)을 건너뜀 / 확인 필요 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/StageWavesTests.cs | Claude Code | 수정 | 고른 스폰에서만 출발·라운드마다 재선택 테스트 추가 / 확인 필요 |
+
+#### 증거
+- 없음
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인 시도
+- 활용 방식: `unity recompile`, `unity status`
+- 잘된 점: 없음
+- 잘 안된 점 및 개선 필요: Editor 프로세스는 응답 중이었으나 Pipeline 연결이 unreachable 상태로 명령이 시간 초과됨. 원인 확인 필요.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Unity 컴파일, EditMode 테스트 전체, 같은 팩션 스폰이 2개 이상인 스테이지에서 웨이브마다 한 지점에서만 나오는지와 경로 표시. 현재 스테이지에 같은 팩션 스폰이 여럿인지는 확인하지 않음.
+
+### [20261119-0520-wave-spawn-pick-verify] 웨이브 스폰 지점 무작위 선택 검증
+- 시각: 2026-11-19 05:20:00 +09:00 (확인 필요: 대략적 시각)
+- 작업자: ppzepi
+- 사용 도구: Claude Code / Claude Opus 5.5, Unity CLI 1.0.0
+- 목적 및 적용 위치: `[20261119-0448-wave-spawn-pick]`에서 미확인으로 남긴 컴파일·테스트 검증.
+- 사용 방식: Editor 응답 복구 후 Unity CLI로 재컴파일과 EditMode 테스트 전체 실행. 코드 변경 없음.
+- 결과 및 확인 방법: 성공 / `unity recompile` 오류 0, EditMode 테스트 77개 통과·실패 0(`StageWavesTests.FactionWithSeveralSpawnsUsesOnlyThePickedOne` 포함).
+- 사람의 개입: Editor 응답 복구(사용자).
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ai-use/ppzepi.md | Claude Code | 수정 | 검증 기록 추가 |
+
+#### 증거
+- 없음
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 재컴파일, EditMode 테스트 전체 실행.
+- 활용 방식: `unity status --until-ready` 후 `unity recompile`, `unity command test run --mode editor`.
+- 잘된 점: 컴파일 오류와 테스트 결과를 표로 바로 확인.
+- 잘 안된 점 및 개선 필요: 재컴파일 직후 Editor 연결이 잠시 끊겨 첫 테스트 실행이 실패함. `--until-ready`로 기다린 뒤 재실행해 해결. 이전에 쓰던 `--caller` 옵션이 현재 CLI에서 인식되지 않음.
+
+#### 미확인 및 후속 확인
+- Play Mode 확인 안 함: 같은 팩션 스폰이 여러 개인 Stage2~4는 어떤 씬도 참조하지 않고 웨이브 SO도 연결되지 않음. 해당 스테이지를 씬에 연결하면 준비 단계마다 경로 표시가 한 스폰으로 바뀌는지 확인 필요.
