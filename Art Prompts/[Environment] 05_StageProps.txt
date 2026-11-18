@@ -242,3 +242,49 @@ A flat top-down ground texture of short highland grass filling the whole frame e
 no humans, -3::1girl, 1boy, human, animal, tree trunk, whole tree, ground, pot, vase::, game asset, foreground foliage, {{black background, simple background}}, single object, isolated, -3::scenery, sky, text, frame, wreath, symmetrical, realistic::,
 one spray of tall grass and heather growing diagonally from the lower left corner toward the upper right, long arching golden-green grass blades with feathery seed heads, mixed with two stems of purple heather flowers, flat simple shapes,
 A single spray of tall golden-green grass blades with feathery seed heads and two stems of purple heather, for a game screen corner decoration: it starts at the lower left corner and spreads diagonally up and to the right. Flat simple shapes. Isolated on a solid black background.
+
+## 13. 왕도 시가지 — Stage 4 (1:1)
+### 13-A. 반목조 집 (붉은 지붕)
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, street, multiple buildings, ground, grass field, scenery, sky, text, sign, letters, realistic::,
+one small two-storey storybook townhouse, half-timbered cream plaster walls with dark brown timber beams, a steep terracotta red tiled roof, one chimney, two small windows with a flower box, a wooden door, chunky, low-poly feeling,
+A single small storybook townhouse for a fantasy royal capital strategy game map: half-timbered cream walls, a steep terracotta roof with a chimney, a flower box and a wooden door. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 13-B. 반목조 집 (푸른 지붕, 3층)
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, street, multiple buildings, ground, grass field, scenery, sky, text, sign, letters, realistic::,
+one narrow three-storey storybook townhouse, the upper floors jut out over the lower, pale cream plaster walls with brown timber beams, a steep slate blue tiled roof with a small dormer window, a hanging shop sign without letters, chunky, low-poly feeling,
+A single narrow three-storey storybook townhouse for a fantasy royal capital strategy game map: jutting upper floors, cream half-timbered walls and a steep slate-blue roof with a dormer. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 13-C. 시장 노점
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, street, multiple buildings, ground, grass field, scenery, sky, text, sign, letters, realistic::,
+one market stall, a wooden counter under a striped red and cream cloth awning, baskets of apples and bread loaves and a few clay jars on the counter, two crates beside it, chunky, low-poly feeling,
+A single market stall for a fantasy royal capital strategy game map: a wooden counter under a striped red and cream awning, with baskets of apples and bread and crates beside it. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 13-D. 분수
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, street, multiple buildings, ground, grass field, scenery, sky, text, sign, letters, realistic::,
+one round stone town fountain, a low octagonal basin of pale stone filled with light blue water, a central pillar with a small stone bird statue on top spouting water, chunky, low-poly feeling,
+A single round stone town fountain for a fantasy royal capital strategy game map: a low pale stone basin with light blue water and a central pillar topped by a small stone bird. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 13-E. 가로등
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, street, multiple buildings, ground, grass field, scenery, sky, text, sign, letters, realistic::,
+one black wrought iron street lamp post, a tall slim post with a small curled bracket, a lantern with warm yellow glass at the top, a hanging flower basket on the bracket, chunky, low-poly feeling,
+A single black iron street lamp with a warm yellow lantern and a hanging flower basket, for a fantasy royal capital strategy game map. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 13-F. 나무 상자와 통
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, street, multiple buildings, ground, grass field, scenery, sky, text, sign, letters, realistic::,
+one small pile of three wooden crates and two wooden barrels with iron hoops, a sack leaning on them, warm brown wood, chunky, low-poly feeling,
+A single small pile of wooden crates and barrels with a sack, for a fantasy royal capital strategy game map. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole object is visible. Isolated on a solid black background.
+
+### 13-G. 바닥 질감 — 자갈 포장
+no humans, -3::1girl, 1boy, human, animal, tree, flowers, path, horizon, sky, perspective, objects, text::, texture, seamless pattern, top-down view, flat, ground texture, full frame,
+rounded cobblestones, warm grey and soft beige stones of slightly different sizes, thin darker gaps between them, even coverage, low contrast,
+A flat top-down ground texture of rounded cobblestone paving filling the whole frame evenly: warm grey and beige stones with thin dark gaps, low contrast and no large shapes, so it can repeat as a tile.
+
+### 13-H. 화면 전경 — 축제 깃발 줄
+no humans, -3::1girl, 1boy, human, animal, building, ground, pole::, game asset, foreground decoration, {{black background, simple background}}, single object, isolated, -3::scenery, sky, text, letters, frame, symmetrical, realistic::,
+one festival bunting string hanging diagonally from the lower left corner toward the upper right in a gentle curve, a thin rope with a row of small triangular pennant flags in red, cream, slate blue and honey gold, flat simple shapes,
+A single string of festival bunting for a game screen corner decoration: a thin rope hangs in a gentle curve from the lower left corner toward the upper right, carrying small triangular pennants in red, cream, blue and gold. Flat simple shapes. Isolated on a solid black background.
+
+### 13-I. 왕성 (원경 랜드마크)
+no humans, -3::1girl, 1boy, human, animal, monster::, game asset, prop, environment prop, {{black background, simple background}}, single object, centered, isolated, -3::village, town, street, ground, grass field, scenery, sky, clouds, mountain, text, realistic::,
+one compact fairytale royal castle, a tall central keep with a pointed slate blue cone roof, four slimmer round towers around it with pointed slate blue cone roofs and small golden flags, pale cream-white stone walls with battlements, a big arched gate with a blue and gold banner, warm lit yellow windows, chunky, low-poly feeling,
+A single compact fairytale royal castle for a fantasy strategy game map: pale cream-white walls with battlements, a tall central keep and four round towers, all with pointed slate-blue cone roofs and small golden flags, an arched gate with a blue and gold banner and warm lit windows. Simple chunky shapes like a low-poly model, seen from a slightly raised three-quarter view. The whole castle is visible. Isolated on a solid black background.

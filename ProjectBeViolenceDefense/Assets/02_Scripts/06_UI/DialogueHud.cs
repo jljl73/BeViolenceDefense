@@ -14,7 +14,7 @@ using UnityEngine.UI;
 /// </summary>
 public sealed class DialogueHud : MonoBehaviour
 {
-    public enum Expression { Neutral, Happy, Surprised, Troubled, Pout }
+    public enum Expression { Neutral, Happy, Surprised, Troubled, Pout, Teary, Breakdown, Shock }
 
     [Serializable]
     public struct Line
@@ -38,7 +38,7 @@ public sealed class DialogueHud : MonoBehaviour
     [SerializeField] private RectTransform portrait;
     [SerializeField] private RawImage portraitImage;
     [SerializeField] private CanvasGroup portraitGroup;
-    [Tooltip("Expression 순서(Neutral, Happy, Surprised, Troubled, Pout)의 초상 그림")]
+    [Tooltip("Expression 순서(Neutral, Happy, Surprised, Troubled, Pout, Teary, Breakdown, Shock)의 초상 그림")]
     [SerializeField] private Texture2D[] portraits = Array.Empty<Texture2D>();
     [Tooltip("선택. Expression 순서의 움직이는 초상 시트. 해당 표정의 시트가 있으면 정지 그림 대신 반복 재생한다.")]
     [SerializeField] private PortraitSheet[] portraitSheets = Array.Empty<PortraitSheet>();

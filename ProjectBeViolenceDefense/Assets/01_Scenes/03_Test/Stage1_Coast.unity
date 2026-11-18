@@ -10550,6 +10550,12 @@ MonoBehaviour:
   - speaker: Mage
     expression: 1
     text: If I can make them meet, they will wear each other down!
+  - speaker: Mage
+    expression: 5
+    text: ...but what if they all come for me instead?
+  - speaker: Mage
+    expression: 6
+    text: Th-that is NOT part of the plan!!
 --- !u!4 &1220946919
 Transform:
   m_ObjectHideFlags: 0

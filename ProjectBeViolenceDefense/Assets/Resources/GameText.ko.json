@@ -19,6 +19,9 @@
     {"key": "dialogue.intro.2", "text": "어느 쪽도 내가 상대할 수는 없어.\n조금도."},
     {"key": "dialogue.intro.3", "text": "잠깐. 저들은 나보다 서로를 더 싫어하는 것 같은데?"},
     {"key": "dialogue.intro.4", "text": "서로 마주치게 하면, 저들끼리 싸우다 지치겠어!"},
+    {"key": "dialogue.intro.5", "text": "…근데 저들이 다 나한테 오면 어떡하지?"},
+    {"key": "dialogue.intro.6", "text": "에…? 지, 진짜로 이쪽으로 온다고?!"},
+    {"key": "dialogue.intro.7", "text": "그, 그건 계획에 없었다고오오!!"},
     {"key": "dialogue.skip", "text": "건너뛰기"},
     {"key": "faction.beast", "text": "짐승"},
     {"key": "faction.coral", "text": "코럴"},
@@ -93,8 +96,21 @@
     {"key": "stage_select.title", "text": "스테이지 선택"},
     {"key": "stage_select.subtitle", "text": "전장을 선택하세요"},
     {"key": "stage_select.default", "text": "기본 전장"},
-    {"key": "stage_select.maple", "text": "단풍"},
+    {"key": "stage_select.maple", "text": "황금 단풍 평원"},
     {"key": "stage_select.snow", "text": "설원"},
-    {"key": "stage_select.graveyard", "text": "묘지"}
+    {"key": "stage_select.graveyard", "text": "묘지"},
+    {"key": "stage_select.capital", "text": "왕도"},
+    {"key": "stage_select.coast", "text": "해안가"},
+    {"key": "stage_select.enter", "text": "입장"},
+    {"key": "stage_select.state.cleared", "text": "클리어"},
+    {"key": "stage_select.state.current", "text": "현재 스테이지"},
+    {"key": "stage_select.state.locked", "text": "잠김"},
+    {"key": "stage_select.speaker", "text": "견습 마법사"},
+    {"key": "stage_select.line.1", "text": "히이잉... 왜 견습인 저만 남겨둔 거예요오..."},
+    {"key": "stage_select.line.2", "text": "해, 해안은 어떻게든 지켰어요...! 다음은 단풍 평원이래요."},
+    {"key": "stage_select.line.3", "text": "설원이라니... 지팡이 잡은 손이 얼어붙을 것 같아요오..."},
+    {"key": "stage_select.line.4", "text": "묘, 묘지는 싫다고요! ...가야 하죠? 네에..."},
+    {"key": "stage_select.line.5", "text": "왕도까지 밀렸어요... 여기서 무너지면 진짜 끝이에요...!"},
+    {"key": "stage_transition.label", "text": "STAGE"}
   ]
 }

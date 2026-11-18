@@ -1,29 +1,226 @@
 using System;
+using LitMotion;
+using LitMotion.Extensions;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+/// 스테이지 선택 화면: 왼쪽에 위아래로 천천히 떠 있는 주인공 그림과 대사 띠, 오른쪽에 위에서부터 스테이지 카드 1~5.
+/// 카드 상태는 진행도(<see cref="unlockedStages"/>)로 정한다. 앞 스테이지는 클리어, 마지막으로 열린 스테이지는 현재, 나머지는 잠김.
+/// 진행도마다 대사와 주인공 표정 그림이 바뀐다(<see cref="moods"/>, 진행도 1부터 순서대로).
+/// 배치는 StageSelectionPopup.prefab에 있다.
 public sealed class StageSelectionPopup : MonoBehaviour
 {
+    [Serializable]
+    public struct Card
+    {
+        public RectTransform root;
+        public CanvasGroup group;
+        public Image plate;
+        public TextMeshProUGUI number;
+        public RawImage thumbnail;
+        public TextMeshProUGUI label;
+        public Image chip;
+        public Image chipIcon;
+        public TextMeshProUGUI chipText;
+        public Button button;
+        public Image buttonImage;
+        public TextMeshProUGUI buttonText;
+        public Image buttonLock;
+    }
+
+    [Serializable]
+    public struct Mood
+    {
+        public string lineKey;
+        public Texture2D portrait;
+    }
+
     [SerializeField] private TextMeshProUGUI title;
-    [SerializeField] private TextMeshProUGUI subtitle;
-    [SerializeField] private Button[] buttons;
-    [SerializeField] private TextMeshProUGUI[] labels;
+    [SerializeField] private Card[] cards = Array.Empty<Card>();
+    [SerializeField] private Texture2D[] thumbnails = Array.Empty<Texture2D>();
+    [SerializeField] private Sprite checkIcon;
+    [SerializeField] private Sprite lockIcon;
+
+    [Header("Heroine")]
+    [SerializeField] private RawImage heroine;
+    [SerializeField] private Mood[] moods = Array.Empty<Mood>();
+    [SerializeField] private float floatHeight = 14f;
+    [SerializeField] private float floatPeriod = 3.2f;
+    [SerializeField] private TextMeshProUGUI speaker;
+    [SerializeField] private TextMeshProUGUI line;
+    [SerializeField] private CanvasGroup lineGroup;
+
+    [Header("Progress (임시: 저장 연동 전)")]
+    [Tooltip("열린 스테이지 수. 저장 기능이 붙기 전까지는 모든 스테이지를 열어 둔다.")]
+    [SerializeField, Min(1)] private int unlockedStages = 5;
+
+    [SerializeField] private float currentScale = 1.04f;
+
+    private const float LockedAlpha = 0.72f;
+    private StageContent[] stages = Array.Empty<StageContent>();
+    private Action<int> select;
+    private Vector2 heroineHome;
+    private bool heroineHomeSet;
+    private MotionHandle heroineFloat;
+    private Vector2[] cardHome = Array.Empty<Vector2>();
+
+    public int UnlockedStages => unlockedStages;
 
     public void Bind(StageContent[] stages, Action<int> select)
     {
+        this.stages = stages;
+        this.select = select;
         title.text = GameText.Get("stage_select.title");
-        subtitle.text = GameText.Get("stage_select.subtitle");
-        for (int i = 0; i < buttons.Length; i++)
+        speaker.text = GameText.Get("stage_select.speaker");
+        cardHome = new Vector2[cards.Length];
+        for (int i = 0; i < cards.Length; i++)
         {
             int index = i;
-            bool available = i < stages.Length && stages[i] != null;
-            buttons[i].gameObject.SetActive(available);
-            buttons[i].onClick.RemoveAllListeners();
-            if (!available)
-                continue;
-            labels[i].text = stages[i].DisplayName;
-            buttons[i].onClick.AddListener(() => select(index));
+            cardHome[i] = cards[i].root.anchoredPosition;
+            cards[i].button.onClick.RemoveAllListeners();
+            cards[i].button.onClick.AddListener(() => Enter(index));
+            AddHover(cards[i]);
         }
+        Refresh();
+        if (isActiveAndEnabled)
+            PlayIntro();
     }
+
+    /// 저장 기능이 진행도를 넘겨줄 자리. 1 = 첫 스테이지만 열림.
+    public void SetProgress(int unlocked)
+    {
+        unlockedStages = Mathf.Max(1, unlocked);
+        Refresh();
+    }
+
+    private void Enter(int index)
+    {
+        if (index < Mathf.Min(unlockedStages, stages.Length))
+            select?.Invoke(index);
+    }
+
+    private void Refresh()
+    {
+        int open = Mathf.Clamp(unlockedStages, 1, Mathf.Max(1, stages.Length));
+        for (int i = 0; i < cards.Length; i++)
+        {
+            Card c = cards[i];
+            bool exists = i < stages.Length && stages[i] != null;
+            c.root.gameObject.SetActive(exists);
+            if (!exists)
+                continue;
+            bool current = i == open - 1, cleared = i < open - 1, locked = i >= open;
+            c.number.text = (i + 1).ToString("00");
+            c.label.text = stages[i].DisplayName;
+            if (i < thumbnails.Length && thumbnails[i] != null)
+                c.thumbnail.texture = thumbnails[i];
+            c.thumbnail.color = locked ? new Color(0.78f, 0.74f, 0.74f) : Color.white;
+
+            c.group.alpha = locked ? LockedAlpha : 1f;
+            c.plate.color = current ? Opaque(UIPalette.LightSurface) : UIPalette.LightSurface;
+            c.root.localScale = Vector3.one * (current ? currentScale : 1f);
+            c.number.color = c.label.color = locked ? UIPalette.TextOnLightMuted : UIPalette.TextOnLight;
+
+            c.chip.color = locked ? Fade(UIPalette.TextOnLightMuted, 0.18f) : UIPalette.ChipOnLight;
+            c.chipText.color = locked ? UIPalette.TextOnLightMuted : UIPalette.TextOnLight;
+            c.chipText.text = GameText.Get(cleared ? "stage_select.state.cleared" : current ? "stage_select.state.current" : "stage_select.state.locked");
+            c.chipIcon.gameObject.SetActive(!current);
+            c.chipIcon.sprite = cleared ? checkIcon : lockIcon;
+            c.chipIcon.color = cleared ? UIPalette.TextOnLight : UIPalette.TextOnLightMuted;
+
+            c.button.interactable = !locked;
+            c.buttonImage.color = locked ? UIPalette.ButtonSecondary : current ? UIPalette.ButtonPrimary : Fade(UIPalette.ButtonPrimary, 0.75f);
+            c.buttonText.gameObject.SetActive(!locked);
+            c.buttonText.text = GameText.Get("stage_select.enter");
+            c.buttonText.color = UIPalette.TextOnAccent;
+            c.buttonLock.gameObject.SetActive(locked);
+            c.buttonLock.color = UIPalette.TextPrimary;
+        }
+        if (moods.Length > 0)
+            ShowMood(moods[Mathf.Clamp(open - 1, 0, moods.Length - 1)]);
+    }
+
+    private void ShowMood(Mood mood)
+    {
+        line.text = GameText.Get(mood.lineKey);
+        if (mood.portrait != null)
+            heroine.texture = mood.portrait;
+    }
+
+    private void OnEnable()
+    {
+        PlayIntro();
+        StartFloat();
+    }
+
+    private void OnDisable()
+    {
+        if (heroineFloat.IsActive())
+            heroineFloat.Cancel();
+        if (heroineHomeSet)
+            heroine.rectTransform.anchoredPosition = heroineHome;
+    }
+
+    // 주인공은 제자리에서 위아래로 천천히 떠 있다.
+    private void StartFloat()
+    {
+        if (heroine == null)
+            return;
+        if (!heroineHomeSet)
+        {
+            heroineHome = heroine.rectTransform.anchoredPosition;
+            heroineHomeSet = true;
+        }
+        if (heroineFloat.IsActive())
+            heroineFloat.Cancel();
+        heroineFloat = LMotion.Create(heroineHome.y, heroineHome.y + floatHeight, floatPeriod * 0.5f)
+            .WithEase(Ease.InOutSine).WithLoops(-1, LoopType.Yoyo).WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+            .BindToAnchoredPositionY(heroine.rectTransform);
+    }
+
+    private void PlayIntro()
+    {
+        if (cardHome.Length != cards.Length || cards.Length == 0)
+            return;
+        // 카드는 위에서부터 차례로 오른쪽에서 밀려 들어오고, 대사 띠는 살짝 늦게 떠오른다.
+        for (int i = 0; i < cards.Length; i++)
+        {
+            Card c = cards[i];
+            float delay = 0.05f * i;
+            float targetAlpha = i >= Mathf.Min(unlockedStages, stages.Length) ? LockedAlpha : 1f;
+            LMotion.Create(cardHome[i] + new Vector2(80f, 0f), cardHome[i], 0.35f).WithEase(Ease.OutCubic).WithDelay(delay)
+                .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale).BindToAnchoredPosition(c.root).AddTo(gameObject);
+            LMotion.Create(0f, targetAlpha, 0.3f).WithDelay(delay).WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                .Bind(c.group, (a, g) => g.alpha = a).AddTo(gameObject);
+        }
+        if (lineGroup != null)
+            LMotion.Create(0f, 1f, 0.35f).WithDelay(0.25f).WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                .Bind(lineGroup, (a, g) => g.alpha = a).AddTo(gameObject);
+    }
+
+    // 열린 카드에 마우스를 올리면 버튼이 살짝 커진다.
+    private static void AddHover(Card card)
+    {
+        var trigger = card.button.GetComponent<EventTrigger>() ?? card.button.gameObject.AddComponent<EventTrigger>();
+        trigger.triggers.Clear();
+        var rect = (RectTransform)card.button.transform;
+        void Add(EventTriggerType type, float scale)
+        {
+            var entry = new EventTrigger.Entry { eventID = type };
+            entry.callback.AddListener(_ =>
+            {
+                if (card.button.interactable)
+                    LMotion.Create(rect.localScale, Vector3.one * scale, 0.12f).WithEase(Ease.OutQuad)
+                        .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale).BindToLocalScale(rect);
+            });
+            trigger.triggers.Add(entry);
+        }
+        Add(EventTriggerType.PointerEnter, 1.06f);
+        Add(EventTriggerType.PointerExit, 1f);
+    }
+
+    private static Color Opaque(Color c) => new(c.r, c.g, c.b, 1f);
+    private static Color Fade(Color c, float a) => new(c.r, c.g, c.b, c.a * a);
 }

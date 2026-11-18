@@ -14,6 +14,9 @@ public sealed class DialogueHudTester : MonoBehaviour
         new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Troubled, textKey = "dialogue.intro.2" },
         new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Surprised, textKey = "dialogue.intro.3" },
         new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Happy, textKey = "dialogue.intro.4" },
+        new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Teary, textKey = "dialogue.intro.5" },
+        new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Shock, textKey = "dialogue.intro.6" },
+        new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Breakdown, textKey = "dialogue.intro.7" },
     };
 
     private void Update()
