@@ -71,6 +71,18 @@ no humans, -3::1girl, 1boy, human, face, skin, skull, skeleton face::, grim reap
 1.4::pitch black void inside the hood, no face, darkness inside the hood::, two small glowing pale violet eyes in the darkness, tattered black hooded robe, deep hood, 1.3::knee-length robe with a ragged hem, visible thin bony grey skeleton legs, bony feet standing on the ground::, long wide sleeves, thin bony grey hands, dark rope belt,
 A tall thin grim reaper enemy for a fantasy game, undead faction, seen from the front in a neutral standing pose with both arms held slightly away from the body and empty bony hands. Inside the deep hood there is no face at all, only pitch black darkness with two small glowing pale violet eyes. The tattered black robe ends at the knees with a ragged hem, and below it two thin bony grey skeleton legs and feet stand clearly on the ground. Dark muted colours. Isolated on a solid black background.
 
+### 1-N. 어둠의 기사 — 기마 (3:2)
+// 디자인 확정용 한 장. 3D는 흑마와 기사를 따로 만든다(GPT 4면도에서 분리).
+no humans, -3::1girl, 1boy, human face, skin::, dark knight, death knight, armored knight riding a horse, mounted knight, monster, full body, from side, side view, profile, horse standing on all fours, four legs, {{black background, simple background}}, -2::gore, blood, jumping, rearing, galloping, dynamic pose, multiple riders, lance::,
+1.3::black horned warhorse, glowing violet ghost-flame mane and tail::, black horse with two curved horns, glowing red eyes, dark iron barding plates on the horse's head and chest, black plate armor knight, horned spiked great helm, glowing violet eye slit, no face visible, tattered dark purple cape, longsword held down at the side, dark iron, muted silver edges,
+A menacing dark knight enemy for a bright fantasy game, undead faction, seen exactly from the side, sitting upright on a black horned warhorse that stands on all four legs with its head level and tail behind, all four legs visible and slightly apart, the whole horse and rider visible. The knight wears black plate armor and a horned great helm with a glowing violet eye slit, a tattered dark purple cape flows behind, and a longsword hangs at his side. The horse has curved horns, red eyes, dark iron barding and a mane and tail of violet ghost flame. Dark colours with violet glow. Isolated on a solid black background.
+// 결과: no humans 때문에 기수 없이 흑마만 나옴 → 흑마 컨셉으로 사용. 기사는 1-O로 따로 생성.
+
+### 1-O. 어둠의 기사 — 기사 단독 (1:1)
+no humans, -3::1girl, 1boy, human face, skin, horse::, dark knight, death knight, living armor, monster, full body, standing, straight-on, looking at viewer, arms at sides, {{black background, simple background}}, -2::gore, blood, dynamic pose, sword swing, shield, bright colors, riding::,
+1.3::horned spiked great helm, glowing violet eye slit, no face visible::, black plate armor with muted silver edges, broad pauldrons, tattered dark purple cape, dark chainmail skirt, armored boots, gauntlets, empty hands,
+A menacing dark knight enemy for a bright fantasy game, undead faction, seen from the front in a neutral standing pose with both arms held slightly away from the body and empty gauntleted hands. Black plate armor with muted silver edges, a horned spiked great helm with only a glowing violet eye slit, a tattered dark purple cape behind. Dark colours with a violet glow. Isolated on a solid black background.
+
 ## 2. 짐승
 ### 2-A. 늑대 (3:2)
 no humans, -3::1girl, 1boy, human, rider, saddle::, animal, wolf, monster, full body, standing, from side, side view, profile, all fours, four legs, {{black background, simple background}}, -2::running, jumping, dynamic pose, sitting, lying, multiple animals::,

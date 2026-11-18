@@ -53,6 +53,9 @@ internal sealed class DefenseHud
     private readonly TextMeshProUGUI lineup;
     private int lineupRound = -1;
     private readonly CombatBalance combatBalance;
+    private readonly RectTransform coreStatus;
+    private readonly RectTransform manaGauge;
+    private readonly RectTransform noticeArea;
     private readonly TextMeshProUGUI core;
     private readonly Image coreFill;
     private readonly RectTransform wallSupply;
@@ -102,7 +105,7 @@ internal sealed class DefenseHud
         lineup = Label("Round Lineup", status, -190, -70, 600, 26, 18, TextAlignmentOptions.Center);
         combatBalance = new CombatBalance(status, factions[0], factions[1]);
 
-        RectTransform coreStatus = Rect("Core Status", ui.HudLayer, Vector2.up, Vector2.up,
+        coreStatus = Rect("Core Status", ui.HudLayer, Vector2.up, Vector2.up,
             new Vector2(55, -35), new Vector2(204, 72));
         AddIcon("Core Gem", coreStatus, this.art.Core, new Vector2(0, -3), 46, UIPalette.ButtonPrimary);
         core = Label("Core", coreStatus, 62, 0, 142, 42, 31);
@@ -116,7 +119,7 @@ internal sealed class DefenseHud
                 new Vector2(64 + (i % 4) * 21, -(i / 4) * 16), 16, UIPalette.TextPrimary);
         wallCount = Label("Walls Left", wallSupply, 0, -35, 150, 28, 20, TextAlignmentOptions.Right);
 
-        RectTransform noticeArea = Rect("Notice", ui.HudLayer, Vector2.up, Vector2.up,
+        noticeArea = Rect("Notice", ui.HudLayer, Vector2.up, Vector2.up,
             new Vector2(55, -110), new Vector2(500, 50));
         notice = Label("Message", noticeArea, 0, 0, 500, 50, 20);
         noticeArea.gameObject.SetActive(false);
@@ -161,7 +164,7 @@ internal sealed class DefenseHud
         armorBuff = CreateSpellSlot("Armor Buff", 3, "4", this.art.Wall,
             DefenseBattle.Spell.ArmorBuff, UIPalette.Armor, cast);
 
-        RectTransform manaGauge = Rect("Mana Gauge", spellBar, Vector2.up, Vector2.up,
+        manaGauge = Rect("Mana Gauge", spellBar, Vector2.up, Vector2.up,
             new Vector2(82, -138), new Vector2(436, 29));
         AddIcon("Mana Drop", manaGauge, this.art.Mana, new Vector2(0, -4), 20, UIPalette.Mana);
         manaFill = Bar("Track", manaGauge, Vector2.up, Vector2.up,
@@ -181,6 +184,29 @@ internal sealed class DefenseHud
         title.text = "Core destroyed";
         restartButton = ActionButton("Restart", defeatPopup, new Vector2(89, -105), new Vector2(112, 72),
             restart, this.art.Restart, "R", 39);
+    }
+
+    /// <summary>
+    /// 별도 좌상단 코어 HUD(LeftCoreHud)를 쓰는 씬에서 호출한다. 기존 코어 패널을 숨기고,
+    /// 알림이 새 패널과 겹치지 않도록 알림 위치를 오른쪽으로 옮긴다.
+    /// </summary>
+    public void UseExternalCorePanel(Vector2 noticePosition)
+    {
+        coreStatus.gameObject.SetActive(false);
+        noticeArea.anchoredPosition = noticePosition;
+    }
+
+    /// <summary>
+    /// 별도 마나 바(ManaBarHud)를 쓰는 씬에서 호출한다. 기존 마나 게이지를 숨기고 새 바를
+    /// 전투 스킬 바의 같은 자리에 붙여, 스킬 바와 함께 보이고 숨겨지게 한다.
+    /// </summary>
+    public void UseExternalManaBar(RectTransform bar, Vector2 position)
+    {
+        manaGauge.gameObject.SetActive(false);
+        bar.SetParent(spellBar, false);
+        bar.anchorMin = bar.anchorMax = Vector2.up;
+        bar.pivot = Vector2.up;
+        bar.anchoredPosition = position;
     }
 
     public void Notify(string message)

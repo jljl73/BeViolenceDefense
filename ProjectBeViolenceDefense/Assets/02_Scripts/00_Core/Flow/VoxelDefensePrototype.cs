@@ -29,6 +29,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private Sprite routeChevron;
     [SerializeField] private EnemyCatalog enemyCatalog;
     [SerializeField] private DefenseHud.Art hudArt = new();
+    [Tooltip("선택. 연결하면 기존 코어 패널 대신 초상이 있는 좌상단 코어 HUD를 쓴다.")]
+    [SerializeField] private LeftCoreHud leftCoreHud;
+    [Tooltip("선택. 연결하면 기존 마나 게이지 대신 하단 마나 바 아트를 쓴다.")]
+    [SerializeField] private ManaBarHud manaBarHud;
     [SerializeField] private BoardTheme boardTheme = new();
     [SerializeField] private FactionSlot coral;
     [SerializeField] private FactionSlot teal;
@@ -100,6 +104,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         battle.EnemySpawned += view.AddEnemy;
         battle.EnemyRemoved += view.RemoveEnemy;
         hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions);
+        if (leftCoreHud != null)
+            hud.UseExternalCorePanel(new Vector2(320, -236));
+        if (manaBarHud != null)
+            hud.UseExternalManaBar((RectTransform)manaBarHud.transform, new Vector2(33, -130));
         RefreshPlanningTiles();
     }
 
@@ -197,6 +205,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 {
                     RefreshPlanningTiles();
                     hud.Notify("Round cleared. Adjust walls before the next battle.");
+                    if (leftCoreHud != null)
+                        leftCoreHud.Cheer();
                 }
                 else if (battle.CurrentPhase == DefenseBattle.Phase.Defeat)
                 {
@@ -436,6 +446,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         int rangeStep = SpellRangeStep;
         view.ShowAreaSpellPreview(aimedSpell, spellCenter, DefenseBattle.AreaSpellRadius(rangeStep));
         hud.Refresh(battle, grid, view, aimedSpell, spellCenter, rangeStep, battleSpeed);
+        if (leftCoreHud != null)
+            leftCoreHud.Refresh(battle.CoreHealth, DefenseBattle.CoreMaxHealth);
+        if (manaBarHud != null)
+            manaBarHud.Refresh(battle.Mana, DefenseBattle.MaxMana);
     }
 
     private void OnApplicationFocus(bool focused)
