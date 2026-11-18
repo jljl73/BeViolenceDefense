@@ -1,0 +1,15 @@
+{
+    "asset": "27201708cd122419786452135fb6db43",
+    "fileName": "01a1efc5-e5f9-7fe1-af3d-57ece7f14ea6.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. An attack power buff activating once: short rising warm magical rush ending in a compact confident low punch. Energetic orange magic feeling, 0.7 seconds then silence.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

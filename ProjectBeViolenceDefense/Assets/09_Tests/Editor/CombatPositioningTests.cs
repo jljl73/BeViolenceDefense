@@ -129,35 +129,24 @@ public sealed class CombatPositioningTests
     }
 
     [Test]
-    public void StalledSidestepsSwitchToReachableNeighborAndStartAttacking()
+    public void CrowdBarrierDetourKeepsTargetAndStartsAttacking()
     {
         var units = BlockedFrontLine(out var attacker, out var preferred);
-        var neighbor = Unit(1, 2, 4, 7, radius: 0.3f);
-        units.Insert(2, neighbor);
+        units.Insert(2, Unit(1, 2, 4, 7, radius: 0.3f));
         var combat = new CombatPositioning(OpenGrid(), units);
-        int switchedAt = -1;
-        int firstAttackAt = -1;
-        for (int tick = 0; tick < 240; tick++)
+        bool usedPath = false;
+        for (int tick = 0; tick < 600; tick++)
         {
             StepApproach(combat, attacker, tick);
-            if (attacker.Target == neighbor)
-            {
-                if (switchedAt < 0) switchedAt = tick;
-                if (combat.CanAttack(attacker, neighbor) && attacker.CanAttack)
-                {
-                    attacker.Attack(neighbor);
-                    if (firstAttackAt < 0) firstAttackAt = tick;
-                }
-            }
-            if (switchedAt >= 0)
-                Assert.That(attacker.Target, Is.SameAs(neighbor), "Do not bounce back to the stalled opponent while approaching/fighting the new one.");
+            Assert.That(attacker.Target ?? attacker.CombatQueue?.Target, Is.SameAs(preferred));
+            usedPath |= attacker.CombatPath.Count > 0;
+            if (combat.CanAttack(attacker, preferred) && attacker.CanAttack) attacker.Attack(preferred);
             foreach (var other in units.Where(u => u != attacker))
                 Assert.That(Vector3.Distance(attacker.Position, other.Position),
                     Is.GreaterThanOrEqualTo(CombatPositioning.RequiredSpacing(attacker.Faction, other.Faction) - 0.0001f));
             attacker.TickTimers(DefenseBattle.TickDuration);
         }
-        Assert.That(switchedAt, Is.InRange(36, 65), "Give the first approach time to progress, then abandon the oscillation.");
-        Assert.That(firstAttackAt, Is.InRange(0, 119), "The reachable neighbor should be engaged within two seconds.");
+        Assert.That(usedPath, Is.True, "A long clear approach should replace oscillating local sidesteps.");
         Assert.That(attacker.AttacksPerformed, Is.GreaterThan(1));
     }
 
@@ -237,9 +226,9 @@ public sealed class CombatPositioningTests
         var battle = new DefenseBattle(new DefenseGrid(), new[]
         {
             new EnemyFaction("Goblin", Color.white, maxHealth: 75, damage: 10, attackInterval: 0.65f,
-                spawnCount: 4, moveSpeed: 1.7f, bodyRadius: 0.34f),
+                spawnCount: 4, awarenessRange: 2.2f, moveSpeed: 1.7f, bodyRadius: 0.34f),
             new EnemyFaction("Skeleton", Color.white, maxHealth: 70, damage: 12, attackInterval: 0.8f,
-                spawnCount: 6, moveSpeed: 1.6f, bodyRadius: 0.286f)
+                spawnCount: 6, awarenessRange: 2.2f, moveSpeed: 1.6f, bodyRadius: 0.286f)
         });
         var headings = new Dictionary<int, Vector3>();
         var reversals = new int[10];
@@ -327,9 +316,9 @@ public sealed class CombatPositioningTests
         var battle = new DefenseBattle(new DefenseGrid(), new[]
         {
             new EnemyFaction("Goblin", Color.white, maxHealth: 75, damage: 10, attackInterval: 0.65f,
-                spawnCount: 4, moveSpeed: 1.7f, bodyRadius: 0.34f),
+                spawnCount: 4, awarenessRange: 2.2f, moveSpeed: 1.7f, bodyRadius: 0.34f),
             new EnemyFaction("Skeleton", Color.white, maxHealth: 70, damage: 12, attackInterval: 0.8f,
-                spawnCount: 6, moveSpeed: 1.6f, bodyRadius: 0.286f)
+                spawnCount: 6, awarenessRange: 2.2f, moveSpeed: 1.6f, bodyRadius: 0.286f)
         });
         var combat = new CombatPositioning(new DefenseGrid(), battle.Enemies);
         var attackers = new HashSet<int>();
@@ -494,6 +483,124 @@ public sealed class CombatPositioningTests
         Assert.That(scout.Target == enemy, Is.EqualTo(detected));
     }
 
+    [TestCase(3f, 2.2f)]
+    [TestCase(6f, 3f)]
+    public void RangedHitRevealsAttackerAndStartsCounterattackInTheSameTick(float range, float awareness)
+    {
+        var grid = new DefenseGrid(17, 17, new RectInt(8, 15, 2, 2),
+            new[] { new Vector2Int(4, 6), new Vector2Int(4 + (int)range, 6) }, new[] { 0, 1 }, null);
+        var battle = new DefenseBattle(grid, new[]
+        {
+            new EnemyFaction("Victim", Color.white, maxHealth: 150, spawnCount: 1, awarenessRange: awareness),
+            new EnemyFaction("Shooter", Color.white, attackRange: range, damage: 4, spawnCount: 1, moveSpeed: 0f)
+        });
+        EnemyUnit victim = null, shooter = null;
+        battle.EnemySpawned += unit => { if (unit.FactionIndex == 0) victim = unit; else shooter = unit; };
+        battle.StartRound();
+        for (int tick = 0; tick < 60 && (victim == null || victim.Health == victim.MaxHealth); tick++)
+            battle.Tick(DefenseBattle.TickDuration, false);
+        Assert.That(victim, Is.Not.Null);
+        Assert.That(victim.Health, Is.LessThan(victim.MaxHealth));
+        Assert.That(victim.RetaliationTarget, Is.SameAs(shooter));
+        Assert.That(victim.Target, Is.SameAs(shooter), "React before the hit tick's route movement, including outside combat-join range.");
+        Assert.That(Vector3.Distance(victim.Position, shooter.Position), Is.LessThan(range));
+        for (int tick = 0; tick < 300 && victim.AttacksPerformed == 0; tick++)
+            battle.Tick(DefenseBattle.TickDuration, false);
+        Assert.That(victim.AttacksPerformed, Is.GreaterThan(0), "Recognition must lead to an actual counterattack.");
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void RangedAggroInterruptsPursuitButKeepsAnImmediateFight(bool alreadyFighting)
+    {
+        var victim = Unit(0, 0, 4, 4);
+        var previous = Unit(1, 1, alreadyFighting ? 5.1f : 6.4f, 4);
+        var shooter = Unit(1, 2, 4, 7, 3f);
+        victim.Target = previous;
+        victim.QueueDamage(8, shooter);
+        victim.ResolveDamage();
+        var combat = new CombatPositioning(OpenGrid(), new[] { victim, previous, shooter });
+        combat.Plan();
+        Assert.That(victim.Target, Is.SameAs(alreadyFighting ? previous : shooter));
+    }
+
+    [TestCase("wall")]
+    [TestCase("expired")]
+    [TestCase("dead")]
+    public void RetaliationRespectsWallsDeathAndMemoryExpiry(string reason)
+    {
+        var victim = Unit(0, 0, 4, 4);
+        var shooter = Unit(1, 1, 10, 4, 6f);
+        victim.QueueDamage(8, shooter);
+        victim.ResolveDamage();
+        if (reason == "dead") shooter.Die();
+        if (reason == "expired")
+            for (int tick = 0; tick <= 240; tick++) victim.TickTimers(DefenseBattle.TickDuration);
+        var combat = new CombatPositioning(reason == "wall" ? OpenGrid(new Vector2Int(7, 4)) : OpenGrid(),
+            new[] { victim, shooter });
+        combat.Plan();
+        Assert.That(victim.Target, Is.Null);
+        if (reason == "expired") Assert.That(victim.RetaliationTarget, Is.Null);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void SimultaneousArmorBlockedHitsChooseStableAttacker(bool reverse)
+    {
+        var victim = new EnemyUnit(new EnemyFaction("Armor", Color.white, armor: 30), 0,
+            new[] { new Vector3(4, 0, 4), new Vector3(4, 0, 5) }, 0);
+        var first = Unit(1, 1, 7, 4, 3f);
+        var second = Unit(1, 2, 4, 7, 3f);
+        victim.QueueDamage(8, reverse ? second : first);
+        victim.QueueDamage(8, reverse ? first : second);
+        Assert.That(victim.RetaliationTarget, Is.Null, "Do not mutate targeting while simultaneous attacks are being evaluated.");
+        victim.ResolveDamage();
+        new CombatPositioning(OpenGrid(), new[] { second, victim, first }).Plan();
+        Assert.That(victim.Health, Is.EqualTo(victim.MaxHealth));
+        Assert.That(victim.RetaliationTarget, Is.SameAs(first));
+        Assert.That(victim.Target, Is.SameAs(first));
+    }
+
+    [Test]
+    public void RepeatedHitsDoNotUndoAReachableAlternativeOrCauseTargetOscillation()
+    {
+        var victim = Unit(0, 0, 4, 4);
+        var shooter = Unit(1, 1, 7, 4, 3f);
+        var reachable = Unit(1, 2, 4, 7);
+        victim.QueueDamage(1, shooter);
+        victim.ResolveDamage();
+        var combat = new CombatPositioning(OpenGrid(), new[] { victim, shooter, reachable });
+        combat.Plan();
+        Assert.That(victim.Target, Is.SameAs(shooter));
+        // The planner has found a reachable neighbor after a stalled approach.
+        victim.Target = reachable;
+        victim.TickTimers(1f);
+        victim.QueueDamage(1, reachable);
+        victim.QueueDamage(1, shooter);
+        victim.ResolveDamage();
+        combat.Plan();
+        Assert.That(victim.Target, Is.SameAs(reachable));
+        Assert.That(victim.RetaliationTarget, Is.SameAs(shooter));
+        Assert.That(victim.RetaliationRemaining, Is.EqualTo(EnemyUnit.RetaliationDuration));
+    }
+
+    [Test]
+    public void SimultaneousLethalAttacksStillBothLandWithRetaliation()
+    {
+        var grid = new DefenseGrid(17, 17, new RectInt(8, 15, 2, 2),
+            new[] { new Vector2Int(4, 6), new Vector2Int(5, 6) }, new[] { 0, 1 }, null);
+        var faction = new EnemyFaction("Duel", Color.white, maxHealth: 10, damage: 10, spawnCount: 1);
+        var battle = new DefenseBattle(grid, new[] { faction, faction });
+        var spawned = new List<EnemyUnit>();
+        battle.EnemySpawned += spawned.Add;
+        battle.StartRound();
+        for (int tick = 0; tick < 60 && battle.CurrentPhase == DefenseBattle.Phase.Combat; tick++)
+            battle.Tick(DefenseBattle.TickDuration, false);
+        Assert.That(spawned.Count, Is.EqualTo(2));
+        Assert.That(spawned.All(unit => !unit.IsAlive && unit.AttacksPerformed == 1), Is.True);
+        Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Preparation));
+    }
+
     [Test]
     public void AdjacentSpawnsDoNotOverlapLargeUnitsInTheSameTick()
     {
@@ -514,5 +621,240 @@ public sealed class CombatPositioningTests
         Assert.That(battle.SpawnCount, Is.EqualTo(2));
         Assert.That(Vector3.Distance(battle.Enemies[0].Position, battle.Enemies[1].Position),
             Is.GreaterThanOrEqualTo(CombatPositioning.RequiredSpacing(factions[0], factions[1]) - 0.0001f));
+    }
+
+    private static DefenseGrid UShapedWall()
+    {
+        var walls = new List<Vector2Int>();
+        for (int z = 3; z <= 9; z++) walls.Add(new Vector2Int(6, z));
+        for (int x = 3; x < 6; x++) { walls.Add(new Vector2Int(x, 3)); walls.Add(new Vector2Int(x, 9)); }
+        return OpenGrid(walls.ToArray());
+    }
+
+    [Test]
+    public void KnownTargetBeyondAwarenessIsKeptUntilReached()
+    {
+        var attacker = Unit(0, 0, 4, 4);
+        var target = Unit(1, 1, 6, 4);
+        var combat = new CombatPositioning(OpenGrid(), new[] { attacker, target });
+        combat.Plan();
+        target.MoveOffRoute(new Vector3(13, 0, 4));
+        for (int tick = 0; tick < 600 && !combat.CanAttack(attacker, target); tick++)
+        {
+            StepApproach(combat, attacker, tick);
+            attacker.TickTimers(DefenseBattle.TickDuration);
+            Assert.That(attacker.Target ?? attacker.CombatQueue?.Target, Is.SameAs(target));
+        }
+        Assert.That(combat.CanAttack(attacker, target), Is.True);
+    }
+
+    [Test]
+    public void KnownTargetIsReachedAroundAUWallWithoutLosingItOrCuttingWalls()
+    {
+        var grid = UShapedWall();
+        var attacker = Unit(0, 0, 4, 6, radius: 0.3f);
+        var target = Unit(1, 1, 8, 6, radius: 0.3f);
+        // An already seen opponent is now occluded while the pursuer is inside the U.
+        attacker.Target = target;
+        var combat = new CombatPositioning(grid, new[] { attacker, target });
+        float travelled = 0f, leftmost = attacker.Position.x;
+        bool usedPath = false;
+        for (int tick = 0; tick < 1200 && !combat.CanAttack(attacker, target); tick++)
+        {
+            Vector3 before = attacker.Position;
+            StepApproach(combat, attacker, tick);
+            attacker.TickTimers(DefenseBattle.TickDuration);
+            Assert.That(attacker.Target ?? attacker.CombatQueue?.Target, Is.SameAs(target));
+            Assert.That(grid.CanPursue(before, attacker.Position), Is.True);
+            Assert.That(Vector3.Distance(attacker.Position, target.Position), Is.GreaterThanOrEqualTo(0.66f - 0.0001f));
+            travelled += Vector3.Distance(before, attacker.Position);
+            leftmost = Mathf.Min(leftmost, attacker.Position.x);
+            usedPath |= attacker.CombatPath.Count > 0;
+        }
+        Assert.That(usedPath, Is.True);
+        Assert.That(leftmost, Is.LessThan(2.5f), "The route must initially move away from the opponent to leave the U.");
+        Assert.That(travelled, Is.GreaterThan(10f));
+        Assert.That(combat.CanAttack(attacker, target), Is.True);
+    }
+
+    [Test]
+    public void OccludedMovingTargetDoesNotUpdateItsLastSeenPosition()
+    {
+        var grid = OpenGrid(Enumerable.Range(2, 10).Select(z => new Vector2Int(6, z)).ToArray());
+        var attacker = Unit(0, 0, 4, 6);
+        var target = Unit(1, 1, 5, 6);
+        var combat = new CombatPositioning(grid, new[] { attacker, target });
+        combat.Plan();
+        Vector3 seen = target.Position;
+        target.MoveOffRoute(new Vector3(8, 0, 6));
+        combat.Plan();
+        Assert.That(attacker.Target, Is.SameAs(target));
+        Assert.That(attacker.LastKnownTargetPosition, Is.EqualTo(seen));
+        Assert.That(attacker.CombatDestination, Is.EqualTo(seen));
+    }
+
+    [Test]
+    public void TrulyUnreachableKnownTargetIsReplacedByReachableOpponent()
+    {
+        var walls = new List<Vector2Int>();
+        for (int x = 5; x <= 7; x++) for (int z = 5; z <= 7; z++)
+            if (x != 6 || z != 6) walls.Add(new Vector2Int(x, z));
+        var attacker = Unit(0, 0, 3, 6);
+        var trapped = Unit(1, 1, 6, 6);
+        var reachable = Unit(1, 2, 2, 8);
+        attacker.Target = trapped;
+        var combat = new CombatPositioning(OpenGrid(walls.ToArray()), new[] { attacker, trapped, reachable });
+        for (int tick = 0; tick < 180 && !combat.CanAttack(attacker, reachable); tick++)
+        {
+            StepApproach(combat, attacker, tick);
+            attacker.TickTimers(DefenseBattle.TickDuration);
+        }
+        Assert.That(attacker.Target, Is.SameAs(reachable));
+        Assert.That(combat.CanAttack(attacker, reachable), Is.True);
+    }
+
+    [Test]
+    public void TargetDeathDuringLongDetourStillAllowsReturningToCoreRoute()
+    {
+        var grid = UShapedWall();
+        var faction = new EnemyFaction("Pursuer", Color.white, spawnCount: 0, maxHealth: 1000);
+        var stationary = new EnemyFaction("Target", Color.white, spawnCount: 0, maxHealth: 1000, moveSpeed: 0f);
+        var battle = new DefenseBattle(grid, new[] { faction, stationary });
+        var attacker = new EnemyUnit(faction, 0, grid.Routes[0], 0);
+        var target = new EnemyUnit(stationary, 1, grid.Routes[1], 1);
+        attacker.MoveOffRoute(new Vector3(4, 0, 6));
+        target.MoveOffRoute(new Vector3(8, 0, 6));
+        attacker.Target = target;
+        battle.StartRound();
+        ((List<EnemyUnit>)battle.Enemies).AddRange(new[] { attacker, target });
+        bool usedPath = false;
+        for (int tick = 0; tick < 180; tick++)
+        {
+            battle.Tick(DefenseBattle.TickDuration, false);
+            usedPath |= attacker.CombatPath.Count > 0;
+        }
+        Assert.That(usedPath, Is.True);
+        target.Die();
+        for (int tick = 0; tick < 3000 && battle.CurrentPhase == DefenseBattle.Phase.Combat; tick++)
+        {
+            battle.Tick(DefenseBattle.TickDuration, false);
+            if (!attacker.ReachedCore)
+                Assert.That(grid.CanPursue(attacker.PreviousPosition, attacker.Position), Is.True);
+        }
+        Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Preparation));
+        Assert.That(battle.CoreHealth, Is.EqualTo(119));
+    }
+
+    // 폭이 width 칸인 가로 복도. 양 끝에서 들어와 가운데에서 만나고, 가운데 위쪽 문으로 코어에 간다.
+    private static DefenseGrid CorridorGrid(int width)
+    {
+        var walls = new List<Vector2Int>();
+        for (int x = 0; x < 17; x++)
+            for (int z = 0; z < 13; z++)
+                if ((z < 4 || z >= 4 + width) && !(x == 8 && z >= 4 + width))
+                    walls.Add(new Vector2Int(x, z));
+        return new DefenseGrid(17, 17, new RectInt(8, 15, 2, 2),
+            new[] { new Vector2Int(0, 4), new Vector2Int(16, 4) }, new[] { 0, 1 }, walls);
+    }
+
+    [TestCase(2)]
+    [TestCase(3)]
+    public void CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets(int width)
+    {
+        // Unit values are frozen here so later balancing cannot hide this regression.
+        var battle = new DefenseBattle(CorridorGrid(width), new[]
+        {
+            new EnemyFaction("Goblin", Color.white, maxHealth: 75, damage: 10, attackInterval: 0.65f,
+                spawnCount: 8, moveSpeed: 1.7f, bodyRadius: 0.34f),
+            new EnemyFaction("Skeleton", Color.white, maxHealth: 70, damage: 12, attackInterval: 0.8f,
+                spawnCount: 8, moveSpeed: 1.6f, bodyRadius: 0.286f)
+        });
+        var seen = new Dictionary<EnemyUnit, (Vector3 Direction, int ReversalTick, EnemyUnit Target)>();
+        int quickReversals = 0, targetSwitches = 0;
+        battle.StartRound();
+        while (battle.CurrentPhase == DefenseBattle.Phase.Combat && battle.TickIndex < 7200)
+        {
+            battle.Tick(DefenseBattle.TickDuration, false);
+            foreach (EnemyUnit unit in battle.Enemies)
+            {
+                if (!seen.TryGetValue(unit, out var last))
+                    last.ReversalTick = -1000;
+                Vector3 step = unit.Position - unit.PreviousPosition;
+                if (step.sqrMagnitude > 1e-10f)
+                {
+                    // A turn of more than 100 degrees that follows another one within half a second.
+                    if (last.Direction.sqrMagnitude > 0f && Vector3.Dot(step.normalized, last.Direction) < -0.173648f)
+                    {
+                        if (battle.TickIndex - last.ReversalTick <= 30)
+                            quickReversals++;
+                        last.ReversalTick = battle.TickIndex;
+                    }
+                    last.Direction = step.normalized;
+                }
+                if (unit.Target != null && last.Target is { IsAlive: true } && unit.Target != last.Target)
+                    targetSwitches++;
+                if (unit.Target != null)
+                    last.Target = unit.Target;
+                seen[unit] = last;
+            }
+        }
+        Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Preparation));
+        Assert.That(quickReversals, Is.LessThanOrEqualTo(12),
+            "Units without a complete approach must hold their position instead of stepping side to side.");
+        Assert.That(targetSwitches, Is.LessThanOrEqualTo(24),
+            "A living opponent is only dropped for an immediate attack, a hit, or a complete approach to another one.");
+    }
+
+    [Test]
+    public void WaitingUnitHoldsItsPositionBehindAFullFight()
+    {
+        var target = Unit(1, 0, 6, 6, radius: 0.3f);
+        var fighters = new[] { Unit(0, 1, 4.9f, 6, radius: 0.3f), Unit(0, 2, 6, 4.9f, radius: 0.3f), Unit(0, 3, 6, 7.1f, radius: 0.3f) };
+        var waiting = Unit(0, 4, 4.2f, 6.6f, radius: 0.3f);
+        var units = new List<EnemyUnit>(fighters) { waiting, target };
+        var combat = new CombatPositioning(OpenGrid(), units);
+        Vector3 start = waiting.Position;
+        for (int tick = 0; tick < 120; tick++)
+        {
+            StepApproach(combat, waiting, tick);
+            Assert.That(waiting.Position, Is.EqualTo(start), "Backing away and walking in again made waiting units pace.");
+        }
+        Assert.That(fighters.All(f => combat.CanAttack(f, target)), Is.True);
+        Assert.That(waiting.CombatQueue?.Target, Is.SameAs(target));
+    }
+
+    [Test]
+    public void HiddenOpponentBehindACrowdIsGivenUpInsteadOfBlockingTheLane()
+    {
+        // A closed one-tile lane along z = 4 that turns up at x = 8; the opponent was seen around that corner.
+        var walls = new List<Vector2Int>();
+        for (int x = 0; x <= 9; x++) { walls.Add(new Vector2Int(x, 3)); if (x != 8) walls.Add(new Vector2Int(x, 5)); }
+        walls.Add(new Vector2Int(9, 4));
+        var grid = OpenGrid(walls.ToArray());
+        var pursuer = Unit(0, 0, 3, 4, radius: 0.3f);
+        var friend = Unit(0, 1, 4, 4, range: 0.1f, radius: 0.3f);
+        var hidden = Unit(1, 2, 8, 7, radius: 0.3f);
+        pursuer.Target = hidden;
+        var combat = new CombatPositioning(grid, new[] { pursuer, friend, hidden });
+        Assert.That(grid.HasLineOfSight(pursuer.Position, hidden.Position), Is.False);
+        for (int tick = 0; tick < 60; tick++)
+            StepApproach(combat, pursuer, tick);
+        Assert.That(pursuer.Target, Is.SameAs(hidden), "A short jam is not a reason to forget a known opponent.");
+        for (int tick = 60; tick < 240; tick++)
+            StepApproach(combat, pursuer, tick);
+        Assert.That(pursuer.Target, Is.Null);
+        Assert.That(pursuer.PursuitTarget, Is.Null);
+    }
+
+    [TestCase(4.5f, true)]
+    [TestCase(5f, false)]
+    public void IdleUnitOffItsRouteStepsAwayOnlyFromATouchingNeighbor(float neighborX, bool steps)
+    {
+        var idle = Unit(0, 0, 4, 4);
+        var neighbor = Unit(0, 1, neighborX, 4);
+        var combat = new CombatPositioning(OpenGrid(), new[] { idle, neighbor });
+        Assert.That(combat.TryStepAside(idle, out Vector3 destination), Is.EqualTo(steps));
+        if (steps)
+            Assert.That(destination.x, Is.LessThan(idle.Position.x), "It gives way on the side away from the neighbor.");
     }
 }

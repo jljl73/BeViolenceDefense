@@ -1,0 +1,15 @@
+{
+    "asset": "f82015bdc34bf4cc98646728567dde3e",
+    "fileName": "01a1efc6-4770-79cf-9000-382b0ac38f8e.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A speed buff activating once: nimble airy gust sweeps upward with a tiny bright flick at the end. Light and quick, 0.5 seconds then silence.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

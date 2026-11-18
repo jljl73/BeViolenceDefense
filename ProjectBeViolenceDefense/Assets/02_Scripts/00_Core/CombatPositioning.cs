@@ -6,12 +6,24 @@ internal sealed class CombatPositioning
     internal const int MaxAttackersPerTarget = 3;
     internal const float StalledRetargetDelay = 0.6f;
     internal const float CombatJoinRange = 4.5f;
+    internal const float LostTargetSearchDuration = 4f;
+    // 보이지 않는 적을 쫓다가 이 시간 동안 조금도 가까워지지 못하면 추격을 그만두고 원래 경로로 돌아간다.
+    internal const float HiddenPursuitStallLimit = 2f;
+    // 옆걸음 직후 이 시간 동안은 방금 온 쪽으로 되돌아가는 옆걸음을 고르지 않는다.
+    internal const float SidestepMemoryDuration = 2.5f;
+    // 스스로 다른 적으로 바꾼 뒤 이 시간 동안은 다시 바꾸지 않는다.
+    internal const float RetargetLockDuration = 1f;
+    // 경로 밖에서 막힌 유닛이 이 여유 안으로 붙어 있는 유닛에게서 한 걸음 비켜선다.
+    private const float StepAsideMargin = 0.15f;
+    private const float StepAsideDistance = 0.4f;
     private const float ApproachProgressThreshold = 0.05f;
     private const int CurrentPositionSlot = -2;
+    // 여덟 공격 자리가 아닌, 사거리 안에서 때릴 수 있는 임의 지점으로 가는 중.
+    private const int OpenPositionSlot = -3;
+    private const float StrikeRangeMargin = 0.05f;
     private const int SlotCount = 8;
     private const int DetourPointsPerSide = SlotCount / 2;
     private const float Diagonal = 0.70710678f;
-    private const float QueueAwarenessMargin = 0.22f;
     private static readonly Vector3[] Directions =
     {
         Vector3.right, new(Diagonal, 0f, Diagonal),
@@ -33,15 +45,26 @@ internal sealed class CombatPositioning
     private readonly HashSet<EnemyUnit> alertedUnits = new();
     private readonly List<EnemyUnit> activeFighters = new();
     private int nextQueueOrder;
+    private int plannedEnemyCount;
+    private readonly PursuitPathfinder pathfinder;
+    private readonly List<Vector3> pathGoals = new();
+    private readonly List<int> pathSlots = new();
+    private readonly List<Vector3> staticPath = new();
 
     public CombatPositioning(DefenseGrid grid, IReadOnlyList<EnemyUnit> enemies)
     {
         this.grid = grid;
         this.enemies = enemies;
+        pathfinder = new PursuitPathfinder(this);
     }
 
     public void Plan()
     {
+        // A death changes the lanes: let waiting units probe either side again.
+        if (enemies.Count < plannedEnemyCount)
+            foreach (EnemyUnit enemy in enemies)
+                enemy.SidestepMemoryRemaining = 0f;
+        plannedEnemyCount = enemies.Count;
         FindNearbyFights();
         assignmentOrder.Clear();
         reservedSlots.Clear();
@@ -49,6 +72,7 @@ internal sealed class CombatPositioning
         foreach (EnemyUnit enemy in enemies)
         {
             EnemyUnit target = FindTarget(enemy);
+            RememberTarget(enemy, target);
             if (target != enemy.CombatProgressTarget)
                 ResetApproachProgress(enemy, target);
             if (target != enemy.Target)
@@ -81,38 +105,81 @@ internal sealed class CombatPositioning
 
             EnemyUnit target = enemy.Target;
 
+            if (!grid.HasLineOfSight(enemy.Position, target.Position))
+            {
+                PursueLastKnownPosition(enemy, target);
+                if (IsKnownUnreachable(enemy, target))
+                {
+                    if (FindAlternative(enemy, target, out EnemyUnit alternativeTarget,
+                        out int alternativeSlot, out Vector3 alternativeWaypoint, out float alternativeLength))
+                        Reserve(enemy, alternativeTarget, alternativeSlot, alternativeWaypoint, alternativeLength);
+                    else
+                    {
+                        enemy.Target = null; enemy.CombatQueue = null; RememberTarget(enemy, null);
+                    }
+                }
+                // A crowd can close every way to the place the opponent was last seen. Waiting
+                // there forever can plug a gate that the same crowd needs, so let go of it.
+                else if (enemy.CombatStalledTime >= HiddenPursuitStallLimit)
+                {
+                    enemy.Target = null; enemy.CombatQueue = null; enemy.CombatDestination = null;
+                    RememberTarget(enemy, null);
+                }
+                continue;
+            }
+
+            if (TryUsePath(enemy, target, out Vector3 pathWaypoint, out float pathLength) &&
+                (enemy.AttackSlot == OpenPositionSlot
+                    ? !IsTargetFull(target) && CanStrikeFrom(enemy, target, enemy.CombatPath[^1])
+                    : SlotAvailable(enemy, target, enemy.AttackSlot)))
+            {
+                Reserve(enemy, target, enemy.AttackSlot, pathWaypoint, pathLength);
+                continue;
+            }
+
             // A local sidestep alone is not proof that this fight is reachable. Probe other
             // complete approaches before renewing a stalled target's reservation.
             if (enemy.CombatStalledTime >= StalledRetargetDelay)
             {
                 ResetApproachProgress(enemy, target);
-                if (FindAlternative(enemy, target, false, out EnemyUnit reachable,
+                if (FindPathSlot(enemy, target, out int detourSlot, out Vector3 detourWaypoint, out float detourLength,
+                        allowOpenPosition: true))
+                {
+                    Reserve(enemy, target, detourSlot, detourWaypoint, detourLength);
+                    continue;
+                }
+                if (enemy.RetargetLockRemaining <= 0f && FindAlternative(enemy, target, out EnemyUnit reachable,
                         out int reachableSlot, out Vector3 reachableWaypoint, out float reachableLength))
                 {
                     Reserve(enemy, reachable, reachableSlot, reachableWaypoint, reachableLength);
+                    enemy.RetargetLockRemaining = RetargetLockDuration;
                     continue;
                 }
             }
 
             int slot = enemy.AttackSlot;
-            if (slot >= 0 && TryApproachSlot(enemy, target, slot, true, out Vector3 waypoint, out float length))
+            if (slot >= 0 && TryApproachSlot(enemy, target, slot, true, out Vector3 waypoint, out float length,
+                    out bool local, true))
             {
-                Reserve(enemy, target, slot, waypoint, length);
+                Reserve(enemy, target, slot, waypoint, length, local);
                 continue;
             }
 
             enemy.AttackSlot = -1;
-            if (FindSlot(enemy, target, out slot, out waypoint, out length))
+            if (FindSlot(enemy, target, out slot, out waypoint, out length, out local, true))
             {
-                Reserve(enemy, target, slot, waypoint, length);
+                Reserve(enemy, target, slot, waypoint, length, local);
                 continue;
             }
 
-            // A full target or an unreachable slot sends the unit to another visible opponent.
-            if (FindAlternative(enemy, target, false, out EnemyUnit alternative, out slot, out waypoint, out length) ||
-                FindAlternative(enemy, target, true, out alternative, out slot, out waypoint, out length))
+            // A full target or an unreachable slot sends the unit to another visible opponent
+            // with a complete approach. A mere sidestep toward someone else is no reason to
+            // switch, and a unit that just switched does not bounce straight back.
+            if (enemy.RetargetLockRemaining <= 0f &&
+                FindAlternative(enemy, target, out EnemyUnit alternative, out slot, out waypoint, out length))
             {
                 Reserve(enemy, alternative, slot, waypoint, length);
+                enemy.RetargetLockRemaining = RetargetLockDuration;
                 continue;
             }
 
@@ -127,10 +194,15 @@ internal sealed class CombatPositioning
                 }
             }
             enemy.Target = null;
+            if (IsKnownUnreachable(enemy, target))
+            {
+                enemy.CombatQueue = null; RememberTarget(enemy, null);
+                continue;
+            }
             if (queueTarget != null)
                 QueueBehindFight(enemy, queueTarget);
             else
-                enemy.CombatQueue = null;
+                QueueBehindFight(enemy, target);
         }
     }
 
@@ -138,6 +210,11 @@ internal sealed class CombatPositioning
     // erase the time already spent stuck. Cooldown while in striking position is not a stall.
     public void TrackApproachProgress(EnemyUnit enemy, float deltaTime)
     {
+        if (enemy.PursuitTarget is { IsAlive: true } remembered &&
+            !grid.HasLineOfSight(enemy.Position, remembered.Position) &&
+            Vector3.Distance(enemy.Position, enemy.LastKnownTargetPosition) <= enemy.Faction.AttackRange &&
+            grid.HasLineOfSight(enemy.Position, enemy.LastKnownTargetPosition))
+            enemy.LostTargetSearchTime += deltaTime;
         EnemyUnit target = enemy.Target ?? enemy.CombatQueue?.Target;
         if (target == null || !target.IsAlive || target != enemy.CombatProgressTarget || CanAttack(enemy, target))
             ResetApproachProgress(enemy, target);
@@ -146,7 +223,7 @@ internal sealed class CombatPositioning
 
         float remaining = enemy.CombatDestination is { } destination && enemy.Target != null
             ? Vector3.Distance(enemy.Position, destination) + enemy.CombatApproachTailLength
-            : Vector3.Distance(enemy.Position, target.Position);
+            : Vector3.Distance(enemy.Position, enemy.LastKnownTargetPosition);
         // Compare against the best remaining route, not distance moved: oscillation must
         // not keep a blocked target alive. Include the tail so genuine detours make progress.
         if (remaining <= enemy.CombatBestRemainingDistance - ApproachProgressThreshold)
@@ -165,7 +242,8 @@ internal sealed class CombatPositioning
         enemy.CombatStalledTime = 0f;
     }
 
-    private bool FindAlternative(EnemyUnit enemy, EnemyUnit current, bool allowLocalSteer,
+    // Another opponent is worth switching to only if a complete approach to it exists.
+    private bool FindAlternative(EnemyUnit enemy, EnemyUnit current,
         out EnemyUnit alternative, out int slot, out Vector3 waypoint, out float length)
     {
         alternative = null;
@@ -175,7 +253,8 @@ internal sealed class CombatPositioning
         foreach (EnemyUnit other in enemies)
         {
             if (other == current || !CanDetect(enemy, other) ||
-                !FindSlot(enemy, other, out int candidateSlot, out Vector3 candidateWaypoint, out float candidateLength, allowLocalSteer) ||
+                !FindSlot(enemy, other, out int candidateSlot, out Vector3 candidateWaypoint, out float candidateLength,
+                    out _, false) ||
                 !IsNearer(other, candidateLength, alternative, length))
                 continue;
             alternative = other;
@@ -205,6 +284,10 @@ internal sealed class CombatPositioning
     {
         destination = default;
         routeOffset = -1;
+        // A fighter that left its route may stand far ahead of its old route index, so every
+        // forward waypoint is a candidate for it. A unit queueing on the route only looks a few ahead.
+        if (!enemy.Position.Equals(enemy.RoutePosition))
+            waypointCount = enemy.RemainingRouteWaypoints;
         int count = Mathf.Min(Mathf.Max(waypointCount, enemy.RouteBypassOffset + 1), enemy.RemainingRouteWaypoints - 1);
         // A sidestep is useful only if it connects to a forward route waypoint. A free
         // patch beside a stationary queue otherwise causes endless leave/rejoin cycles.
@@ -232,6 +315,41 @@ internal sealed class CombatPositioning
         return false;
     }
 
+    // A fighter left standing off its route can sit in the mouth of a lane while the column
+    // behind it stops at exactly the body spacing, each waiting for the other. It gives way.
+    public bool TryStepAside(EnemyUnit enemy, out Vector3 destination)
+    {
+        destination = default;
+        EnemyUnit nearest = null;
+        float nearestDistance = float.PositiveInfinity;
+        foreach (EnemyUnit other in enemies)
+        {
+            float distance = (other.Position - enemy.Position).sqrMagnitude;
+            if (other == enemy || !IsNearer(other, distance, nearest, nearestDistance))
+                continue;
+            nearest = other;
+            nearestDistance = distance;
+        }
+        if (nearest == null)
+            return false;
+        float touching = RequiredSpacing(enemy.Faction, nearest.Faction) + StepAsideMargin;
+        if (nearestDistance >= touching * touching)
+            return false;
+
+        Vector3 away = (enemy.Position - nearest.Position).normalized;
+        float best = 0f;
+        foreach (Vector3 direction in Directions)
+        {
+            float alignment = Vector3.Dot(direction, away);
+            Vector3 point = enemy.Position + direction * StepAsideDistance;
+            if (alignment <= best || !CanMove(enemy, null, enemy.Position, point))
+                continue;
+            best = alignment;
+            destination = point;
+        }
+        return best > 0f;
+    }
+
     public void Move(EnemyUnit enemy, EnemyUnit target, float deltaTime)
     {
         if (CanAttack(enemy, target))
@@ -241,6 +359,13 @@ internal sealed class CombatPositioning
         }
         if (enemy.CombatDestination is not { } destination)
             return;
+
+        if (TryUsePath(enemy, target, out Vector3 pathWaypoint, out float pathLength))
+        {
+            destination = pathWaypoint;
+            enemy.CombatDestination = pathWaypoint;
+            enemy.CombatApproachTailLength = Mathf.Max(0f, pathLength - Vector3.Distance(enemy.Position, pathWaypoint));
+        }
 
         // Keep the selected side until the short waypoint is reached; don't alternate sides
         // every tick when two agents meet. Revalidate against the current movement snapshot.
@@ -255,7 +380,7 @@ internal sealed class CombatPositioning
         if (!CanMove(enemy, target, enemy.Position, next) &&
             TryLocalSteer(enemy, target, destination, out Vector3 detour))
         {
-            enemy.CombatSteerWaypoint = detour;
+            BeginSidestep(enemy, detour);
             next = enemy.StepToward(detour, deltaTime);
         }
         if (CanMove(enemy, target, enemy.Position, next))
@@ -267,8 +392,13 @@ internal sealed class CombatPositioning
 
     private EnemyUnit FindTarget(EnemyUnit enemy)
     {
-        EnemyUnit target = enemy.Target ?? enemy.CombatQueue?.Target;
-        if (target != null && CanDetect(enemy, target))
+        EnemyUnit target = enemy.Target ?? enemy.CombatQueue?.Target ?? enemy.PursuitTarget;
+        EnemyUnit aggressor = enemy.ConsumeRetaliationRequest();
+        if (aggressor != null && CanDetect(enemy, aggressor) &&
+            (target == null || !CanAttackFromHere(enemy, target)))
+            return aggressor;
+        if (target is { IsAlive: true } && target.FactionIndex != enemy.FactionIndex && !IsKnownUnreachable(enemy, target) &&
+            (grid.HasLineOfSight(enemy.Position, target.Position) || enemy.LostTargetSearchTime < LostTargetSearchDuration))
             return target;
 
         EnemyUnit nearest = null;
@@ -283,6 +413,23 @@ internal sealed class CombatPositioning
             nearestDistance = distance;
         }
         return nearest;
+    }
+
+    private void RememberTarget(EnemyUnit enemy, EnemyUnit target)
+    {
+        if (enemy.PursuitTarget != target)
+        {
+            enemy.LostTargetSearchTime = 0f;
+            if (enemy.CombatPathTarget != target) enemy.CombatPath.Clear();
+            enemy.PathRetryRemaining = 0f;
+            if (target != null) enemy.LastKnownTargetPosition = target.Position;
+        }
+        enemy.PursuitTarget = target;
+        if (target != null && grid.HasLineOfSight(enemy.Position, target.Position))
+        {
+            enemy.LastKnownTargetPosition = target.Position;
+            enemy.LostTargetSearchTime = 0f;
+        }
     }
 
     private EnemyUnit FindImmediateTarget(EnemyUnit enemy, EnemyUnit preferred)
@@ -313,8 +460,9 @@ internal sealed class CombatPositioning
     {
         float range = alertedUnits.Contains(enemy) || enemy.Target == other || enemy.CombatQueue?.Target == other
             ? Mathf.Max(enemy.Faction.AwarenessRange, CombatJoinRange) : enemy.Faction.AwarenessRange;
-        return other.IsAlive && other.FactionIndex != enemy.FactionIndex &&
-            (other.Position - enemy.Position).sqrMagnitude <= range * range &&
+        return other.IsAlive && other.FactionIndex != enemy.FactionIndex && !IsKnownUnreachable(enemy, other) &&
+            ((enemy.RetaliationTarget == other && enemy.RetaliationRemaining > 0f) ||
+                (other.Position - enemy.Position).sqrMagnitude <= range * range) &&
             grid.HasLineOfSight(enemy.Position, other.Position);
     }
 
@@ -347,18 +495,24 @@ internal sealed class CombatPositioning
         if (queued != 0)
             return queued;
 
-        float firstDistance = (first.Target.Position - first.Position).sqrMagnitude;
-        float secondDistance = (second.Target.Position - second.Position).sqrMagnitude;
+        float firstDistance = (first.LastKnownTargetPosition - first.Position).sqrMagnitude;
+        float secondDistance = (second.LastKnownTargetPosition - second.Position).sqrMagnitude;
         int distance = firstDistance.CompareTo(secondDistance);
         return distance != 0 ? distance : first.SpawnOrder.CompareTo(second.SpawnOrder);
     }
 
-    private void Reserve(EnemyUnit enemy, EnemyUnit target, int slot, Vector3 waypoint, float length = 0f)
+    private void Reserve(EnemyUnit enemy, EnemyUnit target, int slot, Vector3 waypoint, float length = 0f,
+        bool local = false)
     {
+        RememberTarget(enemy, target);
+        if (slot == CurrentPositionSlot || (enemy.CombatPath.Count > 0 &&
+            !enemy.CombatPath[enemy.CombatPathIndex].Equals(waypoint))) enemy.CombatPath.Clear();
         if (enemy.CombatProgressTarget != target || slot == CurrentPositionSlot)
             ResetApproachProgress(enemy, target);
         if (enemy.Target != target || slot == CurrentPositionSlot)
             enemy.CombatSteerWaypoint = null;
+        if (local)
+            BeginSidestep(enemy, waypoint);
         enemy.Target = target;
         enemy.CombatQueue = null;
         enemy.AttackSlot = slot;
@@ -368,13 +522,16 @@ internal sealed class CombatPositioning
         enemy.RouteBypassOffset = -1;
         enemy.BlockedRouteTime = 0f;
         reservedSlots.TryGetValue(target, out var reservation);
-        int mask = slot == CurrentPositionSlot ? reservation.Mask : reservation.Mask | (1 << slot);
+        int mask = slot < 0 ? reservation.Mask : reservation.Mask | (1 << slot);
         reservedSlots[target] = (mask, reservation.Count + 1);
-        reservedPositions.Add((slot == CurrentPositionSlot ? waypoint : SlotPosition(enemy, target, slot), enemy.Faction.BodyRadius));
+        Vector3 standing = slot >= 0 ? SlotPosition(enemy, target, slot) :
+            slot == OpenPositionSlot && enemy.CombatPath.Count > 0 ? enemy.CombatPath[^1] : waypoint;
+        reservedPositions.Add((standing, enemy.Faction.BodyRadius));
     }
 
     private void QueueBehindFight(EnemyUnit enemy, EnemyUnit target)
     {
+        RememberTarget(enemy, target);
         enemy.CombatSteerWaypoint = null;
         if (enemy.CombatQueue?.Target != target)
             enemy.CombatQueue = (target, nextQueueOrder++);
@@ -382,30 +539,23 @@ internal sealed class CombatPositioning
         enemy.RouteBypassOffset = -1;
         enemy.BlockedRouteTime = 0f;
 
-        // Leave room for the attackers without stepping outside detection range.
-        float range = enemy.Faction.AttackRange;
-        float distance = Mathf.Min(range + RequiredSpacing(enemy.Faction, target.Faction), enemy.Faction.AwarenessRange - QueueAwarenessMargin);
-        Vector3 offset = enemy.Position - target.Position;
-        if (distance <= range || offset.sqrMagnitude >= distance * distance)
-            return;
-
-        Vector3 rear = target.Position + offset.normalized * distance;
-        if (CanMove(enemy, target, enemy.Position, rear))
-            enemy.CombatDestination = rear;
+        // Hold position while waiting. Backing away to make room and walking in again as
+        // soon as a slot opened made waiting units pace back and forth behind the fight.
     }
 
     private bool FindSlot(EnemyUnit enemy, EnemyUnit target, out int slot, out Vector3 waypoint,
-        out float shortest, bool allowLocalSteer = true)
+        out float shortest, out bool local, bool allowLocalSteer)
     {
         slot = -1;
         waypoint = default;
         shortest = float.PositiveInfinity;
+        local = false;
         if (IsTargetFull(target))
             return false;
 
         for (int i = 0; i < SlotCount; i++)
         {
-            if (!TryApproachSlot(enemy, target, i, false, out Vector3 next, out float length) || length >= shortest)
+            if (!TryApproachSlot(enemy, target, i, false, out Vector3 next, out float length, out _, false) || length >= shortest)
                 continue;
             slot = i;
             waypoint = next;
@@ -416,38 +566,234 @@ internal sealed class CombatPositioning
 
         for (int i = 0; i < SlotCount; i++)
         {
-            if (!TryApproachSlot(enemy, target, i, true, out Vector3 next, out float length, allowLocalSteer) || length >= shortest)
+            if (!TryApproachSlot(enemy, target, i, true, out Vector3 next, out float length, out _, false) || length >= shortest)
                 continue;
             slot = i;
             waypoint = next;
             shortest = length;
         }
+        if (slot >= 0) return true;
+        if (FindPathSlot(enemy, target, out slot, out waypoint, out shortest)) return true;
+        if (!allowLocalSteer) return false;
+        for (int i = 0; i < SlotCount; i++)
+        {
+            if (!TryApproachSlot(enemy, target, i, true, out Vector3 next, out float length, out _, true) || length >= shortest)
+                continue;
+            slot = i; waypoint = next; shortest = length;
+        }
+        local = slot >= 0;
         return slot >= 0;
     }
 
     private bool IsTargetFull(EnemyUnit target) =>
         reservedSlots.TryGetValue(target, out var reservation) && reservation.Count >= MaxAttackersPerTarget;
 
-    private bool TryApproachSlot(EnemyUnit enemy, EnemyUnit target, int slot, bool allowDetour,
-        out Vector3 waypoint, out float length, bool allowLocalSteer = true)
+    private bool SlotAvailable(EnemyUnit enemy, EnemyUnit target, int slot)
     {
-        waypoint = SlotPosition(enemy, target, slot);
-        length = float.PositiveInfinity;
-        if (RequiredSpacing(enemy.Faction, target.Faction) > enemy.Faction.AttackRange)
-            return false;
-        if (!grid.IsWalkable(DefenseGrid.PositionToCell(waypoint)) || !grid.HasLineOfSight(waypoint, target.Position))
-            return false;
-
-        if ((reservedSlots.TryGetValue(target, out var reservation) &&
-                (reservation.Count >= MaxAttackersPerTarget || (reservation.Mask & (1 << slot)) != 0)) ||
-            !ClearOfUnits(enemy, target, waypoint, target.Position, attacking: true))
-            return false;
+        if (slot < 0 || RequiredSpacing(enemy.Faction, target.Faction) > enemy.Faction.AttackRange) return false;
+        Vector3 point = SlotPosition(enemy, target, slot);
+        if (!grid.IsWalkable(DefenseGrid.PositionToCell(point)) || !grid.HasLineOfSight(point, target.Position) ||
+            !ClearOfUnits(enemy, target, point, target.Position, attacking: true)) return false;
+        if (reservedSlots.TryGetValue(target, out var reservation) &&
+            (reservation.Count >= MaxAttackersPerTarget || (reservation.Mask & (1 << slot)) != 0)) return false;
         foreach (var reserved in reservedPositions)
         {
             float spacing = enemy.Faction.BodyRadius + reserved.Radius + BodyGap;
-            if ((reserved.Position - waypoint).sqrMagnitude < spacing * spacing)
-                return false;
+            if ((reserved.Position - point).sqrMagnitude < spacing * spacing) return false;
         }
+        return true;
+    }
+
+    // A spot to stand and strike from: in reach with a clear line, and clear of every
+    // body and of the spots other attackers are already heading for.
+    private bool CanStrikeFrom(EnemyUnit enemy, EnemyUnit target, Vector3 point)
+    {
+        float range = enemy.Faction.AttackRange - StrikeRangeMargin;
+        if ((point - target.Position).sqrMagnitude > range * range || !grid.HasLineOfSight(point, target.Position) ||
+            !ClearOfUnits(enemy, null, point, point, attacking: false) ||
+            !ClearOfUnits(enemy, target, point, target.Position, attacking: true)) return false;
+        foreach (var reserved in reservedPositions)
+        {
+            float spacing = enemy.Faction.BodyRadius + reserved.Radius + BodyGap;
+            if ((reserved.Position - point).sqrMagnitude < spacing * spacing) return false;
+        }
+        return true;
+    }
+
+    private bool FindPathSlot(EnemyUnit enemy, EnemyUnit target, out int slot, out Vector3 waypoint, out float length,
+        bool allowOpenPosition = false)
+    {
+        slot = -1; waypoint = default; length = float.PositiveInfinity;
+        if (enemy.PathRetryRemaining > 0f || IsTargetFull(target)) return false;
+        pathGoals.Clear(); pathSlots.Clear();
+        for (int i = 0; i < SlotCount; i++)
+            if (SlotAvailable(enemy, target, i)) { pathGoals.Add(SlotPosition(enemy, target, i)); pathSlots.Add(i); }
+        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int goal))
+            slot = pathSlots[goal];
+        else
+        {
+            // Walls can shut all eight slots around an opponent in plain view, leaving both
+            // sides waiting for good. A unit that has stopped getting closer takes any
+            // reachable spot with a clear strike.
+            pathGoals.Clear(); pathGoals.Add(target.Position);
+            if (!allowOpenPosition ||
+                !pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, strikeTarget: target))
+            {
+                enemy.PathRetryRemaining = StalledRetargetDelay;
+                CheckStaticReachability(enemy, target, hidden: false);
+                return false;
+            }
+            slot = OpenPositionSlot;
+        }
+        enemy.CombatPathIndex = 0;
+        enemy.CombatPathTarget = target;
+        enemy.CombatPathAnchor = target.Position;
+        enemy.CombatPathSearch = false;
+        enemy.CombatSteerWaypoint = null;
+        ResetApproachProgress(enemy, target);
+        return TryUsePath(enemy, target, out waypoint, out length);
+    }
+
+    private bool TryUsePath(EnemyUnit enemy, EnemyUnit target, out Vector3 waypoint, out float length)
+    {
+        waypoint = default; length = 0f;
+        if (enemy.CombatPathTarget != target || enemy.CombatPath.Count == 0) return false;
+        Vector3 anchor = target != null ? enemy.LastKnownTargetPosition : enemy.CombatPathAnchor;
+        if (target != null && enemy.PursuitTarget != target) anchor = target.Position;
+        if ((anchor - enemy.CombatPathAnchor).sqrMagnitude > 0.1225f) return false;
+        while (enemy.CombatPathIndex < enemy.CombatPath.Count - 1 &&
+            enemy.Position.Equals(enemy.CombatPath[enemy.CombatPathIndex])) enemy.CombatPathIndex++;
+        // Shorten only through currently clear segments; keep the chosen side of obstacles.
+        for (int i = enemy.CombatPath.Count - 1; i > enemy.CombatPathIndex; i--)
+            if (CanTraversePath(enemy, enemy.Position, enemy.CombatPath[i])) { enemy.CombatPathIndex = i; break; }
+        waypoint = enemy.CombatPath[enemy.CombatPathIndex];
+        if (!CanTraversePath(enemy, enemy.Position, waypoint)) return false;
+        length = Vector3.Distance(enemy.Position, waypoint);
+        for (int i = enemy.CombatPathIndex + 1; i < enemy.CombatPath.Count; i++)
+            length += Vector3.Distance(enemy.CombatPath[i - 1], enemy.CombatPath[i]);
+        return true;
+    }
+
+    private bool CanTraversePath(EnemyUnit enemy, Vector3 from, Vector3 to) =>
+        grid.IsWalkable(DefenseGrid.PositionToCell(to)) && grid.CanPursue(from, to) &&
+        ClearOfUnits(enemy, null, from, to, attacking: false);
+
+    private void PursueLastKnownPosition(EnemyUnit enemy, EnemyUnit target)
+    {
+        enemy.CombatQueue = null;
+        enemy.AttackSlot = -1;
+        if (!enemy.CombatPathSearch)
+            enemy.CombatPath.Clear();
+        if (TryUsePath(enemy, target, out Vector3 waypoint, out float length))
+        {
+            enemy.CombatDestination = waypoint;
+            enemy.CombatApproachTailLength = Mathf.Max(0f, length - Vector3.Distance(enemy.Position, waypoint));
+            return;
+        }
+        Vector3 goal = enemy.LastKnownTargetPosition;
+        if (CanTraversePath(enemy, enemy.Position, goal))
+        {
+            enemy.CombatPath.Clear(); enemy.CombatDestination = goal; enemy.CombatApproachTailLength = 0f;
+            return;
+        }
+        if (enemy.PathRetryRemaining > 0f) return;
+        pathGoals.Clear(); pathGoals.Add(goal);
+        // The remembered location may still be occupied by the opponent. Reach a
+        // nearby viewing position instead of requiring movement into its body.
+        foreach (Vector3 direction in Directions)
+        {
+            Vector3 point = goal + direction * (enemy.Faction.AttackRange * 0.85f);
+            if (grid.IsWalkable(DefenseGrid.PositionToCell(point)) && grid.HasLineOfSight(point, goal))
+                pathGoals.Add(point);
+        }
+        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _))
+        {
+            enemy.CombatPathIndex = 0; enemy.CombatPathTarget = target; enemy.CombatPathAnchor = goal;
+            enemy.CombatPathSearch = true;
+            enemy.CombatSteerWaypoint = null;
+            ResetApproachProgress(enemy, target);
+            if (TryUsePath(enemy, target, out waypoint, out length))
+            {
+                enemy.CombatDestination = waypoint;
+                enemy.CombatApproachTailLength = Mathf.Max(0f, length - Vector3.Distance(enemy.Position, waypoint));
+            }
+        }
+        else
+        {
+            enemy.PathRetryRemaining = StalledRetargetDelay;
+            CheckStaticReachability(enemy, target, hidden: true);
+        }
+    }
+
+    private bool IsKnownUnreachable(EnemyUnit enemy, EnemyUnit target) =>
+        enemy.UnreachableTarget == target && enemy.UnreachableNavigationVersion == grid.NavigationVersion &&
+        (enemy.Position - enemy.UnreachableFromPosition).sqrMagnitude < 0.25f &&
+        (!grid.HasLineOfSight(enemy.Position, target.Position) ||
+            (target.Position - enemy.UnreachableTargetPosition).sqrMagnitude < 0.25f);
+
+    private void CheckStaticReachability(EnemyUnit enemy, EnemyUnit target, bool hidden)
+    {
+        if (enemy.PursuitTarget != target) return;
+        pathGoals.Clear();
+        if (hidden) pathGoals.Add(enemy.LastKnownTargetPosition);
+        else if (RequiredSpacing(enemy.Faction, target.Faction) <= enemy.Faction.AttackRange)
+            for (int slot = 0; slot < SlotCount; slot++)
+            {
+                Vector3 point = SlotPosition(enemy, target, slot);
+                if (grid.IsWalkable(DefenseGrid.PositionToCell(point)) && grid.HasLineOfSight(point, target.Position))
+                    pathGoals.Add(point);
+            }
+        // A temporary crowd is not an unreachable target. Only reject if even a
+        // route ignoring every unit fails, or no valid striking position exists.
+        if (pathfinder.Find(enemy, pathGoals, staticPath, out _, ignoreUnits: true)) return;
+        enemy.UnreachableTarget = target;
+        enemy.UnreachableTargetPosition = enemy.LastKnownTargetPosition;
+        enemy.UnreachableFromPosition = enemy.Position;
+        enemy.UnreachableNavigationVersion = grid.NavigationVersion;
+    }
+
+    public bool IsReturningAlongPath(EnemyUnit enemy) =>
+        enemy.CombatPathTarget == null && enemy.CombatPath.Count > 0;
+
+    public bool TryReturnAlongPath(EnemyUnit enemy, float deltaTime)
+    {
+        if (enemy.CombatPathTarget != null) enemy.CombatPath.Clear();
+        if (!TryUsePath(enemy, null, out Vector3 waypoint, out _))
+        {
+            if (enemy.PathRetryRemaining > 0f) return false;
+            pathGoals.Clear();
+            if (enemy.RemainingRouteWaypoints == 1) pathGoals.Add(enemy.RoutePosition);
+            else
+                for (int i = 0; i < enemy.RemainingRouteWaypoints - 1; i++) pathGoals.Add(enemy.GetRouteWaypoint(i));
+            if (!pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int offset))
+            {
+                enemy.PathRetryRemaining = StalledRetargetDelay;
+                return false;
+            }
+            enemy.CombatPathTarget = null; enemy.CombatPathIndex = 0;
+            enemy.ReturnRouteOffset = enemy.RemainingRouteWaypoints == 1 ? -1 : offset;
+            if (!TryUsePath(enemy, null, out waypoint, out _)) return false;
+        }
+        Vector3 next = enemy.StepToward(waypoint, deltaTime);
+        if (!CanTraversePath(enemy, enemy.Position, next)) return false;
+        enemy.Face(next);
+        if (next.Equals(enemy.CombatPath[^1]))
+        {
+            enemy.FollowRoute(next, Mathf.Max(0, enemy.ReturnRouteOffset));
+            enemy.CombatPath.Clear(); enemy.RouteBypassOffset = -1;
+        }
+        else enemy.MoveOffRoute(next);
+        enemy.BlockedRouteTime = 0f;
+        return true;
+    }
+
+    private bool TryApproachSlot(EnemyUnit enemy, EnemyUnit target, int slot, bool allowDetour,
+        out Vector3 waypoint, out float length, out bool local, bool allowLocalSteer)
+    {
+        waypoint = SlotPosition(enemy, target, slot);
+        length = float.PositiveInfinity;
+        local = false;
+        if (!SlotAvailable(enemy, target, slot)) return false;
 
         Vector3 goal = waypoint;
         if (CanMove(enemy, target, enemy.Position, goal))
@@ -486,13 +832,32 @@ internal sealed class CombatPositioning
 
         // A temporarily occupied corridor need not make a free attack slot unreachable.
         // Only use local steering when the static route to that slot is clear.
-        if (allowLocalSteer && grid.CanPursue(enemy.Position, goal) && TryLocalSteer(enemy, target, goal, out Vector3 local))
+        if (allowLocalSteer && grid.CanPursue(enemy.Position, goal) &&
+            (TryKeepSidestep(enemy, target, out Vector3 sidestep) || TryLocalSteer(enemy, target, goal, out sidestep)))
         {
-            waypoint = local;
-            length = Vector3.Distance(enemy.Position, local) + Vector3.Distance(local, goal);
+            waypoint = sidestep;
+            length = Vector3.Distance(enemy.Position, sidestep) + Vector3.Distance(sidestep, goal);
+            local = true;
             return true;
         }
         return false;
+    }
+
+    // Finish a sidestep already under way instead of choosing a new side on every plan.
+    private bool TryKeepSidestep(EnemyUnit enemy, EnemyUnit target, out Vector3 sidestep)
+    {
+        sidestep = enemy.CombatSteerWaypoint ?? default;
+        return enemy.CombatSteerWaypoint.HasValue && !enemy.Position.Equals(sidestep) &&
+            CanMove(enemy, target, enemy.Position, sidestep);
+    }
+
+    private static void BeginSidestep(EnemyUnit enemy, Vector3 sidestep)
+    {
+        if (enemy.CombatSteerWaypoint is { } current && current.Equals(sidestep))
+            return;
+        enemy.CombatSteerWaypoint = sidestep;
+        enemy.SidestepDirection = (sidestep - enemy.Position).normalized;
+        enemy.SidestepMemoryRemaining = SidestepMemoryDuration;
     }
 
     private bool TryLocalSteer(EnemyUnit enemy, EnemyUnit target, Vector3 goal, out Vector3 waypoint)
@@ -507,6 +872,10 @@ internal sealed class CombatPositioning
         {
             // Tangential steps can open a lane; backwards wandering is not a useful fallback.
             if (Vector3.Dot(direction, desired) < -0.001f)
+                continue;
+            // Stepping straight back to where the last sidestep started is the shuffle
+            // seen in corridors; hold position instead until the memory fades or a unit dies.
+            if (enemy.SidestepMemoryRemaining > 0f && Vector3.Dot(direction, enemy.SidestepDirection) < -0.5f)
                 continue;
             Vector3 point = enemy.Position + direction * Mathf.Clamp(enemy.Faction.BodyRadius * 3f, 0.4f, 0.9f);
             float cost = Vector3.Distance(point, goal);
@@ -527,7 +896,7 @@ internal sealed class CombatPositioning
         grid.IsWalkable(DefenseGrid.PositionToCell(to)) &&
         ClearOfUnits(enemy, target, from, to, attacking: false) &&
         grid.CanPursue(from, to) &&
-        HasRouteConnection(enemy, to);
+        (target != null || HasRouteConnection(enemy, to));
 
     private bool HasRouteConnection(EnemyUnit enemy, Vector3 position)
     {
@@ -562,4 +931,154 @@ internal sealed class CombatPositioning
         }
         return true;
     }
+    // A bounded board graph at half-tile spacing. Static wall edges are cached; unit
+    // clearance is checked against the current snapshot. No scene navigation state.
+    private sealed class PursuitPathfinder
+    {
+        private static readonly int[] Dx = { 1, 1, 0, -1, -1, -1, 0, 1 };
+        private static readonly int[] Dz = { 0, 1, 1, 1, 0, -1, -1, -1 };
+        private readonly CombatPositioning owner;
+        private readonly int width, depth;
+        private readonly Vector3[] points;
+        private readonly byte[] edges;
+        private readonly float[] costs;
+        private readonly int[] parents;
+        private readonly bool[] closed;
+        private readonly List<(int Node, float Score)> open = new();
+        private int version = -1;
+        private bool ignoreUnits;
+
+        public PursuitPathfinder(CombatPositioning owner)
+        {
+            this.owner = owner;
+            width = owner.grid.Width * 2 - 1;
+            depth = owner.grid.Depth * 2 - 1;
+            int count = width * depth;
+            points = new Vector3[count]; edges = new byte[count]; costs = new float[count];
+            parents = new int[count]; closed = new bool[count];
+            for (int z = 0; z < depth; z++)
+                for (int x = 0; x < width; x++) points[z * width + x] = new Vector3(x * 0.5f, 0, z * 0.5f);
+        }
+
+        private void RefreshEdges()
+        {
+            if (version == owner.grid.NavigationVersion) return;
+            version = owner.grid.NavigationVersion;
+            for (int i = 0; i < points.Length; i++)
+            {
+                edges[i] = 0;
+                if (!owner.grid.IsWalkable(DefenseGrid.PositionToCell(points[i]))) continue;
+                for (int d = 0; d < 8; d++)
+                {
+                    int x = i % width + Dx[d], z = i / width + Dz[d];
+                    if (x < 0 || z < 0 || x >= width || z >= depth) continue;
+                    int next = z * width + x;
+                    if (owner.grid.IsWalkable(DefenseGrid.PositionToCell(points[next])) &&
+                        owner.grid.CanPursue(points[i], points[next])) edges[i] |= (byte)(1 << d);
+                }
+            }
+        }
+
+        // With strikeTarget, the search ends at the first node the unit can strike it from.
+        public bool Find(EnemyUnit enemy, IReadOnlyList<Vector3> goals, List<Vector3> result, out int goalIndex,
+            bool ignoreUnits = false, EnemyUnit strikeTarget = null)
+        {
+            this.ignoreUnits = ignoreUnits;
+            goalIndex = -1;
+            if (goals.Count == 0) return false;
+            RefreshEdges();
+            open.Clear();
+            for (int i = 0; i < costs.Length; i++) { costs[i] = float.PositiveInfinity; parents[i] = -1; closed[i] = false; }
+            int sx = Mathf.RoundToInt(enemy.Position.x * 2f), sz = Mathf.RoundToInt(enemy.Position.z * 2f);
+            for (int z = Mathf.Max(0, sz - 1); z <= Mathf.Min(depth - 1, sz + 1); z++)
+                for (int x = Mathf.Max(0, sx - 1); x <= Mathf.Min(width - 1, sx + 1); x++)
+                {
+                    int i = z * width + x;
+                    if (edges[i] == 0 || !Clear(enemy, enemy.Position, points[i])) continue;
+                    costs[i] = Vector3.Distance(enemy.Position, points[i]);
+                    Push(i, costs[i] + Heuristic(points[i], goals));
+                }
+            int end = -1;
+            float best = float.PositiveInfinity;
+            while (open.Count > 0)
+            {
+                var entry = Pop();
+                if (entry.Score >= best) break;
+                int i = entry.Node;
+                if (closed[i]) continue;
+                closed[i] = true;
+                if (strikeTarget != null && owner.CanStrikeFrom(enemy, strikeTarget, points[i]))
+                {
+                    end = i; goalIndex = 0;
+                    break;
+                }
+                for (int g = 0; strikeTarget == null && g < goals.Count; g++)
+                {
+                    float distance = Vector3.Distance(points[i], goals[g]);
+                    if (distance > 1f || costs[i] + distance >= best || !Clear(enemy, points[i], goals[g])) continue;
+                    best = costs[i] + distance; end = i; goalIndex = g;
+                }
+                for (int d = 0; d < 8; d++)
+                {
+                    if ((edges[i] & (1 << d)) == 0) continue;
+                    int next = i + Dz[d] * width + Dx[d];
+                    float cost = costs[i] + (d % 2 == 0 ? 0.5f : 0.70710678f);
+                    if (closed[next] || cost >= costs[next] ||
+                        (!ignoreUnits && !owner.ClearOfUnits(enemy, null, points[i], points[next], attacking: false))) continue;
+                    costs[next] = cost; parents[next] = i;
+                    Push(next, cost + Heuristic(points[next], goals));
+                }
+            }
+            if (end < 0) return false;
+            result.Clear();
+            if (strikeTarget == null) result.Add(goals[goalIndex]);
+            for (int i = end; i >= 0; i = parents[i]) result.Add(points[i]);
+            result.Reverse();
+            return true;
+        }
+
+        private bool Clear(EnemyUnit enemy, Vector3 from, Vector3 to) =>
+            owner.grid.IsWalkable(DefenseGrid.PositionToCell(to)) && owner.grid.CanPursue(from, to) &&
+            (ignoreUnits || owner.ClearOfUnits(enemy, null, from, to, attacking: false));
+
+        private static float Heuristic(Vector3 point, IReadOnlyList<Vector3> goals)
+        {
+            float distance = float.PositiveInfinity;
+            foreach (Vector3 goal in goals) distance = Mathf.Min(distance, Vector3.Distance(point, goal));
+            return distance;
+        }
+
+        private static bool Before((int Node, float Score) a, (int Node, float Score) b) =>
+            a.Score < b.Score || (a.Score == b.Score && a.Node < b.Node);
+
+        private void Push(int node, float score)
+        {
+            var value = (Node: node, Score: score);
+            int i = open.Count; open.Add(value);
+            while (i > 0)
+            {
+                int parent = (i - 1) / 2;
+                if (!Before(value, open[parent])) break;
+                open[i] = open[parent]; i = parent;
+            }
+            open[i] = value;
+        }
+
+        private (int Node, float Score) Pop()
+        {
+            var result = open[0]; var value = open[^1]; open.RemoveAt(open.Count - 1);
+            if (open.Count == 0) return result;
+            int i = 0;
+            while (i * 2 + 1 < open.Count)
+            {
+                int child = i * 2 + 1;
+                if (child + 1 < open.Count && Before(open[child + 1], open[child])) child++;
+                if (!Before(open[child], value)) break;
+                open[i] = open[child]; i = child;
+            }
+            open[i] = value;
+            return result;
+        }
+    }
+
 }

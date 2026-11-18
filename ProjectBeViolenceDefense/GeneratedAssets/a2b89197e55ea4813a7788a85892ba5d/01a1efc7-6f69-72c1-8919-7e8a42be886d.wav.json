@@ -1,0 +1,15 @@
+{
+    "asset": "a2b89197e55ea4813a7788a85892ba5d",
+    "fileName": "01a1efc7-6f69-72c1-8919-7e8a42be886d.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. One stone board piece being retrieved: short dry rock shuffle with a tiny hollow release pop. Light and clean, 0.35 seconds then silence.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

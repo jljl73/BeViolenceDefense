@@ -1,0 +1,7 @@
+Unity 6000.3.28f1 / Sound Play Mode exit 0
+SOUND_API_PASS: pools, UI isolation, per-clip cap, live volume, mute, null clips, BGM continuity
+ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+SOUND_PERSISTENCE_PASS: recreation reloads all saved volumes
+SOUND_SCENE_PASS: one manager, BGM retained, transient voices stopped
+SOUND_PLAYMODE_PASS: hitFrames=9303, peakHitVoices=6, core=116, remaining=0
+SOUND_TEST_SETTINGS_RESTORED

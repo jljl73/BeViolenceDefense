@@ -1,0 +1,15 @@
+{
+    "asset": "3eef3984756244d14964bfd5a41dd0b7",
+    "fileName": "01a1efc2-1fe1-7485-a8fb-50729a449cc1.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single small wooden bow firing: taut string twang and tiny soft airy arrow release. A crisp 0.25 second gesture then silence.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

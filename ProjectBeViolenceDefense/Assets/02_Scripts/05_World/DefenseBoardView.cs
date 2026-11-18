@@ -21,7 +21,7 @@ internal sealed class DefenseBoardView
     private const float RouteMarkerHeight = 0.02f;
     private const float RouteMarkerTravel = 0.36f;
     private const float RouteMarkerCyclesPerSecond = 0.5f;
-    private const float SingleLaneRouteWidth = 1.3f;
+    private const float SingleLaneRouteMargin = 0.04f;
     private const float RouteMarkerFadePortion = 0.18f;
     private const float BattleRouteTileTint = 0.3f;
     private const float BattleRouteMarkerTint = 0.6f;
@@ -135,6 +135,7 @@ internal sealed class DefenseBoardView
     private readonly Shader shader;
     private readonly IReadOnlyList<EnemyFaction> factions;
     private readonly EnemyCatalog catalog;
+    private readonly System.Action playHitSound;
     private readonly Sprite routeChevron;
     private readonly HashSet<Vector2Int> spawnCells;
     private readonly IReadOnlyList<int> spawnFactions;
@@ -145,6 +146,7 @@ internal sealed class DefenseBoardView
     private float routeMarkerPhase = 0.5f;
     private readonly Mesh routeMarkerMesh;
     private readonly Material routeMarkerMaterial;
+    private readonly float singleLaneRouteWidth;
     private readonly List<Material> materials = new();
     private readonly Dictionary<Material, Material> aimOverlayMaterials = new();
     private readonly SpriteRenderer aimDim;
@@ -197,9 +199,10 @@ internal sealed class DefenseBoardView
 
     public DefenseBoardView(Transform root, Camera camera, Shader shader, DefenseGrid grid,
         IReadOnlyList<EnemyFaction> factions, Sprite routeChevron, BoardTheme theme, EnemyCatalog catalog,
-        StageData stage = null)
+        StageData stage = null, System.Action playHitSound = null)
     {
         this.catalog = catalog;
+        this.playHitSound = playHitSound;
         this.root = root;
         coreShockwaveCenter = grid.CorePosition + Vector3.up * CoreShockwaveHeight;
         this.camera = camera;
@@ -244,6 +247,7 @@ internal sealed class DefenseBoardView
         Box("Board base", root, grid.Center - Vector3.up * 0.55f,
             new Vector3(boardWidth, 0.6f, boardDepth), foundation);
         float tileSize = 1f - theme.tileGap;
+        singleLaneRouteWidth = Mathf.Max(1f, (tileSize - SingleLaneRouteMargin) / routeMarkerMesh.bounds.size.x);
         var tileScale = new Vector3(tileSize, TileHeight, tileSize);
         Mesh tileMesh = theme.tileBevel > 0f ? Beveled("Board Tile", tileScale, theme.tileBevel) : null;
         for (int x = 0; x < boardWidth; x++)
@@ -703,7 +707,7 @@ internal sealed class DefenseBoardView
                     color = Color.Lerp(floorColor, color, BattleRouteMarkerTint);
                 marker.enabled = true;
                 routeMarkerMotions[markerIndex] = new RouteMarkerMotion(markerCenter, direction, color, floorColor,
-                    steps.Count == 1 ? SingleLaneRouteWidth : 1f);
+                    steps.Count == 1 ? singleLaneRouteWidth : 1f);
             }
         }
 
@@ -732,8 +736,8 @@ internal sealed class DefenseBoardView
         // The old route icon was a hollow chevron. Extrude its two narrow arms instead of filling the middle.
         Vector2[] outline =
         {
-            new(-0.23f, -0.12f), new(-0.13f, -0.12f), new(0f, 0.05f),
-            new(0.13f, -0.12f), new(0.23f, -0.12f), new(0f, 0.15f)
+            new(-0.23f, -0.12f), new(-0.10f, -0.12f), new(0f, 0.025f),
+            new(0.10f, -0.12f), new(0.23f, -0.12f), new(0f, 0.15f)
         };
         var vertices = new List<Vector3>();
         foreach (Vector2 point in outline)
@@ -917,10 +921,7 @@ internal sealed class DefenseBoardView
         if (!BoardGround.Raycast(ray, out float distance))
             return false;
 
-        foreach (Vector2Int wall in wallViews.Keys)
-            if (DefenseGrid.WallBounds(wall).IntersectRay(ray, out float wallDistance) && wallDistance < distance)
-                return false;
-
+        // Spell aiming follows the ground beneath walls and other visuals; building still uses TryPickCell.
         point = ray.GetPoint(distance);
         return point.x >= -0.5f && point.x < boardWidth - 0.5f &&
             point.z >= -0.5f && point.z < boardDepth - 0.5f;
@@ -1661,6 +1662,7 @@ internal sealed class DefenseBoardView
         toAttacker.y = 0f;
         Vector3 point = target.Position + Vector3.up * HitHeight + Vector3.ClampMagnitude(toAttacker, HitForwardOffset);
         NextHitEffect().Play(root.TransformPoint(point), attacker.Faction.Color);
+        playHitSound?.Invoke();
         if (boosted)
             spellEffects.PlayAttack(attacker.Position, target.Position);
         if (targetArmored)

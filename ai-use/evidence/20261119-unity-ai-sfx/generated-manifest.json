@@ -1,0 +1,163 @@
+[
+  {
+    "file": "ui_confirm_02.wav",
+    "guid": "47f97815883a149c2aa24007885b19b0",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/47f97815883a149c2aa24007885b19b0/01a1efc7-b11e-7486-84cf-c1af4a5df21f.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/47f97815883a149c2aa24007885b19b0/01a1efc7-b11e-7486-84cf-c1af4a5df21f.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single gentle UI selection click: a muted marimba-like wooden plink with a tiny bubble pop, slightly higher. Compact 0.18 second gesture then silence."
+  },
+  {
+    "file": "wave_start.wav",
+    "guid": "2b93fd43542954c908f236642b9a074d",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/2b93fd43542954c908f236642b9a074d/01a1efc9-43d4-7d25-ba19-6017574b6f86.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/2b93fd43542954c908f236642b9a074d/01a1efc9-43d4-7d25-ba19-6017574b6f86.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A short fantasy wave starting signal: one soft rounded horn call with a small wooden percussion pickup. Readable and gently urgent, under 1.2 seconds, no marching or continuing music."
+  },
+  {
+    "file": "spell_speed.wav",
+    "guid": "f82015bdc34bf4cc98646728567dde3e",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/f82015bdc34bf4cc98646728567dde3e/01a1efc6-4770-79cf-9000-382b0ac38f8e.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/f82015bdc34bf4cc98646728567dde3e/01a1efc6-4770-79cf-9000-382b0ac38f8e.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A speed buff activating once: nimble airy gust sweeps upward with a tiny bright flick at the end. Light and quick, 0.5 seconds then silence."
+  },
+  {
+    "file": "ui_denied.wav",
+    "guid": "30b9903a01cd248c7972532602972e69",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/30b9903a01cd248c7972532602972e69/01a1efc9-164e-778f-8008-78b127354f3c.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/30b9903a01cd248c7972532602972e69/01a1efc9-164e-778f-8008-78b127354f3c.wav.json",
+    "prompt": "For a colorful low-poly fantasy game. Dry isolated one-shot, warm rounded playful tone, short tail. No voices, music bed, ambience, gore or harsh distortion. A single friendly action unavailable cue: two closely spaced muted wooden notes descending, a soft hollow tok-tok. Clearly different from confirmation, never an alarm or harsh buzzer, 0.3 seconds then silence."
+  },
+  {
+    "file": "core_hit_02.wav",
+    "guid": "4266024b0e6ce49549fbad497fd8f223",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/4266024b0e6ce49549fbad497fd8f223/01a1efc5-b618-72c8-8e3a-9f65a1c54d64.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/4266024b0e6ce49549fbad497fd8f223/01a1efc5-b618-72c8-8e3a-9f65a1c54d64.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. One impact against a magical crystal core: compact hollow thud and a gently wobbling glass resonance. Deeper than ordinary combat, 0.65 seconds then silence."
+  },
+  {
+    "file": "ui_cancel.wav",
+    "guid": "340f6c48c8a1b45dc8890b5917eae20a",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/340f6c48c8a1b45dc8890b5917eae20a/01a1efc8-0282-7194-920d-024049619a8c.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/340f6c48c8a1b45dc8890b5917eae20a/01a1efc8-0282-7194-920d-024049619a8c.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single UI cancel gesture: soft small wooden plop bending gently downward. Neutral and unobtrusive, 0.2 seconds then silence."
+  },
+  {
+    "file": "wall_place_01.wav",
+    "guid": "cfe39fd7cd806483fb2e3279d81cd302",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/cfe39fd7cd806483fb2e3279d81cd302/01a1efc6-a3a3-7158-bb54-7909e32955ea.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/cfe39fd7cd806483fb2e3279d81cd302/01a1efc6-a3a3-7158-bb54-7909e32955ea.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. One chunky small stone wall set on a tile: tight low stone clunk, tiny gravel settling. Friendly tactile board game piece placement, 0.35 seconds then silence."
+  },
+  {
+    "file": "attack_sling_02.wav",
+    "guid": "e8844e1dc5a504d96ba4a2bd55cfe324",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/e8844e1dc5a504d96ba4a2bd55cfe324/01a1efc5-30cb-7928-99d9-8f822fb95dd8.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/e8844e1dc5a504d96ba4a2bd55cfe324/01a1efc5-30cb-7928-99d9-8f822fb95dd8.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single cartoon leather sling throw: quick soft rope whirl, a hollow air flick as a small stone leaves. One 0.3 second gesture, no impact."
+  },
+  {
+    "file": "wall_remove_02.wav",
+    "guid": "a2b89197e55ea4813a7788a85892ba5d",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/a2b89197e55ea4813a7788a85892ba5d/01a1efc7-6f69-72c1-8919-7e8a42be886d.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/a2b89197e55ea4813a7788a85892ba5d/01a1efc7-6f69-72c1-8919-7e8a42be886d.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. One stone board piece being retrieved: short dry rock shuffle with a tiny hollow release pop. Light and clean, 0.35 seconds then silence."
+  },
+  {
+    "file": "spell_armor.wav",
+    "guid": "1e3c78dec6c4a4d589db40cf30d0e3c4",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/1e3c78dec6c4a4d589db40cf30d0e3c4/01a1efc6-7587-7870-a562-07f8d22ebee3.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/1e3c78dec6c4a4d589db40cf30d0e3c4/01a1efc6-7587-7870-a562-07f8d22ebee3.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A protective armor spell activates once: rounded muted metal clasp clicks shut followed by a soft warm shield hum. Solid reassuring protection, 0.7 seconds then silence."
+  },
+  {
+    "file": "attack_bow_02.wav",
+    "guid": "7c52bad03daee4863a0aad08f6fe5812",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/7c52bad03daee4863a0aad08f6fe5812/01a1efc2-4b34-7c1d-bf4f-02e9ce79b918.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/7c52bad03daee4863a0aad08f6fe5812/01a1efc2-4b34-7c1d-bf4f-02e9ce79b918.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single light bow shot: brief elastic string pluck with a feather-light air flick, slightly lower and softer. One 0.3 second gesture then silence."
+  },
+  {
+    "file": "spell_heal.wav",
+    "guid": "d822e61ba65c54e8c8fda598bae3d485",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/d822e61ba65c54e8c8fda598bae3d485/01a1efc6-1785-7c06-8949-654f8697b422.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/d822e61ba65c54e8c8fda598bae3d485/01a1efc6-1785-7c06-8949-654f8697b422.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A healing spell applied once: soft water drop bloom with two tiny clear rounded bell sparkles ascending. Gentle mint green restorative feeling, 0.8 seconds then silence."
+  },
+  {
+    "file": "core_hit_01.wav",
+    "guid": "1eaf5e7f6385e4b0ca4c7bc911166be8",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/1eaf5e7f6385e4b0ca4c7bc911166be8/01a1efc5-7418-7a0b-8e0c-31c28a688fac.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/1eaf5e7f6385e4b0ca4c7bc911166be8/01a1efc5-7418-7a0b-8e0c-31c28a688fac.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A protected magical core taking one hit: a rounded low stone thump with a soft resonant crystal pulse. Distinct and urgent but not frightening, 0.6 seconds then silence."
+  },
+  {
+    "file": "wave_clear.wav",
+    "guid": "7a6c3072819df4f97b07bb1bd60ae1e9",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/7a6c3072819df4f97b07bb1bd60ae1e9/01a1efc9-7239-7755-96cf-cc88cafb4f41.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/7a6c3072819df4f97b07bb1bd60ae1e9/01a1efc9-7239-7755-96cf-cc88cafb4f41.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A restrained fantasy round complete stinger: three warm rounded bell notes gently rising to a tiny satisfying wooden chime. Cheerful small success, under 1.2 seconds, not a grand victory fanfare."
+  },
+  {
+    "file": "ui_confirm_01.wav",
+    "guid": "173ce2ad067d049f0ac07db3d1c243fd",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/173ce2ad067d049f0ac07db3d1c243fd/01a1efc0-d92e-79cf-b61f-9dfd9f3ba277.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/173ce2ad067d049f0ac07db3d1c243fd/01a1efc0-d92e-79cf-b61f-9dfd9f3ba277.wav.json",
+    "prompt": "A single soft tactile UI confirm click for a charming colorful low-poly fantasy strategy game. A tiny wooden tick with a rounded glassy pop, bright and warm, compact 0.15 second gesture followed by silence. Dry close isolated sound, no music, voice, ambience, repetition or harsh high frequencies."
+  },
+  {
+    "file": "attack_bow_01.wav",
+    "guid": "3eef3984756244d14964bfd5a41dd0b7",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/3eef3984756244d14964bfd5a41dd0b7/01a1efc2-1fe1-7485-a8fb-50729a449cc1.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/3eef3984756244d14964bfd5a41dd0b7/01a1efc2-1fe1-7485-a8fb-50729a449cc1.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single small wooden bow firing: taut string twang and tiny soft airy arrow release. A crisp 0.25 second gesture then silence."
+  },
+  {
+    "file": "combat_hit_light_02.wav",
+    "guid": "7c43a4c170316467887b748a4bc92f73",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/7c43a4c170316467887b748a4bc92f73/01a1efc1-c6f7-7880-b727-3173f8daf891.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/7c43a4c170316467887b748a4bc92f73/01a1efc1-c6f7-7880-b727-3173f8daf891.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single light cartoon combat impact: compact padded woody smack and small rounded thump. One 0.2 second hit, then silence."
+  },
+  {
+    "file": "combat_hit_light_03.wav",
+    "guid": "037c6f3b86001411da6cc1e772ccd9be",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/037c6f3b86001411da6cc1e772ccd9be/01a1efc1-f0cd-72a8-9a3f-92b2588a9503.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/037c6f3b86001411da6cc1e772ccd9be/01a1efc1-f0cd-72a8-9a3f-92b2588a9503.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single light cartoon combat impact: soft rubbery pop with a low compact fist thud, slightly deeper than a wooden smack. One 0.25 second hit, then silence."
+  },
+  {
+    "file": "spell_attack.wav",
+    "guid": "27201708cd122419786452135fb6db43",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/27201708cd122419786452135fb6db43/01a1efc5-e5f9-7fe1-af3d-57ece7f14ea6.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/27201708cd122419786452135fb6db43/01a1efc5-e5f9-7fe1-af3d-57ece7f14ea6.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. An attack power buff activating once: short rising warm magical rush ending in a compact confident low punch. Energetic orange magic feeling, 0.7 seconds then silence."
+  },
+  {
+    "file": "wall_remove_01.wav",
+    "guid": "7bf09aa0d864249bd87b7397eb967f69",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/7bf09aa0d864249bd87b7397eb967f69/01a1efc7-3da6-79df-b29e-51be09c7fc01.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/7bf09aa0d864249bd87b7397eb967f69/01a1efc7-3da6-79df-b29e-51be09c7fc01.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. One small stone wall removed: light pebble crumble and a soft upward suction pop, compact playful removal gesture. 0.4 seconds then silence."
+  },
+  {
+    "file": "game_defeat.wav",
+    "guid": "2bcb1bb257826416ba02bb9ef636689b",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/2bcb1bb257826416ba02bb9ef636689b/01a1efc9-a475-71b9-ba34-5fddb2de8785.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/2bcb1bb257826416ba02bb9ef636689b/01a1efc9-a475-71b9-ba34-5fddb2de8785.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A short gentle fantasy defeat stinger: two descending mellow wooden bell notes and a low soft magical sigh fading out. Bittersweet and restrained, 1.5 seconds, no dramatic orchestra or voices."
+  },
+  {
+    "file": "wall_place_02.wav",
+    "guid": "ad58b895ccaa845cdba71e99b225df1d",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/ad58b895ccaa845cdba71e99b225df1d/01a1efc6-cf22-7f2d-97de-1342216be178.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/ad58b895ccaa845cdba71e99b225df1d/01a1efc6-cf22-7f2d-97de-1342216be178.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. One compact stone block snapping into place on a board: soft hollow rock knock and tiny dusty rattle. Slightly higher and lighter, 0.4 seconds then silence."
+  },
+  {
+    "file": "attack_sling_01.wav",
+    "guid": "7948c7278174c4a579dc4dffa0da43ed",
+    "source": "ProjectBeViolenceDefense/GeneratedAssets/7948c7278174c4a579dc4dffa0da43ed/01a1efc2-7797-7978-afce-68336b4f3576.wav",
+    "metadata": "ProjectBeViolenceDefense/GeneratedAssets/7948c7278174c4a579dc4dffa0da43ed/01a1efc2-7797-7978-afce-68336b4f3576.wav.json",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single leather sling releasing a pebble: short curved cloth swoosh ending with a tiny dry release tick. One 0.35 second gesture, no impact."
+  }
+]

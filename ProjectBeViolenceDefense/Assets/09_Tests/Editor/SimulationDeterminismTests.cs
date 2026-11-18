@@ -84,6 +84,33 @@ public sealed class SimulationDeterminismTests
             Mix(enemy.Health);
             Mix(enemy.AttacksPerformed);
             Mix(enemy.AttackBuffStacks);
+            Mix(enemy.Target?.SpawnOrder ?? -1);
+            Mix(enemy.RetaliationTarget?.SpawnOrder ?? -1);
+            Mix(BitConverter.SingleToInt32Bits(enemy.RetaliationRemaining));
+            Mix(enemy.HasRetaliationRequest ? 1 : 0);
+            Mix(enemy.PursuitTarget?.SpawnOrder ?? -1);
+            Mix(BitConverter.SingleToInt32Bits(enemy.LastKnownTargetPosition.x));
+            Mix(BitConverter.SingleToInt32Bits(enemy.LastKnownTargetPosition.z));
+            Mix(BitConverter.SingleToInt32Bits(enemy.LostTargetSearchTime));
+            Mix(enemy.CombatPathTarget?.SpawnOrder ?? -1);
+            Mix(enemy.CombatPathIndex);
+            Mix(enemy.CombatPath.Count);
+            Mix(enemy.CombatPathSearch ? 1 : 0);
+            Mix(BitConverter.SingleToInt32Bits(enemy.CombatPathAnchor.x));
+            Mix(BitConverter.SingleToInt32Bits(enemy.CombatPathAnchor.z));
+            Mix(BitConverter.SingleToInt32Bits(enemy.PathRetryRemaining));
+            Mix(enemy.ReturnRouteOffset);
+            Mix(enemy.UnreachableTarget?.SpawnOrder ?? -1);
+            Mix(BitConverter.SingleToInt32Bits(enemy.UnreachableTargetPosition.x));
+            Mix(BitConverter.SingleToInt32Bits(enemy.UnreachableTargetPosition.z));
+            Mix(BitConverter.SingleToInt32Bits(enemy.UnreachableFromPosition.x));
+            Mix(BitConverter.SingleToInt32Bits(enemy.UnreachableFromPosition.z));
+            Mix(enemy.UnreachableNavigationVersion);
+            foreach (Vector3 point in enemy.CombatPath)
+            {
+                Mix(BitConverter.SingleToInt32Bits(point.x));
+                Mix(BitConverter.SingleToInt32Bits(point.z));
+            }
         }
         return hash;
     }

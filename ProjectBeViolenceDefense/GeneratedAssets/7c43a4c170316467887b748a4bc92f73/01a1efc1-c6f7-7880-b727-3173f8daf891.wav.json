@@ -1,0 +1,15 @@
+{
+    "asset": "7c43a4c170316467887b748a4bc92f73",
+    "fileName": "01a1efc1-c6f7-7880-b727-3173f8daf891.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single light cartoon combat impact: compact padded woody smack and small rounded thump. One 0.2 second hit, then silence.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

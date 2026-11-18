@@ -1,0 +1,15 @@
+{
+    "asset": "173ce2ad067d049f0ac07db3d1c243fd",
+    "fileName": "01a1efc0-d92e-79cf-b61f-9dfd9f3ba277.wav",
+    "prompt": "A single soft tactile UI confirm click for a charming colorful low-poly fantasy strategy game. A tiny wooden tick with a rounded glassy pop, bright and warm, compact 0.15 second gesture followed by silence. Dry close isolated sound, no music, voice, ambience, repetition or harsh high frequencies.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

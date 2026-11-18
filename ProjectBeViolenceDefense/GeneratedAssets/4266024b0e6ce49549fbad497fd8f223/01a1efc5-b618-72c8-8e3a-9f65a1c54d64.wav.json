@@ -1,0 +1,15 @@
+{
+    "asset": "4266024b0e6ce49549fbad497fd8f223",
+    "fileName": "01a1efc5-b618-72c8-8e3a-9f65a1c54d64.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. One impact against a magical crystal core: compact hollow thud and a gently wobbling glass resonance. Deeper than ordinary combat, 0.65 seconds then silence.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

@@ -22,7 +22,7 @@ internal sealed class EnemyFaction
     public string UnitId { get; }
 
     public EnemyFaction(string displayName, Color color, float attackRange = 1.5f, int maxHealth = 50,
-        int damage = 10, float attackInterval = 0.65f, int spawnCount = 9, float awarenessRange = 2.2f,
+        int damage = 10, float attackInterval = 0.65f, int spawnCount = 9, float awarenessRange = 3f,
         float moveSpeed = 1.7f, int armor = 0, string unitId = null, float bodyRadius = 0.3f)
     {
         DisplayName = displayName;
@@ -45,6 +45,7 @@ internal sealed class EnemyUnit
     public const int AttackBonus = 15;
     public const float MoveSpeedBonusPercent = 0.5f;
     public const int ArmorBonus = 5;
+    internal const float RetaliationDuration = 4f;
 
     private readonly Vector3[] path;
     private readonly List<float> attackBuffTimers = new();
@@ -52,6 +53,8 @@ internal sealed class EnemyUnit
     private readonly List<float> armorBuffTimers = new();
     private int waypoint = 1;
     private int pendingDamage;
+    private EnemyUnit pendingAttacker;
+    private bool retaliationRequested;
     private float cooldown;
     private float attackFlash;
 
@@ -81,10 +84,32 @@ internal sealed class EnemyUnit
     public bool IsAlive => Health > 0;
     public bool CanAttack => cooldown <= 0;
     public EnemyUnit Target { get; set; }
+    public EnemyUnit PursuitTarget { get; set; }
+    public Vector3 LastKnownTargetPosition { get; set; }
+    public float LostTargetSearchTime { get; set; }
+    public List<Vector3> CombatPath { get; } = new();
+    public int CombatPathIndex { get; set; }
+    public EnemyUnit CombatPathTarget { get; set; }
+    public Vector3 CombatPathAnchor { get; set; }
+    public bool CombatPathSearch { get; set; }
+    public int ReturnRouteOffset { get; set; } = -1;
+    public float PathRetryRemaining { get; set; }
+    public EnemyUnit UnreachableTarget { get; set; }
+    public Vector3 UnreachableTargetPosition { get; set; }
+    public Vector3 UnreachableFromPosition { get; set; }
+    public int UnreachableNavigationVersion { get; set; }
+    public EnemyUnit RetaliationTarget { get; private set; }
+    public float RetaliationRemaining { get; private set; }
+    public bool HasRetaliationRequest => retaliationRequested;
     public (EnemyUnit Target, int Order)? CombatQueue { get; set; }
     public int AttackSlot { get; set; } = -1;
     public Vector3? CombatDestination { get; set; }
     public Vector3? CombatSteerWaypoint { get; set; }
+    // 직전 옆걸음 방향. 남은 시간 동안은 그 반대쪽으로 되돌아가는 옆걸음을 고르지 않는다.
+    public Vector3 SidestepDirection { get; set; }
+    public float SidestepMemoryRemaining { get; set; }
+    // 스스로 타깃을 바꾼 뒤 다시 바꾸지 않고 유지하는 남은 시간.
+    public float RetargetLockRemaining { get; set; }
     public EnemyUnit CombatProgressTarget { get; set; }
     public float CombatBestRemainingDistance { get; set; } = float.PositiveInfinity;
     public float CombatApproachTailLength { get; set; }
@@ -110,6 +135,15 @@ internal sealed class EnemyUnit
         cooldown = Mathf.Max(0, cooldown - deltaTime);
         attackFlash = Mathf.Max(0, attackFlash - deltaTime);
         HealFlash = Mathf.Max(0, HealFlash - deltaTime);
+        PathRetryRemaining = Mathf.Max(0, PathRetryRemaining - deltaTime);
+        RetargetLockRemaining = Mathf.Max(0, RetargetLockRemaining - deltaTime);
+        SidestepMemoryRemaining = Mathf.Max(0, SidestepMemoryRemaining - deltaTime);
+        RetaliationRemaining = Mathf.Max(0, RetaliationRemaining - deltaTime);
+        if (RetaliationRemaining <= 0f || RetaliationTarget is not { IsAlive: true })
+        {
+            RetaliationTarget = null;
+            retaliationRequested = false;
+        }
         TickBuffs(attackBuffTimers, deltaTime);
         TickBuffs(moveSpeedBuffTimers, deltaTime);
         TickBuffs(armorBuffTimers, deltaTime);
@@ -155,17 +189,46 @@ internal sealed class EnemyUnit
         return (int)Math.Min(int.MaxValue, Faction.Damage + (long)AttackBonus * AttackBuffStacks);
     }
 
-    public void QueueDamage(int damage)
+    public void QueueDamage(int damage, EnemyUnit attacker = null)
     {
         long armor = Faction.Armor + (long)ArmorBonus * ArmorBuffStacks;
         long applied = Math.Max(0, (long)damage - armor);
         pendingDamage = (int)Math.Min(int.MaxValue, pendingDamage + applied);
+        // Even armor absorbing a hit must reveal its source. Select simultaneous
+        // attackers independently of iteration order, retaining an existing aggressor.
+        if (damage <= 0 || attacker is not { IsAlive: true } || attacker.FactionIndex == FactionIndex)
+            return;
+        if (pendingAttacker == RetaliationTarget && pendingAttacker != null)
+            return;
+        float distance = (attacker.Position - Position).sqrMagnitude;
+        float pendingDistance = pendingAttacker == null ? float.PositiveInfinity :
+            (pendingAttacker.Position - Position).sqrMagnitude;
+        if (attacker == RetaliationTarget || distance < pendingDistance ||
+            (distance == pendingDistance && attacker.SpawnOrder < pendingAttacker.SpawnOrder))
+            pendingAttacker = attacker;
     }
 
     public void ResolveDamage()
     {
         Health = Mathf.Max(0, Health - pendingDamage);
         pendingDamage = 0;
+        if (IsAlive && pendingAttacker != null &&
+            (RetaliationTarget == null || RetaliationRemaining <= 0f || pendingAttacker == RetaliationTarget))
+        {
+            // Request the switch once; repeated hits renew recognition without
+            // undoing a stalled unit's decision to approach a reachable neighbor.
+            retaliationRequested |= RetaliationTarget != pendingAttacker;
+            RetaliationTarget = pendingAttacker;
+            RetaliationRemaining = RetaliationDuration;
+        }
+        pendingAttacker = null;
+    }
+
+    public EnemyUnit ConsumeRetaliationRequest()
+    {
+        EnemyUnit attacker = retaliationRequested ? RetaliationTarget : null;
+        retaliationRequested = false;
+        return attacker;
     }
 
     public void Die() => Health = 0;

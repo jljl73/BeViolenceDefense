@@ -1,0 +1,6 @@
+FAIL CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,False): AssertionException Expected: Preparation |   But was:  Combat
+FAIL CombatPositioningTests.CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets(2): AssertionException Units without a complete approach must hold their position instead of stepping side to side. |   Expected: less than or equal to 12 |   But was:  106
+FAIL CombatPositioningTests.CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets(3): AssertionException Units without a complete approach must hold their position instead of stepping side to side. |   Expected: less than or equal to 12 |   But was:  62
+FAIL CombatPositioningTests.WaitingUnitHoldsItsPositionBehindAFullFight(): AssertionException Backing away and walking in again made waiting units pace. |   Expected: (4.20, 0.00, 6.60) |   But was:  (4.17, 0.00, 6.61)
+FAIL CombatPositioningTests.HiddenOpponentBehindACrowdIsGivenUpInsteadOfBlockingTheLane(): AssertionException Expected: null |   But was:  <EnemyUnit>
+pass 55 fail 5

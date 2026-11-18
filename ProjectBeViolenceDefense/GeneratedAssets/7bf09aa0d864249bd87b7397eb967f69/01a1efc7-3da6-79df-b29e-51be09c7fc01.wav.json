@@ -1,0 +1,15 @@
+{
+    "asset": "7bf09aa0d864249bd87b7397eb967f69",
+    "fileName": "01a1efc7-3da6-79df-b29e-51be09c7fc01.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. One small stone wall removed: light pebble crumble and a soft upward suction pop, compact playful removal gesture. 0.4 seconds then silence.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

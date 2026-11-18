@@ -1,0 +1,15 @@
+{
+    "asset": "7948c7278174c4a579dc4dffa0da43ed",
+    "fileName": "01a1efc2-7797-7978-afce-68336b4f3576.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single leather sling releasing a pebble: short curved cloth swoosh ending with a tiny dry release tick. One 0.35 second gesture, no impact.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}
