@@ -19,10 +19,10 @@ internal sealed class DefenseBoardView
     private const float TileHeight = 0.28f;
     private const float RouteLaneSpacing = 0.49f;
     private const float RouteMarkerHeight = 0.02f;
-    private const float RouteMarkerTravel = 0.36f;
-    private const float RouteMarkerCyclesPerSecond = 0.5f;
+    private const float RouteMarkerSpacing = 0.8f;
+    private const float RouteMarkerSpeed = 0.55f;
+    private const float RouteEndpointTaper = 0.24f;
     private const float SingleLaneRouteMargin = 0.04f;
-    private const float RouteMarkerFadePortion = 0.18f;
     private const float BattleRouteTileTint = 0.3f;
     private const float BattleRouteMarkerTint = 0.6f;
     private const float SpawnPadHeight = 0.09f;
@@ -104,20 +104,15 @@ internal sealed class DefenseBoardView
 
     private readonly struct RouteMarkerMotion
     {
-        public readonly Vector3 Center;
-        public readonly Vector3 Direction;
-        public readonly Color ArrowColor;
-        public readonly Color FloorColor;
-        public readonly float WidthScale;
+        public readonly RouteFlowPath Path;
+        public readonly float Distance;
+        public readonly Color Color;
 
-        public RouteMarkerMotion(Vector3 center, Vector3 direction, Color arrowColor, Color floorColor,
-            float widthScale)
+        public RouteMarkerMotion(RouteFlowPath path, float distance, Color color)
         {
-            Center = center;
-            Direction = direction;
-            ArrowColor = arrowColor;
-            FloorColor = floorColor;
-            WidthScale = widthScale;
+            Path = path;
+            Distance = distance;
+            Color = color;
         }
     }
 
@@ -150,7 +145,8 @@ internal sealed class DefenseBoardView
     private readonly int boardDepth;
     private readonly List<MeshRenderer> routeMarkers = new();
     private readonly List<RouteMarkerMotion> routeMarkerMotions = new();
-    private float routeMarkerPhase = 0.5f;
+    private float routeMarkerPhase = RouteMarkerSpacing * 0.5f;
+    private int activeRouteMarkerCount;
     private readonly Mesh routeMarkerMesh;
     private readonly Material routeMarkerMaterial;
     private readonly float singleLaneRouteWidth;
@@ -638,8 +634,8 @@ internal sealed class DefenseBoardView
             for (int z = 0; z < boardDepth; z++)
                 floor[x, z].sharedMaterial = tiles[(x + z) % tiles.Length];
 
-        int markerCount = routes == null ? 0 : DrawRoutes(routes, subdued);
-        for (int i = markerCount; i < routeMarkers.Count; i++)
+        activeRouteMarkerCount = routes == null ? 0 : DrawRoutes(routes, subdued);
+        for (int i = activeRouteMarkerCount; i < routeMarkers.Count; i++)
             routeMarkers[i].enabled = false;
 
         foreach (Vector2Int cell in PlannedEncounters)
@@ -649,32 +645,34 @@ internal sealed class DefenseBoardView
 
     public void AdvanceRouteMarkers(float deltaTime)
     {
-        routeMarkerPhase = Mathf.Repeat(routeMarkerPhase + deltaTime * RouteMarkerCyclesPerSecond, 1f);
-        for (int i = 0; i < routeMarkers.Count; i++)
+        routeMarkerPhase = Mathf.Repeat(routeMarkerPhase + Mathf.Max(0f, deltaTime) * RouteMarkerSpeed,
+            RouteMarkerSpacing);
+        for (int i = 0; i < activeRouteMarkerCount; i++)
         {
             MeshRenderer marker = routeMarkers[i];
+            RouteMarkerMotion motion = routeMarkerMotions[i];
+            float distance = motion.Distance + routeMarkerPhase;
+            // Only enter/leave at the spawn pad and core. The rest of the stream never fades or restarts.
+            float taper = Mathf.SmoothStep(0f, 1f, Mathf.Min(distance - 0.48f,
+                motion.Path.Length - distance) / RouteEndpointTaper);
+            marker.enabled = taper > 0f;
             if (!marker.enabled)
                 continue;
 
-            RouteMarkerMotion motion = routeMarkerMotions[i];
-            float phase = routeMarkerPhase;
-            float travel = Mathf.SmoothStep(0f, 1f, phase);
-            marker.transform.localPosition = motion.Center + motion.Direction * ((travel - 0.5f) * RouteMarkerTravel);
-            float fade = Mathf.SmoothStep(0f, 1f,
-                Mathf.Min(phase, 1f - phase) / RouteMarkerFadePortion);
-            marker.transform.localScale = new Vector3(motion.WidthScale * fade, fade, fade);
-            tintBlock.SetColor(BaseColor, Color.Lerp(motion.FloorColor, motion.ArrowColor, fade));
+            motion.Path.Sample(distance, out Vector3 position, out Vector3 direction, out float width);
+            marker.transform.SetLocalPositionAndRotation(position, Quaternion.LookRotation(direction, Vector3.up));
+            marker.transform.localScale = new Vector3(width * taper, taper, taper);
+            tintBlock.SetColor(BaseColor, motion.Color);
             marker.SetPropertyBlock(tintBlock);
         }
     }
 
     private int DrawRoutes(IReadOnlyList<Vector3[]> routes, bool subdued)
     {
-        var stepsByCell = new Dictionary<Vector2Int, List<(int FactionIndex, Vector3 Direction)>>();
-        // factionIndex는 여기서 스폰(경로) 인덱스이고, 색은 spawnFactions로 찾는다.
-        for (int factionIndex = 0; factionIndex < routes.Count; factionIndex++)
+        var stepsByCell = new Dictionary<Vector2Int, List<(int Route, Vector3 Direction)>>();
+        for (int route = 0; route < routes.Count; route++)
         {
-            Vector3[] path = routes[factionIndex];
+            Vector3[] path = routes[route];
             // The last waypoint is the contact point on the core, not a floor tile.
             for (int i = 0; i < path.Length - 1; i++)
             {
@@ -684,42 +682,57 @@ internal sealed class DefenseBoardView
                     steps = new List<(int, Vector3)>(factions.Count);
                     stepsByCell.Add(cell, steps);
                 }
-                steps.Add((factionIndex, (path[i + 1] - path[i]).normalized));
+                Vector3 incoming = i > 0 ? (path[i] - path[i - 1]).normalized : Vector3.zero;
+                Vector3 outgoing = (path[i + 1] - path[i]).normalized;
+                steps.Add((route, (incoming + outgoing).normalized));
             }
         }
 
-        int markerCount = 0;
-        foreach (var (cell, steps) in stepsByCell)
-        {
+        foreach (var cell in stepsByCell.Keys)
             floor[cell.x, cell.y].sharedMaterial = subdued
                 ? battleRouteTiles[(cell.x + cell.y) % battleRouteTiles.Length]
                 : routeTile;
-            // 스폰 패드가 시작점을 표시하므로 그 위에는 방향 꺾쇠를 겹치지 않는다.
-            if (routeChevron == null || spawnCells.Contains(cell))
-                continue;
+        if (routeChevron == null)
+            return 0;
 
-            // Both arrows use one lateral axis so opposite headings stay in separate lanes.
-            Vector3 side = Vector3.Cross(Vector3.up, steps[0].Direction);
-            Vector3 center = DefenseGrid.CellPosition(cell) + Vector3.up * RouteMarkerHeight;
-            Color floorColor = floor[cell.x, cell.y].sharedMaterial.color;
-            for (int i = 0; i < steps.Count; i++)
+        int markerCount = 0;
+        for (int route = 0; route < routes.Count; route++)
+        {
+            Vector3[] path = routes[route];
+            if (path.Length < 2)
+                continue;
+            var points = new Vector3[path.Length];
+            var widths = new float[path.Length];
+            for (int i = 0; i < path.Length - 1; i++)
             {
-                var (factionIndex, direction) = steps[i];
-                float offset = (i - (steps.Count - 1) * 0.5f) * RouteLaneSpacing;
-                int markerIndex = markerCount++;
-                MeshRenderer marker = RouteMarker(markerIndex);
-                Vector3 markerCenter = center + side * offset;
-                marker.transform.localPosition = markerCenter;
-                marker.transform.localRotation = Quaternion.LookRotation(direction, Vector3.up);
-                Color color = factions[spawnFactions[factionIndex]].Color;
-                if (subdued)
-                    color = Color.Lerp(floorColor, color, BattleRouteMarkerTint);
-                marker.enabled = true;
-                routeMarkerMotions[markerIndex] = new RouteMarkerMotion(markerCenter, direction, color, floorColor,
-                    steps.Count == 1 ? singleLaneRouteWidth : 1f);
+                Vector2Int cell = DefenseGrid.PositionToCell(path[i]);
+                var steps = stepsByCell[cell];
+                int lane = steps.FindIndex(step => step.Route == route);
+                // Shared cells use the same lateral axis even for opposite headings.
+                Vector3 side = Vector3.Cross(Vector3.up, steps[0].Direction);
+                float spacing = Mathf.Min(RouteLaneSpacing,
+                    singleLaneRouteWidth * routeMarkerMesh.bounds.size.x / steps.Count);
+                float offset = (lane - (steps.Count - 1) * 0.5f) * spacing;
+                points[i] = path[i] + side * offset + Vector3.up * RouteMarkerHeight;
+                widths[i] = steps.Count == 1 ? singleLaneRouteWidth
+                    : Mathf.Min(1f, spacing * 0.9f / routeMarkerMesh.bounds.size.x);
+            }
+            points[^1] = path[^1] + Vector3.up * RouteMarkerHeight;
+            widths[^1] = widths[^2];
+            var flowPath = new RouteFlowPath(points, widths);
+            if (flowPath.Length <= 0f)
+                continue;
+            Color color = factions[spawnFactions[route]].Color;
+            if (subdued)
+                color = Color.Lerp(battleRouteTiles[0].color, color, BattleRouteMarkerTint);
+            int count = Mathf.CeilToInt(flowPath.Length / RouteMarkerSpacing);
+            for (int i = 0; i < count; i++)
+            {
+                RouteMarker(markerCount);
+                routeMarkerMotions[markerCount++] = new RouteMarkerMotion(flowPath,
+                    i * RouteMarkerSpacing, color);
             }
         }
-
         return markerCount;
     }
 
@@ -745,8 +758,8 @@ internal sealed class DefenseBoardView
         // The old route icon was a hollow chevron. Extrude its two narrow arms instead of filling the middle.
         Vector2[] outline =
         {
-            new(-0.23f, -0.12f), new(-0.10f, -0.12f), new(0f, 0.025f),
-            new(0.10f, -0.12f), new(0.23f, -0.12f), new(0f, 0.15f)
+            new(-0.23f, -0.18f), new(-0.10f, -0.18f), new(0f, 0.0375f),
+            new(0.10f, -0.18f), new(0.23f, -0.18f), new(0f, 0.225f)
         };
         var vertices = new List<Vector3>();
         foreach (Vector2 point in outline)

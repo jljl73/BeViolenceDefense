@@ -1,0 +1,4 @@
+ROUTE_FLOW_PLAY_PASS frames=91 minimumVisible=147 routes=4; continuous wraps, pause, hide/rebuild, battle tint passed
+Observed editor warning: UnityEditor.Search.SearchDatabase.EnumerateAll raised ArgumentOutOfRangeException during editor search indexing startup. No route rendering stack frames; the Play Mode route validation completed successfully.
+C# compilation errors: none observed.
+EditMode: RouteFlowPathTests 4/4 passed.
