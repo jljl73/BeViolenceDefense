@@ -12134,7 +12134,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageContent
   displayNameKey: stage_select.snow
-  stage: {fileID: 11400000, guid: 123d9cede485f44dfa3a4862a9971cd4, type: 2}
+  stage: {fileID: 11400000, guid: 700cc9156affe8b48bf68439c6999018, type: 2}
   theme:
     background: {r: 0.8509804, g: 0.89411765, b: 0.94509804, a: 1}
     foundation: {r: 0.4862745, g: 0.54509807, b: 0.6509804, a: 1}

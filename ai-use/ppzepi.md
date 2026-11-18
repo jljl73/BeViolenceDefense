@@ -858,3 +858,33 @@
 - Play Mode 미확인: 스폰이 여러 개인 스테이지에서 웨이브 예고 선분·교전 예고·스폰 예고가 선택된 스폰에만 표시되는지 직접 확인 필요.
 - Stage2_Temp를 유지할지, 별도 이름으로 바꿀지, 삭제할지 결정 필요.
 - StageContentTests의 스테이지 개수 기대값(4 → 5) 갱신은 main 쪽 후속 작업.
+
+### [20261119-0732-stage2-3-data-link] GameScene 2·3 스테이지 StageData 연결
+- 시각: 2026-11-19 07:32:22 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (desktop) / claude-opus-5-5, Unity CLI, unity-editor-mcp
+- 목적 및 적용 위치: GameScene 스테이지 선택 2·3번 슬롯이 수제작 SO(Stage2_Temp, Stage3)를 불러오도록 수정
+- 사용 방식: 원인 조사 후 프리팹 참조 교체. 2번 슬롯(Stage_GoldenMaple 프리팹)은 c9b1876에서 삭제된 Stage2.asset을 가리켜 Missing 상태였고, 3번 슬롯(Stage_Snowfield 프리팹)은 Stage3가 아닌 Stage_Snowfield.asset을 쓰고 있었음. 두 프리팹의 StageContent.stage를 각각 Stage2_Temp·Stage3로 교체하고, 이전 SO를 고정하던 테스트를 갱신
+- 결과 및 확인 방법: 성공 / 컴파일 오류 없음. EditMode StageContentTests 5개 중 4개 통과(신규 HandmadeStagesLoadTheirStageData 포함). Play Mode에서 GameScene SelectStage(1)·(2) 호출 시 usedStage가 각각 Stage2_Temp·Stage3로 확인, 콘솔 에러 0
+- 사람의 개입: 요청 및 검토. 그 외 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_Stages/Stage_GoldenMaple.prefab | Claude Code | 수정 | stage → Stage2_Temp. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_Stages/Stage_Snowfield.prefab | Claude Code | 수정 | stage → Stage3. 사용 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/StageContentTests.cs | Claude Code | 수정 | 삭제된 Stage2·이전 설원 배치 테스트를 2·3번 슬롯 SO 연결 테스트로 교체. 사용 |
+
+#### 증거
+- 없음
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 스크립트 재컴파일, EditMode 테스트, Play Mode 스테이지 진입 확인
+- 활용 방식: `unity recompile`로 컴파일 확인. `unity test`는 에디터가 열려 있어 거부되어 unity-editor-mcp(test run, playmode, script_eval)로 테스트·진입 검증
+- 잘된 점: 실행 중 에디터에서 실제 진입 후 사용 중인 StageData를 직접 확인
+- 잘 안된 점 및 개선 필요: `unity test`는 열린 에디터와 함께 쓸 수 없음
+
+#### 미확인 및 후속 확인
+- SharedSceneHasOneSelectorWithFourDistinctStageChoices는 이번 변경 전부터 실패(씬 슬롯 5개, 기대값 4).
+- Stage2_Temp(19×18)·Stage3(19×20)는 17×17 기준으로 만든 황금 단풍·설원 프리팹 장식과 크기가 달라 화면상 겹침·빈 공간 직접 확인 필요.
+- 두 SO 모두 StageTEST_Waves를 써 진영 2·3 스폰 없음 경고가 뜸.

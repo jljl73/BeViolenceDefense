@@ -31,11 +31,10 @@ public sealed class StageContentTests
         }
     }
 
-    // 설원·묘지 길 구조 시안: 테마 장식이 맞춰진 틀(크기·코어·스폰)은 그대로 두고, 벽 없이는
+    // 묘지 길 구조 시안: 테마 장식이 맞춰진 틀(크기·코어·스폰)은 그대로 두고, 벽 없이는
     // 두 진영이 각자 길로만 가며, 길목을 막으면 가운데로 돌아가 경로가 길어진다.
-    [TestCase("Snowfield", 45, 18, "2,11 14,11", 19, "0,7 1,7 15,7 16,7", 25)]
     [TestCase("Graveyard", 41, 16, "4,12 5,12 11,12 12,12", 17, "4,6 5,6 11,6 12,6", 21)]
-    public void SnowfieldAndGraveyardLayoutsKeepTheSceneryFrameAndLengthenRoutesWhenTheirGatesAreWalled(
+    public void GraveyardLayoutKeepsTheSceneryFrameAndLengthensRoutesWhenItsGatesAreWalled(
         string name, int fixedWalls, int openRoute, string upperGates, int upperRoute, string lowerGates, int lowerRoute)
     {
         var original = new DefenseGrid();
@@ -68,23 +67,14 @@ public sealed class StageContentTests
         return grid;
     }
 
-    [Test]
-    public void GoldenMapleLoadsTheStage2LayoutOnTheFrameItsSceneryWasBuiltFor()
+    // GameScene 2·3번 슬롯(황금 단풍·설원)은 수제작한 Stage2_Temp·Stage3 SO를 쓴다.
+    [TestCase("GoldenMaple", "Stage2_Temp")]
+    [TestCase("Snowfield", "Stage3")]
+    public void HandmadeStagesLoadTheirStageData(string name, string data)
     {
-        var original = new DefenseGrid();
-        var stage = Load("GoldenMaple");
-        Assert.That(AssetDatabase.GetAssetPath(stage.Data), Is.EqualTo("Assets/04_Data/04_Stages/Stage2.asset"));
-        var grid = stage.Data.CreateGrid();
-        Assert.That(grid.Width, Is.EqualTo(original.Width));
-        Assert.That(grid.Depth, Is.EqualTo(original.Depth));
-        Assert.That(grid.CorePosition, Is.EqualTo(original.CorePosition));
-        Assert.That(grid.CoreSize, Is.EqualTo(original.CoreSize));
-        CollectionAssert.AreEqual(original.SpawnCells, grid.SpawnCells);
-        CollectionAssert.AreEqual(original.SpawnFactions, grid.SpawnFactions);
-        Assert.That(grid.FixedWalls.Count, Is.EqualTo(71));
-        // Without player walls each side keeps to its own lane, 20 tiles to the core.
-        Assert.That(grid.Routes.Select(route => route.Length - 2), Is.EqualTo(new[] { 20, 20 }));
-        Assert.That(stage.Data.waves, Is.Null, "The layout draft comes without a wave lineup.");
+        var stage = Load(name);
+        Assert.That(AssetDatabase.GetAssetPath(stage.Data), Is.EqualTo($"Assets/04_Data/04_Stages/{data}.asset"));
+        Assert.That(stage.Data.Validate(stage.Data.CreateGrid()), Is.Null);
     }
 
     [Test]

@@ -7184,7 +7184,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageContent
   displayNameKey: stage_select.maple
-  stage: {fileID: 11400000, guid: 049034fea2424952a4b98d2ae1a696e2, type: 2}
+  stage: {fileID: 11400000, guid: 23b6f8bf5a21a5643abb5c4659d41103, type: 2}
   theme:
     background: {r: 0.9137255, g: 0.84313726, b: 0.6509804, a: 1}
     foundation: {r: 0.43137255, g: 0.35686275, b: 0.2, a: 1}
