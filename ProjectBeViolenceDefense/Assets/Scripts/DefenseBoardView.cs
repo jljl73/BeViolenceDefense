@@ -23,6 +23,7 @@ internal sealed class DefenseBoardView
     public static readonly Color32 CoreColor = new(255, 209, 112, 255);
     public static readonly Color32 MoveSpeedBuffColor = new(102, 218, 255, 255);
     public static readonly Color32 HealColor = new(153, 245, 160, 255);
+    private static readonly Color32 FixedWallTint = new(130, 130, 140, 255);
 
     private sealed class EnemyView
     {
@@ -436,6 +437,23 @@ internal sealed class DefenseBoardView
 
     private Transform CreateWall(Vector2Int cell, string label, Material material)
     {
+        var prefab = AssetLoader.Global.Load<GameObject>(AssetPaths.Prefabs.WoodBlockWall);
+        if (prefab != null)
+        {
+            Transform woodWall = Object.Instantiate(prefab, root, false).transform;
+            woodWall.name = label;
+            woodWall.localPosition = DefenseGrid.CellPosition(cell);
+            // 고정 벽은 배치한 벽과 구분되도록 어둡게 칠한다.
+            if (material != buildWall)
+            {
+                var block = new MaterialPropertyBlock();
+                block.SetColor("_BaseColor", FixedWallTint);
+                foreach (Renderer renderer in woodWall.GetComponentsInChildren<Renderer>())
+                    renderer.SetPropertyBlock(block);
+            }
+            return woodWall;
+        }
+
         var wall = new GameObject(label).transform;
         wall.SetParent(root, false);
         wall.localPosition = DefenseGrid.CellPosition(cell);

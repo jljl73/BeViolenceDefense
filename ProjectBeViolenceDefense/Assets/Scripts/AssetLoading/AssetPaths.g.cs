@@ -11,6 +11,7 @@ public static class AssetPaths
         "Fonts & Materials/Netmarble Medium SDF",
         "LineBreaking Following Characters",
         "LineBreaking Leading Characters",
+        "Prefabs/WoodBlockWall",
         "Style Sheets/Default Style Sheet",
         "TMP Settings",
     };
@@ -23,6 +24,12 @@ public static class AssetPaths
     {
         public const string Folder = "Fonts & Materials";
         public const string Netmarble_Medium_SDF = "Fonts & Materials/Netmarble Medium SDF";
+    }
+
+    public static class Prefabs
+    {
+        public const string Folder = "Prefabs";
+        public const string WoodBlockWall = "Prefabs/WoodBlockWall";
     }
 
     public static class Style_Sheets
