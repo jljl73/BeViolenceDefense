@@ -114,8 +114,8 @@ internal sealed class StagePreview
         }
         highlight.gameObject.SetActive(true);
         highlight.localPosition = new Vector3(footprint.x + (footprint.width - 1) * 0.5f, 0.03f,
-            footprint.y + (footprint.height - 1) * 0.5f);
-        highlight.localScale = new Vector3(footprint.width - 0.04f, 0.04f, footprint.height - 0.04f);
+            footprint.y + (footprint.height - 1) * 0.5f) * DefenseGrid.DefaultCellSize;
+        highlight.localScale = new Vector3(footprint.width - 0.04f, 0.04f, footprint.height - 0.04f) * DefenseGrid.DefaultCellSize;
         highlight.GetComponent<MeshRenderer>().SetPropertyBlock(Tint(color));
 
         if (!obstacle)
@@ -139,7 +139,7 @@ internal sealed class StagePreview
                 ghost = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
                 DefenseBoardView.Release(ghost.GetComponent<Collider>());
                 ghost.SetParent(root, false);
-                ghost.localScale = new Vector3(DefenseGrid.WallWidth, DefenseGrid.WallHeight, DefenseGrid.WallWidth);
+                ghost.localScale = new Vector3(DefenseGrid.WallWidth, DefenseGrid.WallHeight, DefenseGrid.WallWidth) * DefenseGrid.DefaultCellSize;
             }
             ghost.name = "Brush Ghost";
             ghostPrefab = prefab;
@@ -149,7 +149,7 @@ internal sealed class StagePreview
 
         ghost.gameObject.SetActive(true);
         Vector3 center = new StageData.Obstacle { cell = footprint.position, size = footprint.size }.Center;
-        ghost.localPosition = prefab != null ? center : center + Vector3.up * (DefenseGrid.WallHeight * 0.5f);
+        ghost.localPosition = prefab != null ? center : center + Vector3.up * (DefenseGrid.WallHeight * DefenseGrid.DefaultCellSize * 0.5f);
         foreach (Renderer renderer in ghost.GetComponentsInChildren<Renderer>())
             renderer.SetPropertyBlock(allowed ? null : Tint(new Color(1f, 0.35f, 0.3f, 1f)));
     }

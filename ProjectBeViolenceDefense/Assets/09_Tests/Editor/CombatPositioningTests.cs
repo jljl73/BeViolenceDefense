@@ -5,12 +5,201 @@ using UnityEngine;
 
 public sealed class CombatPositioningTests
 {
+    [Test]
+    public void DefaultGridDoublesCellsWallsAndCoreContact()
+    {
+        var original = new DefenseGrid(cellSize: 1f);
+        var enlarged = new DefenseGrid();
+        Assert.That(enlarged.CellSize, Is.EqualTo(2f));
+        Assert.That(enlarged.Center, Is.EqualTo(original.Center * 2f));
+        Assert.That(enlarged.CorePosition, Is.EqualTo(original.CorePosition * 2f));
+        for (int route = 0; route < original.Routes.Count; route++)
+        {
+            Assert.That(enlarged.Routes[route].Length, Is.EqualTo(original.Routes[route].Length));
+            for (int i = 0; i < original.Routes[route].Length; i++)
+                Assert.That(enlarged.Routes[route][i], Is.EqualTo(original.Routes[route][i] * 2f));
+        }
+        var cell = new Vector2Int(5, 7);
+        Bounds wall = DefenseGrid.WallBounds(cell);
+        Assert.That(wall.center, Is.EqualTo(DefenseGrid.WallBounds(cell, 1f).center * 2f));
+        Assert.That(wall.size, Is.EqualTo(DefenseGrid.WallBounds(cell, 1f).size * 2f));
+        Assert.That(enlarged.HasLineOfSight(new Vector3(10, 0, 12), new Vector3(10, 0, 16)), Is.False);
+        Assert.That(DefenseGrid.PositionToCell(new Vector3(10.8f, 0, 14.8f)), Is.EqualTo(cell));
+    }
+
+    [Test]
+    public void DoubledGridKeepsUnitSizeSpeedAndRange()
+    {
+        var grid = new DefenseGrid();
+        var faction = new EnemyFaction("Unit", Color.white);
+        var unit = new EnemyUnit(faction, 0, grid.Routes[0], 0);
+        Assert.That(Vector3.Distance(unit.Position, unit.NextRoutePosition(0.1f)), Is.EqualTo(faction.MoveSpeed * 0.1f).Within(0.0001f));
+        Assert.That(faction.BodyRadius, Is.EqualTo(0.3f));
+        Assert.That(faction.AttackRange, Is.EqualTo(1.5f));
+        var battle = new DefenseBattle(grid, new[] { faction, faction });
+        battle.StartRound();
+        for (int tick = 0; tick < 14400 && battle.CurrentPhase == DefenseBattle.Phase.Combat; tick++)
+            battle.Tick(DefenseBattle.TickDuration, false);
+        Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Preparation));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void BlockedQueueReroutesAndReachesOpponent(bool hasAttacker)
+    {
+        var attacker = Unit(0, 0, 4, 4, radius: 0.3f);
+        var target = Unit(1, 1, 6, 4, radius: 0.3f);
+        var units = new List<EnemyUnit> { attacker, target,
+            Unit(0, 2, 4.7f, 4, range: 0.1f, radius: 0.3f),
+            Unit(0, 3, 4, 4.7f, range: 0.1f, radius: 0.3f),
+            Unit(0, 4, 4, 3.3f, range: 0.1f, radius: 0.3f) };
+        if (hasAttacker) units.Add(Unit(0, 5, 6, 5.2f, radius: 0.3f));
+        var grid = OpenGrid(new Vector2Int(4, 2));
+        var combat = new CombatPositioning(grid, units);
+        combat.Plan();
+        Assert.That(attacker.Target, Is.Null, "The regression must begin in a queue, not in an assigned approach.");
+        Assert.That(attacker.CombatQueue?.Target, Is.SameAs(target));
+        Assert.That(attacker.CombatQueueReason, Is.EqualTo(EnemyUnit.QueueReason.BlockedApproach));
+        bool detoured = false;
+        for (int tick = 1; tick <= 600 && !combat.CanAttack(attacker, target); tick++)
+        {
+            Vector3 previous = attacker.Position;
+            StepApproach(combat, attacker, tick);
+            detoured |= attacker.CombatDetour != null;
+            Assert.That(grid.CanPursue(previous, attacker.Position), Is.True);
+            foreach (var other in units.Where(u => u != attacker))
+                Assert.That(Vector3.Distance(attacker.Position, other.Position),
+                    Is.GreaterThanOrEqualTo(CombatPositioning.RequiredSpacing(attacker.Faction, other.Faction) - 0.0001f));
+        }
+        Assert.That(detoured, Is.True);
+        Assert.That(combat.CanAttack(attacker, target), Is.True, $"Stopped at {attacker.Position}");
+        Assert.That(attacker.CombatQueueReason, Is.EqualTo(EnemyUnit.QueueReason.None));
+    }
+
+    [Test]
+    public void FullTargetQueueWaitsThenUsesVacatedAttackPosition()
+    {
+        var target = Unit(1, 0, 6, 6);
+        var rear = Unit(0, 4, 4, 6);
+        var units = new List<EnemyUnit> { target, rear, Unit(0, 1, 5, 6), Unit(0, 2, 6, 5), Unit(0, 3, 6, 7) };
+        var combat = new CombatPositioning(OpenGrid(), units);
+        combat.Plan();
+        Assert.That(rear.CombatQueueReason, Is.EqualTo(EnemyUnit.QueueReason.Capacity));
+        for (int tick = 1; tick < 120; tick++)
+        {
+            StepApproach(combat, rear, tick);
+            Assert.That(rear.CombatStalledTime, Is.Zero);
+            Assert.That(rear.CombatDetour, Is.Null);
+            Assert.That(units.Count(u => u.Target == target), Is.LessThanOrEqualTo(3));
+        }
+        units.RemoveAt(2);
+        combat.Plan();
+        Assert.That(rear.Target, Is.SameAs(target));
+        Assert.That(rear.CombatQueueReason, Is.EqualTo(EnemyUnit.QueueReason.None));
+    }
+
+    [Test]
+    public void BlockedQueuePreservesPenaltyAcrossPlanningAndClearsOnTargetLoss()
+    {
+        var attacker = Unit(0, 0, 4, 4, range: 0.1f);
+        var target = Unit(1, 1, 6, 4);
+        var combat = new CombatPositioning(OpenGrid(), new[] { attacker, target });
+        combat.Plan();
+        Assert.That(attacker.CombatQueueReason, Is.EqualTo(EnemyUnit.QueueReason.BlockedApproach));
+        attacker.CongestedPoint = new Vector3(4.65f, 0, 4);
+        attacker.CongestionRemaining = 1f;
+        for (int i = 0; i < 10; i++) combat.Plan();
+        Assert.That(attacker.CongestedPoint, Is.Not.Null);
+        Assert.That(attacker.CongestionRemaining, Is.EqualTo(1f));
+        target.Die();
+        combat.Plan();
+        Assert.That(attacker.CombatQueue, Is.Null);
+        Assert.That(attacker.CombatQueueReason, Is.EqualTo(EnemyUnit.QueueReason.None));
+        Assert.That(attacker.CongestedPoint, Is.Null);
+    }
+
+    [Test]
+    public void StalledUnitFlanksRockAndFrontLineWithoutChangingOpponent()
+    {
+        var units = BlockedFrontLine(out var attacker, out var opponent);
+        var grid = OpenGrid(new Vector2Int(4, 2), new Vector2Int(5, 2));
+        var combat = new CombatPositioning(grid, units);
+        bool selectedDetour = false;
+        bool wentAroundLine = false;
+        Vector3[] committed = null;
+        int keptPlans = 0;
+        for (int tick = 0; tick < 600 && !combat.CanAttack(attacker, opponent); tick++)
+        {
+            Vector3 previous = attacker.Position;
+            StepApproach(combat, attacker, tick);
+            if (attacker.CombatDetour != null)
+            {
+                selectedDetour = true;
+                if (committed == attacker.CombatDetour && tick % 8 == 0) keptPlans++;
+                committed = attacker.CombatDetour;
+            }
+            wentAroundLine |= attacker.Position.z > 6f;
+            Assert.That(attacker.Target, Is.SameAs(opponent));
+            Assert.That(grid.CanPursue(previous, attacker.Position), Is.True);
+            foreach (var other in units.Where(u => u != attacker))
+                Assert.That(Vector3.Distance(attacker.Position, other.Position),
+                    Is.GreaterThanOrEqualTo(CombatPositioning.RequiredSpacing(attacker.Faction, other.Faction) - 0.0001f));
+        }
+        Assert.That(selectedDetour, Is.True);
+        Assert.That(keptPlans, Is.GreaterThan(2), "Do not discard the selected path at every plan.");
+        Assert.That(wentAroundLine, Is.True);
+        Assert.That(combat.CanAttack(attacker, opponent), Is.True, $"Stopped at {attacker.Position}");
+    }
+
+    [Test]
+    public void CongestionPenaltyIsPersonalTemporaryAndNotABarrier()
+    {
+        var first = Unit(0, 0, 4, 4);
+        var second = Unit(0, 1, 4, 4);
+        var combat = new CombatPositioning(OpenGrid(), new[] { first, second });
+        first.CongestedPoint = new Vector3(4.65f, 0, 4);
+        first.CongestionRemaining = CombatPositioning.CongestionDuration;
+        Vector3 end = new(5, 0, 4);
+        Assert.That(CombatPositioning.CongestionCost(first, first.Position, end), Is.GreaterThan(1f));
+        Assert.That(float.IsInfinity(CombatPositioning.CongestionCost(first, first.Position, end)), Is.False);
+        Assert.That(CombatPositioning.CongestionCost(second, second.Position, end), Is.EqualTo(1f));
+        for (int tick = 0; tick < 121; tick++) combat.TrackApproachProgress(first, DefenseBattle.TickDuration);
+        Assert.That(first.CongestedPoint, Is.Null);
+        Assert.That(CombatPositioning.CongestionCost(first, first.Position, end), Is.EqualTo(1f));
+    }
+
+    [Test]
+    public void IntentionalCombatQueueDoesNotTriggerRerouting()
+    {
+        var unit = Unit(0, 0, 4, 4);
+        var target = Unit(1, 1, 6, 4);
+        unit.CombatQueue = (target, 0);
+        unit.CombatQueueReason = EnemyUnit.QueueReason.Capacity;
+        var combat = new CombatPositioning(OpenGrid(), new[] { unit, target });
+        for (int tick = 0; tick < 120; tick++) combat.TrackApproachProgress(unit, DefenseBattle.TickDuration);
+        Assert.That(unit.CombatStalledTime, Is.Zero);
+        Assert.That(unit.CongestedPoint, Is.Null);
+    }
+
+    [Test]
+    public void LosingTargetDiscardsCommittedDetour()
+    {
+        var units = BlockedFrontLine(out var attacker, out var target);
+        var combat = new CombatPositioning(OpenGrid(), units);
+        attacker.CombatDetour = new[] { new Vector3(4, 0, 6) };
+        attacker.CongestedPoint = new Vector3(4.7f, 0, 4);
+        attacker.CongestionRemaining = 2f;
+        target.Die();
+        combat.Plan();
+        Assert.That(attacker.CombatDetour, Is.Null);
+        Assert.That(attacker.CongestedPoint, Is.Null);
+    }
     // These compact regression layouts reproduce the original steering/slot bugs.
     // Full-battle tests below use the actual gameplay spacing.
     private const float FixtureRadius = 0.19f;
     private const float FixtureSpacing = FixtureRadius * 2f + CombatPositioning.BodyGap;
     private static DefenseGrid OpenGrid(params Vector2Int[] walls) => new(17, 17,
-        new RectInt(8, 15, 2, 2), new[] { new Vector2Int(2, 2), new Vector2Int(14, 2) }, new[] { 0, 1 }, walls);
+        new RectInt(8, 15, 2, 2), new[] { new Vector2Int(2, 2), new Vector2Int(14, 2) }, new[] { 0, 1 }, walls, cellSize: 1f);
 
     private static EnemyUnit Unit(int side, int order, float x, float z, float range = 1.5f, float radius = FixtureRadius) =>
         new(new EnemyFaction("Test", Color.white, attackRange: range, awarenessRange: 4f, bodyRadius: radius), side,
@@ -156,7 +345,7 @@ public sealed class CombatPositioningTests
                     Is.GreaterThanOrEqualTo(CombatPositioning.RequiredSpacing(attacker.Faction, other.Faction) - 0.0001f));
             attacker.TickTimers(DefenseBattle.TickDuration);
         }
-        Assert.That(switchedAt, Is.InRange(36, 65), "Give the first approach time to progress, then abandon the oscillation.");
+        Assert.That(switchedAt, Is.InRange(36, 95), "Try a same-target detour before falling back to another reachable opponent.");
         Assert.That(firstAttackAt, Is.InRange(0, 119), "The reachable neighbor should be engaged within two seconds.");
         Assert.That(attacker.AttacksPerformed, Is.GreaterThan(1));
     }
@@ -234,7 +423,7 @@ public sealed class CombatPositioningTests
     {
         // GameScene_LeftCoreHud W1: the user's live reproduction, with catalog values
         // frozen here so later balancing cannot silently remove this traffic regression.
-        var battle = new DefenseBattle(new DefenseGrid(), new[]
+        var battle = new DefenseBattle(new DefenseGrid(cellSize: 1f), new[]
         {
             new EnemyFaction("Goblin", Color.white, maxHealth: 75, damage: 10, attackInterval: 0.65f,
                 spawnCount: 4, moveSpeed: 1.7f, bodyRadius: 0.34f),
@@ -324,14 +513,14 @@ public sealed class CombatPositioningTests
     [Test]
     public void FirstWaveRearUnitsSpreadAndJoinSeveralFights()
     {
-        var battle = new DefenseBattle(new DefenseGrid(), new[]
+        var battle = new DefenseBattle(new DefenseGrid(cellSize: 1f), new[]
         {
             new EnemyFaction("Goblin", Color.white, maxHealth: 75, damage: 10, attackInterval: 0.65f,
                 spawnCount: 4, moveSpeed: 1.7f, bodyRadius: 0.34f),
             new EnemyFaction("Skeleton", Color.white, maxHealth: 70, damage: 12, attackInterval: 0.8f,
                 spawnCount: 6, moveSpeed: 1.6f, bodyRadius: 0.286f)
         });
-        var combat = new CombatPositioning(new DefenseGrid(), battle.Enemies);
+        var combat = new CombatPositioning(new DefenseGrid(cellSize: 1f), battle.Enemies);
         var attackers = new HashSet<int>();
         var flankers = new HashSet<int>();
         var flankingSides = new HashSet<int>();
@@ -386,7 +575,7 @@ public sealed class CombatPositioningTests
     [Test]
     public void FlankingSurvivorCanBypassTrafficUsingForwardRouteConnection()
     {
-        var grid = new DefenseGrid();
+        var grid = new DefenseGrid(cellSize: 1f);
         foreach (var cell in new[] { new Vector2Int(6, 5), new(10, 5), new(7, 4), new(9, 4) })
             Assert.That(grid.TryPlace(cell), Is.EqualTo(DefenseGrid.BuildResult.Placed));
         var faction = new EnemyFaction("Large", Color.white, spawnCount: 0, moveSpeed: 1.2f, bodyRadius: 0.48f);
@@ -424,7 +613,7 @@ public sealed class CombatPositioningTests
     [TestCase(40, true)]
     public void CrowdedBattlesFinishWithoutOverlapOrWallPenetration(int count, bool walls)
     {
-        var grid = new DefenseGrid();
+        var grid = new DefenseGrid(cellSize: 1f);
         if (walls)
             foreach (Vector2Int wall in new[] { new Vector2Int(6, 5), new(10, 5), new(7, 4), new(9, 4) })
                 Assert.That(grid.TryPlace(wall), Is.EqualTo(DefenseGrid.BuildResult.Placed));
@@ -448,7 +637,8 @@ public sealed class CombatPositioningTests
                         CombatPositioning.RequiredSpacing(enemy.Faction, battle.Enemies[j].Faction));
             }
         }
-        Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Preparation));
+        Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Preparation),
+            string.Join("; ", battle.Enemies.Select(e => $"#{e.SpawnOrder} {e.Position} route {e.RouteWaypoint} target {e.Target?.SpawnOrder} detour {e.CombatDetourIndex}/{e.CombatDetour?.Length} stall {e.CombatStalledTime}")));
         Assert.That(minimumClearance, Is.GreaterThanOrEqualTo(-0.0001f));
         Assert.That(crossedWall, Is.False);
     }
@@ -498,7 +688,7 @@ public sealed class CombatPositioningTests
     public void AdjacentSpawnsDoNotOverlapLargeUnitsInTheSameTick()
     {
         var grid = new DefenseGrid(17, 17, new RectInt(8, 15, 2, 2),
-            new[] { new Vector2Int(2, 2), new Vector2Int(3, 2) }, new[] { 0, 1 }, null);
+            new[] { new Vector2Int(2, 2), new Vector2Int(3, 2) }, new[] { 0, 1 }, null, cellSize: 1f);
         var factions = new[]
         {
             new EnemyFaction("A", Color.white, spawnCount: 1, bodyRadius: 0.55f),

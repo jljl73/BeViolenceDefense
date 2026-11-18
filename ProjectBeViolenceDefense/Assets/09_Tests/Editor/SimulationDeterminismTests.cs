@@ -84,6 +84,27 @@ public sealed class SimulationDeterminismTests
             Mix(enemy.Health);
             Mix(enemy.AttacksPerformed);
             Mix(enemy.AttackBuffStacks);
+            Mix(enemy.Target?.SpawnOrder ?? -1);
+            Mix(enemy.CombatQueue?.Target.SpawnOrder ?? -1);
+            Mix(enemy.CombatQueue?.Order ?? -1);
+            Mix((int)enemy.CombatQueueReason);
+            Mix(enemy.AttackSlot);
+            Mix(BitConverter.SingleToInt32Bits(enemy.CombatStalledTime));
+            Mix(BitConverter.SingleToInt32Bits(enemy.CongestionRemaining));
+            Mix(enemy.CongestedPoint.HasValue ? 1 : 0);
+            if (enemy.CongestedPoint is { } blocked)
+            {
+                Mix(BitConverter.SingleToInt32Bits(blocked.x));
+                Mix(BitConverter.SingleToInt32Bits(blocked.z));
+            }
+            Mix(enemy.CombatDetourIndex);
+            Mix(enemy.CombatDetour?.Length ?? -1);
+            if (enemy.CombatDetour != null)
+                foreach (Vector3 waypoint in enemy.CombatDetour)
+                {
+                    Mix(BitConverter.SingleToInt32Bits(waypoint.x));
+                    Mix(BitConverter.SingleToInt32Bits(waypoint.z));
+                }
         }
         return hash;
     }

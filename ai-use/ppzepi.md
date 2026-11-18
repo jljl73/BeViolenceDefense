@@ -627,3 +627,119 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: StageTEST에서는 짐승-용족만 자연스럽게 만나고 나머지 쌍은 벽 없이 코어로 직행함(벽 유도 필요). 5웨이브 후 승리 판정 없음(W1 반복). 코어 체력 120에 누수당 1이라 패배 압박이 약함. 3종족 이상 웨이브에서 세력 바는 앞 두 종족만 표시. 저장소 `BalanceSim`은 2종족 전용이며 현재 카탈로그 형식을 못 읽음.
+
+### [20261119-0219-combat-rerouting] 정체 시 같은 적 우회 구현 및 대기열 누락 진단
+- 시각: 2026-11-19 02:19:13 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / PowerShell / Unity MCP(Pipeline, Unity 6000.3.28f1)
+- 목적 및 적용 위치: 정체한 유닛이 같은 적의 다른 공격 자리로 우회하도록 변경하고 후속 박쥐 스크린샷 원인 조사.
+- 사용 방식: 0.6초 정체 시 유닛별 2초 혼잡 비용 및 지역 가중 경로 탐색, 선택 경로 유지 추가. 기존 시야·코어·카탈로그 유지.
+- 결과 및 확인 방법: 부분 성공 / 컴파일 완료, EditMode 46/46 통과. 바위+앞줄 재현에서 같은 적 우회·공격 및 경로 유지 확인. 후속 이미지 조사에서 대기열 유닛은 정체 누적에서 제외되어 우회 탐색이 발동하지 않을 수 있는 누락 확인. 스크린샷 순간 상태는 에디터가 정지 상태여서 확정 불가. Play Mode 검증 도중 사용자 개입으로 종료되어 실제 라운드 검증 결과 없음.
+- 사람의 개입: 사용자 구현 요청 및 여전히 우회하지 않는 박쥐 이미지 제공.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs | Codex | 수정 | 정체 우회 탐색·임시 비용·경로 유지 적용, 대기열 처리 추가 보완 필요 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs | Codex | 수정 | 유닛별 경로와 혼잡 상태 적용 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/CombatPositioningTests.cs | Codex | 수정 | 신규 검사 4개 및 변경된 우회 우선순위를 반영한 전환 시간 검사 적용 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/SimulationDeterminismTests.cs | Codex | 수정 | 경로·혼잡 상태 해시 적용 |
+| docs/combat-rerouting.md | Codex | 생성 | 구현 설명과 한계 적용 |
+| ai-use/evidence/20261119-combat-rerouting/editmode-results.json | Unity MCP / Codex | 생성 | Test Runner 46개 통과 응답 저장 |
+
+#### 증거
+- ai-use/evidence/20261119-combat-rerouting/editmode-results.json
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 실행 파일 탐색.
+- 활용 방식: Get-Command unity로 가용성 확인, 실행 파일을 찾지 못하여 실제 검증은 Unity MCP 사용.
+- 잘된 점: MCP로 대상 프로젝트 확인·컴파일·EditMode 검증 완료.
+- 잘 안된 점 및 개선 필요: CLI PATH 미등록. MCP 도메인 재로드 중 일시적 HTTP 400 이후 재호출로 정상 실행.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 현재 저장소.
+- 사용 방식: 코드 편집·회귀 테스트·후속 이미지와 조건 분기 대조.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: 해당 방향으로 수정 시도해봐
+- 결과 및 실제 활용 방식: 정체 시 동일 타깃 우회 프로토타입 적용.
+- 선정 이유: 시야 기억 변경을 롤백한 뒤 우회 중심 접근으로 전환한 구현 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 대기열 원인(공격 인원 한도/접근 실패) 구분과 재탐색 필요. 원래 코어 경로 직선 연결 제약도 여전히 적용된다. 사진 속 유닛의 실제 상태와 정확한 재현은 미확인.
+
+### [20261119-0224-blocked-queue-rerouting] 접근 실패 대기열의 우회 탐색 누락 수정
+- 시각: 2026-11-19 02:24:00 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / PowerShell / Unity MCP(Pipeline, Unity 6000.3.28f1)
+- 목적 및 적용 위치: 접근하지 못해 대기열에 들어간 박쥐 같은 유닛도 정체 후 같은 적의 우회 경로를 탐색하도록 수정.
+- 사용 방식: 대기 사유를 인원 한도와 접근 실패로 분리. 전체 자리 배정 후 사유 확정. 접근 실패 대기만 정체 누적. 같은 상대의 대기·접근 전환에서 혼잡 기록 보존. 다른 공격자가 없어도 접근 실패 상태 유지.
+- 결과 및 확인 방법: 성공 / 컴파일 완료·오류 없음, Unity Test Runner EditMode 50/50 통과. 접근 실패 대기에서 출발하는 우회 재현(다른 공격자 유무), 인원 한도 대기·빈자리 재접근, 기록 유지·타깃 상실 해제 검증. git diff --check 통과. 사용자 지시에 따라 실제 씬 Play Mode는 실행하지 않음.
+- 사람의 개입: 사용자 수정 요청 및 실제 씬 테스트 금지 지정. 사진의 정확한 상황 재현은 미확인.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs | Codex | 수정 | 대기 사유 분류, 접근 실패의 정체 누적·대상 보존 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs | Codex | 수정 | QueueReason 및 유닛별 대기 사유 적용 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/CombatPositioningTests.cs | Codex | 수정 | 접근 실패·인원 한도 대기의 실제 분기 회귀 테스트 적용 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/SimulationDeterminismTests.cs | Codex | 수정 | 대기 상대·순서·사유의 틱별 해시 적용 |
+| docs/combat-rerouting.md | Codex | 수정 | 대기 구분과 검증 범위 반영 |
+| ai-use/evidence/20261119-combat-rerouting/queue-fix-editmode-results.json | Unity MCP / Codex | 생성 | 최종 50개 테스트 응답 저장 |
+
+#### 증거
+- ai-use/evidence/20261119-combat-rerouting/queue-fix-editmode-results.json
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 로컬 코드·문서.
+- 사용 방식: 조건 분기 수정 및 EditMode 재현·회귀 테스트 작성과 실행.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: 수정은 시도하고 에디터 검증 외 실제 씬 테스트는 돌리지마
+- 결과 및 실제 활용 방식: 실제 씬 실행 없이 컴파일과 EditMode로만 검증.
+- 선정 이유: 작업 범위와 검증 제한을 지정한 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 사진 속 정확한 플레이 상태에서의 변화. 원래 코어 경로의 직선 연결 제약은 이번 수정 범위에 포함하지 않았음. MCP 컴파일 도메인 재로드 중 일시적 HTTP 400 후 recompile_status에서 완료 확인.
+
+### [20261119-double-grid] 스테이지 한 칸 크기와 장애물 두 배 확대
+- 시각: 2026-11-19 02:31:08 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / PowerShell / Unity MCP(Pipeline, Unity 6000.3.28f1)
+- 목적 및 적용 위치: 칸 수·배치를 유지하고 칸 간격을 1에서 2로 변경, 장애물도 동일하게 확대.
+- 사용 방식: DefenseGrid의 기본 셀 크기 2 도입. 경로·월드 좌표 변환·코어 영역·벽 판정과 보드 표시·장애물·편집기 좌표를 함께 수정. 적 크기·이동속도·사거리 및 카탈로그 수치는 유지.
+- 결과 및 확인 방법: 성공 / 컴파일 오류 없음, EditMode 52/52 통과, git diff --check 통과. 배율·벽 경계·코어 접점·좌표 역변환·유닛 수치 불변·확대 보드 전투 종료 검사 추가. 기존 고정 좌표 교전 회귀 테스트는 셀 크기 1을 명시하고, 결정론 테스트는 새 기본 크기 2에서 실행. 이전 사용자 지시대로 실제 씬 Play Mode 실행 안 함.
+- 사람의 개입: 사용자 전체 칸 크기 및 방해물 2배 확대 요청. 시각적 검토 여부 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseGrid.cs | Codex | 수정 | 기본 셀 크기 2, 경로·코어·벽 판정·좌표 변환 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs | Codex | 수정 | 격자 인스턴스의 셀 크기로 월드 좌표 변환 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs | Codex | 수정 | 예상 교전 칸의 좌표 변환 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/StageData.cs | Codex | 수정 | 장애물 중심 좌표 배율 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Codex | 수정 | 바닥·스폰 패드·장애물·벽·코어 영역·경로 표시·카메라 범위·클릭 판정 확대 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/BoardEnvironment.cs | Codex | 수정 | 배경 중심과 보드 제외 영역 확대 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/Editor/StagePreview.cs | Codex | 수정 | 브러시·장애물 미리보기 크기·위치 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/Editor/StageEditorWindow.cs | Codex | 수정 | 2D 편집기의 월드 경로 투영 보정 적용 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/CombatPositioningTests.cs | Codex | 수정 | 배율·수치 불변·확대 보드 검사 추가, 기존 고정 좌표 검사 셀 크기 명시 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/FourFactionBattleTests.cs | Codex | 수정 | 기존 근접 스폰 검사 셀 크기 1 명시 |
+| ai-use/evidence/20261119-double-grid/editmode-results.json | Unity MCP / Codex | 생성 | 52개 통과 결과 저장 |
+
+#### 증거
+- ai-use/evidence/20261119-double-grid/editmode-results.json
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 로컬 코드·검증 기록.
+- 사용 방식: 좌표 의존 코드 검색, 배율 변경, 컴파일·EditMode 검증.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: 야 그냥 스테이지 그리드의 모든 한 칸 단위 크기만 두 배로 키워줘. 방해물까지 같이
+- 결과 및 실제 활용 방식: 스테이지 셀과 장애물 확대 적용.
+- 선정 이유: 길찾기 조정과 별개로 공간 크기 변경을 지정한 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 실제 씬의 카메라·장애물 표시와 플레이 감각. 사용자 지시에 따라 Play Mode 확인은 생략. 컴파일 요청 중 일시적 HTTP 400 이후 recompile_status에서 성공 확인.

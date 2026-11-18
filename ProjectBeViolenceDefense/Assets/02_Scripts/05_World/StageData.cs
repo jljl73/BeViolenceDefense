@@ -40,7 +40,7 @@ public sealed class StageData : ScriptableObject
         public int rotation;
 
         public RectInt Footprint => new(cell, size);
-        public Vector3 Center => new(cell.x + (size.x - 1) * 0.5f, 0f, cell.y + (size.y - 1) * 0.5f);
+        public Vector3 Center => new Vector3(cell.x + (size.x - 1) * 0.5f, 0f, cell.y + (size.y - 1) * 0.5f) * DefenseGrid.DefaultCellSize;
     }
 
     [Range(MinSize, MaxSize)] public int width = DefenseGrid.DefaultSize;

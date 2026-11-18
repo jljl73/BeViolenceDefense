@@ -362,7 +362,7 @@ internal sealed class StageEditorWindow : EditorWindow
             canvas.y + (canvas.height - cell * stage.depth) * 0.5f);
         Rect CellsRect(RectInt cells) => new(origin.x + cells.xMin * cell, origin.y + (stage.depth - cells.yMax) * cell,
             cells.width * cell, cells.height * cell);
-        Vector2 CellCenter(Vector3 point) => new(origin.x + (point.x + 0.5f) * cell, origin.y + (stage.depth - point.z - 0.5f) * cell);
+        Vector2 CellCenter(Vector3 point) => new(origin.x + (point.x / DefenseGrid.DefaultCellSize + 0.5f) * cell, origin.y + (stage.depth - point.z / DefenseGrid.DefaultCellSize - 0.5f) * cell);
 
         Vector2 mouse = Event.current.mousePosition;
         Vector2Int? cellUnderMouse = null;

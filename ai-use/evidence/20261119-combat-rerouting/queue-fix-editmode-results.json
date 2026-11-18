@@ -1,0 +1,352 @@
+[
+  {
+    "fullName": "CombatPositioningTests.AdjacentSpawnsDoNotOverlapLargeUnitsInTheSameTick",
+    "status": "Passed",
+    "duration": 0.0421643,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.AttackCooldownDoesNotCountAsApproachStall",
+    "status": "Passed",
+    "duration": 0.0123811,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.AwarenessControlsFindingDistantEnemies(2.2f,False)",
+    "status": "Passed",
+    "duration": 0.003968,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.AwarenessControlsFindingDistantEnemies(3.2f,True)",
+    "status": "Passed",
+    "duration": 0.0001418,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap",
+    "status": "Passed",
+    "duration": 0.0013191,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.BlockedQueuePreservesPenaltyAcrossPlanningAndClearsOnTargetLoss",
+    "status": "Passed",
+    "duration": 0.0034698,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.BlockedQueueReroutesAndReachesOpponent(False)",
+    "status": "Passed",
+    "duration": 0.013363,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.BlockedQueueReroutesAndReachesOpponent(True)",
+    "status": "Passed",
+    "duration": 0.0031993,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(4.0f,True,False,True)",
+    "status": "Passed",
+    "duration": 0.0007431,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(4.0f,False,False,False)",
+    "status": "Passed",
+    "duration": 0.0001211,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(1.0f,True,False,False)",
+    "status": "Passed",
+    "duration": 0.0000745,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(4.0f,True,True,False)",
+    "status": "Passed",
+    "duration": 0.0001032,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CongestionPenaltyIsPersonalTemporaryAndNotABarrier",
+    "status": "Passed",
+    "duration": 0.0008157,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(9,False)",
+    "status": "Passed",
+    "duration": 0.1354476,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(9,True)",
+    "status": "Passed",
+    "duration": 0.182644,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(20,False)",
+    "status": "Passed",
+    "duration": 0.3697044,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(20,True)",
+    "status": "Passed",
+    "duration": 0.6749366,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,False)",
+    "status": "Passed",
+    "duration": 1.4585834,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,True)",
+    "status": "Passed",
+    "duration": 1.7677176,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.EquidistantTargetsUseSpawnOrderInsteadOfListOrder",
+    "status": "Passed",
+    "duration": 0.0004519,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.FirstWaveRearUnitsDoNotRepeatedlyReverseWhileWithoutTarget",
+    "status": "Passed",
+    "duration": 0.0663559,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.FirstWaveRearUnitsSpreadAndJoinSeveralFights",
+    "status": "Passed",
+    "duration": 0.0473357,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.FlankingSurvivorCanBypassTrafficUsingForwardRouteConnection",
+    "status": "Passed",
+    "duration": 0.0043724,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.ForwardRouteShortcutKeepsItsChosenWaypointUntilReached",
+    "status": "Passed",
+    "duration": 0.0009564,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.FullTargetQueueWaitsThenUsesVacatedAttackPosition",
+    "status": "Passed",
+    "duration": 0.001402,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.IntentionalCombatQueueDoesNotTriggerRerouting",
+    "status": "Passed",
+    "duration": 0.0004162,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.LocalSteeringGoesAroundUnitsWithoutCuttingThroughAWall",
+    "status": "Passed",
+    "duration": 0.0006657,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.LosingTargetDiscardsCommittedDetour",
+    "status": "Passed",
+    "duration": 0.0006319,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.MovementUsesBothUnitsRadii(0.2f,0.2f)",
+    "status": "Passed",
+    "duration": 0.0006501,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.MovementUsesBothUnitsRadii(0.2f,0.5f)",
+    "status": "Passed",
+    "duration": 0.0000817,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.MovementUsesBothUnitsRadii(0.5f,0.5f)",
+    "status": "Passed",
+    "duration": 0.00006,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.ReadyAttackerTakesPriorityOverDistantReservations",
+    "status": "Passed",
+    "duration": 0.0008111,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.ReadyFighterStaysPutAndAlternativeTargetIsUsedWhenFull",
+    "status": "Passed",
+    "duration": 0.0012496,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears(False)",
+    "status": "Passed",
+    "duration": 0.0037514,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears(True)",
+    "status": "Passed",
+    "duration": 0.0041607,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.ShortAttackRangeDoesNotAllowEnteringAnotherUnitsSpace",
+    "status": "Passed",
+    "duration": 0.0010517,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(\"wall\")",
+    "status": "Passed",
+    "duration": 0.0039944,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(\"range\")",
+    "status": "Passed",
+    "duration": 0.0030218,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(\"dead\")",
+    "status": "Passed",
+    "duration": 0.0024184,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(\"body\")",
+    "status": "Passed",
+    "duration": 0.0032928,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledSidestepsSwitchToReachableNeighborAndStartAttacking",
+    "status": "Passed",
+    "duration": 0.0068856,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledUnitFlanksRockAndFrontLineWithoutChangingOpponent",
+    "status": "Passed",
+    "duration": 0.0046652,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledUnitWithoutAlternativeResumesWhenFrontLineClears",
+    "status": "Passed",
+    "duration": 0.00184,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.SuccessfulDetourKeepsPreferredTarget",
+    "status": "Passed",
+    "duration": 0.0008564,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.WallStillBlocksDetectionAndAttacks",
+    "status": "Passed",
+    "duration": 0.0003109,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "FourFactionBattleTests.AllFourRacesSpawnAndFightEachOther",
+    "status": "Passed",
+    "duration": 0.0125554,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "FourFactionBattleTests.RacesWithoutSpawnAreSkipped",
+    "status": "Passed",
+    "duration": 0.0016894,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "SimulationDeterminismTests.CommandHistoryReplaysTheSameBattle",
+    "status": "Passed",
+    "duration": 0.1225436,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "SimulationDeterminismTests.SameTicksAcrossFramePatterns",
+    "status": "Passed",
+    "duration": 0.3034218,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "SimulationPurityTests.SimulationFilesAvoidFrameAndSceneDependencies",
+    "status": "Passed",
+    "duration": 0.0211357,
+    "message": null,
+    "stackTrace": null
+  }
+]

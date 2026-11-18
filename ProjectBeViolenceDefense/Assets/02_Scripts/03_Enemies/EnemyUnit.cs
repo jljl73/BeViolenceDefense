@@ -42,6 +42,7 @@ internal sealed class EnemyFaction
 
 internal sealed class EnemyUnit
 {
+    public enum QueueReason { None, Capacity, BlockedApproach }
     public const int AttackBonus = 15;
     public const float MoveSpeedBonusPercent = 0.5f;
     public const int ArmorBonus = 5;
@@ -82,6 +83,7 @@ internal sealed class EnemyUnit
     public bool CanAttack => cooldown <= 0;
     public EnemyUnit Target { get; set; }
     public (EnemyUnit Target, int Order)? CombatQueue { get; set; }
+    public QueueReason CombatQueueReason { get; set; }
     public int AttackSlot { get; set; } = -1;
     public Vector3? CombatDestination { get; set; }
     public Vector3? CombatSteerWaypoint { get; set; }
@@ -89,6 +91,11 @@ internal sealed class EnemyUnit
     public float CombatBestRemainingDistance { get; set; } = float.PositiveInfinity;
     public float CombatApproachTailLength { get; set; }
     public float CombatStalledTime { get; set; }
+    public Vector3[] CombatDetour { get; set; }
+    public int CombatDetourIndex { get; set; }
+    public Vector3 CombatDetourTargetPosition { get; set; }
+    public Vector3? CongestedPoint { get; set; }
+    public float CongestionRemaining { get; set; }
     public Vector3? RouteYieldDestination { get; set; }
     public int RouteBypassOffset { get; set; } = -1;
     public float BlockedRouteTime { get; set; }

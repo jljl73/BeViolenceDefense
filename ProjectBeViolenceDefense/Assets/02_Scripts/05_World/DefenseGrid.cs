@@ -5,6 +5,8 @@ using UnityEngine;
 public sealed class DefenseGrid
 {
     public const int DefaultSize = 17;
+    public const float DefaultCellSize = 2f;
+    public float CellSize { get; }
     public const int WallLimit = 8;
     public const float WallWidth = 0.92f;
     public const float WallHeight = 0.8f;
@@ -34,20 +36,22 @@ public sealed class DefenseGrid
     // 경로 계산이 실패한 첫 스폰 인덱스. 성공하면 -1.
     public int UnreachableSpawn { get; private set; } = -1;
     public int WallCount => placed.Count;
-    public Vector3 CorePosition => new(coreFootprint.center.x - 0.5f, 0f, coreFootprint.center.y - 0.5f);
+    public Vector3 CorePosition => new Vector3(coreFootprint.center.x - 0.5f, 0f, coreFootprint.center.y - 0.5f) * CellSize;
     public Vector2Int CoreSize => coreFootprint.size;
-    public Vector3 Center => new((Width - 1) * 0.5f, 0, (Depth - 1) * 0.5f);
+    public Vector3 Center => new Vector3((Width - 1) * 0.5f, 0, (Depth - 1) * 0.5f) * CellSize;
 
     // 기본 지형: 17x17, 가운데 한 칸만 열린 가로 벽.
-    public DefenseGrid() : this(DefaultSize, DefaultSize, new RectInt(DefaultSize / 2, DefaultSize - 2, 2, 2),
-        new[] { new Vector2Int(2, 2), new Vector2Int(DefaultSize - 3, 2) }, new[] { 0, 1 }, DefaultWalls())
+    public DefenseGrid(float cellSize = DefaultCellSize) : this(DefaultSize, DefaultSize, new RectInt(DefaultSize / 2, DefaultSize - 2, 2, 2),
+        new[] { new Vector2Int(2, 2), new Vector2Int(DefaultSize - 3, 2) }, new[] { 0, 1 }, DefaultWalls(), cellSize)
     {
     }
 
     // 범위 밖·코어·스폰 위에 놓인 벽 칸은 무시한다. 경로가 없으면 Routes가 null이다.
     public DefenseGrid(int width, int depth, RectInt core, IReadOnlyList<Vector2Int> spawnCells,
-        IReadOnlyList<int> spawnFactionIndices, IEnumerable<Vector2Int> fixedWallCells)
+        IReadOnlyList<int> spawnFactionIndices, IEnumerable<Vector2Int> fixedWallCells, float cellSize = DefaultCellSize)
     {
+        if (cellSize <= 0f) throw new ArgumentOutOfRangeException(nameof(cellSize));
+        CellSize = cellSize;
         Width = width;
         Depth = depth;
         coreFootprint = core;
@@ -79,9 +83,9 @@ public sealed class DefenseGrid
     public bool IsFixedWall(Vector2Int cell) => fixedWalls.Contains(cell);
 
     private Vector3 ClosestCorePoint(Vector3 position) => new(
-        Mathf.Clamp(position.x, coreFootprint.xMin - 0.5f, coreFootprint.xMax - 0.5f),
+        Mathf.Clamp(position.x, (coreFootprint.xMin - 0.5f) * CellSize, (coreFootprint.xMax - 0.5f) * CellSize),
         0f,
-        Mathf.Clamp(position.z, coreFootprint.yMin - 0.5f, coreFootprint.yMax - 0.5f));
+        Mathf.Clamp(position.z, (coreFootprint.yMin - 0.5f) * CellSize, (coreFootprint.yMax - 0.5f) * CellSize));
 
     public BuildResult TryPlace(Vector2Int cell)
     {
@@ -120,7 +124,7 @@ public sealed class DefenseGrid
         if (length == 0f)
             return true;
 
-        var coreBounds = new Bounds(CorePosition, new Vector3(CoreSize.x, 1f, CoreSize.y));
+        var coreBounds = new Bounds(CorePosition, new Vector3(CoreSize.x * CellSize, 1f, CoreSize.y * CellSize));
         return (!coreBounds.IntersectRay(new Ray(from, step / length), out float distance) || distance > length) &&
             IsWallFree(from, to, 0.24f);
     }
@@ -132,7 +136,7 @@ public sealed class DefenseGrid
         if (length == 0)
             return true;
 
-        var ray = new Ray(from + Vector3.up * (WallHeight * 0.5f), step / length);
+        var ray = new Ray(from + Vector3.up * (WallHeight * CellSize * 0.5f), step / length);
         foreach (Vector2Int cell in fixedWalls)
         {
             if (IntersectsWall(cell, ray, length, wallExpansion))
@@ -146,17 +150,17 @@ public sealed class DefenseGrid
         return true;
     }
 
-    public static Bounds WallBounds(Vector2Int cell) =>
-        new(CellPosition(cell) + Vector3.up * (WallHeight * 0.5f), new Vector3(WallWidth, WallHeight, WallWidth));
+    public static Bounds WallBounds(Vector2Int cell, float cellSize = DefaultCellSize) =>
+        new(CellPosition(cell, cellSize) + Vector3.up * (WallHeight * cellSize * 0.5f), new Vector3(WallWidth, WallHeight, WallWidth) * cellSize);
 
-    public static Vector3 CellPosition(Vector2Int cell) => new(cell.x, 0, cell.y);
+    public static Vector3 CellPosition(Vector2Int cell, float cellSize = DefaultCellSize) => new Vector3(cell.x, 0, cell.y) * cellSize;
 
-    public static Vector2Int PositionToCell(Vector3 position) =>
-        new(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.z));
+    public static Vector2Int PositionToCell(Vector3 position, float cellSize = DefaultCellSize) =>
+        new(Mathf.RoundToInt(position.x / cellSize), Mathf.RoundToInt(position.z / cellSize));
 
-    private static bool IntersectsWall(Vector2Int cell, Ray ray, float length, float expansion)
+    private bool IntersectsWall(Vector2Int cell, Ray ray, float length, float expansion)
     {
-        Bounds bounds = WallBounds(cell);
+        Bounds bounds = WallBounds(cell, CellSize);
         bounds.Expand(expansion);
         return bounds.IntersectRay(ray, out float distance) && distance <= length;
     }
@@ -209,7 +213,7 @@ public sealed class DefenseGrid
             // Mirror the tie-break for spawns right of center so equally short paths stay symmetric.
             bool mirrored = cell.x * 2 > Width - 1;
 
-            var path = new List<Vector3> { CellPosition(cell) };
+            var path = new List<Vector3> { CellPosition(cell, CellSize) };
             while (distance > 1)
             {
                 foreach (Vector2Int direction in Directions)
@@ -221,11 +225,11 @@ public sealed class DefenseGrid
 
                     cell = next;
                     distance--;
-                    path.Add(CellPosition(cell));
+                    path.Add(CellPosition(cell, CellSize));
                     break;
                 }
             }
-            path.Add(ClosestCorePoint(CellPosition(cell)));
+            path.Add(ClosestCorePoint(CellPosition(cell, CellSize)));
             result[i] = path.ToArray();
         }
         UnreachableSpawn = -1;

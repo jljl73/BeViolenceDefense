@@ -1,0 +1,366 @@
+[
+  {
+    "fullName": "CombatPositioningTests.AdjacentSpawnsDoNotOverlapLargeUnitsInTheSameTick",
+    "status": "Passed",
+    "duration": 0.0460931,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.AttackCooldownDoesNotCountAsApproachStall",
+    "status": "Passed",
+    "duration": 0.0136829,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.AwarenessControlsFindingDistantEnemies(2.2f,False)",
+    "status": "Passed",
+    "duration": 0.00464,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.AwarenessControlsFindingDistantEnemies(3.2f,True)",
+    "status": "Passed",
+    "duration": 0.0001687,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap",
+    "status": "Passed",
+    "duration": 0.0013837,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.BlockedQueuePreservesPenaltyAcrossPlanningAndClearsOnTargetLoss",
+    "status": "Passed",
+    "duration": 0.0034734,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.BlockedQueueReroutesAndReachesOpponent(False)",
+    "status": "Passed",
+    "duration": 0.0135915,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.BlockedQueueReroutesAndReachesOpponent(True)",
+    "status": "Passed",
+    "duration": 0.0049962,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(4.0f,True,False,True)",
+    "status": "Passed",
+    "duration": 0.0008725,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(4.0f,False,False,False)",
+    "status": "Passed",
+    "duration": 0.00013,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(1.0f,True,False,False)",
+    "status": "Passed",
+    "duration": 0.0000813,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(4.0f,True,True,False)",
+    "status": "Passed",
+    "duration": 0.0001171,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CongestionPenaltyIsPersonalTemporaryAndNotABarrier",
+    "status": "Passed",
+    "duration": 0.0009256,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(9,False)",
+    "status": "Passed",
+    "duration": 0.156353,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(9,True)",
+    "status": "Passed",
+    "duration": 0.2170288,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(20,False)",
+    "status": "Passed",
+    "duration": 0.430701,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(20,True)",
+    "status": "Passed",
+    "duration": 0.7709829,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,False)",
+    "status": "Passed",
+    "duration": 1.220657,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,True)",
+    "status": "Passed",
+    "duration": 2.0270186,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.DefaultGridDoublesCellsWallsAndCoreContact",
+    "status": "Passed",
+    "duration": 0.0022786,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.DoubledGridKeepsUnitSizeSpeedAndRange",
+    "status": "Passed",
+    "duration": 0.1029978,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.EquidistantTargetsUseSpawnOrderInsteadOfListOrder",
+    "status": "Passed",
+    "duration": 0.0004219,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.FirstWaveRearUnitsDoNotRepeatedlyReverseWhileWithoutTarget",
+    "status": "Passed",
+    "duration": 0.0689348,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.FirstWaveRearUnitsSpreadAndJoinSeveralFights",
+    "status": "Passed",
+    "duration": 0.0469903,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.FlankingSurvivorCanBypassTrafficUsingForwardRouteConnection",
+    "status": "Passed",
+    "duration": 0.0045794,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.ForwardRouteShortcutKeepsItsChosenWaypointUntilReached",
+    "status": "Passed",
+    "duration": 0.0010637,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.FullTargetQueueWaitsThenUsesVacatedAttackPosition",
+    "status": "Passed",
+    "duration": 0.001458,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.IntentionalCombatQueueDoesNotTriggerRerouting",
+    "status": "Passed",
+    "duration": 0.0004215,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.LocalSteeringGoesAroundUnitsWithoutCuttingThroughAWall",
+    "status": "Passed",
+    "duration": 0.0006867,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.LosingTargetDiscardsCommittedDetour",
+    "status": "Passed",
+    "duration": 0.0006423,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.MovementUsesBothUnitsRadii(0.2f,0.2f)",
+    "status": "Passed",
+    "duration": 0.0005782,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.MovementUsesBothUnitsRadii(0.2f,0.5f)",
+    "status": "Passed",
+    "duration": 0.0000793,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.MovementUsesBothUnitsRadii(0.5f,0.5f)",
+    "status": "Passed",
+    "duration": 0.0000598,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.ReadyAttackerTakesPriorityOverDistantReservations",
+    "status": "Passed",
+    "duration": 0.000751,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.ReadyFighterStaysPutAndAlternativeTargetIsUsedWhenFull",
+    "status": "Passed",
+    "duration": 0.0008297,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears(False)",
+    "status": "Passed",
+    "duration": 0.0032791,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears(True)",
+    "status": "Passed",
+    "duration": 0.0046065,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.ShortAttackRangeDoesNotAllowEnteringAnotherUnitsSpace",
+    "status": "Passed",
+    "duration": 0.0009219,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(\"wall\")",
+    "status": "Passed",
+    "duration": 0.0033252,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(\"range\")",
+    "status": "Passed",
+    "duration": 0.0022502,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(\"dead\")",
+    "status": "Passed",
+    "duration": 0.0025458,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(\"body\")",
+    "status": "Passed",
+    "duration": 0.0034584,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledSidestepsSwitchToReachableNeighborAndStartAttacking",
+    "status": "Passed",
+    "duration": 0.0067573,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledUnitFlanksRockAndFrontLineWithoutChangingOpponent",
+    "status": "Passed",
+    "duration": 0.004563,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.StalledUnitWithoutAlternativeResumesWhenFrontLineClears",
+    "status": "Passed",
+    "duration": 0.0024241,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.SuccessfulDetourKeepsPreferredTarget",
+    "status": "Passed",
+    "duration": 0.0010483,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "CombatPositioningTests.WallStillBlocksDetectionAndAttacks",
+    "status": "Passed",
+    "duration": 0.0003673,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "FourFactionBattleTests.AllFourRacesSpawnAndFightEachOther",
+    "status": "Passed",
+    "duration": 0.0232749,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "FourFactionBattleTests.RacesWithoutSpawnAreSkipped",
+    "status": "Passed",
+    "duration": 0.0018068,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "SimulationDeterminismTests.CommandHistoryReplaysTheSameBattle",
+    "status": "Passed",
+    "duration": 0.1397608,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "SimulationDeterminismTests.SameTicksAcrossFramePatterns",
+    "status": "Passed",
+    "duration": 0.3346457,
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "fullName": "SimulationPurityTests.SimulationFilesAvoidFrameAndSceneDependencies",
+    "status": "Passed",
+    "duration": 0.0212114,
+    "message": null,
+    "stackTrace": null
+  }
+]

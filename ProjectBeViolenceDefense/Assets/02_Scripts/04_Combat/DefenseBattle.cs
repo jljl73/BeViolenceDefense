@@ -319,8 +319,8 @@ internal sealed class DefenseBattle
             if ((first - second).sqrMagnitude > range * range || !grid.HasLineOfSight(first, second))
                 continue;
 
-            Vector2Int center = DefenseGrid.PositionToCell((first + second) * 0.5f);
-            return grid.IsWalkable(center) ? center : DefenseGrid.PositionToCell(first);
+            Vector2Int center = DefenseGrid.PositionToCell((first + second) * 0.5f, grid.CellSize);
+            return grid.IsWalkable(center) ? center : DefenseGrid.PositionToCell(first, grid.CellSize);
         }
 
         return null;

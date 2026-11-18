@@ -58,8 +58,8 @@ public sealed class BoardEnvironment : MonoBehaviour
         var random = new System.Random(seed);
         int width = stage != null ? stage.width : DefenseGrid.DefaultSize;
         int depth = stage != null ? stage.depth : DefenseGrid.DefaultSize;
-        center = new((width - 1) * 0.5f, 0f, (depth - 1) * 0.5f);
-        halfBoard = Mathf.Max(width, depth) * 0.5f + 0.5f;
+        center = new Vector3((width - 1) * 0.5f, 0f, (depth - 1) * 0.5f) * DefenseGrid.DefaultCellSize;
+        halfBoard = (Mathf.Max(width, depth) * 0.5f + 0.5f) * DefenseGrid.DefaultCellSize;
         // 카메라 반대쪽(화면 위)과 카메라 쪽(화면 아래)을 구분한다.
         Camera cam = viewCamera != null ? viewCamera : Camera.main;
         toFar = cam != null

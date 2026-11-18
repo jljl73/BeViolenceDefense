@@ -4,6 +4,7 @@ using UnityEngine.Rendering;
 
 internal sealed class DefenseBoardView
 {
+    private const float CellSize = DefenseGrid.DefaultCellSize;
     private const float CameraPanSpeed = 6f;
     private const float CameraDistance = 20f;
     private const float CameraFocusOffset = 0.9f;
@@ -240,15 +241,15 @@ internal sealed class DefenseBoardView
         Material core = Palette(CoreColor);
 
         Box("Board base", root, grid.Center - Vector3.up * 0.55f,
-            new Vector3(boardWidth, 0.6f, boardDepth), foundation);
-        float tileSize = 1f - theme.tileGap;
+            new Vector3(boardWidth * CellSize, 0.6f, boardDepth * CellSize), foundation);
+        float tileSize = (1f - theme.tileGap) * CellSize;
         var tileScale = new Vector3(tileSize, TileHeight, tileSize);
         Mesh tileMesh = theme.tileBevel > 0f ? Beveled("Board Tile", tileScale, theme.tileBevel) : null;
         for (int x = 0; x < boardWidth; x++)
         {
             for (int z = 0; z < boardDepth; z++)
             {
-                floor[x, z] = Box($"Tile {x},{z}", root, new Vector3(x, -TileHeight * 0.5f, z),
+                floor[x, z] = Box($"Tile {x},{z}", root, new Vector3(x * CellSize, -TileHeight * 0.5f, z * CellSize),
                     tileScale, tiles[(x + z) % tiles.Length], tileMesh).GetComponent<MeshRenderer>();
             }
         }
@@ -266,11 +267,11 @@ internal sealed class DefenseBoardView
         {
             EnemyFaction faction = factions[spawnFactions[i]];
             Vector3 position = DefenseGrid.CellPosition(grid.SpawnCells[i]);
-            var padScale = new Vector3(0.9f, 0.07f, 0.9f);
+            var padScale = new Vector3(0.9f * CellSize, 0.07f, 0.9f * CellSize);
             Mesh padMesh = theme.tileBevel > 0f ? Beveled("Spawn Pad", padScale, Mathf.Min(theme.tileBevel, 0.03f)) : null;
             Box($"{faction.DisplayName} spawn pad", root, position + Vector3.up * 0.035f,
                 padScale, FactionMaterial(faction), padMesh);
-            Box("Spawn pad center", root, position + Vector3.up * 0.075f, new Vector3(0.55f, 0.03f, 0.55f), foundation);
+            Box("Spawn pad center", root, position + Vector3.up * 0.075f, new Vector3(0.55f * CellSize, 0.03f, 0.55f * CellSize), foundation);
         }
 
         CreateCore(grid, theme, foundation, fixedWall, core);
@@ -339,7 +340,7 @@ internal sealed class DefenseBoardView
         int cells = obstacle.rotation % 2 == 0 ? obstacle.size.x : obstacle.size.y;
         float length = LocalLengthX(model);
         if (length > 0.01f)
-            model.localScale *= (cells - (1f - DefenseGrid.WallWidth)) / length;
+            model.localScale *= (cells - (1f - DefenseGrid.WallWidth)) * CellSize / length;
         model.SetLocalPositionAndRotation(obstacle.Center, Quaternion.Euler(0f, obstacle.rotation * 90f, 0f));
     }
 
@@ -400,11 +401,11 @@ internal sealed class DefenseBoardView
         float bevel = Mathf.Max(theme.tileBevel, 0.04f);
         float y = (top + bottom) * 0.5f;
         Vector3 center = grid.Center;
-        float halfX = boardWidth * 0.5f + width * 0.5f;
-        float halfZ = boardDepth * 0.5f + width * 0.5f;
+        float halfX = boardWidth * CellSize * 0.5f + width * 0.5f;
+        float halfZ = boardDepth * CellSize * 0.5f + width * 0.5f;
 
-        var longSize = new Vector3(boardWidth + width * 2f, height, width);
-        var shortSize = new Vector3(width, height, boardDepth);
+        var longSize = new Vector3(boardWidth * CellSize + width * 2f, height, width);
+        var shortSize = new Vector3(width, height, boardDepth * CellSize);
         Mesh longMesh = Beveled("Board Border Long", longSize, bevel);
         Mesh shortMesh = Beveled("Board Border Short", shortSize, bevel);
         Box("Border near", root, new Vector3(center.x, y, center.z - halfZ), longSize, material, longMesh);
@@ -426,8 +427,8 @@ internal sealed class DefenseBoardView
         model.SetParent(root, false);
         model.localPosition = grid.CorePosition;
 
-        float width = grid.CoreSize.x - 0.04f;
-        float depth = grid.CoreSize.y - 0.04f;
+        float width = (grid.CoreSize.x - 0.04f) * CellSize;
+        float depth = (grid.CoreSize.y - 0.04f) * CellSize;
         const float rim = 0.16f;
         float platformTop = 0.32f;
         const float platformThickness = 0.12f;
@@ -436,8 +437,8 @@ internal sealed class DefenseBoardView
             // 테마가 받침 모델을 주면 기본 블록 받침대 대신 그것을 놓고, 캐릭터는 그 위에 세운다.
             GameObject platform = Object.Instantiate(theme.corePlatformPrefab, model, false);
             platform.name = "Core platform model";
-            platform.transform.localScale *= theme.corePlatformScale;
-            platformTop = theme.corePlatformTop;
+            platform.transform.localScale *= theme.corePlatformScale * CellSize;
+            platformTop = theme.corePlatformTop * CellSize;
         }
         else
             CreateCorePedestal(model, width, depth, rim, platformTop, platformThickness, foundation, wall);
@@ -534,7 +535,7 @@ internal sealed class DefenseBoardView
 
     public void FitCamera()
     {
-        float boardScale = Mathf.Max(boardWidth, boardDepth) / 12f;
+        float boardScale = Mathf.Max(boardWidth, boardDepth) * CellSize / 12f;
         camera.orthographicSize = Mathf.Max(9.4f, 9.5f / camera.aspect) * boardScale * viewScale;
     }
 
@@ -592,8 +593,8 @@ internal sealed class DefenseBoardView
 
     private void MoveCamera(Vector3 offset)
     {
-        cameraFocus.x = ClampPanAxis(cameraFocus.x + offset.x, boardWidth - 1f);
-        cameraFocus.z = ClampPanAxis(cameraFocus.z + offset.z, boardDepth - 1f);
+        cameraFocus.x = ClampPanAxis(cameraFocus.x + offset.x, (boardWidth - 1f) * CellSize);
+        cameraFocus.z = ClampPanAxis(cameraFocus.z + offset.z, (boardDepth - 1f) * CellSize);
         PositionCamera();
     }
 
@@ -604,7 +605,7 @@ internal sealed class DefenseBoardView
     }
 
     private void PositionCamera() =>
-        camera.transform.position = root.TransformPoint(cameraFocus) - camera.transform.forward * CameraDistance;
+        camera.transform.position = root.TransformPoint(cameraFocus) - camera.transform.forward * (CameraDistance * CellSize);
 
     public void ShowPlanningTiles(IReadOnlyList<Vector3[]> routes = null,
         IReadOnlyCollection<Vector2Int> encounters = null)
@@ -642,10 +643,10 @@ internal sealed class DefenseBoardView
             RouteMarkerMotion motion = routeMarkerMotions[i];
             float phase = routeMarkerPhase;
             float travel = Mathf.SmoothStep(0f, 1f, phase);
-            marker.transform.localPosition = motion.Center + motion.Direction * ((travel - 0.5f) * RouteMarkerTravel);
+            marker.transform.localPosition = motion.Center + motion.Direction * ((travel - 0.5f) * RouteMarkerTravel * CellSize);
             float fade = Mathf.SmoothStep(0f, 1f,
                 Mathf.Min(phase, 1f - phase) / RouteMarkerFadePortion);
-            marker.transform.localScale = new Vector3(motion.WidthScale * fade, fade, fade);
+            marker.transform.localScale = new Vector3(motion.WidthScale * fade, fade, fade) * CellSize;
             tintBlock.SetColor(BaseColor, Color.Lerp(motion.FloorColor, motion.ArrowColor, fade));
             marker.SetPropertyBlock(tintBlock);
         }
@@ -688,7 +689,7 @@ internal sealed class DefenseBoardView
             for (int i = 0; i < steps.Count; i++)
             {
                 var (factionIndex, direction) = steps[i];
-                float offset = (i - (steps.Count - 1) * 0.5f) * RouteLaneSpacing;
+                float offset = (i - (steps.Count - 1) * 0.5f) * RouteLaneSpacing * CellSize;
                 int markerIndex = markerCount++;
                 MeshRenderer marker = RouteMarker(markerIndex);
                 Vector3 markerCenter = center + side * offset;
@@ -785,8 +786,8 @@ internal sealed class DefenseBoardView
                 return false;
 
         point = ray.GetPoint(distance);
-        return point.x >= -0.5f && point.x < boardWidth - 0.5f &&
-            point.z >= -0.5f && point.z < boardDepth - 0.5f;
+        return point.x >= -0.5f * CellSize && point.x < (boardWidth - 0.5f) * CellSize &&
+            point.z >= -0.5f * CellSize && point.z < (boardDepth - 0.5f) * CellSize;
     }
 
     public void ShowAreaSpellPreview(DefenseBattle.Spell? spell, Vector3? center, float radius)
@@ -904,7 +905,7 @@ internal sealed class DefenseBoardView
             foreach (Vector2Int cell in wallViews.Keys)
             {
                 Vector3 wall = DefenseGrid.CellPosition(cell);
-                float margin = DefenseGrid.WallWidth * 0.5f + 0.1f;
+                float margin = DefenseGrid.WallWidth * CellSize * 0.5f + 0.1f;
                 if (Mathf.Abs(midpoint.x - wall.x) <= margin && Mathf.Abs(midpoint.z - wall.z) <= margin)
                 {
                     onWall = true;
@@ -1638,6 +1639,7 @@ internal sealed class DefenseBoardView
             Transform woodWall = Object.Instantiate(wallPrefab, root, false).transform;
             woodWall.name = label;
             woodWall.localPosition = DefenseGrid.CellPosition(cell);
+            woodWall.localScale *= CellSize;
             // 고정 벽은 배치한 벽과 구분되도록 어둡게 칠한다.
             if (material != buildWall)
             {
@@ -1652,6 +1654,7 @@ internal sealed class DefenseBoardView
         var wall = new GameObject(label).transform;
         wall.SetParent(root, false);
         wall.localPosition = DefenseGrid.CellPosition(cell);
+        wall.localScale = Vector3.one * CellSize;
         Box("Block", wall, Vector3.up * 0.34f, new Vector3(DefenseGrid.WallWidth, 0.68f, DefenseGrid.WallWidth), material);
         Box("Cap", wall, Vector3.up * 0.73f, new Vector3(0.86f, 0.12f, 0.86f), trim);
         return wall;

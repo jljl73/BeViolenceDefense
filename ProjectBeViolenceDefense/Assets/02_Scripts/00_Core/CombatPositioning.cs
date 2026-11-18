@@ -6,6 +6,14 @@ internal sealed class CombatPositioning
     internal const int MaxAttackersPerTarget = 3;
     internal const float StalledRetargetDelay = 0.6f;
     internal const float CombatJoinRange = 4.5f;
+    internal const float CongestionDuration = 2f;
+    private const float DetourStep = 0.5f;
+    private const float DetourBudget = 8f;
+    private static readonly Vector2Int[] DetourDirections =
+    {
+        new(1, 0), new(1, 1), new(0, 1), new(-1, 1),
+        new(-1, 0), new(-1, -1), new(0, -1), new(1, -1)
+    };
     private const float ApproachProgressThreshold = 0.05f;
     private const int CurrentPositionSlot = -2;
     private const int SlotCount = 8;
@@ -48,16 +56,23 @@ internal sealed class CombatPositioning
         reservedPositions.Clear();
         foreach (EnemyUnit enemy in enemies)
         {
+            EnemyUnit previousTarget = enemy.Target ?? enemy.CombatQueue?.Target;
             EnemyUnit target = FindTarget(enemy);
             if (target != enemy.CombatProgressTarget)
                 ResetApproachProgress(enemy, target);
-            if (target != enemy.Target)
+            if (target != previousTarget)
             {
+                enemy.CombatDetour = null;
+                enemy.CongestedPoint = null;
+                enemy.CongestionRemaining = 0f;
                 enemy.AttackSlot = -1;
                 enemy.CombatSteerWaypoint = null;
             }
             if (enemy.CombatQueue is { } queue && queue.Target != target)
+            {
                 enemy.CombatQueue = null;
+                enemy.CombatQueueReason = EnemyUnit.QueueReason.None;
+            }
             enemy.Target = target;
             enemy.CombatDestination = null;
             if (target != null)
@@ -81,11 +96,21 @@ internal sealed class CombatPositioning
 
             EnemyUnit target = enemy.Target;
 
-            // A local sidestep alone is not proof that this fight is reachable. Probe other
-            // complete approaches before renewing a stalled target's reservation.
+            if (enemy.CombatStalledTime < StalledRetargetDelay && ContinueDetour(enemy, target))
+                continue;
+
+            // Re-route around the blockage before looking for a different opponent.
             if (enemy.CombatStalledTime >= StalledRetargetDelay)
             {
+                Vector3 direction = (enemy.CombatDetour != null
+                    ? enemy.CombatDetour[enemy.CombatDetourIndex] : enemy.CombatSteerWaypoint ?? target.Position) - enemy.Position;
+                enemy.CongestedPoint = enemy.Position + direction.normalized * 0.65f;
+                enemy.CongestionRemaining = CongestionDuration;
+                enemy.CombatDetour = null;
                 ResetApproachProgress(enemy, target);
+                // Keep the opponent: first search all free attack positions around it.
+                if (FindCongestionDetour(enemy, target))
+                    continue;
                 if (FindAlternative(enemy, target, false, out EnemyUnit reachable,
                         out int reachableSlot, out Vector3 reachableWaypoint, out float reachableLength))
                 {
@@ -116,21 +141,20 @@ internal sealed class CombatPositioning
                 continue;
             }
 
-            EnemyUnit queueTarget = reservedSlots.ContainsKey(target) ? target : null;
-            foreach (EnemyUnit other in enemies)
-            {
-                if (other == target || !CanDetect(enemy, other))
-                    continue;
-                if (queueTarget == null && reservedSlots.ContainsKey(other))
-                {
-                    queueTarget = other;
-                }
-            }
             enemy.Target = null;
-            if (queueTarget != null)
-                QueueBehindFight(enemy, queueTarget);
-            else
-                enemy.CombatQueue = null;
+            // No reservation yet is also an approach failure, not absence of an enemy.
+            QueueBehindFight(enemy, target);
+        }
+
+        // Classify after all reservations: later attackers can fill the same opponent.
+        foreach (EnemyUnit enemy in enemies)
+        {
+            if (enemy.CombatQueue is not { } queue) continue;
+            EnemyUnit.QueueReason reason = IsTargetFull(queue.Target)
+                ? EnemyUnit.QueueReason.Capacity : EnemyUnit.QueueReason.BlockedApproach;
+            if (enemy.CombatQueueReason != reason)
+                ResetApproachProgress(enemy, queue.Target);
+            enemy.CombatQueueReason = reason;
         }
     }
 
@@ -138,13 +162,16 @@ internal sealed class CombatPositioning
     // erase the time already spent stuck. Cooldown while in striking position is not a stall.
     public void TrackApproachProgress(EnemyUnit enemy, float deltaTime)
     {
+        enemy.CongestionRemaining = Mathf.Max(0f, enemy.CongestionRemaining - deltaTime);
+        if (enemy.CongestionRemaining == 0f) enemy.CongestedPoint = null;
         EnemyUnit target = enemy.Target ?? enemy.CombatQueue?.Target;
         if (target == null || !target.IsAlive || target != enemy.CombatProgressTarget || CanAttack(enemy, target))
             ResetApproachProgress(enemy, target);
-        if (target == null || !target.IsAlive || CanAttack(enemy, target))
+        if (target == null || !target.IsAlive || CanAttack(enemy, target) ||
+            (enemy.Target == null && enemy.CombatQueueReason == EnemyUnit.QueueReason.Capacity))
             return;
 
-        float remaining = enemy.CombatDestination is { } destination && enemy.Target != null
+        float remaining = enemy.CombatDetour != null ? DetourRemaining(enemy) : enemy.CombatDestination is { } destination && enemy.Target != null
             ? Vector3.Distance(enemy.Position, destination) + enemy.CombatApproachTailLength
             : Vector3.Distance(enemy.Position, target.Position);
         // Compare against the best remaining route, not distance moved: oscillation must
@@ -163,6 +190,117 @@ internal sealed class CombatPositioning
         enemy.CombatProgressTarget = target;
         enemy.CombatBestRemainingDistance = float.PositiveInfinity;
         enemy.CombatStalledTime = 0f;
+    }
+
+    private static float DetourRemaining(EnemyUnit enemy)
+    {
+        float length = 0f;
+        Vector3 previous = enemy.Position;
+        for (int i = enemy.CombatDetourIndex; i < enemy.CombatDetour.Length; i++)
+        {
+            length += Vector3.Distance(previous, enemy.CombatDetour[i]);
+            previous = enemy.CombatDetour[i];
+        }
+        return length;
+    }
+
+    private bool ContinueDetour(EnemyUnit enemy, EnemyUnit target)
+    {
+        if (enemy.CombatDetour == null) return false;
+        if (enemy.AttackSlot < 0 || !SlotAvailable(enemy, target, enemy.AttackSlot) ||
+            Vector3.Distance(target.Position, enemy.CombatDetourTargetPosition) > 0.35f)
+        {
+            enemy.CombatDetour = null;
+            return false;
+        }
+        Reserve(enemy, target, enemy.AttackSlot, enemy.CombatDetour[enemy.CombatDetourIndex], DetourRemaining(enemy), keepDetour: true);
+        return true;
+    }
+
+    // Local weighted Dijkstra, used only after a real approach stall. Half-cell samples
+    // do not change the building grid. Every segment still checks walls and unit bodies.
+    private bool FindCongestionDetour(EnemyUnit enemy, EnemyUnit target)
+    {
+        var goals = new List<int>();
+        for (int slot = 0; slot < SlotCount; slot++)
+            if (SlotAvailable(enemy, target, slot)) goals.Add(slot);
+        if (goals.Count == 0) return false;
+
+        Vector3 origin = enemy.Position;
+        Vector3 Point(Vector2Int node) => origin + new Vector3(node.x * DetourStep, 0f, node.y * DetourStep);
+        var open = new List<Vector2Int> { Vector2Int.zero };
+        var costs = new Dictionary<Vector2Int, float> { [Vector2Int.zero] = 0f };
+        var parents = new Dictionary<Vector2Int, Vector2Int>();
+        var closed = new HashSet<Vector2Int>();
+        float bestCost = DetourBudget;
+        int bestSlot = -1;
+        Vector2Int bestNode = default;
+        while (open.Count > 0)
+        {
+            int best = 0;
+            for (int i = 1; i < open.Count; i++)
+                if (costs[open[i]] < costs[open[best]]) best = i;
+            Vector2Int node = open[best];
+            open.RemoveAt(best);
+            float cost = costs[node];
+            if (cost >= bestCost) break;
+            closed.Add(node);
+            Vector3 point = Point(node);
+            foreach (int slot in goals)
+            {
+                Vector3 goal = SlotPosition(enemy, target, slot);
+                float candidate = cost + CongestionCost(enemy, point, goal);
+                if (candidate >= bestCost || !CanMove(enemy, target, point, goal)) continue;
+                bestCost = candidate;
+                bestSlot = slot;
+                bestNode = node;
+            }
+            foreach (Vector2Int direction in DetourDirections)
+            {
+                Vector2Int next = node + direction;
+                if (closed.Contains(next)) continue;
+                Vector3 destination = Point(next);
+                float candidate = cost + CongestionCost(enemy, point, destination);
+                if (candidate >= bestCost ||
+                    (costs.TryGetValue(next, out float old) && old <= candidate) ||
+                    !CanMove(enemy, target, point, destination)) continue;
+                if (!costs.ContainsKey(next)) open.Add(next);
+                costs[next] = candidate;
+                parents[next] = node;
+            }
+        }
+        if (bestSlot < 0) return false;
+
+        var path = new List<Vector3> { SlotPosition(enemy, target, bestSlot) };
+        while (bestNode != Vector2Int.zero)
+        {
+            path.Add(Point(bestNode));
+            bestNode = parents[bestNode];
+        }
+        path.Reverse();
+        enemy.CombatDetour = path.ToArray();
+        enemy.CombatDetourIndex = 0;
+        enemy.CombatDetourTargetPosition = target.Position;
+        enemy.CombatSteerWaypoint = null;
+        ResetApproachProgress(enemy, target);
+        Reserve(enemy, target, bestSlot, path[0], DetourRemaining(enemy), keepDetour: true);
+        return true;
+    }
+
+    internal static float CongestionCost(EnemyUnit enemy, Vector3 from, Vector3 to)
+    {
+        Vector3 step = to - from;
+        float length = step.magnitude;
+        if (enemy.CongestionRemaining <= 0f || enemy.CongestedPoint is not { } blocked || length == 0f)
+            return length;
+        float along = Vector3.Dot(blocked - from, step / length);
+        // A soft per-unit cost, never a global wall or a permanent blacklisted cell.
+        float perpendicularSquared = (blocked - from).sqrMagnitude - along * along;
+        const float radius = 0.65f;
+        if (perpendicularSquared >= radius * radius) return length;
+        float halfChord = Mathf.Sqrt(Mathf.Max(0f, radius * radius - perpendicularSquared));
+        float overlap = Mathf.Max(0f, Mathf.Min(length, along + halfChord) - Mathf.Max(0f, along - halfChord));
+        return length + overlap * 4f;
     }
 
     private bool FindAlternative(EnemyUnit enemy, EnemyUnit current, bool allowLocalSteer,
@@ -237,6 +375,20 @@ internal sealed class CombatPositioning
         if (CanAttack(enemy, target))
         {
             enemy.CombatSteerWaypoint = null;
+            enemy.CombatDetour = null;
+            return;
+        }
+        if (enemy.CombatDetour != null)
+        {
+            Vector3 waypoint = enemy.CombatDetour[enemy.CombatDetourIndex];
+            Vector3 step = enemy.StepToward(waypoint, deltaTime);
+            if (CanMove(enemy, target, enemy.Position, step))
+            {
+                enemy.Face(step);
+                enemy.MoveOffRoute(step);
+                if (step.Equals(waypoint) && ++enemy.CombatDetourIndex == enemy.CombatDetour.Length)
+                    enemy.CombatDetour = null;
+            }
             return;
         }
         if (enemy.CombatDestination is not { } destination)
@@ -353,14 +505,16 @@ internal sealed class CombatPositioning
         return distance != 0 ? distance : first.SpawnOrder.CompareTo(second.SpawnOrder);
     }
 
-    private void Reserve(EnemyUnit enemy, EnemyUnit target, int slot, Vector3 waypoint, float length = 0f)
+    private void Reserve(EnemyUnit enemy, EnemyUnit target, int slot, Vector3 waypoint, float length = 0f, bool keepDetour = false)
     {
+        if (!keepDetour) enemy.CombatDetour = null;
         if (enemy.CombatProgressTarget != target || slot == CurrentPositionSlot)
             ResetApproachProgress(enemy, target);
         if (enemy.Target != target || slot == CurrentPositionSlot)
             enemy.CombatSteerWaypoint = null;
         enemy.Target = target;
         enemy.CombatQueue = null;
+        enemy.CombatQueueReason = EnemyUnit.QueueReason.None;
         enemy.AttackSlot = slot;
         enemy.CombatDestination = waypoint;
         enemy.CombatApproachTailLength = Mathf.Max(0f, length - Vector3.Distance(enemy.Position, waypoint));
@@ -375,6 +529,7 @@ internal sealed class CombatPositioning
 
     private void QueueBehindFight(EnemyUnit enemy, EnemyUnit target)
     {
+        enemy.CombatDetour = null;
         enemy.CombatSteerWaypoint = null;
         if (enemy.CombatQueue?.Target != target)
             enemy.CombatQueue = (target, nextQueueOrder++);
@@ -433,9 +588,26 @@ internal sealed class CombatPositioning
     {
         waypoint = SlotPosition(enemy, target, slot);
         length = float.PositiveInfinity;
+        if (!SlotAvailable(enemy, target, slot)) return false;
+
+        Vector3 goal = waypoint;
+        if (CanMove(enemy, target, enemy.Position, goal))
+        {
+            length = Vector3.Distance(enemy.Position, goal);
+            return true;
+        }
+        if (!allowDetour)
+            return false;
+
+        return TryLegacyDetour(enemy, target, slot, goal, allowLocalSteer, out waypoint, out length);
+    }
+
+    private bool SlotAvailable(EnemyUnit enemy, EnemyUnit target, int slot)
+    {
+        Vector3 waypoint = SlotPosition(enemy, target, slot);
         if (RequiredSpacing(enemy.Faction, target.Faction) > enemy.Faction.AttackRange)
             return false;
-        if (!grid.IsWalkable(DefenseGrid.PositionToCell(waypoint)) || !grid.HasLineOfSight(waypoint, target.Position))
+        if (!grid.IsWalkable(DefenseGrid.PositionToCell(waypoint, grid.CellSize)) || !grid.HasLineOfSight(waypoint, target.Position))
             return false;
 
         if ((reservedSlots.TryGetValue(target, out var reservation) &&
@@ -449,14 +621,14 @@ internal sealed class CombatPositioning
                 return false;
         }
 
-        Vector3 goal = waypoint;
-        if (CanMove(enemy, target, enemy.Position, goal))
-        {
-            length = Vector3.Distance(enemy.Position, goal);
-            return true;
-        }
-        if (!allowDetour)
-            return false;
+        return true;
+    }
+
+    private bool TryLegacyDetour(EnemyUnit enemy, EnemyUnit target, int slot, Vector3 goal, bool allowLocalSteer,
+        out Vector3 waypoint, out float length)
+    {
+        waypoint = goal;
+        length = float.PositiveInfinity;
 
         // Work backwards from the attack slot along either edge of the fight.
         float outerRadius = enemy.Faction.AttackRange + RequiredSpacing(enemy.Faction, target.Faction);
@@ -523,8 +695,8 @@ internal sealed class CombatPositioning
             Mathf.Max(enemy.Faction.AttackRange * 0.85f, RequiredSpacing(enemy.Faction, target.Faction) + 0.02f));
 
     private bool CanMove(EnemyUnit enemy, EnemyUnit target, Vector3 from, Vector3 to) =>
-        grid.IsWalkable(DefenseGrid.PositionToCell(from)) &&
-        grid.IsWalkable(DefenseGrid.PositionToCell(to)) &&
+        grid.IsWalkable(DefenseGrid.PositionToCell(from, grid.CellSize)) &&
+        grid.IsWalkable(DefenseGrid.PositionToCell(to, grid.CellSize)) &&
         ClearOfUnits(enemy, target, from, to, attacking: false) &&
         grid.CanPursue(from, to) &&
         HasRouteConnection(enemy, to);

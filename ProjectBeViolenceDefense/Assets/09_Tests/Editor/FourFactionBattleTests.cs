@@ -19,7 +19,7 @@ public sealed class FourFactionBattleTests
         // 서로 인지 거리 안에 붙여 둔 스폰. 열린 보드에서도 종족끼리 바로 만난다.
         var cells = new[] { new Vector2Int(7, 2), new Vector2Int(9, 2), new Vector2Int(7, 4), new Vector2Int(9, 4) };
         return new DefenseGrid(17, 17, new RectInt(8, 15, 2, 2), cells.Take(spawnFactions.Length).ToArray(),
-            spawnFactions, null);
+            spawnFactions, null, cellSize: 1f);
     }
 
     [Test]
