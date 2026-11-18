@@ -255,3 +255,28 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: Unity 재시작 후 Input Debugger의 Keyboard/Mouse 인식 및 실제 Space·클릭 입력. TestScene은 빌드 목록에 없어 현재 buildIndex 기반 재시작 경로도 별도 수정 필요. 독립 실행 빌드 미검증.
+
+### [20261118-1942] TestScene 가을 숲 배경 구성 (3단계)
+- 시각: 2026-11-18 19:42:00 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code / Claude Opus 5.5 (claude-opus-5-5), Unity Editor MCP (Pipeline)
+- 목적 및 적용 위치: Emberward 가을 숲 레퍼런스를 참고해 TestScene 보드 주변에 지면·단풍나무·떨어지는 잎·먼 곳 안개·조명·후처리를 구성.
+- 사용 방식: 실행 시 배경을 생성하는 BoardEnvironment 컴포넌트를 작성해 TestScene에만 배치. 지면 질감은 Perlin 노이즈로 생성하고, 나무는 흔든 정이십면체 잎 덩어리와 육각 기둥 줄기로 생성. 카메라 쪽 가까운 자리에는 덤불만 두어 보드를 가리지 않게 함. TestScene 전용 볼륨 프로필을 복제해 색보정과 따뜻한 비네트 적용, 환경광을 Trilight로 변경.
+- 결과 및 확인 방법: 성공. 컴파일 실패 없음, Play Mode 중 콘솔 경고·에러 0건. Play Mode 캡처를 3회 반복하며 나무 밀도·크기·지면 색·안개 수치를 조정하고 2560×1440 캡처로 나무 형태와 그림자 확인.
+- 사람의 개입: 3단계 진행을 사용자가 지시. 색·밀도·안개 수치는 AI 임시 선택, 사람 검토 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/BoardEnvironment.cs | Claude Code | 생성 | 지면·나무·덤불·떨어지는 잎 생성, 거리 기반 안개 색 혼합. 검토 중 |
+| ProjectBeViolenceDefense/Assets/Settings/TestSceneProfile.asset | Unity Editor MCP | 생성(복제) | SampleSceneProfile 복제 후 Color Adjustments 추가, 비네트 색·강도 변경. 원본 프로필은 그대로. 검토 중 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/TestScene.unity | Unity Editor MCP | 수정 | Board Environment 오브젝트 추가, 배경색 #E2A985, Trilight 환경광, 조명 1.8·그림자 0.85, 전용 볼륨 프로필 연결. 검토 중 |
+
+#### 증거
+- 없음. Play Mode 캡처는 세션 임시 폴더에만 저장.
+
+#### 미확인 및 후속 확인
+- Unity CLI는 사용하지 않음. 컴파일·Play Mode 확인은 Unity Editor MCP로 수행.
+- Unity 기본 안개(Linear)를 켜면 직교 카메라에서 화면 전체가 청록색으로 덮이는 문제를 확인해 사용하지 않음. 대신 생성 시 거리 기반으로 안개 색을 섞음(카메라 이동·줌에 따라 바뀌지 않음).
+- 줌 최대 축소(145%)·카메라 이동 시 배경 끝이 보이는지, 전투 중 유닛과 잎 파티클의 가독성, 상단 HUD 글자가 나무 위에서 읽히는지는 직접 확인하지 않음.
+- Netmarble Medium SDF.asset 1줄 변경은 에디터가 만든 것으로 보이며 이번 작업 범위가 아님.
