@@ -222,12 +222,7 @@ internal sealed class DefenseBoardView
             {
                 view = Object.Instantiate(obstacle.prefab, root, false).transform;
                 view.name = $"{obstacle.prefab.name} {obstacle.cell.x},{obstacle.cell.y}";
-                // 자수정 산맥처럼 한 칸 길이로 줄여 임포트한 프리팹도 차지한 칸 길이에 맞춰 균일하게 키운다.
-                int cells = obstacle.rotation % 2 == 0 ? obstacle.size.x : obstacle.size.y;
-                float length = LocalLengthX(view);
-                if (length > 0.01f)
-                    view.localScale *= (cells - (1f - DefenseGrid.WallWidth)) / length;
-                view.SetLocalPositionAndRotation(obstacle.Center, Quaternion.Euler(0f, obstacle.rotation * 90f, 0f));
+                FitObstacle(view, obstacle);
             }
             else
             {
@@ -242,6 +237,41 @@ internal sealed class DefenseBoardView
                 wallViews.Add(cell, view != null ? view : CreateWall(cell, $"Fixed Wall {cell.x},{cell.y}", fixedWall));
             }
         }
+    }
+
+    // 자수정 산맥처럼 한 칸 길이로 줄여 임포트한 프리팹도 차지한 칸 길이에 맞춰 균일하게 키운 뒤 칸 중심에 놓는다.
+    internal static void FitObstacle(Transform model, StageData.Obstacle obstacle)
+    {
+        int cells = obstacle.rotation % 2 == 0 ? obstacle.size.x : obstacle.size.y;
+        float length = LocalLengthX(model);
+        if (length > 0.01f)
+            model.localScale *= (cells - (1f - DefenseGrid.WallWidth)) / length;
+        model.SetLocalPositionAndRotation(obstacle.Center, Quaternion.Euler(0f, obstacle.rotation * 90f, 0f));
+    }
+
+    // Stage Editor 미리보기가 다시 만들 때 카메라 위치와 줌을 유지한다.
+    internal (Vector3 Focus, float Scale) CameraState
+    {
+        get => (cameraFocus, targetViewScale);
+        set
+        {
+            cameraFocus = value.Focus;
+            viewScale = targetViewScale = value.Scale;
+            zoomAnchorViewport = null;
+            PositionCamera();
+            FitCamera();
+        }
+    }
+
+    // Stage Editor 미리보기(에디터 모드)에서도 쓰므로 Play Mode가 아니면 즉시 지운다.
+    internal static void Release(Object target)
+    {
+        if (target == null)
+            return;
+        if (Application.isPlaying)
+            Object.Destroy(target);
+        else
+            Object.DestroyImmediate(target);
     }
 
     // 프리팹 루트 기준 메시 전체의 X 길이 (루트 자신의 스케일 제외).
@@ -1067,18 +1097,18 @@ internal sealed class DefenseBoardView
     public void ReleaseMaterials()
     {
         spellCastMarkers.ReleaseSprites();
-        Object.Destroy(areaSpellPreviewMesh);
-        Object.Destroy(factionRingMesh);
+        Release(areaSpellPreviewMesh);
+        Release(factionRingMesh);
         if (aimDim != null && aimDim.sprite != null)
         {
-            Object.Destroy(aimDim.sprite.texture);
-            Object.Destroy(aimDim.sprite);
+            Release(aimDim.sprite.texture);
+            Release(aimDim.sprite);
         }
-        Object.Destroy(previewRingMesh);
+        Release(previewRingMesh);
         foreach (Material material in materials)
-            Object.Destroy(material);
+            Release(material);
         foreach (Mesh mesh in meshes)
-            Object.Destroy(mesh);
+            Release(mesh);
     }
 
     private Transform CreateWall(Vector2Int cell, string label, Material material)
@@ -1132,7 +1162,7 @@ internal sealed class DefenseBoardView
         if (mesh == null)
         {
             cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            Object.Destroy(cube.GetComponent<BoxCollider>());
+            Release(cube.GetComponent<BoxCollider>());
             cube.transform.localScale = size;
         }
         else

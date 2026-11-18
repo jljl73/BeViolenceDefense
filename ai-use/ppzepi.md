@@ -478,3 +478,40 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: GameScene diff의 Popup 오브젝트가 의도한 변경인지. `Amethyst.mat`(_MainTex 자동 동기화)과 TMP `Netmarble Medium SDF.asset`(Play Mode 동적 아틀라스) 변경은 Editor 부수 효과로 이번 작업에 포함하지 않음. 실제 마우스로 Stage Editor를 칠하는 조작감, 17×17이 아닌 보드에서의 카메라·배경 배치는 미확인. Windows 빌드 미실행.
+
+### [20261118-stage-editor-gameview] Stage Editor 게임 화면 미리보기
+- 시각: 2026-11-18 23:13:20 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code / Claude Opus 5.5 (claude-opus-5-5), Unity CLI 1.0.0 (Unity 6000.3.28f1 Editor 연결)
+- 목적 및 적용 위치: Stage Editor 2D 격자가 실제 플레이 화면과 달라 장애물 배치 결과를 알기 어렵다는 피드백 반영. 게임과 같은 보드 표시 코드·카메라로 그린 3D 화면에서 직접 배치하고, 놓을 장애물을 실제 모델로 미리 보여 줌.
+- 사용 방식: AI가 DefenseBoardView를 에디터 모드에서 쓸 수 있게 고치고(Play Mode가 아니면 DestroyImmediate, 장애물 배치·카메라 상태 공개), PreviewRenderUtility 기반 미리보기를 작성. 씬의 Voxel Defense Prototype 설정·방향광·Global Volume을 복사하고, 후처리가 적용되도록 카메라 종류를 Game으로 지정.
+- 결과 및 확인 방법: 부분 성공. 컴파일 오류·경고 0, `Tools/Verify Stage Data`·`Tools/Verify Enemy Groups Once` 통과. Stage1 미리보기와 Play Mode 준비 단계 캡처를 비교해 벽 배치·경로 화살표·예상 교전 타일·코어·스폰 패드·카메라 각도·톤매핑/비네트 일치 확인. 칸 중심 → 화면 → 칸 왕복 선택 5/5 일치, 자수정 3×1 고스트가 실제 크기로 표시, 배치 후 다시 그려도 줌 유지, 콘솔 0건. 바닥·벽 색이 게임보다 약간 푸르고 밝은 차이는 해결하지 못함(미리보기 환경광 설정이 URP에서 반영되지 않는 것으로 관찰).
+- 사람의 개입: 미리보기 부족 문제 제기. 실제 마우스 조작 검토는 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/Editor/StagePreview.cs | Claude Code | 생성 | 게임 화면 미리보기(보드 생성, 조명·후처리 복사, 선택·줌·이동, 고스트·칸 표시). 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/Editor/StageEditorWindow.cs | Claude Code | 수정 | 게임 화면/격자 전환, 3D 화면 입력, 붓 판정 공용화. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Claude Code | 수정 | `Release`(에디터 모드 즉시 삭제), `FitObstacle`, `CameraState` 추가. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Effects/SpellCastMarkers.cs | Claude Code | 수정 | 스프라이트 해제를 `DefenseBoardView.Release`로. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/StageData.cs | Claude Code | 수정 | 에디터 어셈블리에 `InternalsVisibleTo` 부여. 사용 |
+| docs/prototype.md | Claude Code | 수정 | Stage Editor 게임 화면 설명. 사용 |
+
+#### 증거
+- ai-use/evidence/stage-editor/stage_editor_gameview.png, ai-use/evidence/stage-editor/playmode_stage1_prep.png (비교용), ai-use/evidence/stage-editor/stage_editor_ghost.png
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 반복 컴파일, 에디터 창 캡처, Play Mode 준비 단계 캡처, 리플렉션으로 선택 좌표 왕복·고스트·배치 후 재구성 확인, 임시 테스트 에셋 생성·삭제.
+- 활용 방식: `script eval`, `capture editor_window`, `capture game_view`, `console get`.
+- 잘된 점: 게임 화면과 미리보기를 같은 조건으로 캡처해 차이(후처리 누락)를 찾고 원인(Preview 카메라)을 바로 시험함.
+- 잘 안된 점 및 개선 필요: 더 이상 쓰지 않는 `BeginPreviewHDR` 호출로 API Updater가 돌아 Editor가 잠시 응답하지 않았음. 도메인 리로드 후 창의 스테이지 선택이 풀림.
+
+#### 주요 프롬프트
+- 사용 도구: Claude Code
+- 프롬프트 원문: `현재 미리보기 능력이 부족하다. 실제 게임 플레이 화면과 뷰가 상이하고, 실제로 장해물 오브젝트를 설치했을 때 어떻게 보일지 모른다.`
+- 결과 및 실제 활용 방식: Stage Editor 기본 보기를 게임 화면 미리보기로 교체.
+- 선정 이유: 편집 화면과 실제 화면의 차이를 없애는 방향을 정한 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Editor 메모리의 Stage1에 저장되지 않은 기본 벽 (10,11)이 있음(디스크는 55개). 의도한 배치가 아니면 저장하지 말고 지울 것. 미리보기 색감 차이, 실제 마우스로 칠하기·줌·이동 조작감, 17×17이 아닌 보드의 미리보기는 미확인.

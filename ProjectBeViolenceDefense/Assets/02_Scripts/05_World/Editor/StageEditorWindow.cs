@@ -6,7 +6,7 @@ using UnityEngine;
 
 /// <summary>
 /// StageData 편집 창. 보드 크기, 고정 장애물 프리팹, 진영별 스폰, 코어 위치를 칸 단위로 칠한다.
-/// 왼쪽 클릭·드래그로 배치, 오른쪽 클릭으로 삭제, R로 장애물 회전.
+/// 게임 화면(실제 보드 표시 코드) 또는 격자에서 왼쪽 클릭·드래그로 배치, 오른쪽 클릭으로 삭제, R로 장애물 회전.
 /// </summary>
 internal sealed class StageEditorWindow : EditorWindow
 {
@@ -35,6 +35,8 @@ internal sealed class StageEditorWindow : EditorWindow
     [SerializeField] private int spawnFaction;
     [SerializeField] private int paletteIndex;
     [SerializeField] private int rotation;
+    [SerializeField] private bool gameView = true;
+    private StagePreview gamePreview;
     private readonly List<PaletteItem> palette = new();
     private DefenseGrid preview;
     private string problem;
@@ -75,11 +77,17 @@ internal sealed class StageEditorWindow : EditorWindow
     {
         Undo.undoRedoPerformed += OnUndoRedo;
         wantsMouseMove = true;
+        gamePreview = new StagePreview();
         LoadPalette();
         Rebuild();
     }
 
-    private void OnDisable() => Undo.undoRedoPerformed -= OnUndoRedo;
+    private void OnDisable()
+    {
+        Undo.undoRedoPerformed -= OnUndoRedo;
+        gamePreview?.Dispose();
+        gamePreview = null;
+    }
 
     private void OnProjectChange()
     {
@@ -125,6 +133,8 @@ internal sealed class StageEditorWindow : EditorWindow
         }
         preview = stage.CreateGrid();
         problem = stage.Validate(preview);
+        if (gameView)
+            gamePreview?.Rebuild(stage);
     }
 
     private void OnGUI()
@@ -140,11 +150,18 @@ internal sealed class StageEditorWindow : EditorWindow
                 EditorGUIUtility.labelWidth = 0f;
             }
 
-            Rect canvas = GUILayoutUtility.GetRect(10f, 10f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            if (stage != null)
-                DrawBoard(canvas);
-            else
-                EditorGUI.LabelField(canvas, "StageData를 선택하거나 새로 만드세요.", EditorStyles.centeredGreyMiniLabel);
+            using (new EditorGUILayout.VerticalScope())
+            {
+                if (stage != null)
+                    DrawCanvasToolbar();
+                Rect canvas = GUILayoutUtility.GetRect(10f, 10f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                if (stage == null)
+                    EditorGUI.LabelField(canvas, "StageData를 선택하거나 새로 만드세요.", EditorStyles.centeredGreyMiniLabel);
+                else if (gameView)
+                    DrawGameView(canvas);
+                else
+                    DrawBoard(canvas);
+            }
         }
 
         Event e = Event.current;
@@ -247,6 +264,90 @@ internal sealed class StageEditorWindow : EditorWindow
         EditorGUILayout.HelpBox($"{ObstacleFolder}의 프리팹. 이름의 NxM이 차지하는 칸 수입니다.", MessageType.None);
     }
 
+    private void DrawCanvasToolbar()
+    {
+        using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+        {
+            EditorGUI.BeginChangeCheck();
+            gameView = GUILayout.Toolbar(gameView ? 0 : 1, new[] { "게임 화면", "격자" }, EditorStyles.toolbarButton,
+                GUILayout.Width(140f)) == 0;
+            if (EditorGUI.EndChangeCheck())
+            {
+                hoverCell = null;
+                Rebuild();
+            }
+            GUILayout.FlexibleSpace();
+            if (!gameView)
+                return;
+            GUILayout.Label(gamePreview.Source != null
+                ? $"설정: {gamePreview.Source}"
+                : "씬에 Voxel Defense Prototype이 없어 기본 설정으로 그립니다", EditorStyles.miniLabel);
+            GUILayout.Label("· 휠 줌 · 가운데 버튼 드래그 이동", EditorStyles.miniLabel);
+            if (GUILayout.Button("새로 고침", EditorStyles.toolbarButton))
+            {
+                // 씬의 조명·후처리·카메라 설정을 다시 읽는다.
+                gamePreview.Dispose();
+                gamePreview = new StagePreview();
+                Rebuild();
+            }
+        }
+    }
+
+    // 게임과 같은 보드 표시 코드·카메라 각도로 그린 화면 위에서 바로 칠한다.
+    private void DrawGameView(Rect canvas)
+    {
+        Event e = Event.current;
+        bool inside = canvas.Contains(e.mousePosition);
+        if (inside && e.type == EventType.ScrollWheel)
+        {
+            gamePreview.Zoom(canvas, e.mousePosition, -e.delta.y);
+            e.Use();
+            Repaint();
+        }
+        else if (inside && e.type == EventType.MouseDrag && e.button == 2)
+        {
+            gamePreview.Drag(canvas, e.mousePosition - e.delta, e.mousePosition);
+            e.Use();
+            Repaint();
+        }
+
+        Vector2Int? cellUnderMouse = null;
+        if (inside && gamePreview.TryPickCell(canvas, e.mousePosition, out Vector2Int picked) &&
+            InBoard(new RectInt(picked, Vector2Int.one)))
+            cellUnderMouse = picked;
+        HandleInput(cellUnderMouse);
+        if (e.type != EventType.Repaint)
+            return;
+
+        if (gamePreview.Error != null)
+        {
+            EditorGUI.HelpBox(canvas, $"미리보기를 만들 수 없습니다: {gamePreview.Error}", MessageType.Error);
+            return;
+        }
+        if (hoverCell is { } hover)
+        {
+            bool allowed = BrushAllowed(hover);
+            gamePreview.ShowBrush(Brush(hover), BrushColor(allowed), allowed, tool == Tool.Obstacle,
+                palette[paletteIndex].Prefab, rotation);
+        }
+        else
+        {
+            gamePreview.HideBrush();
+        }
+        gamePreview.Render(canvas);
+    }
+
+    private bool BrushAllowed(Vector2Int hover) => tool switch
+    {
+        Tool.Obstacle => CanPlace(Brush(hover), ignoreCore: false),
+        Tool.Core => CanPlace(Brush(hover), ignoreCore: true),
+        Tool.Spawn => CanPlaceSpawn(hover),
+        _ => true
+    };
+
+    private Color BrushColor(bool allowed) => tool == Tool.Erase ? new Color(1f, 1f, 1f, 0.25f)
+        : allowed ? new Color(0.3f, 1f, 0.4f, 0.35f) : new Color(1f, 0.25f, 0.2f, 0.4f);
+
     private void DrawBoard(Rect canvas)
     {
         const float margin = 12f;
@@ -260,7 +361,16 @@ internal sealed class StageEditorWindow : EditorWindow
             cells.width * cell, cells.height * cell);
         Vector2 CellCenter(Vector3 point) => new(origin.x + (point.x + 0.5f) * cell, origin.y + (stage.depth - point.z - 0.5f) * cell);
 
-        HandleInput(canvas, origin, cell);
+        Vector2 mouse = Event.current.mousePosition;
+        Vector2Int? cellUnderMouse = null;
+        if (canvas.Contains(mouse))
+        {
+            int x = Mathf.FloorToInt((mouse.x - origin.x) / cell);
+            int y = stage.depth - 1 - Mathf.FloorToInt((mouse.y - origin.y) / cell);
+            if (x >= 0 && x < stage.width && y >= 0 && y < stage.depth)
+                cellUnderMouse = new Vector2Int(x, y);
+        }
+        HandleInput(cellUnderMouse);
         if (Event.current.type != EventType.Repaint)
             return;
 
@@ -303,31 +413,12 @@ internal sealed class StageEditorWindow : EditorWindow
         }
 
         if (hoverCell is { } hover)
-        {
-            bool allowed = tool switch
-            {
-                Tool.Obstacle => CanPlace(Brush(hover), ignoreCore: false),
-                Tool.Core => CanPlace(Brush(hover), ignoreCore: true),
-                Tool.Spawn => CanPlaceSpawn(hover),
-                _ => true
-            };
-            Color color = tool == Tool.Erase ? new Color(1f, 1f, 1f, 0.25f)
-                : allowed ? new Color(0.3f, 1f, 0.4f, 0.35f) : new Color(1f, 0.25f, 0.2f, 0.4f);
-            EditorGUI.DrawRect(CellsRect(Brush(hover)), color);
-        }
+            EditorGUI.DrawRect(CellsRect(Brush(hover)), BrushColor(BrushAllowed(hover)));
     }
 
-    private void HandleInput(Rect canvas, Vector2 origin, float cell)
+    private void HandleInput(Vector2Int? cellUnderMouse)
     {
         Event e = Event.current;
-        Vector2Int? cellUnderMouse = null;
-        if (canvas.Contains(e.mousePosition))
-        {
-            int x = Mathf.FloorToInt((e.mousePosition.x - origin.x) / cell);
-            int y = stage.depth - 1 - Mathf.FloorToInt((e.mousePosition.y - origin.y) / cell);
-            if (x >= 0 && x < stage.width && y >= 0 && y < stage.depth)
-                cellUnderMouse = new Vector2Int(x, y);
-        }
 
         if (e.type == EventType.MouseMove || e.type == EventType.MouseDrag)
         {

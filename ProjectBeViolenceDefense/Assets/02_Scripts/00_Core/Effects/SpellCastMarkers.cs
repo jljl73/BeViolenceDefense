@@ -222,8 +222,8 @@ internal sealed class SpellCastMarkers
 
     private static void DestroySprite(Sprite sprite)
     {
-        Object.Destroy(sprite.texture);
-        Object.Destroy(sprite);
+        DefenseBoardView.Release(sprite.texture);
+        DefenseBoardView.Release(sprite);
     }
 
     private sealed class Marker

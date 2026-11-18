@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Stage Editor(에디터 어셈블리)가 게임 보드 표시 코드를 그대로 써서 미리보기를 그린다.
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Assembly-CSharp-Editor")]
+
 /// <summary>
 /// 스테이지 하나의 보드: 크기, 코어, 스폰, 처음부터 놓인 장애물. Tools/Stage Editor에서 편집한다.
 /// 좌표는 칸 단위이고 (0,0)이 화면 아래쪽 모서리, y가 클수록 코어 쪽이다.
