@@ -12,7 +12,7 @@ using UnityEngine;
 /// </summary>
 internal sealed class AssetPathsGenerator : AssetPostprocessor
 {
-    private const string OutputPath = "Assets/Scripts/AssetLoading/AssetPaths.g.cs";
+    private const string OutputPath = "Assets/02_Scripts/00_Core/AssetLoading/AssetPaths.g.cs";
     private const string ResourcesSegment = "/Resources/";
 
     private static readonly HashSet<string> Keywords = new(StringComparer.Ordinal)

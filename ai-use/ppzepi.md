@@ -29,3 +29,41 @@
 #### 미확인 및 후속 확인
 - 준비 단계에서 플레이어가 직접 벽을 배치·철거하는 동작은 직접 조작해 확인하지 않았다.
 - Netmarble Medium SDF.asset과 URPProjectSettings.asset의 변경은 에디터가 만든 것으로 보이며 이번 작업 범위가 아니다. 커밋 여부를 확인해야 한다.
+
+### [20261118-1841] LuckyNumber 기준 Assets 폴더 정리
+- 시각: 2026-11-18 18:41:00 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / 모델·버전 확인 필요, PowerShell, Unity Editor MCP (Pipeline)
+- 목적 및 적용 위치: LuckyNumber/Assets의 번호·역할별 구조를 현재 프로젝트에 적용. Addressables 제외.
+- 사용 방식: 기준 폴더와 패키지·씬·코드를 확인하고 AssetDatabase.MoveAsset으로 이동. 기존 GUID와 파일 해시를 이동 전후 비교.
+- 결과 및 확인 방법: 폴더 정리 성공. 원본 GUID 누락 0개, 에셋 본문 변경은 AssetPathsGenerator 출력 경로뿐. 컴파일 실패 없음, 씬 Missing Script 0개, Resources 벽 프리팹 로딩 성공. Play Mode에서 게임/UI 초기화 및 프레임 3320→5062, 시간 21.46→33.41초 진행 확인 후 종료. 기존 Verify Enemy Groups Once 검증은 첫 스폰 9명 조건에서 실패; 전체 검증 통과로 판단하지 않음.
+- 사람의 개입: 기준 프로젝트와 Addressables 제외를 사용자 지정. 기존 사용자 변경 내용 보존; 추가 직접 개입 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/01_Scenes ~ 09_Tests | Codex + Unity Editor MCP | 이동·생성 | 번호별 폴더와 역할 분류 적용. 상세 108개 이동 항목은 docs/asset-folders.md 참고. 사용 중 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/AssetLoading/Editor/AssetPathsGenerator.cs | Codex | 수정 | 생성 파일 출력 경로 갱신. 사용 중 |
+| ProjectBeViolenceDefense/ProjectSettings/EditorBuildSettings.asset | Unity Editor MCP | 경로 확인·갱신 | 기존 씬 GUID로 현재 GameScene 경로 재해석. 사용 중 |
+| AGENTS.md, docs/prototype.md, docs/ui-flow.md | Codex | 수정 | 이동된 경로 링크 갱신. 사용 중 |
+| docs/asset-folders.md | Codex | 생성 | 폴더 기준 및 실제 이동 목록. 사용 중 |
+
+#### 증거
+- docs/asset-folders.md
+- Unity MCP 세션 결과: GUID 누락 0, missingScripts=0, wall=true, compilationFailed=false. 별도 실행 로그 파일 없음.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex의 파일 검사·수정 및 Unity MCP 호출.
+- 사용 방식: 폴더 비교, 에셋 이동, 경로 갱신, 해시·GUID 검증, Play Mode 확인.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: C:\Users\Choij\Documents\Projects\Unity\LuckyNumber\Assets 해당 폴더의 폴더링 구조를 보고 현재 프로젝트도 유사하게 폴더링한다. 단 Addressable은 제외한다.
+- 결과 및 실제 활용 방식: 01_Scenes~09_Tests 분류를 적용하고 Resources와 외부 플러그인 위치를 유지.
+- 선정 이유: 폴더 정리 범위와 Addressables 제외를 결정한 요청.
+
+#### 미확인 및 후속 확인
+- Unity CLI는 unity --version 실행 시 PATH에서 찾지 못함. CLI 컴파일·빌드 미실행. Unity Editor MCP로 컴파일 상태와 Play Mode를 확인.
+- 기존 스폰 검증 메뉴의 첫 조건 실패 원인은 이번 폴더 정리 범위에서 수정하지 않음. 관련 런타임·검증 코드 내용은 이동 전후 동일.
+- 최초 일괄 이동 중 폴더 등록 시점과 기존 생성기 출력 경로로 오류 발생. 순차 이동과 출력 경로 수정 후 완료. 재생성된 중복 파일은 본문 해시 일치 확인 후 개별 삭제.
+- 자동 승인 검토가 Scripts 폴더 전체 삭제를 증거 부족으로 거절. 이후 중복 파일 동등성과 빈 폴더 여부를 확인하여 제한된 삭제 완료. 남은 승인 대기 없음.

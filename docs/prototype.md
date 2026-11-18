@@ -32,7 +32,7 @@
 
 ## 첫 플레이 테스트
 
-[GameScene](../ProjectBeViolenceDefense/Assets/Scenes/GameScene.unity)을 열고 Play를 누른다. 12×12 그리드의 준비 단계부터 시작한다.
+[GameScene](../ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity)을 열고 Play를 누른다. 12×12 그리드의 준비 단계부터 시작한다.
 
 - **초기 벽**은 화면 세로축을 기준으로 좌우 대칭이며 144칸 중 19칸을 차지한다. 양쪽의 기본 경로는 길이가 같고 중앙 통로에서 만난 뒤 코어로 향한다.
 - **준비**에서 추가 벽을 왼쪽 클릭으로 배치하고 오른쪽 클릭으로 철거한다. 추가 벽은 최대 8개를 동시에 배치하며, 철거하면 즉시 한 칸을 다시 쓸 수 있다. 초기 벽은 고정 지형이다. 두 스폰 지점의 경로는 바닥에 표시되며, 한 곳이라도 코어까지 갈 수 없게 되는 배치는 거부된다.

@@ -21,11 +21,11 @@
 | 상태와 자원 | `Round.png`, `Core.png`, `Wall.png`, `Enemy.png`, `Mana.png` | 각 96×96 |
 | 빈 스킬 슬롯 | `Lock.png` | 64×64 |
 
-투명 PNG는 `Assets/Art/Hud`에 둔다. 버튼과 패널은 Unity의 9-slice로 모서리 형태를 유지한다. 전투 시작과 재시작은 금색을 쓰고, 사용 가능한 스킬은 산호색·연두색·하늘색 아이콘으로 구분한다. 사용 불가와 미선택 상태는 `ButtonDisabled`, 조준과 선택은 `OutlineFocus`를 쓴다.
+투명 PNG는 `Assets/07_UI/01_Icons/Hud`에 둔다. 버튼과 패널은 Unity의 9-slice로 모서리 형태를 유지한다. 전투 시작과 재시작은 금색을 쓰고, 사용 가능한 스킬은 산호색·연두색·하늘색 아이콘으로 구분한다. 사용 불가와 미선택 상태는 `ButtonDisabled`, 조준과 선택은 `OutlineFocus`를 쓴다.
 
 ## 색상 규칙
 
-UI 색은 `Assets/Scripts/UI/UIPalette.cs`의 토큰만 사용한다. 코드에 색 값을 직접 쓰지 않으며, 색을 바꿀 때는 이 파일의 hex 값만 수정한다.
+UI 색은 `Assets/02_Scripts/06_UI/UIPalette.cs`의 토큰만 사용한다. 코드에 색 값을 직접 쓰지 않으며, 색을 바꿀 때는 이 파일의 hex 값만 수정한다.
 
 | 그룹 | 토큰 | 값 | 용도 |
 | --- | --- | --- | --- |
