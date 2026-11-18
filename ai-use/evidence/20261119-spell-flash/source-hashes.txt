@@ -1,0 +1,4 @@
+Validated clone SHA-256:
+cac1ea34f7484248bf8ff1e3537056c0a2dfa9a79a3f709b16bfef432792c836  Assets/02_Scripts/00_Core/Effects/SpellEffects.cs
+6e0bbe4bfc0473f258097ec66cb6e99eeee19556a485cdfb96476b84ccbc8aa5  Assets/02_Scripts/05_World/DefenseBoardView.cs
+1b04eb7468bd82a9a5477c3859d9d3e0d9e2b2af60cf13897440be5a93fd3cb2  Assets/Resources/SpellAreaBurst.shader

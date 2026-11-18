@@ -23,6 +23,8 @@ public sealed class DefenseGrid
     private readonly HashSet<Vector2Int> fixedWalls = new();
     private readonly HashSet<Vector2Int> placed = new();
     private Vector3[][] routes;
+    private int[,] coreDistances;
+    private int coreDistancesVersion = -1;
 
     public int Width { get; }
     public int Depth { get; }
@@ -181,7 +183,52 @@ public sealed class DefenseGrid
 
     private bool IsWall(Vector2Int cell) => fixedWalls.Contains(cell) || placed.Contains(cell);
 
+    // 지금 위치에서 코어까지 가는 최단 경로. 첫 점은 position 그대로다. 위치가 걸을 수 없는 칸이거나
+    // 코어까지 길이 없으면 null.
+    public Vector3[] RouteFrom(Vector3 position)
+    {
+        Vector2Int cell = PositionToCell(position);
+        if (!IsWalkable(cell))
+            return null;
+        if (coreDistancesVersion != NavigationVersion || coreDistances == null)
+        {
+            coreDistances = FloodFromCore(null);
+            coreDistancesVersion = NavigationVersion;
+        }
+        if (coreDistances[cell.x, cell.y] == 0)
+            return null;
+
+        var path = new List<Vector3> { position };
+        TraceRoute(cell, coreDistances, path);
+        // 자기 칸 중심으로 되돌아가지 않고, 다음 칸이 바로 보이면 그쪽으로 곧장 간다.
+        if (path.Count > 2 && CanPursue(position, path[2]))
+            path.RemoveAt(1);
+        return path.ToArray();
+    }
+
     private Vector3[][] FindRoutes(Vector2Int? candidate = null)
+    {
+        int[,] distances = FloodFromCore(candidate);
+        var result = new Vector3[spawns.Length][];
+        for (int i = 0; i < result.Length; i++)
+        {
+            Vector2Int cell = spawns[i];
+            if (!InBounds(cell) || distances[cell.x, cell.y] == 0)
+            {
+                UnreachableSpawn = i;
+                return null;
+            }
+
+            var path = new List<Vector3>();
+            TraceRoute(cell, distances, path);
+            result[i] = path.ToArray();
+        }
+        UnreachableSpawn = -1;
+        return result;
+    }
+
+    // 코어 옆 칸이 1, 그다음이 2...인 걸음 수. 갈 수 없는 칸은 0. candidate 칸은 벽으로 본다.
+    private int[,] FloodFromCore(Vector2Int? candidate)
     {
         // Flood from all open tiles touching the core's sides.
         var distances = new int[Width, Depth];
@@ -212,42 +259,33 @@ public sealed class DefenseGrid
                 queue.Enqueue(next);
             }
         }
+        return distances;
+    }
 
-        var result = new Vector3[spawns.Length][];
-        for (int i = 0; i < result.Length; i++)
+    // cell 중심부터 코어 외곽 점까지 칸 중심을 path에 덧붙인다. cell은 코어에 닿을 수 있어야 한다.
+    private void TraceRoute(Vector2Int cell, int[,] distances, List<Vector3> path)
+    {
+        int distance = distances[cell.x, cell.y];
+        // Mirror the tie-break for spawns right of center so equally short paths stay symmetric.
+        bool mirrored = cell.x * 2 > Width - 1;
+
+        path.Add(CellPosition(cell));
+        while (distance > 1)
         {
-            Vector2Int cell = spawns[i];
-            int distance = InBounds(cell) ? distances[cell.x, cell.y] : 0;
-            if (distance == 0)
+            foreach (Vector2Int direction in Directions)
             {
-                UnreachableSpawn = i;
-                return null;
+                Vector2Int step = mirrored ? new Vector2Int(-direction.x, direction.y) : direction;
+                Vector2Int next = cell + step;
+                if (!InBounds(next) || distances[next.x, next.y] != distance - 1)
+                    continue;
+
+                cell = next;
+                distance--;
+                path.Add(CellPosition(cell));
+                break;
             }
-
-            // Mirror the tie-break for spawns right of center so equally short paths stay symmetric.
-            bool mirrored = cell.x * 2 > Width - 1;
-
-            var path = new List<Vector3> { CellPosition(cell) };
-            while (distance > 1)
-            {
-                foreach (Vector2Int direction in Directions)
-                {
-                    Vector2Int step = mirrored ? new Vector2Int(-direction.x, direction.y) : direction;
-                    Vector2Int next = cell + step;
-                    if (!InBounds(next) || distances[next.x, next.y] != distance - 1)
-                        continue;
-
-                    cell = next;
-                    distance--;
-                    path.Add(CellPosition(cell));
-                    break;
-                }
-            }
-            path.Add(ClosestCorePoint(CellPosition(cell)));
-            result[i] = path.ToArray();
         }
-        UnreachableSpawn = -1;
-        return result;
+        path.Add(ClosestCorePoint(CellPosition(cell)));
     }
 
     public bool InBounds(Vector2Int cell) =>

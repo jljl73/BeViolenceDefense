@@ -27,11 +27,75 @@ MonoBehaviour:
     faction: 1
   obstacles:
   - prefab: {fileID: 0}
-    cell: {x: 0, y: 7}
+    cell: {x: 0, y: 11}
     size: {x: 1, y: 1}
     rotation: 0
   - prefab: {fileID: 0}
-    cell: {x: 1, y: 7}
+    cell: {x: 1, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 3, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 4, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 5, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 6, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 7, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 9, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 10, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 11, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 12, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 13, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 15, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 16, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 3, y: 10}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 13, y: 10}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 3, y: 8}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 13, y: 8}
     size: {x: 1, y: 1}
     rotation: 0
   - prefab: {fileID: 0}
@@ -43,19 +107,15 @@ MonoBehaviour:
     size: {x: 1, y: 1}
     rotation: 0
   - prefab: {fileID: 0}
-    cell: {x: 4, y: 7}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 0}
-    cell: {x: 5, y: 7}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 0}
     cell: {x: 6, y: 7}
     size: {x: 1, y: 1}
     rotation: 0
   - prefab: {fileID: 0}
     cell: {x: 7, y: 7}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 8, y: 7}
     size: {x: 1, y: 1}
     rotation: 0
   - prefab: {fileID: 0}
@@ -67,14 +127,6 @@ MonoBehaviour:
     size: {x: 1, y: 1}
     rotation: 0
   - prefab: {fileID: 0}
-    cell: {x: 11, y: 7}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 0}
-    cell: {x: 12, y: 7}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 0}
     cell: {x: 13, y: 7}
     size: {x: 1, y: 1}
     rotation: 0
@@ -83,11 +135,75 @@ MonoBehaviour:
     size: {x: 1, y: 1}
     rotation: 0
   - prefab: {fileID: 0}
-    cell: {x: 15, y: 7}
+    cell: {x: 3, y: 6}
     size: {x: 1, y: 1}
     rotation: 0
   - prefab: {fileID: 0}
-    cell: {x: 16, y: 7}
+    cell: {x: 13, y: 6}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 3, y: 5}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 13, y: 5}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 3, y: 4}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 4, y: 4}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 5, y: 4}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 6, y: 4}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 7, y: 4}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 9, y: 4}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 10, y: 4}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 11, y: 4}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 12, y: 4}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 13, y: 4}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 4, y: 3}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 12, y: 3}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 4, y: 2}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 12, y: 2}
     size: {x: 1, y: 1}
     rotation: 0
   waves: {fileID: 0}

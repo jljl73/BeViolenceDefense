@@ -6,6 +6,10 @@ internal sealed class SpellEffects
 {
     private const float ImpactDuration = 0.28f;
     private const float UnitEffectScale = 1.5f;
+    private const float BurstDuration = 0.55f;
+    private const int MaxAreaBursts = 16;
+    private static readonly int BurstColor = Shader.PropertyToID("_BurstColor");
+    private static readonly int BurstAge = Shader.PropertyToID("_BurstAge");
     private static readonly Vector2[] AreaRing = CreateCircle();
     private static readonly Vector2[] ShieldLeft =
     {
@@ -27,6 +31,11 @@ internal sealed class SpellEffects
     private readonly int pulseSortingOrder;
     private readonly List<Pulse> playing = new();
     private readonly Stack<Pulse> available = new();
+    private readonly List<AreaBurst> bursts = new();
+    private readonly Stack<AreaBurst> availableBursts = new();
+    private readonly Material burstMaterial;
+    private readonly Mesh burstMesh;
+    private readonly MaterialPropertyBlock burstProperties = new();
 
     public SpellEffects(Transform board, Camera camera, Material material, int pulseSortingOrder)
     {
@@ -34,10 +43,22 @@ internal sealed class SpellEffects
         this.camera = camera.transform;
         this.material = material;
         this.pulseSortingOrder = pulseSortingOrder;
+        // Resources에 두어 플레이어 빌드에도 포함한다. 시간은 BattleClock에서만 전달한다.
+        burstMaterial = new Material(Resources.Load<Shader>("SpellAreaBurst")) { name = "Spell Area Burst" };
+        burstMesh = new Mesh
+        {
+            name = "Spell Area Burst Quad",
+            vertices = new[] { new Vector3(-1.08f, 0, -1.08f), new Vector3(-1.08f, 0, 1.08f),
+                new Vector3(1.08f, 0, 1.08f), new Vector3(1.08f, 0, -1.08f) },
+            uv = new[] { Vector2.zero, Vector2.up, Vector2.one, Vector2.right },
+            triangles = new[] { 0, 1, 2, 0, 2, 3 }
+        };
+        burstMesh.RecalculateBounds();
     }
 
     public void PlayArea(DefenseBattle.Spell spell, Vector3 center, float radius)
     {
+        PlayAreaBurst(center, radius, SpellColor(spell));
         Vector3 point = board.TransformPoint(center + Vector3.up * 0.055f);
         Play(AreaRing, point, Vector3.zero, SpellColor(spell), 0.42f, 0.20f,
             rotation: board.rotation * Quaternion.Euler(90f, 0f, 0f), scale: radius);
@@ -120,6 +141,19 @@ internal sealed class SpellEffects
 
     public void Advance(float deltaTime)
     {
+        for (int i = bursts.Count - 1; i >= 0; i--)
+        {
+            AreaBurst burst = bursts[i];
+            burst.Age += deltaTime;
+            if (burst.Age >= BurstDuration)
+            {
+                burst.Renderer.enabled = false;
+                availableBursts.Push(burst);
+                bursts.RemoveAt(i);
+            }
+            else
+                DrawBurst(burst);
+        }
         for (int i = playing.Count - 1; i >= 0; i--)
         {
             Pulse pulse = playing[i];
@@ -136,6 +170,65 @@ internal sealed class SpellEffects
                 Draw(pulse);
             }
         }
+    }
+
+    private void PlayAreaBurst(Vector3 center, float radius, Color color)
+    {
+        AreaBurst burst;
+        if (availableBursts.Count > 0)
+            burst = availableBursts.Pop();
+        else if (bursts.Count >= MaxAreaBursts)
+        {
+            // 리스트는 시전 순서다. 극단적인 연속 시전도 오브젝트 수가 늘지 않는다.
+            burst = bursts[0];
+            bursts.RemoveAt(0);
+        }
+        else
+        {
+            var effect = new GameObject("Spell Area Flash");
+            effect.transform.SetParent(board, false);
+            effect.AddComponent<MeshFilter>().sharedMesh = burstMesh;
+            var renderer = effect.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = burstMaterial;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            renderer.sortingOrder = pulseSortingOrder;
+            burst = new AreaBurst(renderer);
+        }
+        burst.Renderer.transform.localPosition = center + Vector3.up * 0.065f;
+        burst.Renderer.transform.localScale = Vector3.one * radius;
+        burst.Color = color;
+        burst.Age = 0f;
+        DrawBurst(burst);
+        burst.Renderer.enabled = true;
+        bursts.Add(burst);
+    }
+
+    private void DrawBurst(AreaBurst burst)
+    {
+        burstProperties.SetColor(BurstColor, burst.Color);
+        burstProperties.SetFloat(BurstAge, burst.Age);
+        burst.Renderer.SetPropertyBlock(burstProperties);
+    }
+
+    public void Release()
+    {
+        foreach (AreaBurst burst in bursts)
+            ReleaseObject(burst.Renderer.gameObject);
+        foreach (AreaBurst burst in availableBursts)
+            ReleaseObject(burst.Renderer.gameObject);
+        bursts.Clear();
+        availableBursts.Clear();
+        ReleaseObject(burstMaterial);
+        ReleaseObject(burstMesh);
+    }
+
+    private static void ReleaseObject(Object value)
+    {
+        if (Application.isPlaying)
+            Object.Destroy(value);
+        else
+            Object.DestroyImmediate(value);
     }
 
     private void Play(Vector2[] shape, Vector3 point, Vector3 motion, Color color, float duration,
@@ -213,5 +306,14 @@ internal sealed class SpellEffects
         public float Age;
 
         public Pulse(LineRenderer line) => Line = line;
+    }
+
+    private sealed class AreaBurst
+    {
+        public readonly MeshRenderer Renderer;
+        public Color Color;
+        public float Age;
+
+        public AreaBurst(MeshRenderer renderer) => Renderer = renderer;
     }
 }

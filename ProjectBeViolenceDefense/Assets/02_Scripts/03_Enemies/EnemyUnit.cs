@@ -49,7 +49,7 @@ internal sealed class EnemyUnit
     public const float TauntHealthBonusPercent = 0.5f;
     internal const float RetaliationDuration = 4f;
 
-    private readonly Vector3[] path;
+    private Vector3[] path;
     private readonly List<float> attackBuffTimers = new();
     private readonly List<float> moveSpeedBuffTimers = new();
     private int waypoint = 1;
@@ -128,6 +128,8 @@ internal sealed class EnemyUnit
     public Vector3? RouteYieldDestination { get; set; }
     public int RouteBypassOffset { get; set; } = -1;
     public float BlockedRouteTime { get; set; }
+    // 직전 이동 때 교전·추격·대기 중이었는지. 타깃을 잃은 첫 이동에서 코어 경로를 다시 잡는 데 쓴다.
+    public bool WasEngaged { get; set; }
     public bool ReachedCore => Position.Equals(path[^1]);
 
     public EnemyUnit(EnemyFaction faction, int factionIndex, Vector3[] path, int spawnOrder)
@@ -308,6 +310,19 @@ internal sealed class EnemyUnit
     public void MoveOffRoute(Vector3 next) => Position = next;
 
     public Vector3 GetRouteWaypoint(int offset) => path[waypoint + offset];
+
+    // 지금 위치에서 시작하는 새 코어 경로로 갈아탄다. route[0]은 현재 위치여야 한다.
+    public void Reroute(Vector3[] route)
+    {
+        path = route;
+        waypoint = 1;
+        RoutePosition = Position;
+        ReturnRouteOffset = -1;
+        RouteBypassOffset = -1;
+        RouteYieldDestination = null;
+        if (CombatPathTarget == null)
+            CombatPath.Clear();
+    }
 
     public void FollowRoute(Vector3 next, int rejoinOffset = 0)
     {
