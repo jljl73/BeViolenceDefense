@@ -80,6 +80,7 @@ internal sealed class EnemyUnit
     public float AttackFlash => attackFlash;
     public int AttacksPerformed { get; private set; }
     public Vector3 AttackHeading { get; private set; }
+    public (EnemyUnit Target, bool Boosted, bool TargetArmored) LastAttack { get; private set; }
     public bool IsAlive => Health > 0;
     public bool CanAttack => cooldown <= 0;
     public EnemyUnit Target { get; set; }
@@ -141,12 +142,13 @@ internal sealed class EnemyUnit
             Heading = heading;
     }
 
-    public int Attack()
+    public int Attack(EnemyUnit target)
     {
         cooldown = Faction.AttackInterval;
         attackFlash = 0.14f;
         AttacksPerformed++;
         AttackHeading = Heading;
+        LastAttack = (target, AttackBuffStacks > 0, target.ArmorBuffStacks > 0);
         return (int)Math.Min(int.MaxValue, Faction.Damage + (long)AttackBonus * AttackBuffStacks);
     }
 

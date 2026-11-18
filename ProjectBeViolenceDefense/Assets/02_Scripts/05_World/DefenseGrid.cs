@@ -34,13 +34,55 @@ internal sealed class DefenseGrid
     public Vector2Int CoreSize => CoreFootprint.size;
     public Vector3 Center => new((Width - 1) * 0.5f, 0, (Depth - 1) * 0.5f);
 
-    public DefenseGrid()
+    // fixedWallCells 가 없으면 기본 지형(가운데 한 칸만 열린 가로 벽)을 쓴다.
+    public DefenseGrid(IEnumerable<Vector2Int> fixedWallCells = null)
     {
+        if (fixedWallCells != null)
+        {
+            foreach (Vector2Int cell in fixedWallCells)
+                if (InBounds(cell) && !CoreFootprint.Contains(cell) && Array.IndexOf(Spawns, cell) < 0)
+                    fixedWalls.Add(cell);
+            routes = FindRoutes();
+            if (routes != null)
+                return;
+
+            Debug.LogError("The board layout leaves a spawn without a path to the core. Using the default terrain.");
+            fixedWalls.Clear();
+        }
+
         // The two entrances share one straight approach from the gate to the core.
         for (int x = 0; x < Width; x++)
             if (x != MainLaneColumn)
                 fixedWalls.Add(new Vector2Int(x, GateRow));
         routes = FindRoutes();
+    }
+
+    // 글자 맵을 고정 벽 목록으로 바꾼다. 17줄 x 17칸, 첫 줄이 코어 쪽(y=16)이고 '#'이 벽이다.
+    // 나머지 글자(코어 C, 바닥 . 등)는 바닥으로 본다.
+    public static bool TryParseLayout(string text, out List<Vector2Int> walls, out string error)
+    {
+        walls = new List<Vector2Int>();
+        error = null;
+        string[] rows = (text ?? string.Empty).Replace("\r", string.Empty).Trim().Split('\n');
+        if (rows.Length != Depth)
+        {
+            error = $"needs {Depth} rows, found {rows.Length}";
+            return false;
+        }
+
+        for (int i = 0; i < Depth; i++)
+        {
+            string row = rows[i].Trim();
+            if (row.Length != Width)
+            {
+                error = $"row {i + 1} needs {Width} cells, found {row.Length}";
+                return false;
+            }
+            for (int x = 0; x < Width; x++)
+                if (row[x] == '#')
+                    walls.Add(new Vector2Int(x, Depth - 1 - i));
+        }
+        return true;
     }
 
     public bool IsWalkable(Vector2Int cell) => InBounds(cell) && !CoreFootprint.Contains(cell) && !IsWall(cell);

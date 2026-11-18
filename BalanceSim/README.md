@@ -9,11 +9,16 @@ Unity 없이 실제 전투 코드(`DefenseBattle`, `CombatPositioning`, `Defense
 
 ```bash
 cd BalanceSim
-# 현재 1스테이지 값 확인: <고블린 체력 공격력 간격 수> <좀비 체력 공격력 간격 수>
+# 두 유닛만 맞붙이기: <A 체력 공격력 간격 수> <B 체력 공격력 간격 수>
 dotnet run -c Release -- 50 10 0.65 6 90 15 1.0 4
 
 # 좀비 수치 훑기: sweep <고블린 4값> <좀비 간격> <체력 최소> <체력 최대> <공격력 최소> <공격력 최대>
 dotnet run -c Release -- sweep 50 10 0.65 6 1.0 80 120 14 20
+
+# 라운드 편성 검증: EnemyCatalog.asset 의 유닛 수치와 GameScene 의 Rounds 를 그대로 읽는다
+dotnet run -c Release -- rounds
+# 편성 후보 비교: 한 줄에 "메모 | coral-id*수, id*수 | teal-id*수"
+dotnet run -c Release -- rounds candidates.txt
 
 # 교전 구도와 "한쪽에만 마법 걸기" 측정 (1대1/난전 비율, 반경별 조준 허용 범위, 구도별 승패)
 dotnet run -c Release -- mix 50 10 0.65 6 90 15 1.0 4
@@ -23,6 +28,8 @@ dotnet run -c Release -- mix 50 10 0.65 6 90 15 1.0 4
 - `LAYOUTS` (기본 200): 벽 없음 1개 + 무작위 벽 배치 수
 - `SEEDS` (기본 5): 배치마다 프레임 시간을 1/144~1/40초로 흔드는 횟수. 0번 시드는 고정 1/60초
 - `RANGE` (기본 1.5): 두 진영 공통 공격 사거리. 씬 값과 맞춘다
+- `WALLS` (예: `"5,7;8,7"`): 무작위 배치 대신 지정한 플레이어 벽 배치 하나만 쓴다. 빈 문자열이면 벽 없음
+- `MAP` (파일 경로): 17줄 글자 맵으로 지형을 바꿔 시험한다. 없으면 `GameScene`의 `boardLayout`을 쓰고, 그것도 없으면 기본 지형
 
 ## 결과 읽기
 

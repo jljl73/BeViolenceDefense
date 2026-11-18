@@ -10,6 +10,28 @@ using UnityEngine;
 internal static class Program
 {
     private const float Step = 1f / 60f;
+
+    // 지형: MAP 환경 변수(17줄 글자 맵 파일)가 있으면 그것을, 없으면 GameScene 의 boardLayout 을 쓴다. 둘 다 없으면 기본 지형.
+    private static readonly List<Vector2Int> Board = LoadBoard();
+
+    private static List<Vector2Int> LoadBoard()
+    {
+        string text = null;
+        string mapPath = Environment.GetEnvironmentVariable("MAP");
+        if (mapPath != null)
+            text = System.IO.File.ReadAllText(mapPath);
+        else if (System.IO.File.Exists("../ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity"))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(
+                System.IO.File.ReadAllText("../ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity"),
+                "\n  boardLayout: \"([^\"]*)\"");
+            if (m.Success) text = System.Text.RegularExpressions.Regex.Unescape(m.Groups[1].Value);
+        }
+        if (string.IsNullOrWhiteSpace(text)) return null;
+        if (DefenseGrid.TryParseLayout(text, out List<Vector2Int> walls, out string error)) return walls;
+        Console.WriteLine($"지형 오류: {error}. 기본 지형을 씁니다.");
+        return null;
+    }
     private const int TickLimit = 240 * 60;
     private static readonly float Range = float.Parse(Environment.GetEnvironmentVariable("RANGE") ?? "1.5");
 
@@ -26,6 +48,17 @@ internal static class Program
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
         var layouts = BuildLayouts(int.Parse(Environment.GetEnvironmentVariable("LAYOUTS") ?? "200"));
+        // WALLS="x,y;x,y" 이면 무작위 배치 대신 그 플레이어 벽 배치 하나만 쓴다.
+        string fixedWalls = Environment.GetEnvironmentVariable("WALLS");
+        if (fixedWalls != null)
+            layouts = new List<Vector2Int[]> { fixedWalls.Split(';', StringSplitOptions.RemoveEmptyEntries)
+                .Select(c => c.Split(',')).Select(c => new Vector2Int(int.Parse(c[0]), int.Parse(c[1]))).ToArray() };
+
+        if (args.Length > 0 && args[0] == "rounds")
+        {
+            Rounds(layouts, args.Skip(1).ToArray());
+            return 0;
+        }
 
         if (args.Length > 0 && args[0] == "mix")
         {
@@ -55,7 +88,7 @@ internal static class Program
         var rng = new System.Random(20261118);
         while (result.Count < count)
         {
-            var grid = new DefenseGrid();
+            var grid = new DefenseGrid(Board);
             var placed = new List<Vector2Int>();
             int walls = rng.Next(1, DefenseGrid.WallLimit + 1);
             for (int attempt = 0; attempt < 200 && placed.Count < walls; attempt++)
@@ -74,7 +107,7 @@ internal static class Program
 
     private static Outcome Run(Stats g, Stats z, Vector2Int[] layout, int seed = 0)
     {
-        var grid = new DefenseGrid();
+        var grid = new DefenseGrid(Board);
         foreach (Vector2Int cell in layout)
             grid.TryPlace(cell);
 
@@ -181,7 +214,7 @@ internal static class Program
     {
         var g = a.Length >= 4 ? Parse(a, 0) : new Stats(50, 10, 0.65f, 6);
         var z = a.Length >= 8 ? Parse(a, 4) : new Stats(90, 15, 1.0f, 4);
-        float[] radii = { DefenseBattle.AreaSpellRadius, 1.25f, 0.75f };
+        float[] radii = { DefenseBattle.DefaultAreaSpellRadius, 1.25f, 0.75f };
         long fighters = 0, duel = 0, twoOnOne = 0, brawl = 0;
         long sideSamples = 0;
         var clean = new long[radii.Length];
@@ -195,7 +228,7 @@ internal static class Program
         foreach (var layout in layouts)
         for (int seed = 0; seed < Seeds; seed++)
         {
-            var grid = new DefenseGrid();
+            var grid = new DefenseGrid(Board);
             foreach (Vector2Int cell in layout) grid.TryPlace(cell);
             var gf = new EnemyFaction("Goblin", new Color(1, 0, 0), Range, g.Hp, g.Dmg, g.Interval, g.Count);
             var zf = new EnemyFaction("Zombie", new Color(0, 1, 1), Range, z.Hp, z.Dmg, z.Interval, z.Count);
@@ -301,6 +334,192 @@ internal static class Program
     }
 
     private static float Sq(Vector3 v) => v.x * v.x + v.z * v.z;
+
+    // ───── 라운드 편성 검증 ─────
+    // 유닛 수치는 EnemyCatalog.asset 에서, 편성은 GameScene 의 rounds 또는 텍스트 파일에서 읽는다.
+    private const string CatalogPath = "../ProjectBeViolenceDefense/Assets/04_Data/03_Balance/EnemyCatalog.asset";
+    private const string ScenePath = "../ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity";
+
+    private sealed class UnitStats
+    {
+        public string Id;
+        public int Hp, Dmg, Armor;
+        public float Interval, Range, Aware, Speed;
+        public double Power => Hp * (Dmg / Interval) / 769.0;
+    }
+
+    private sealed class RoundSpec
+    {
+        public string Note;
+        public readonly List<(string Id, int Count)>[] Sides = { new(), new() };
+    }
+
+    private static Dictionary<string, UnitStats> LoadCatalog(string path)
+    {
+        var result = new Dictionary<string, UnitStats>();
+        string text = System.IO.File.ReadAllText(path);
+        foreach (string block in text.Split("\n  - id: ").Skip(1))
+        {
+            string F(string key)
+            {
+                var m = System.Text.RegularExpressions.Regex.Match(block, @"\n    " + key + @": ([^\n]*)");
+                return m.Success ? m.Groups[1].Value.Trim() : null;
+            }
+            var u = new UnitStats
+            {
+                Id = block.Split('\n')[0].Trim(),
+                Hp = int.Parse(F("maxHealth") ?? "50"),
+                Dmg = int.Parse(F("damage") ?? "10"),
+                Interval = float.Parse(F("attackInterval") ?? "0.65"),
+                Range = float.Parse(F("attackRange") ?? "1.5"),
+                Aware = float.Parse(F("awarenessRange") ?? "2.2"),
+                Speed = float.Parse(F("moveSpeed") ?? "1.7"),
+                Armor = int.Parse(F("armor") ?? "0"),
+            };
+            result[u.Id] = u;
+        }
+        return result;
+    }
+
+    // 텍스트: "메모 | coral-id*수, id*수 | teal-id*수" 한 줄에 한 라운드. # 은 주석.
+    // 씬: VoxelDefensePrototype 의 rounds 직렬화 형식.
+    private static List<RoundSpec> LoadRounds(string path)
+    {
+        var rounds = new List<RoundSpec>();
+        var lines = System.IO.File.ReadAllLines(path);
+        if (path.EndsWith(".txt"))
+        {
+            foreach (string raw in lines)
+            {
+                string line = raw.Split('#')[0].Trim();
+                if (line.Length == 0) continue;
+                var cols = line.Split('|');
+                var spec = new RoundSpec { Note = cols[0].Trim() };
+                for (int side = 0; side < 2; side++)
+                    foreach (string item in cols[side + 1].Split(',', StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        var kv = item.Trim().Split('*');
+                        spec.Sides[side].Add((kv[0].Trim(), kv.Length > 1 ? int.Parse(kv[1]) : 1));
+                    }
+                rounds.Add(spec);
+            }
+            return rounds;
+        }
+
+        bool inRounds = false;
+        int sideIndex = -1;
+        string pendingId = null;
+        foreach (string raw in lines)
+        {
+            string t = raw.Trim();
+            if (raw.StartsWith("  rounds:")) { inRounds = true; continue; }
+            if (!inRounds) continue;
+            if (raw.StartsWith("  ") && !raw.StartsWith("   ") && !raw.StartsWith("  - ") && !raw.StartsWith("  rounds")) break;
+            if (raw.StartsWith("---")) break;
+            if (raw.StartsWith("  - note:")) { rounds.Add(new RoundSpec { Note = System.Text.RegularExpressions.Regex.Unescape(t.Substring("- note:".Length).Trim().Trim('"')) }); sideIndex = -1; continue; }
+            if (t == "coral:" || t.StartsWith("coral: [")) { sideIndex = 0; continue; }
+            if (t == "teal:" || t.StartsWith("teal: [")) { sideIndex = 1; continue; }
+            if (t.StartsWith("- unitId:")) { pendingId = t.Substring("- unitId:".Length).Trim(); continue; }
+            if (t.StartsWith("count:") && pendingId != null && sideIndex >= 0)
+            {
+                rounds[^1].Sides[sideIndex].Add((pendingId, int.Parse(t.Substring("count:".Length).Trim())));
+                pendingId = null;
+            }
+        }
+        return rounds;
+    }
+
+    private static void Rounds(List<Vector2Int[]> layouts, string[] a)
+    {
+        var catalog = LoadCatalog(CatalogPath);
+        var rounds = LoadRounds(a.Length > 0 ? a[0] : ScenePath);
+        if (rounds.Count == 0) { Console.WriteLine("편성을 찾지 못했습니다."); return; }
+        var sideColors = new[] { new Color(1, 0.45f, 0.34f), new Color(0.27f, 0.87f, 0.81f) };
+        Console.WriteLine($"배치 {layouts.Count} x 시드 {Seeds} | 결과: 남은 체력 비율 차(+는 Coral 우세), ±0.2 안이면 무승부");
+        for (int r = 0; r < rounds.Count; r++)
+        {
+            RoundSpec spec = rounds[r];
+            var units = new Dictionary<(string, int), EnemyFaction>();
+            var queues = new IReadOnlyList<EnemyFaction>[2];
+            var totalHp = new double[2];
+            var power = new double[2];
+            bool missing = false;
+            for (int side = 0; side < 2; side++)
+            {
+                var q = new List<EnemyFaction>();
+                foreach (var (id, n) in spec.Sides[side])
+                {
+                    if (!catalog.TryGetValue(id, out UnitStats st)) { Console.WriteLine($"  알 수 없는 유닛: {id}"); missing = true; continue; }
+                    if (!units.TryGetValue((id, side), out EnemyFaction f))
+                        units[(id, side)] = f = new EnemyFaction(id, sideColors[side], st.Range, st.Hp, st.Dmg, st.Interval, 0,
+                            st.Aware, st.Speed, null, null, null, 1f, st.Armor, id);
+                    for (int i = 0; i < n; i++) q.Add(f);
+                    totalHp[side] += st.Hp * n;
+                    power[side] += st.Power * n;
+                }
+                queues[side] = q;
+            }
+            if (missing) continue;
+
+            var sideReps = new[] { new EnemyFaction("Coral", sideColors[0]), new EnemyFaction("Teal", sideColors[1]) };
+            int runs = 0, cWins = 0, tWins = 0, draws = 0;
+            double balanceSum = 0, fight = 0;
+            var lost = new double[2];
+            var leaks = new double[2];
+            var attacks = new Dictionary<string, long>();
+            var spawned = new Dictionary<string, long>();
+            var survived = new Dictionary<string, long>();
+            foreach (var layout in layouts)
+            for (int seed = 0; seed < Seeds; seed++)
+            {
+                var grid = new DefenseGrid(Board);
+                foreach (Vector2Int cell in layout) grid.TryPlace(cell);
+                var battle = new DefenseBattle(grid, sideReps, _ => queues);
+                var all = new List<EnemyUnit>();
+                var lastHp = new Dictionary<EnemyUnit, int>();
+                battle.EnemySpawned += e => all.Add(e);
+                battle.StartRound();
+                var rng = new System.Random(seed * 7919 + 17);
+                float time = 0f;
+                for (int i = 0; i < TickLimit && battle.CurrentPhase == DefenseBattle.Phase.Combat; i++)
+                {
+                    foreach (EnemyUnit e in battle.Enemies) lastHp[e] = e.Health;
+                    float dt = seed == 0 ? Step : 1f / (40f + (float)rng.NextDouble() * 104f);
+                    battle.Tick(dt, pauseMovement: false);
+                    time += dt;
+                }
+                var left = new double[2];
+                foreach (EnemyUnit e in all)
+                {
+                    string key = $"{(e.FactionIndex == 0 ? "C" : "T")}:{e.Faction.UnitId}";
+                    spawned[key] = spawned.GetValueOrDefault(key) + 1;
+                    attacks[key] = attacks.GetValueOrDefault(key) + e.AttacksPerformed;
+                    if (e.ReachedCore)
+                    {
+                        survived[key] = survived.GetValueOrDefault(key) + 1;
+                        left[e.FactionIndex] += lastHp.GetValueOrDefault(e);
+                    }
+                }
+                double diff = left[0] / totalHp[0] - left[1] / totalHp[1];
+                for (int side = 0; side < 2; side++)
+                {
+                    lost[side] += 1 - left[side] / totalHp[side];
+                    leaks[side] += all.Count(e => e.FactionIndex == side && e.ReachedCore);
+                }
+                runs++;
+                balanceSum += diff;
+                fight += time;
+                if (diff > 0.2) cWins++; else if (diff < -0.2) tWins++; else draws++;
+            }
+
+            string Lineup(int side) => string.Join(", ", spec.Sides[side].Select(x => $"{x.Id}×{x.Count}"));
+            Console.WriteLine($"\nR{r + 1} {spec.Note}");
+            Console.WriteLine($"  Coral {Lineup(0)} (전력 {power[0]:0.0}, 체력 {totalHp[0]:0})  vs  Teal {Lineup(1)} (전력 {power[1]:0.0}, 체력 {totalHp[1]:0})");
+            Console.WriteLine($"  Coral 승 {100.0 * cWins / runs:0}% · Teal 승 {100.0 * tWins / runs:0}% · 무승부 {100.0 * draws / runs:0}% | 평균 차 {balanceSum / runs:+0.00;-0.00} | 잃은 체력 C {100 * lost[0] / runs:0}% / T {100 * lost[1] / runs:0}% | 코어 도달 C {leaks[0] / runs:0.0} / T {leaks[1] / runs:0.0}마리 | {fight / runs:0}s");
+            Console.WriteLine("  유닛별 평균 공격 횟수 / 코어 도달률: " + string.Join(" · ", spawned.Keys.OrderBy(k => k).Select(k =>
+                $"{k} {(double)attacks[k] / spawned[k]:0.0}회/{100.0 * survived.GetValueOrDefault(k) / spawned[k]:0}%")));
+        }
+    }
 
     // 고블린 수치를 고정하고 좀비 후보를 훑어 균형점(남은 체력 비율 차 ≈ 0)을 찾는다.
     private static void Sweep(List<Vector2Int[]> layouts, string[] args)

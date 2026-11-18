@@ -160,8 +160,9 @@ internal sealed class DefenseBattle
         _ => false
     };
 
-    public string CastAreaSpell(Spell spell, Vector3 center, int rangeStep)
+    public string CastAreaSpell(Spell spell, Vector3 center, int rangeStep, List<EnemyUnit> recipients = null)
     {
+        recipients?.Clear();
         string blocked = SpellBlockReason(spell, rangeStep);
         if (blocked != null)
             return blocked;
@@ -188,6 +189,7 @@ internal sealed class DefenseBattle
                     enemy.Heal(Mathf.CeilToInt(enemy.MaxHealth * HealPercent));
                     break;
             }
+            recipients?.Add(enemy);
             affected++;
         }
 
@@ -272,7 +274,7 @@ internal sealed class DefenseBattle
             {
                 enemy.Face(target.Position);
                 if (enemy.CanAttack && combat.CanAttack(enemy, target))
-                    target.QueueDamage(enemy.Attack());
+                    target.QueueDamage(enemy.Attack(target));
             }
         }
 
