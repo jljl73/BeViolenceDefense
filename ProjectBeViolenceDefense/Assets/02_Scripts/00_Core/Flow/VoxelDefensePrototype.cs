@@ -35,6 +35,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private ManaBarHud manaBarHud;
     [Tooltip("선택. 연결하면 상단 중앙 정보·우상단 설정/배속·우하단 웨이브 호출 버튼을 새 HUD로 쓴다.")]
     [SerializeField] private BattleInfoHud battleInfoHud;
+    [Tooltip("선택. 연결하면 유닛이 쓰러진 자리에 스테이지 입자(낙엽·눈)를 흩날린다.")]
+    [SerializeField] private StageAmbience stageAmbience;
     [SerializeField] private BoardTheme boardTheme = new();
     [SerializeField] private FactionSlot coral;
     [SerializeField] private FactionSlot teal;
@@ -111,6 +113,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             hud.UseExternalCorePanel(new Vector2(320, -236));
         if (manaBarHud != null)
             hud.UseExternalManaBar((RectTransform)manaBarHud.transform, new Vector2(33, hudArt.SlotFrame != null ? -146 : -130));
+        if (stageAmbience != null)
+            battle.EnemyRemoved += enemy => stageAmbience.Burst(transform.TransformPoint(enemy.Position));
         if (battleInfoHud != null)
         {
             hud.UseExternalBattleInfo();

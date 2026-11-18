@@ -1473,3 +1473,154 @@
 - 활용 방식: `script eval --file`
 - 잘된 점: 직렬화 필드 중 비어 있는 참조를 나열해 누락(enemyCatalog) 발견
 - 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+### [20261118-stage-themes] 스테이지 테마 2종(황금 단풍 평원·설원) 시안과 테스트 씬
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), OpenAI Images API(gpt-image-2.6-sunburst), NovelAI V5, Meshy API, Blender 4.5(헤드리스 변환), Python, Unity CLI
+- 목적 및 적용 위치: 스테이지 환경 테마 방향 잡기와 첫 적용. 씬 `01_Scenes/03_Test/Stage_GoldenMaple.unity`, `Stage_Snowfield.unity`(HUD 테스트 씬 복사본). GameScene은 변경 없음
+- 사용 방식:
+  - GPT: 현재 전투 화면을 테마별로 다시 칠한 방향 시안 2장(환경만 변경, 보드·HUD 유지 지시)
+  - NAI: 소품 컨셉 5종×2장과 바닥 질감 2장(`Art Prompts/[Environment] 05_StageProps.txt` 신규)
+  - Meshy: 단일 이미지로 소품 5종 메시(각 약 800 tris, 150크레딧) → Blender 헤드리스로 FBX 변환(바닥 중심 원점, 높이 1)
+  - Unity: 프리팹 5종, `BoardTheme` 색·타일 질감·테두리, 보드 주변 지면과 소품 배치(보드 바깥만), 방향광·3색 환경광·안개, 테마별 후처리 프로필(Bloom, 색 보정, 화이트밸런스, 비네트), 낙엽/눈 파티클
+  - `StageAmbience.cs` 신규와 `VoxelDefensePrototype` 선택 필드 `stageAmbience`: 유닛이 사라진 자리에 테마 입자를 흩날림
+- 결과 및 확인 방법: 성공(1차). 두 씬 Play Mode 준비·전투 캡처 확인, 콘솔 오류 0. 1차 캡처에서 단풍 테마 과포화와 설원 벽 대비 부족을 발견해 색을 조정하고 재확인
+- 사람의 개입: 테마 지정(황금 단풍 평원, 설원), GPT·Meshy·NAI 조합과 조명·연출 포함 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/05_Art/05_Meshes/Environment/` | NAI, Meshy, Blender | 생성 | 소품 FBX 5종, 텍스처, 머티리얼. 사용 |
+| `Assets/03_Prefabs/04_World/Env_*.prefab` | Unity CLI | 생성 | 소품 프리팹 5종. 사용 |
+| `Assets/05_Art/06_Textures/Stage/`, `Assets/05_Art/03_VFX/Stage/` | NAI + Python, Python | 생성 | 반복 바닥 질감 2장, 낙엽·눈 입자 그림과 머티리얼. 사용 |
+| `Assets/Settings/Stage/` | Unity CLI | 생성 | 테마별 후처리 프로필과 지면 머티리얼. 사용 |
+| `Assets/02_Scripts/05_World/StageAmbience.cs` | Claude Code | 생성 | 분위기 입자 연출. 사용 |
+| `Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs` | Claude Code | 수정 | 선택 필드 `stageAmbience` 연결 |
+| `Assets/01_Scenes/03_Test/Stage_GoldenMaple.unity`, `Stage_Snowfield.unity` | Unity CLI | 생성 | 테마 테스트 씬 |
+| `Tools/_out/stage/dir_maple.png`, `dir_snow.png` | GPT 이미지 | 생성 | 방향 시안. 참고용 |
+
+#### 증거
+- `Tools/_out/stage/stage_v2.jpg`, `Tools/_nai_out/stage_contact.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 소품 임포트·프리팹, 씬 복사와 테마 값·조명·후처리·파티클 설정, 두 씬 Play Mode 캡처
+- 활용 방식: 재실행 가능한 빌더 스크립트를 `script eval --file`로 실행, 캡처는 셸 스크립트
+- 잘된 점: 캡처로 색 문제를 확인하고 빌더 값만 바꿔 재생성
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Images API 편집 2회(방향 시안)
+- 사용 방식: 전투 화면 캡처와 HUD 프레임 양식을 입력, 환경만 바꾸도록 지시
+- 특별히 활용한 점: 시안의 색·소품 구성을 소품 목록과 테마 색의 기준으로 사용
+
+#### 미확인 및 후속 확인
+- 단풍나무 메시가 납작하게 나와 깊이를 2.6배 늘려 사용(다시 뽑으려면 4면도 필요)
+- 소나무의 눈이 흰색이 아니라 연한 파랑, 설원의 기둥은 사암색 그대로
+- 유닛이 쓰러질 때의 입자 흩날림은 컴파일·무오류만 확인(화면으로는 미확인)
+- 벽에 눈·이끼가 얹힌 전용 블록, 타일 위 낙엽 같은 세부는 미적용
+
+### [20261118-stage-dense] 스테이지 주변 밀도 올리기, 전경 가지, 바람 흔들림
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), NovelAI V5, Python(Pillow·SciPy), Unity CLI
+- 목적 및 적용 위치: "맵이 텅 비어 보인다", "좌우 하단이 비어 보인다", "나무도 바람에 흔들리게" 피드백 반영. `Stage_GoldenMaple.unity`, `Stage_Snowfield.unity`
+- 사용 방식:
+  - 손 배치 17개 → 무작위 산포 165개(큰 나무 70, 어린 나무 45, 바위 45, 기둥 5). 보드와 거리 유지, 키 큰 소품이 화면상 보드를 가리는 위치는 제외
+  - NAI로 단풍 가지·눈 덮인 솔가지 각 3장 생성, 흰 외곽선을 깎아 스프라이트화. 화면 좌우 하단에 3장씩 겹쳐 HUD 뒤(전용 캔버스, 정렬 순서 HUD-1, 레이캐스터 없음)에 배치하고 어둡게 틴트
+  - `SwayingSprite.cs`(전경 가지 흔들림), `WindSway.cs`(나무를 바람 방향 물결로 기울임, 돌풍 주기) 신규
+- 결과 및 확인 방법: 성공. 컴파일 오류 0, 두 씬 Play Mode 캡처 확인. 나무 기울기(0.21°~0.93°)와 가지 각도(40.3°~46.3°)가 시간에 따라 변하는 것을 값으로 확인. 설원 씬 에디터 기준 약 140~150fps, 삼각형 65만~106만, 배치 2,400~3,100
+- 사람의 개입: 밀도·전경 장식·나무 흔들림 방향 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/05_World/SwayingSprite.cs`, `WindSway.cs` | Claude Code | 생성 | 흔들림 연출. 사용 |
+| `Assets/05_Art/00_Sprites/Stage/Branch_Maple.png`, `Branch_Pine.png` | NAI + Python | 생성 | 전경 가지(512px, HUD 아이콘이 아닌 환경 장식). 사용 |
+| `Assets/01_Scenes/03_Test/Stage_GoldenMaple.unity`, `Stage_Snowfield.unity` | Unity CLI | 수정 | 산포 배치, 전경 캔버스, 바람 |
+| `Art Prompts/[Environment] 05_StageProps.txt` | Claude Code | 수정 | 4-A·4-B 전경 가지 섹션 |
+
+#### 증거
+- `Tools/_out/stage/stage_v4.jpg`, `Tools/_nai_out/branch_contact.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 씬 재생성, Play Mode 캡처, 흔들림 값·렌더 통계 조회
+- 활용 방식: 빌더 스크립트 `script eval --file`
+- 잘된 점: 흔들림을 수치로 확인
+- 잘 안된 점 및 개선 필요: 사용자가 Play Mode 중일 때 빌더가 거부됨. 캡처 중 사용자의 카메라 조작으로 설원 캡처가 확대된 상태로 찍힘
+
+#### 미확인 및 후속 확인
+- 소품이 늘어 삼각형·배치 수가 큼(대부분 그림자). 필요하면 어린 나무·바위의 그림자를 끄거나 수를 줄일 것
+- 전경 가지가 우하단 웨이브 버튼 글자와 겹쳐 글자가 덜 읽힘
+
+### [20261118-stage-opt-light] 스테이지 최적화와 극적인 조명
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), Python(NumPy), Unity CLI
+- 목적 및 적용 위치: 테마 씬 2종의 렌더 부하 줄이기와 조명 연출 강화. `Stage_GoldenMaple.unity`, `Stage_Snowfield.unity`, `StageAmbience.cs`, `CloudShadows.cs`
+- 사용 방식:
+  - 최적화: 그림자는 보드 근처(8칸 이내) 큰 나무와 기둥만 드리우게 하고 어린 나무·바위·먼 나무는 끔. 바위·기둥은 정적 배칭. 테마 씬 시작 시 평평한 보드 바닥 타일·테두리·스폰 패드의 그림자 드리우기를 끔(받기는 유지, GameScene과 팀원 코드는 그대로)
+  - 조명: 해 고도를 낮춰(약 30°) 긴 그림자, 따뜻한 주광과 차가운 환경광 대비, 방향광 쿠키로 흐르는 구름 그림자(`CloudShadows`), ACES 톤매핑·강한 블룸·그늘은 차갑게/밝은 곳은 따뜻하게(Shadows/Midtones/Highlights)·짙은 비네트
+- 결과 및 확인 방법: 성공. 같은 방법으로 전후 측정(Play Mode, UnityStats): 삼각형 약 65만 → 37~38만, 배치 약 2,450 → 1,570~1,590, 그림자 드리우는 렌더러 580 → 144~146, 프레임 시간은 6.4~8.1ms → 6.5~6.7ms(에디터, 차이 작음). 두 씬 캡처로 조명 확인, 콘솔 오류 0
+- 사람의 개입: 최적화와 "극적인" 조명 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/05_World/CloudShadows.cs` | Claude Code | 생성 | 구름 그림자 흐름. 사용 |
+| `Assets/02_Scripts/05_World/StageAmbience.cs` | Claude Code | 수정 | 보드 바닥 그림자 드리우기 끄기 옵션 |
+| `Assets/05_Art/06_Textures/Stage/CloudCookie.png` | Python | 생성 | 반복되는 구름 무늬. 사용 |
+| `Assets/01_Scenes/03_Test/Stage_GoldenMaple.unity`, `Stage_Snowfield.unity`, `Assets/Settings/Stage/*` | Unity CLI | 수정 | 그림자 설정, 조명, 후처리 |
+
+#### 증거
+- `Tools/_out/stage/stage_v5.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 전후 렌더 통계 측정, 씬 재생성, Play Mode 캡처
+- 활용 방식: 측정·캡처 셸 스크립트와 빌더 `script eval --file`
+- 잘된 점: 같은 절차로 전후 수치를 비교
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+#### 미확인 및 후속 확인
+- 프레임 시간은 에디터 측정이라 빌드 실행 값과 다를 수 있음
+- 구름 그림자는 정지 캡처로는 구분이 어려워 움직임은 직접 확인 필요
+- 단풍 테마의 채도·대비가 강함(유닛 가독성은 캡처상 유지)
+
+### [20261118-stage-foreground-slots] 하단 전경 부채꼴, 하단 UI dim, 웨이브 버튼 확대, 슬롯 프레임 재채색
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), OpenAI Images API(gpt-image-2.6-sunburst), Python(NumPy·OpenCV·SciPy), Unity CLI
+- 목적 및 적용 위치: 테마 씬 2종의 하단 전경과 HUD 가독성, 슬롯 프레임 톤 맞추기. `Stage_GoldenMaple.unity`, `Stage_Snowfield.unity`, `BattleInfoHud.prefab`, `07_UI/01_Icons/Hud/SkillSlot/`
+- 사용 방식:
+  - 전경: 가지 스프라이트 3종씩(NAI 기존 생성분)을 화면 아래 가장자리에 3줄 36장으로 배치. 화면 아래 중앙 밖에서 퍼지는 부채꼴 방향, 구석은 크게·가운데는 작게 해 윗선이 아래로 파인 호가 되게 함. 1차 결과가 납작해 구석 가지를 세우고 크기 차를 키움
+  - dim: 부드러운 타원 그라데이션 판을 스킬 바 뒤와 웨이브 버튼 뒤에 배치(전경 위, HUD 아래). 1차가 약해 농도와 크기를 올림
+  - 웨이브 호출 버튼: 프리팹에서 1.4배 확대
+  - 슬롯 프레임: 기존 기본/선택 프레임을 GPT로 꿀색 프레임 양식에 맞춰 재채색, 원본 알파로 128px 분절(윤곽 일치 0.979/0.984). 이전 파일은 `Tools/_out/slot2/*_old.png`에 보관
+- 결과 및 확인 방법: 성공. 두 씬 Play Mode 전투 캡처 확인, 콘솔 오류 0
+- 사람의 개입: 전경 모양(아래가 파인 부채꼴), dim, 버튼 확대, 슬롯 프레임 재생성 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/05_Art/00_Sprites/Stage/Branch_*2.png`, `*3.png`, `DimPlate.png` | NAI + Python, Python | 생성 | 가지 변형 4장, dim 판. 사용 |
+| `Assets/07_UI/01_Icons/Hud/SkillSlot/SkillSlot_Default.png`, `SkillSlot_Selected.png` | GPT 이미지 + Python | 교체 | 꿀색 프레임으로 재채색. 사용(HUD 테스트 씬 포함) |
+| `Assets/03_Prefabs/05_UI/BattleInfoHud.prefab` | Unity CLI | 수정 | 웨이브 버튼 1.4배 |
+| `Assets/01_Scenes/03_Test/Stage_GoldenMaple.unity`, `Stage_Snowfield.unity` | Unity CLI | 수정 | 전경 부채꼴, dim 판 |
+
+#### 증거
+- `Tools/_out/stage/stage_v7.jpg`, `Tools/_out/slot2/slots_new.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 프리팹 수정, 씬 재생성, Play Mode 캡처
+- 활용 방식: 빌더 `script eval --file`
+- 잘된 점: 캡처를 보고 모양·농도를 수치로 재조정
+- 잘 안된 점 및 개선 필요: 사용자가 Play Mode 중이어서 빌드가 거부되어 Play Mode를 끄고 진행
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Images API 편집 1회(슬롯 프레임)
+- 사용 방식: 기존 프레임 2장을 회색 캔버스에 확대 배치해 입력, 모양 유지·색만 변경 지시
+- 특별히 활용한 점: 결과를 원본 알파로 다시 잘라 윤곽을 유지
+
+#### 미확인 및 후속 확인
+- 잠긴 슬롯 표시와 마나 바 테두리는 아직 이전 톤
+- 전경이 화면 하단 약 1/4을 덮어 보드 아래 꼭짓점 주변 지형이 가려짐
