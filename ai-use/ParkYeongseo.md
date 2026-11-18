@@ -711,3 +711,765 @@
 #### 미확인 및 후속 확인
 - 해츨링·와이번 걷기 동작이 55° 위에서 보면 움직임이 작음. 게임에서 부족하면 Codex 보정 필요
 - 마나 수치 줄바꿈 문제(`DefenseHud.cs`) 담당자 확인 필요
+
+### [20261118-corner-hud-f7] 좌상단 코어·우상단 전투 HUD 새 생성
+- 시각: 2026-11-18 20:08:57 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / imagegen image_gen.py / OpenAI Image API gpt-image-2.6-sunburst high / Pillow
+- 목적 및 적용 위치: 사용자가 새 생성을 요청하며 출현·팩션 정보를 우상단으로 이동하도록 교정. 양쪽 코너 HUD를 한 세트로 신규 디자인.
+- 사용 방식: 전장·소녀 원화·사용자 첨부·채색 샘플 4장 참조로 API edit 1회. 좌상단 초상/체력, 우상단 라운드/출현/팩션/배속을 새로 생성. 기존 패널 조각 이동·확장은 하지 않음.
+- 결과 및 확인 방법: 성공. API 45.5초. 1672×941 RGB, 2,094,233 bytes. 생성 원본을 그대로 전달하고 확인용 크롭만 추가. 전체 화면과 양쪽 크롭에서 정보·수치·한글·배속 중복·전장 가림을 육안 확인. 픽셀 동일성이나 런타임 동작 검증은 하지 않음.
+- 사람의 개입: 사용자가 출현/팩션 정보의 우상단 배치와 새 이미지 생성을 명시. 최종 채택 여부 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/F7_CornerHudNew_20261118/REQUEST.md, PROMPTS.txt | Codex | 생성 | 양쪽 HUD의 역할 분리와 실제 API 프롬프트. 생성에 사용. |
+| ArtDirection/Mockups/F7_CornerHudNew_20261118/Reference/ | 파일 복사 / Pillow | 생성 | 전장·원화·사용자 첨부·채색 샘플 입력. 원본 미수정. |
+| ArtDirection/Mockups/F7_CornerHudNew_20261118/BattleScreen_F7_Generated.png, BattleScreen_F7_Mockup.png | OpenAI Image API / 파일 복사 | 생성 | 두 코너 HUD를 새로 그린 전체 목업. 동일 바이트, 게임 미적용. |
+| ArtDirection/Mockups/F7_CornerHudNew_20261118/LeftCoreHud_Preview.png, RightBattleHud_Preview.png | Pillow | 생성 | 양쪽 UI 확인용 크롭. 생산 에셋 분절 아님. |
+| ArtDirection/Mockups/F7_CornerHudNew_20261118/README.md, validation.json, api-generation.log | Codex / Pillow / imagegen CLI | 생성 | 실제 결과·제안 대비 차이·실행 기록·해시. |
+
+#### 증거
+- ArtDirection/Mockups/F7_CornerHudNew_20261118/api-generation.log
+- ArtDirection/Mockups/F7_CornerHudNew_20261118/validation.json
+- ArtDirection/Mockups/F7_CornerHudNew_20261118/README.md
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: 승인된 API 경로, F7 목업 폴더.
+- 사용 방식: 기존 배치 복제를 피하도록 역할별 참조를 지정하고 좌/우 UI를 새로 생성. 원본 프레임을 그대로 검토·전달.
+
+#### 주요 프롬프트
+- 사용 도구: Codex / OpenAI Image API
+- 프롬프트 원문:
+> 아예 새로 생성시키고, 이번엔 우측 상단 UI도 만들어야 해.
+> 이거 관련은 우측 상단으로 보내는게 맞지 않아?
+- 사용자 첨부 사본: ArtDirection/Mockups/F7_CornerHudNew_20261118/Reference/MoveToRight.png
+- API 문구: ArtDirection/Mockups/F7_CornerHudNew_20261118/PROMPTS.txt
+- 결과 및 실제 활용 방식: 좌상단 코어와 우상단 전투 정보를 분리한 검토용 새 목업.
+- 선정 이유: 부분 수정에서 양쪽 HUD의 역할 분리 및 일괄 새 생성으로 범위를 전환한 핵심 교정.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 양쪽 HUD의 크기와 청록 코어 수정 아이콘 채택 여부. 게임 미적용, 코드·씬·생산 에셋 수정 및 Unity CLI 실행 없음.
+
+### [20261118-left-core-hud-split] F7 좌상단 HUD 분절
+- 시각: 2026-11-18 20:19:29 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / Python Pillow·OpenCV
+- 목적 및 적용 위치: F7 목업 좌상단 초상·코어 체력 HUD를 재조립 가능한 이미지로 분절.
+- 사용 방식: 원본 픽셀을 마스크로 추출하고 숫자·게이지 뒤 패널 면을 인페인팅. 숫자는 별도 텍스트 영역으로 기록. 기본 11개 레이어와 디테일 보존용 선택 타일 36개를 출력.
+- 결과 및 확인 방법: 성공. 사용 PNG 47개의 RGBA·각 변 128px 이하·알파 조건을 검사했고, 재조립 및 체력 50% 미리보기를 육안 확인. ZIP 무결성 검사 통과. Unity 적용·실행 검증은 수행하지 않음.
+- 사람의 개입: 사용자가 좌상단 분절을 요청. 최종 검토·채택 여부 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/F7_CornerHudNew_20261118/SPLIT_REQUEST.md | Codex | 생성 | 분절 범위·출력 규격. 작업에 사용 |
+| ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v1/ | Codex·Pillow·OpenCV | 생성 | 투명 PNG·배치 JSON·검증·미리보기·재현 스크립트. 상세 목록은 해당 폴더 README.md 및 layout.json 참조. 게임 미적용 |
+| ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v1.zip | Python zipfile | 생성 | 분절 결과 전달용 압축 파일. 채택 확인 필요 |
+
+#### 증거
+- ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v1/validation.json
+- ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v1/Contact_Sheet.png
+- ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v1/Preview/Health50.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 로컬 이미지 분절·배치 문서 작성·육안 검토.
+- 사용 방식: 기존 생성 목업을 로컬 픽셀 처리로 분절. 이번 작업에서는 이미지 생성 API를 호출하지 않음.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: “좌상단 분절해봐.”
+- 결과 및 실제 활용 방식: F7 좌상단 이미지의 기본 레이어와 선택 타일을 제작.
+- 선정 이유: 이번 작업의 대상과 분절 범위를 지정한 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Unity에서 배치·9-slice·타일 경계·텍스트 연결 검증 필요. 초상 그림은 내부 배경을 포함하며 캐릭터 단독 누끼가 아님. 원본 색상을 유지한 분절본으로 실제 UI 색상 토큰 적용은 후속 통합 범위. ArtDirection 폴더는 Git 무시 대상이므로 팀 공유 시 ZIP 전달 필요.
+
+### [20261118-leftcore-hud] 좌상단 코어 HUD(초상·피격 표정) 적용
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Opus 5.5), Python(Pillow), Unity CLI
+- 목적 및 적용 위치: F7 목업 분절 패키지(`ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v1`)를 복사 씬 `01_Scenes/03_Test/GameScene_LeftCoreHud.unity`에 적용. GameScene은 변경하지 않음
+- 사용 방식:
+  - 분절 조각과 초상 테두리 2배 타일을 `07_UI/01_Icons/Hud/LeftCore/`로 복사, 주인공 초상 레이어(Caster_Base·Caster_Face_*)를 128px 이하 타일(몸통 12장, 표정 5종×4장)로 잘라 `05_Art/00_Sprites/Portraits/CasterHud/`에 저장
+  - `layout.json` 좌표(1672 기준)를 1920 캔버스로 환산해 Unity CLI로 `03_Prefabs/05_UI/LeftCoreHud.prefab` 조립
+  - `LeftCoreHud.cs` 신규(체력 수치·채움·잔상, 피격 시 놀람 표정·흔들림·테두리 붉은 번쩍임, 50% 이하 곤란, 라운드 정리 시 웃음)
+  - `VoxelDefensePrototype.cs`에 선택 필드 `leftCoreHud`와 갱신·Cheer 호출, `DefenseHud.cs`에 `UseExternalCorePanel`(기존 코어 패널 숨김, 알림 위치 이동) 추가. 필드가 비어 있는 GameScene은 기존 동작 그대로
+- 결과 및 확인 방법: 성공. 컴파일 오류 0, 복사 씬 Play Mode 캡처로 준비 화면·피격·체력 50%·라운드 정리 표정 확인(피격 반응은 확인용으로 지속 시간을 늘려 캡처). 몸통+무표정 타일 합성과 원본 초상의 평균 픽셀 차이 0.03
+- 사람의 개입: 작업 지시(복사 씬 사용, 피격 표정 반영)
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/LeftCoreHud.cs` | Claude Code | 생성 | 좌상단 코어 HUD 런타임. 사용 |
+| `Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs`, `Assets/02_Scripts/06_UI/DefenseHud.cs` | Claude Code | 수정 | 선택 연결 지점 추가. GameScene 동작 불변 |
+| `Assets/03_Prefabs/05_UI/LeftCoreHud.prefab` | Unity CLI | 생성 | 조각 배치·참조. 사용 |
+| `Assets/07_UI/01_Icons/Hud/LeftCore/`, `Assets/05_Art/00_Sprites/Portraits/CasterHud/` | Python | 생성 | HUD 조각 25장, 초상 타일 32장(모두 128px 이하). 사용 |
+| `Assets/01_Scenes/03_Test/GameScene_LeftCoreHud.unity` | Unity CLI | 생성 | GameScene 복사본에 HUD 배치. 테스트용 |
+
+#### 증거
+- `Tools/_out/ui_mock/lc2_states.jpg`, `lc_prep.png` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 스프라이트 임포트 설정(9-slice 포함), 프리팹 조립, 씬 복사·배치, Play Mode 캡처와 리플렉션으로 체력 값 변경 검증
+- 활용 방식: Python으로 좌표를 넣은 빌더 스크립트를 생성해 `script eval`로 실행
+- 잘된 점: 좌표 환산과 배치를 재실행 가능한 스크립트로 처리
+- 잘 안된 점 및 개선 필요: 처음에는 무표정 외 얼굴 스프라이트가 임포트 전에 연결돼 비어 있었음(빌더 수정 후 해결). CLI 호출 간격 때문에 0.3~0.9초 연출은 지속 시간을 늘려야 캡처 가능
+
+#### 미확인 및 후속 확인
+- 복사 씬은 Build Settings에 없어 `R` 재시작(빌드 인덱스 기준)이 동작하지 않음
+- 실제 전투에서 적이 코어에 닿는 상황으로는 확인하지 않음(체력 값을 직접 바꿔 검증)
+- 패널 조각은 128px 제한 때문에 확대되어 약간 흐림. 표정 `pout`은 현재 사용처 없음
+
+### [20261118-left-core-hud-split-v2] 사용자 누끼 기준 좌상단 분절 교정
+- 시각: 2026-11-18 20:38:46 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / Python Pillow·NumPy·OpenCV
+- 목적 및 적용 위치: F7 좌상단 분절본을 적용했을 때 생긴 사선 연결부·초상 비율 문제를 사용자 누끼 기준으로 교정.
+- 사용 방식: 기존 프리팹을 읽어 HealthPanel/HealthBorder의 Sliced 설정을 확인. 새 누끼의 픽셀·알파를 보존해 공통 좌표의 4개 그룹으로 분절하고 124px 표시 영역+사방 2px 여유의 타일로 출력. 숫자·보석 뒤 면은 인페인팅, 빈 게이지는 BarTrack 색 기준 복원.
+- 결과 및 확인 방법: 분절 패키지 성공. 28개 사용 PNG 모두 각 변128px 이하. 디스크에서 타일을 다시 읽어 그룹별 RGBA 재조립 동일성 확인. 복원 영역 밖 원본 대비 보이는 픽셀 최대 차이0, 전체 알파 동일. 원본/재조립·모든 타일·0/50/100% 게이지·밝고 어두운 배경을 육안 확인. ZIP 무결성 검사 통과. Unity 적용·실행 검증은 미실행.
+- 사람의 개입: 사용자가 잘못 적용된 화면과 직접 누끼 처리한 WebP를 제공. 최종 수정본 검토·채택은 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v2/ | Codex·Pillow·OpenCV | 생성 | 사용자 원본 사본, 분절 명세·28개 타일·layout.json·검증·비교 시트·재현 스크립트·README. 전체 파일과 배치는 README.md/layout.json 참조. 게임 미적용 |
+| ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v2.zip | Python zipfile | 생성 | 공유용 수정 분절 패키지. 기존 v1 및 사용자 원본은 보존 |
+
+#### 증거
+- ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v2/Reference/UserIntegration.png
+- ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v2/Reference/UserCutout.webp
+- ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v2/validation.json
+- ArtDirection/Mockups/F7_CornerHudNew_20261118/Extracted/LeftCore_v2/Contact_Sheet.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex로 원인 조사, 로컬 픽셀 분절 스크립트 작성, 시각 검토, 배치 문서 작성.
+- 사용 방식: 기존 이미지 픽셀 처리. 이미지 생성 API 추가 호출 없음.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: “네가 한대로 하면 이렇게 나옴. 내가 누끼딴 것도 따로 줄게.”
+- 결과 및 실제 활용 방식: 제공 누끼를 기준으로 축소·9-slice 없는 v2 분절 제작.
+- 선정 이유: 이전 결과의 실제 문제와 교정 기준 원본을 제시한 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Unity에서 새 타일 표시 rect·단일 게이지 클립·폰트·실제 GPU 경계 확인 필요. 기존 LeftCoreHud의 표정 타일 및 Image.fillAmount 연결과 직접 호환되지 않으므로 배치 가이드에 따른 연결 변경 필요. 프리팹·에셋·메타·코드는 이번 작업에서 수정하지 않음. ArtDirection은 Git 무시 대상으로 ZIP 공유 필요.
+
+### [20261118-leftcore-hud-v2] 좌상단 코어 HUD를 분절 v2 패키지로 교체
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Opus 5.5), Python(Pillow·NumPy·OpenCV), Unity CLI
+- 목적 및 적용 위치: 사용자가 새로 추출한 `Extracted/LeftCore_v2`(575×360 원본 좌표, 1:1 타일) 적용. v1 적용본의 9-slice 왜곡과 초상이 프레임 밖으로 나오던 문제 해결. 복사 씬 `01_Scenes/03_Test/GameScene_LeftCoreHud.unity`만 사용
+- 사용 방식:
+  - FrameSurface·CoreGem·HealthFill 타일을 그대로 복사, RawImage + `uv_rect`로 표시 영역만 사용. 루트에만 1920/1672 균일 배율
+  - 체력은 README대로 RectMask2D `FillClip`(276,108,255,32) 하나로 왼쪽부터 자름. 잔상용 `TrailClip` 추가
+  - 주인공 표정 레이어를 v2 초상에 템플릿 매칭(점수 0.974, 배율 0.2275)으로 맞추고, 인물 영역만 인페인팅한 v2 배경 위에 합성, v2 초상 알파로 잘라 같은 타일 격자(2px 여유)로 표정 5종×9장 생성
+  - `LeftCoreHud.cs`를 RawImage·클립 방식으로 수정(초상 9장 통째 교체, 패널 전체 흔들림·붉은 번쩍임)
+  - v1 조각(`07_UI/01_Icons/Hud/LeftCore`, `05_Art/00_Sprites/Portraits/CasterHud`)은 v2 결과로 교체
+- 결과 및 확인 방법: 성공. 컴파일 오류 0, Play Mode 캡처로 기본·피격(84)·25% 이하·라운드 정리 상태 확인(연출 시간은 검증용으로 늘림)
+- 사람의 개입: v2 분절 패키지 직접 제작·제공, 적용 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/LeftCoreHud.cs` | Claude Code | 수정 | v2 구조(RawImage, 클립)로 변경. 사용 |
+| `Assets/03_Prefabs/05_UI/LeftCoreHud.prefab` | Unity CLI | 수정 | v2 배치로 재생성. 사용 |
+| `Assets/07_UI/01_Icons/Hud/LeftCore/` | 사용자 v2 패키지 복사 | 교체 | 프레임·보석·채움 타일 19장. 사용 |
+| `Assets/05_Art/00_Sprites/Portraits/CasterHud/` | Python | 교체 | 표정 5종 × 초상 타일 9장(128px 이하). 사용 |
+
+#### 증거
+- `Tools/_out/ui_mock/v2_states.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 텍스처 임포트, 프리팹 재조립, 복사 씬 갱신, Play Mode 캡처
+- 활용 방식: 매니페스트로 빌더 스크립트를 생성해 `script eval` 실행
+- 잘된 점: 원본 픽셀 1:1 배치로 목업과 같은 모양 확인
+- 잘 안된 점 및 개선 필요: 스크립트 컴파일 직후 도메인 리로드 중 첫 실행이 실패(재시도로 해결). 셸 함수 안의 캡처 경로가 저장되지 않아 스크립트 파일로 바꿔 해결
+
+#### 미확인 및 후속 확인
+- 인페인팅 배경 가장자리에 약한 얼룩이 있을 수 있음
+- 실제 적이 코어에 닿는 전투 상황으로는 미확인
+
+### [20261118-dark-knight] 기마 어둠의 기사(흑마 + 기사)
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Opus 5.5), NovelAI V5, OpenAI Images API(gpt-image-2.6-sunburst), Meshy API, Codex CLI 0.170.0 + Blender 4.5 MCP, Unity CLI
+- 목적 및 적용 위치: 2칸 엘리트 기마 유닛. `Assets/05_Art/05_Meshes/Enemies/DarkKnight/`, `Assets/03_Prefabs/02_Enemies/DarkKnight.prefab`
+- 사용 방식: NAI 컨셉(흑마 4장, 기사 4장, 사용자 각 1번 선택) → GPT 4면도 각각 → Meshy 메시(흑마 2.5k, 기사 2k)·기사 인간형 리깅·공격/피격 동작 → Codex가 Blender에서 흑마 4족 리깅, 기사를 안장 뼈에 결합(뼈 55개 한 뼈대), 리빙 아머 검 부착, Walk·Attack·Hit·Death 제작 → Unity에서 메시 3개에 머티리얼 3개 연결
+- 결과 및 확인 방법: 부분 성공. Codex 캡처와 Unity Play Mode 캡처에서 탑승·공격·옆으로 쓰러짐 확인. Codex 보고상 안장·허벅지 일부 교차와 망토 변형이 남음
+- 사람의 개입: 컨셉 선택
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/05_Art/05_Meshes/Enemies/DarkKnight/` | Meshy, Codex, Unity CLI | 생성 | FBX, 텍스처 3장, 머티리얼 3개, 컨트롤러. 사용 |
+| `Assets/03_Prefabs/02_Enemies/DarkKnight.prefab` | Unity CLI | 생성 | 사용 |
+| `Art Prompts/[Enemies] 01_Enemies.txt` 1-N, 1-O | Claude Code | 수정 | 기마·기사 단독 섹션. 사용 |
+
+#### 증거
+- `Art3D/DarkHorse/Blender/README.md`, `Anim_*.png`, `Tools/_out/dk_unity.png` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 가져오기·머티리얼 3종 연결·프리팹, Test_DarkKnight 미리보기 캡처
+- 활용 방식: `script eval`
+- 잘된 점: 렌더러 이름으로 머티리얼을 자동 배정
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+#### 미확인 및 후속 확인
+- 안장·허벅지 교차, 망토가 위에서 크게 펼쳐 보이는 점은 필요 시 Codex 보정
+- Haiku 감시 에이전트가 진행 중인 Codex 작업을 "중단"으로 잘못 보고함(프로세스 직접 확인으로 정정)
+
+### [20261118-bottom-hud-g1] 좌상단 테마에 맞춘 하단 스킬 UI 생성
+- 시각: 2026-11-18 20:55:30 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / imagegen 스킬 CLI / OpenAI Image API gpt-image-2.6-sunburst high / Pillow
+- 목적 및 적용 위치: 하단 스킬 UI 목업. 기존 자물쇠 슬롯을 없애고 버튼 수 증가를 염두에 둔 반복 모듈 구성.
+- 사용 방식: 사용자 첨부 좌상단 테마와 기존 하단 정보 구성을 참고해 요청서·프롬프트 작성. 기존 승인 API 경로로 이미지1회 생성. 현재 코드의 비용24/32/24를 반영. 생성 후 확인용 여백 크롭만 수행.
+- 결과 및 확인 방법: 성공. 1774×887 생성본에서 활성 버튼3개·자물쇠/빈 슬롯 없음·단축키/비용/횟수·힐 선택 테두리·마나100/100·다른 HUD 부재를 육안 확인. 동적 확장과 Unity 적용은 미실행.
+- 사람의 개입: 사용자가 버튼 동적 증가·잠금 슬롯 제거·좌상단 테마 준수를 요청하고 참고 이미지2장을 제공. 생성본 최종 채택은 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/G1_BottomSkillHud_20261118/ | Codex·Image API·Pillow | 생성 | 생성 PNG·확인용 크롭·참고 이미지 사본·요청/프롬프트/로그/검토 기록. 상세 목록은 해당 README.md 참조. 목업 단계, 게임 미적용 |
+
+#### 증거
+- ArtDirection/Mockups/G1_BottomSkillHud_20261118/api-generation.log
+- ArtDirection/Mockups/G1_BottomSkillHud_20261118/validation.json
+- ArtDirection/Mockups/G1_BottomSkillHud_20261118/BottomHud_G1_Generated.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: imagegen CLI edit, 참고 이미지2장으로 하단 HUD 생성.
+- 사용 방식: gpt-image-2.6-sunburst high, size auto, 실제 API 생성1회(38.5초). API 전 크기검증/환경변수/SDK 문제는 기존 설정과 프로젝트 가상환경으로 해결. 비밀키 값 저장·출력 없음.
+
+#### 주요 프롬프트
+- 사용 도구: Codex·Image API
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: ArtDirection/Mockups/G1_BottomSkillHud_20261118/REQUEST.md(사용자 요청 원문), PROMPTS.txt(실제 전송 문구).
+- 결과 및 실제 활용 방식: 잠금 슬롯 없는 3버튼·마나 UI를 새로 생성하고 좌상단의 사선 모서리/자주색 채색을 반영.
+- 선정 이유: 하단 UI 정보 구조와 공통 아트 테마를 결정한 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 선택 테두리/아이콘 광택과 실제 HUD 크기 가독성 검토. 4개 이상 버튼 배치와 동적 확장은 목업 구상이며 미구현. 생산용 분절·128px 에셋 제한·토큰 기반 적용은 후속 작업. Unity 코드·씬·메타는 이번 작업에서 수정하지 않음.
+
+### [20261118-bottom-hud-g2] 넓은 사다리꼴 일체형 하단 UI 생성
+- 시각: 2026-11-18 20:59:36 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / imagegen CLI / OpenAI Image API gpt-image-2.6-sunburst high / Pillow
+- 목적 및 적용 위치: 향후6~7개 스킬을 상정한 넓은 하단 단일 패널 목업.
+- 사용 방식: 사용자 수정대로 스킬과 마나를 하나의 사다리꼴 안에 배치하고 현재3개 버튼은 중앙에 작게 표시하도록 이미지 생성1회. 생성 원본은 유지하고 여백 크롭만 작성.
+- 결과 및 확인 방법: 목업 생성 성공. 원본1774×887과 크롭에서 윗변이 짧은 사다리꼴·외곽 패널1개·마나 통합·현재3버튼·빈/잠금 슬롯 부재를 육안 확인. 실제 동적 증가 및7버튼 Unity 배치는 미검증.
+- 사람의 개입: 사용자가 패널 일체화·사다리꼴 방향·넓은 폭·6~7개 스킬 수용을 명시. 최종 채택은 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/G2_WideBottomHud_20261118/ | Codex·Image API·Pillow | 생성 | 목업 원본·크롭·참고 이미지·요청/전송 프롬프트·로그·검토 기록. 상세 목록은 README.md 참조. 게임 미적용 |
+
+#### 증거
+- ArtDirection/Mockups/G2_WideBottomHud_20261118/api-generation.log
+- ArtDirection/Mockups/G2_WideBottomHud_20261118/validation.json
+- ArtDirection/Mockups/G2_WideBottomHud_20261118/BottomHud_G2_Generated.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: imagegen CLI edit로 하단 UI 새 생성.
+- 사용 방식: 기존 승인 경로, 참조2장, gpt-image-2.6-sunburst high/auto, API1회36.4초. 비밀키 값 출력·저장 없음.
+
+#### 주요 프롬프트
+- 사용 도구: Codex·Image API
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: ArtDirection/Mockups/G2_WideBottomHud_20261118/REQUEST.md(사용자 원문), PROMPTS.txt(전송 문구).
+- 결과 및 실제 활용 방식: 좁은3버튼/분리된 마나 패널에서 넓은 단일 사다리꼴로 구성 변경.
+- 선정 이유: 패널 형태와 향후 수용량을 바로잡은 핵심 수정 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 생성된 버튼은 약210px 폭.7개 실제 배치 때 공통 버튼폭192px·간격20px 등의 보정이 필요하며 README에 명시. 동적 증가·생산 분절·Unity 적용·폰트 가독성은 후속 검증 대상. 이번 작업에서 코드·씬·프리팹·메타 수정 없음.
+
+### [20261118-mana-bar-only] 뒷패널 제거 및 마나 바 단독 축소
+- 시각: 2026-11-18 21:15:42 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / Python Pillow·NumPy
+- 목적 및 적용 위치: 하단 뒷패널 사용 취소에 따른 마나 바 단독 아트 제공.
+- 사용 방식: 5/2로 줄이기를 가로2.5배 축소(40%)로 해석해 알렸다. G2 마나 바만 추출하여 높이와 양 끝32px를 유지하고 가운데 폭만 줄였다. 투명 PNG와128px 이하 사용 타일4개를 제공.
+- 결과 및 확인 방법: 성공.480×52 RGBA. 체커/어두운 배경에서 잔여 패널·수치·아이콘 부재와 곡선 확인. 디스크 타일 재조립 RGBA 동일, 크기 제한, ZIP 무결성 검사 통과. Unity 적용은 미실행.
+- 사람의 개입: 사용자가 뒷패널 사용 취소와 마나 바 축소/단독 제공을 요청. 가로40% 해석과 결과에 대한 최종 확인은 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/G3_ManaBarOnly_20261118/ | Codex·Pillow·NumPy | 생성 | 단독 마나PNG·사용 타일4개·배치/검증JSON·확인 이미지·재현 스크립트·README·ZIP. 상세 목록 README.md 참조. 게임 미적용 |
+
+#### 증거
+- ArtDirection/Mockups/G3_ManaBarOnly_20261118/validation.json
+- ArtDirection/Mockups/G3_ManaBarOnly_20261118/Preview/ManaBar_Checker.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex로 로컬 픽셀 추출·마스킹·폭 조절·시각 확인. 이미지 생성 API는 호출하지 않음.
+- 사용 방식: G2 생성 원본을 보존한 채 별도G3 폴더로 결과 출력.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: “중앙 하단 뒷패널은 쓰지 않기로 함. 마나 바 크기를 5/2로 줄이고, 마나 바만 따로 제공할 것.”
+- 결과 및 실제 활용 방식: 뒷패널 없는480×52 마나 바 아트를 제작.
+- 선정 이유: 채택 범위 축소와 단독 전달 규격을 지정한 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용:100% 채워진 정적 아트이며 게이지 갱신 및 Unity 임포트 검증은 미실행.480px 전체본은 디자인 원본, 게임용은 각 변128px 이하 타일. 실제 코드/씬에서 뒷패널을 제거하는 작업은 수행하지 않음.
+
+### [20261118-mana-icon] 마나 물방울 아이콘 추가 추출
+- 시각: 2026-11-18 21:17:29 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / Python Pillow·NumPy·SciPy
+- 목적 및 적용 위치: 기존 단독 마나 바와 함께 사용할 물방울 아이콘 제공.
+- 사용 방식: G2 원본의 물방울을 색상 분리·가장자리 알파/배경색 보정으로 추출. 기존 마나 바와 아이콘을 별도 파일로 유지.
+- 결과 및 확인 방법: 성공.47×64 RGBA, 각 변128px 이하. 어두운 배경 확대와 바 옆 배치 확인본을 육안 검토했고 아이콘 포함ZIP 무결성 검사 통과. Unity 적용 미실행.
+- 사람의 개입: 사용자가 “마나 아이콘도 필요.”라고 요청. 최종 채택 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/G3_ManaBarOnly_20261118/Sprites/ManaIcon.png | Pillow·NumPy·SciPy | 생성 | 독립 투명 마나 아이콘47×64. 게임 미적용 |
+| ArtDirection/Mockups/G3_ManaBarOnly_20261118/ | Codex·Python | 생성·수정 | 아이콘 재현 스크립트·검증JSON·확인본·아이콘 포함ZIP 추가, README 갱신. 상세 경로는 README 참조 |
+
+#### 증거
+- ArtDirection/Mockups/G3_ManaBarOnly_20261118/icon-validation.json
+- ArtDirection/Mockups/G3_ManaBarOnly_20261118/Preview/ManaIcon_WithBar.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex로 픽셀 추출·검토. 이미지 생성 API 호출 없음.
+- 사용 방식: 기존 생성 원본에서 아이콘만 로컬 추출.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Unity 임포트·실제 화면 배치. 코드·씬·메타 변경 없음.
+
+### [20261118-mana-bar] 하단 마나 바 아트 적용
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Opus 5.5), Python(Pillow·NumPy), Unity CLI
+- 목적 및 적용 위치: 사용자가 준비한 `ArtDirection/Mockups/G3_ManaBarOnly_20261118/ManaBar_WithIcon_Package.zip`(480×52 채워진 바 타일 4장 + 물방울 아이콘)을 복사 씬 `01_Scenes/03_Test/GameScene_LeftCoreHud.unity`에 적용
+- 사용 방식:
+  - 패키지 타일을 그대로 채움 레이어로 쓰고, 행마다 청록 채움 구간을 `BarTrack`(#120F26) 음영으로 바꾼 빈 홈 타일을 생성(같은 격자, 2px 여유)
+  - `ManaBarHud.cs` 신규: 빈 홈 위에 채움을 RectMask2D로 왼쪽부터 자르고, 마나를 쓰면 줄어든 만큼 반투명 잔상, 바 가운데 수치(외곽선 텍스트)
+  - `DefenseHud.UseExternalManaBar` 추가(기존 마나 게이지 숨기고 새 바를 스킬 바 아래 같은 자리에 붙임), `VoxelDefensePrototype`에 선택 필드 `manaBarHud`와 갱신 호출. 필드가 비어 있는 GameScene은 기존 동작 그대로
+  - `03_Prefabs/05_UI/ManaBarHud.prefab` 조립
+- 결과 및 확인 방법: 성공. 컴파일 오류 0, Play Mode에서 전투 시작 후 마나를 70→46→10으로 바꿔 가득·사용 잔상·부족 상태 캡처 확인
+- 사람의 개입: 마나 바·아이콘 패키지 직접 준비, 적용 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/ManaBarHud.cs` | Claude Code | 생성 | 마나 바 런타임. 사용 |
+| `Assets/02_Scripts/06_UI/DefenseHud.cs`, `Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs` | Claude Code | 수정 | 선택 연결 지점 추가 |
+| `Assets/03_Prefabs/05_UI/ManaBarHud.prefab` | Unity CLI | 생성 | 사용 |
+| `Assets/07_UI/01_Icons/Hud/ManaBar/` | 사용자 패키지 복사, Python | 생성 | 채움 타일 4, 빈 홈 타일 4, 아이콘 1(모두 128px 이하). 사용 |
+
+#### 증거
+- `Tools/_out/ui_mock/mana_states.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 텍스처 임포트, 프리팹 조립, 복사 씬 배치, Play Mode 전투 시작(리플렉션)·마나 값 변경·캡처
+- 활용 방식: 매니페스트로 빌더 스크립트를 생성해 `script eval`, 상태 캡처는 셸 스크립트로 실행
+- 잘된 점: 채움을 클립 하나로 잘라 둥근 왼쪽 끝 모양 유지
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+#### 미확인 및 후속 확인
+- 채움 오른쪽 끝은 세로로 잘린 직선(둥근 끝 아님)
+- 마나 부족 시 별도 강조 연출 없음
+
+### [20261118-buff-icons] 액티브 버프 아이콘 4종 NAI 생성
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Opus 5.5), NovelAI V5, Python(Pillow·SciPy)
+- 목적 및 적용 위치: 공격력·체력·이동속도·방어력 버프 스킬 슬롯 아이콘 후보. `Art Prompts/[UI] 04_SkillIcons.txt` 신규, 결과는 `Tools/_nai_out/icons*`(git 제외)
+- 사용 방식: 프로젝트 Base/Negative 프롬프트로 무료 범위 20장 생성. 방어력은 v1(판처럼 보임)·v2·v3(화살표 방향 오류)를 거쳐, 깔끔한 방패(v3-1)에 공격력 2번의 화살표를 연보라로 바꿔 Python으로 합성
+- 결과 및 확인 방법: 후보 생성 완료, 96px·56px 슬롯 크기 미리보기로 확인. 게임 미적용(사용자 선택 대기)
+- 사람의 개입: 아이콘 종류 지정과 참고 이미지 제공
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Art Prompts/[UI] 04_SkillIcons.txt` | Claude Code | 생성 | 1-A~1-D 섹션, 방어력 v3까지 이력 주석. 사용 |
+| `Tools/_nai_out/icons_final/` | NAI, Python | 생성 | 96px 후보 4종. 미적용 |
+
+#### 증거
+- `Tools/_nai_out/icons_final_set.jpg`, `icons_contact.jpg` (git 제외 폴더)
+
+#### 미확인 및 후속 확인
+- 방어력 색 토큰이 UIPalette에 없음
+
+### [20261118-buff-slot-frames] 기존 버프 아이콘용 공통 슬롯 프레임 제작
+- 시각: 2026-11-18 21:28:34 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / imagegen CLI·OpenAI Image API gpt-image-2.6-sunburst high(수정 전1회) / Python Pillow·NumPy·OpenCV
+- 목적 및 적용 위치: 사용자가 이미 제작한 이동속도·체력·공격력·방어력 아이콘을 담는 슬롯 바탕.
+- 사용 방식: 최초 요청을 아이콘 포함 슬롯으로 해석해API1회 실행했고, 사용자 중단 후 확인 시29.7초로 완료된 상태였다. 사용자가 기존 아이콘 경로를 제공한 뒤에는 새 아이콘을 채택하지 않고 완료 결과의 프레임만 추출. G2 채색 패치를 이용해 빈 면을 복원하고 기존4종PNG를 리사이즈 없이 합성. 추가API 호출 없음.
+- 결과 및 확인 방법: 성공. 공통 바탕128×128,4종 확인 합성본 각128×128. 빈 바탕·모든 합성본 육안 확인,RGBA/128px 제한·기존 아이콘 해시 불변·ZIP 무결성 검사 통과. Unity 적용은 미실행.
+- 사람의 개입: 사용자가 내부 아이콘은 준비돼 있다고 정정하고 def_comp_view.jpg 참고 경로를 제공. 실제 icons_final 파일4종을 사용. 최종 바탕 채택 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/G4_FourBuffSlots_20261118/ | Codex·Image API | 생성 | 초기 요청/프롬프트/참조/생성본/로그. 아이콘은 미채택, 프레임만 후속 작업에 사용 |
+| ArtDirection/Mockups/G4_BuffSlotFrames_20261118/ | Codex·Pillow·OpenCV | 생성 | 공통 바탕PNG·기존아이콘 합성4종·명세/좌표/검증/재현/README·ZIP. 상세 목록 README.md 및 layout.json 참조. 게임 미적용 |
+| Tools/_nai_out/icons_final/*_96.png | 사용자 제공 기존 파일 | 수정 없음 | 아이콘 픽셀과 파일 해시를 유지해 읽기/합성에만 사용 |
+
+#### 증거
+- ArtDirection/Mockups/G4_FourBuffSlots_20261118/api-generation.log
+- ArtDirection/Mockups/G4_BuffSlotFrames_20261118/layout.json
+- ArtDirection/Mockups/G4_BuffSlotFrames_20261118/validation.json
+- ArtDirection/Mockups/G4_BuffSlotFrames_20261118/Preview/ExistingIcons_InSlots.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: imagegen CLI edit, gpt-image-2.6-sunburst high/auto, 참조2장. Codex로 후속 원본 확인·프레임 추출·합성·검토.
+- 사용 방식: 사용자 수정 전에 시작한 생성1회가 완료됐음을 로그로 확인. 수정 후 추가API 호출 없이 로컬 픽셀 처리. 새로 생성된 아이콘 대신 사용자 원본을 사용.
+
+#### 주요 프롬프트
+- 사용 도구: Codex·Image API
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: G4_FourBuffSlots_20261118/REQUEST.md·PROMPTS.txt(ArtDirection/Mockups 아래), G4_BuffSlotFrames_20261118/SPLIT_REQUEST.md(사용자 정정 원문).
+- 결과 및 실제 활용 방식: 아이콘 포함 생성에서 기존 아이콘을 담는 공통 슬롯 바탕 제작으로 범위 수정.
+- 선정 이유: 사용자가 기존 결과물을 보존하도록 지정한 핵심 정정.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Unity 임포트/실게임 배치/선택 상태/색상 토큰 적용. 코드·씬·프리팹·메타 변경 없음. ArtDirection은 Git 무시 대상이므로 ZIP 별도 공유 필요.
+
+### [20261118-palette-idle] 주인공 기준 UI 팔레트 교체, 좌상단 HUD 재채색 시안, 초상 idle 시트
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), OpenAI Images API(gpt-image-2.6-sunburst), spriteLab MCP, Python(Pillow·NumPy), Unity CLI
+- 목적 및 적용 위치: `UIPalette.cs` 토큰을 주인공 색(크림·꿀색·갈색) 기준으로 교체, `docs/ui-flow.md` 색상표 갱신. 좌상단 HUD 프레임을 새 팔레트로 다시 칠한 GPT 시안과 주인공 초상 idle 스프라이트 시트 생성(둘 다 게임 미적용)
+- 사용 방식:
+  - 초상·HUD 아트에서 주요 색을 추출해 토큰 17개 값 변경, `Defense` 토큰 추가
+  - GPT 이미지 편집에 현행 HUD 누끼(숫자 없음)·색 견본·주인공 초상을 주고 "모양 유지, 색만 변경" 지시, 2안 생성 후 전경 마스크 겹침(IoU)으로 모양 유지 측정
+  - spriteLab에 초상 상반신(512×768)과 직접 쓴 idle 프롬프트로 24프레임 3초 반복 생성(quality 모드). 이미지 전송은 설정된 MCP 서버에 스크립트로 직접 호출
+- 결과 및 확인 방법: 팔레트는 컴파일 오류 0, 테스트 씬 준비·전투 화면 캡처 확인. HUD 시안 IoU A 0.990 / B 0.986. idle 시트 4096×2304(8×3) 육안 확인
+- 사람의 개입: 팔레트 교체와 GPT 재채색 방향 지시("현행 모양 유지"), idle 생성 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/UIPalette.cs`, `docs/ui-flow.md` | Claude Code | 수정 | 토큰 값 교체, Defense 추가. 사용(전 UI에 반영) |
+| `Tools/_out/palette/hud_gpt_A.png`, `hud_gpt_B.png` | GPT 이미지 | 생성 | 좌상단 HUD 재채색 시안. 미적용 |
+| `Tools/_out/spritelab/idle_sheet.png`, `idle.gif` | spriteLab | 생성 | 초상 idle 24프레임. 미적용 |
+
+#### 증거
+- `Tools/_out/palette/hud_compare.jpg`, `game_battle.png` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 팔레트 변경 후 컴파일 확인, 테스트 씬 Play Mode 캡처
+- 활용 방식: `script eval`, `editor.playmode`
+- 잘된 점: 관찰된 문제 없음
+- 잘 안된 점 및 개선 필요: 화면 배경 남색은 팔레트 토큰이 아니라 씬 카메라 색이라 바뀌지 않음
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Images API 편집 2회
+- 사용 방식: 원본 누끼를 1536×1024 회색 캔버스에 올려 입력, 색상 hex와 유지 항목을 프롬프트에 명시
+- 특별히 활용한 점: 결과와 원본의 윤곽 겹침을 수치로 검증
+
+#### 미확인 및 후속 확인
+- HUD 시안을 게임에 넣으려면 v2와 같은 방식의 분절이 다시 필요
+- 좌상단 HUD·마나 바 아트는 아직 이전 자두색이라 새 팔레트와 톤이 다름
+
+### [20261118-character-palette-slots-g5] 캐릭터 기반 팔레트 슬롯 프레임 재생성
+- 시각: 2026-11-18 21:43:13 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / imagegen CLI·OpenAI Image API gpt-image-2.6-sunburst high / Python Pillow·NumPy
+- 목적 및 적용 위치: 자두색 면·모브 테두리의 구조색과 금발 꿀색의 선택 강조를 나눈 새 슬롯 프레임.
+- 사용 방식: 사용자 제안 색상표와 기존 슬롯/캐릭터 HUD를 참조해 빈 기본·선택 프레임을API1회 생성. 출력 대표색을 측정해 로컬 색 보정,128px 추출, 실루엣/내부 면 공통화. 기존 아이콘4종은 리사이즈 없이 합성.
+- 결과 및 확인 방법: 성공. 기본/선택PNG각128×128. 대표 샘플 중앙값 면#463247·기본 테두리#98658E·선택 테두리#D9B891. 상태별 알파/내부 면 동일, 사용PNG10개RGBA/128px, 원본 아이콘 해시 불변, ZIP 무결성 검사 통과. 전체 원본과 최종 비교 목업 육안 확인. Unity 적용 미실행.
+- 사람의 개입: 사용자가 구조색/강조색 구분과 실제 아트·주인공 색상값을 제공하고 슬롯 프레임 재생성을 요청. 최종 채택 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/G5_CharacterPaletteSlots_20261118/ | Codex·Image API·Pillow·NumPy | 생성 | 생성 원본·기본/선택 프레임2종·아이콘 확인본8종·배치/검증·원문/프롬프트/로그/참고·재현 스크립트·ZIP. 상세 목록 README.md 참조. 게임 미적용 |
+| Tools/_nai_out/icons_final/*_96.png | 사용자 제공 기존 파일 | 수정 없음 | 픽셀 그대로 합성에 사용, 리사이즈/색변경 없음 |
+
+#### 증거
+- ArtDirection/Mockups/G5_CharacterPaletteSlots_20261118/api-generation.log
+- ArtDirection/Mockups/G5_CharacterPaletteSlots_20261118/validation.json
+- ArtDirection/Mockups/G5_CharacterPaletteSlots_20261118/Preview/PaletteFrames_WithExistingIcons.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: imagegen CLI edit, gpt-image-2.6-sunburst high/auto, 참조3장, 기존 승인 경로.
+- 사용 방식: 기본/선택 프레임API1회27.4초. 후처리는 로컬 픽셀 마스크·색 보정·상태 정렬. 비밀키 출력·저장 없음.
+
+#### 주요 프롬프트
+- 사용 도구: Codex·Image API
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: ArtDirection/Mockups/G5_CharacterPaletteSlots_20261118/REQUEST.md(사용자 요청), PROMPTS.txt(실제 전송 문구).
+- 결과 및 실제 활용 방식: 따뜻한 자두색·모브를 구조색으로, 금발 꿀색을 선택 강조색으로 분리한 새 프레임에 적용.
+- 선정 이유: 아트와 토큰 간 색 불일치 문제를 해결하기 위한 명시적 팔레트 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Unity 임포트·실게임 가독성·선택 전환·역할별 토큰 통합. 현재 UIPalette.cs는 이미 별도 따뜻한 값으로 변경돼 있었으며 이번 작업에서는 코드/토큰/씬/프리팹/메타를 수정하지 않음. 채색PNG에 토큰색을 다시 곱하면 프리뷰와 달라질 수 있음.
+
+### [20261118-leftcore-hud-v3] 좌상단 HUD B안 재채색 적용, 초상 idle 재생
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), Python(Pillow·NumPy·OpenCV), Unity CLI (입력: GPT 재채색 B안, spriteLab idle 시트)
+- 목적 및 적용 위치: 사용자가 고른 GPT 재채색 B안을 좌상단 HUD에 적용하고, 초상에 idle 24프레임을 재생. 테스트 씬 `GameScene_LeftCoreHud`와 `LeftCoreHud.prefab`
+- 사용 방식: B안을 575×360으로 되돌려 원본 윤곽에 정렬(IoU 0.9885)하고 v2 알파로 회색 배경을 풀어 FrameSurface·CoreGem·HealthFill을 같은 타일 격자로 분절. 초상은 창 전용 2×3 격자(6장)로 바꿔 표정 5종과 idle 24프레임(템플릿 매칭 0.996)을 B안 배경 위에 합성. `LeftCoreHud.cs`에 무표정일 때 idle 반복 재생(8fps) 추가
+- 결과 및 확인 방법: 성공. 컴파일 오류 0, Play Mode에서 idle 프레임 진행(8→19→15)과 피격 표정·붉은 번쩍임·잔상 캡처 확인
+- 사람의 개입: B안 선택, idle 적용 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/LeftCoreHud.cs` | Claude Code | 수정 | idle 프레임 재생 추가. 사용 |
+| `Assets/03_Prefabs/05_UI/LeftCoreHud.prefab` | Unity CLI | 수정 | v3 타일로 재생성. 사용 |
+| `Assets/07_UI/01_Icons/Hud/LeftCore/` | GPT 이미지 + Python 분절 | 교체 | B안 색의 타일 19장. 사용 |
+| `Assets/05_Art/00_Sprites/Portraits/CasterHud/` | spriteLab + Python | 교체 | 표정 5종×6장, idle 24프레임×6장(모두 128px 이하). 사용 |
+
+#### 증거
+- `Tools/_out/palette/v3_states.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 텍스처 임포트, 프리팹 재조립, Play Mode 캡처
+- 활용 방식: `script eval`
+- 잘된 점: 기존 빌더를 매니페스트만 바꿔 재사용
+- 잘 안된 점 및 개선 필요: 스크립트 수정 직후 도메인 리로드 중 실행이 두 번 실패해 대기 후 재실행
+
+#### 미확인 및 후속 확인
+- 빈 체력바 홈 오른쪽 끝에 사각 경계가 약하게 보임
+- 마나 바 아트는 아직 이전 자두색 톤
+
+### [20261118-soft-slot-frames-g6] 직선적인 슬롯을 부드러운 곡선 프레임으로 수정
+- 시각: 2026-11-18 21:50:26 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / imagegen CLI·OpenAI Image API gpt-image-2.6-sunburst high / Python Pillow·NumPy·OpenCV·SciPy
+- 목적 및 적용 위치: 직선 도형적인 슬롯에 대한 피드백을 반영한 기본·선택 슬롯 아트.
+- 사용 방식: 기존 팔레트를 유지하며 사선 모서리 대신 연속 곡선, 살짝 휜 변, 손그림 테두리를API1회 생성. 모델 윤곽을 직접 마스킹해128px로 출력. 같은 기본 프레임의 테두리 색만 변경해 선택 상태를 만들고 기존 아이콘을 그대로 합성.
+- 결과 및 확인 방법: 성공. 사용PNG10개RGBA/128px, 기본·선택 알파/내부 면 동일성, 아이콘 원본 해시 불변, ZIP 무결성 확인. 확대/실제128px 아이콘 배치 육안 검토. 테두리 색 변경이 내부에 번진 첫 로컬 처리 결과는 외곽 거리 제한을 추가해 교정하고 재확인. Unity 적용 미실행.
+- 사람의 개입: 사용자가 프레임이 너무 직선 도형적이라고 지적. 새 곡선 시안의 최종 채택은 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/G6_SoftSlotFrames_20261118/ | Codex·Image API·Python | 생성 | 생성 원본·기본/선택2종·기존아이콘 확인본8종·참고/요청/프롬프트/로그/배치/검증/재현/README·ZIP. 상세 목록 README.md 참조. 게임 미적용 |
+
+#### 증거
+- ArtDirection/Mockups/G6_SoftSlotFrames_20261118/api-generation.log
+- ArtDirection/Mockups/G6_SoftSlotFrames_20261118/validation.json
+- ArtDirection/Mockups/G6_SoftSlotFrames_20261118/Preview/SoftFrames_WithExistingIcons.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: imagegen CLI edit, 기존 승인 경로, gpt-image-2.6-sunburst high/auto, 참조3장.
+- 사용 방식: 생성1회35.0초. 이후 로컬 알파 추출·팔레트 보정·상태 공통화·확인본 작성. 비밀키 출력·저장 없음.
+
+#### 주요 프롬프트
+- 사용 도구: Codex·Image API
+- 프롬프트 원문: “근데 슬롯 프레임 너무 직선 도형적이지 않음...?”
+- 실제 전송 프롬프트 경로: ArtDirection/Mockups/G6_SoftSlotFrames_20261118/PROMPTS.txt
+- 결과 및 실제 활용 방식: 직선 사선 모서리를 없애고 손그림 곡선 프레임으로 새로 생성.
+- 선정 이유: 슬롯 실루엣과 채색 방식 변경의 직접적인 사용자 피드백.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 실제 Unity HUD 배치·선택 전환·최종 곡률 선호. 코드·토큰·씬·프리팹·메타 수정 없음. 기존 아이콘은 원본 그대로 유지.
+
+### [20261118-asymmetric-slot-frames-g7] 미세한 비대칭 슬롯 프레임 생성
+- 시각: 2026-11-18 21:54:35 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / imagegen CLI·OpenAI Image API gpt-image-2.6-sunburst high / Python Pillow·NumPy·OpenCV·SciPy
+- 목적 및 적용 위치: G6의 부드러운 슬롯을 모서리별 성격이 다른 비대칭 테마로 수정.
+- 사용 방식: 왼쪽 위의 넓은 곡선, 오른쪽 위의 작은 곡선, 중심에서 벗어난 윗변 굴곡을 요청해API1회 생성. 실제 윤곽을 마스크로 추출하고128px로 출력. 팔레트 보정 후 동일 기본 프레임의 테두리만 꿀색으로 바꿔 선택 상태 제작. 기존 사용자 아이콘을 그대로 합성.
+- 결과 및 확인 방법: 성공. 원본·프레임 확대·128px 아이콘 배치 육안 확인. 기본/선택 알파·테두리 밖 내부 면 동일성, 사용PNG10개RGBA/128px, 기존 아이콘 해시 불변, ZIP 무결성 검사 통과. Unity 적용 미실행.
+- 사람의 개입: 사용자가 “살짝 비대칭적인 테마로 다시 뽑아보셈.”이라고 요청. 최종 채택 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/G7_AsymmetricSlotFrames_20261118/ | Codex·Image API·Python | 생성 | 기본/선택128px2종·기존 아이콘 확인본8종·생성 원본·요청/프롬프트/참고/로그/좌표/검증/재현/README·ZIP. 상세 목록 README.md 참조. 게임 미적용 |
+
+#### 증거
+- ArtDirection/Mockups/G7_AsymmetricSlotFrames_20261118/api-generation.log
+- ArtDirection/Mockups/G7_AsymmetricSlotFrames_20261118/validation.json
+- ArtDirection/Mockups/G7_AsymmetricSlotFrames_20261118/Preview/AsymmetricFrames_WithExistingIcons.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: 기존 승인 imagegen CLI edit 경로, gpt-image-2.6-sunburst high/auto, 참고3장.
+- 사용 방식: 생성1회36.3초, 이후 로컬 추출·팔레트 보정·상태 공통화·합성. 비밀키 출력/저장 없음.
+
+#### 주요 프롬프트
+- 사용 도구: Codex·Image API
+- 프롬프트 원문: “살짝 비대칭적인 테마로 다시 뽑아보셈.”
+- 실제 전송 프롬프트: ArtDirection/Mockups/G7_AsymmetricSlotFrames_20261118/PROMPTS.txt
+- 결과 및 실제 활용 방식: 좌우 모서리 곡률·상단 윤곽·테두리 무게에 차이를 둔 새 슬롯 시안.
+- 선정 이유: 프레임 실루엣의 수정 방향을 직접 지정한 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 비대칭 정도 최종 선호, 실게임 배치·선택 전환. 요청의2~4px 변화 목표는 정밀 측정하지 않았으며 시각 시안이다. 코드·토큰·씬·프리팹·메타 수정 없음.
+
+### [20261118-portrait-idle-48] 초상 idle 고프레임화와 프레임 블렌딩
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), spriteLab MCP(reprocess), Python(OpenCV), Unity CLI
+- 목적 및 적용 위치: 초상 idle이 끊겨 보인다는 피드백 대응. `LeftCoreHud.cs`, `LeftCoreHud.prefab`, `05_Art/00_Sprites/Portraits/CasterHud/`
+- 사용 방식: 원본 영상(24fps·73프레임)과 기존 시트를 분석해 원인이 8fps 추출임을 확인(반복 이음매는 정상). 같은 영상에서 48프레임으로 재추출(GPU 재생성 없음), 타일 288장 생성. 재생 16fps, 프레임 사이를 겹친 타일의 알파로 섞는 블렌딩 추가
+- 결과 및 확인 방법: 성공. 프레임 간 평균 밝기 차이 2.51 → 1.41(시트 기준), Play Mode에서 프레임 진행(0→16→25→34)과 블렌드 알파 변화, 화면 약 180fps 확인
+- 사람의 개입: 고프레임 재추출과 테스트 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/LeftCoreHud.cs` | Claude Code | 수정 | 16fps, 프레임 블렌딩. 사용 |
+| `Assets/05_Art/00_Sprites/Portraits/CasterHud/` | spriteLab + Python | 교체 | idle 48프레임×6장 + 표정 5종×6장 = 318장. 사용 |
+| `Assets/03_Prefabs/05_UI/LeftCoreHud.prefab` | Unity CLI | 수정 | 블렌드 타일 6개 추가. 사용 |
+
+#### 증거
+- `Tools/_out/spritelab/idle_sheet48.png`, `idle_raw.mp4` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 텍스처 임포트, 프리팹 재조립, Play Mode에서 프레임·블렌드 값 조회
+- 활용 방식: 빌드 스크립트가 명령줄 길이를 넘어 `script eval --file`로 실행
+- 잘된 점: 재생 상태를 수치로 확인
+- 잘 안된 점 및 개선 필요: 텍스처 300여 장 임포트와 재컴파일 동안 명령이 30초 제한에 여러 번 걸림
+
+#### 미확인 및 후속 확인
+- 실제 체감 부드러움은 사용자 확인 필요
+
+### [20261118-skill-slot-frames] 스킬 슬롯 프레임과 새 버프 아이콘 적용
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), Unity CLI
+- 목적 및 적용 위치: 사용자가 준비한 `ArtDirection/Mockups/G7_AsymmetricSlotFrames_20261118/AsymmetricSlotFrames_Package.zip`(기본·선택 프레임 128px)과 NAI 버프 아이콘을 테스트 씬 `GameScene_LeftCoreHud`의 스킬 슬롯에 적용
+- 사용 방식: `DefenseHud.Art`에 선택 필드 `SlotFrame`·`SlotFrameSelected`·`ColoredSkillIcons` 추가. 프레임이 있으면 슬롯 뒤에 깔고 조준 중인 스킬은 선택 프레임으로 교체, 사용 불가 시 프레임·아이콘을 흐리게. 채색 아이콘은 의미 색을 곱하지 않고 비율 유지. 비용·횟수 줄과 마나 바를 프레임 아래로 내림. 테스트 씬의 hudArt에만 새 스프라이트 연결(GameScene은 필드가 비어 기존 그대로)
+- 결과 및 확인 방법: 성공. 컴파일 오류 0, Play Mode에서 기본·조준(공격 버프 선택 프레임)·마나 부족 상태 캡처 확인
+- 사람의 개입: 슬롯 프레임 패키지 제작·제공, 적용 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/DefenseHud.cs`, `Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs` | Claude Code | 수정 | 슬롯 프레임 선택 지원, 마나 바 위치 조정 |
+| `Assets/07_UI/01_Icons/Hud/SkillSlot/` | 사용자 패키지 복사, NAI 아이콘 | 생성 | 프레임 2장, 버프 아이콘 4장(방어력은 아직 스킬 없음). 사용 |
+| `Assets/01_Scenes/03_Test/GameScene_LeftCoreHud.unity` | Unity CLI | 수정 | hudArt에 프레임·아이콘 연결 |
+
+#### 증거
+- `Tools/_out/ui_mock/slot_states.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 스프라이트 임포트, 씬 직렬화 값 설정, Play Mode에서 전투 시작·조준·마나 변경 후 캡처
+- 활용 방식: `script eval --file`과 셸 스크립트
+- 잘된 점: 조준 상태를 리플렉션으로 재현해 선택 프레임 확인
+- 잘 안된 점 및 개선 필요: 셸 heredoc에서 역슬래시가 줄어 캡처 경로가 어긋남(스크립트 파일로 해결)
+
+#### 미확인 및 후속 확인
+- 잠긴 슬롯 3칸은 프레임 없이 자물쇠 표시 그대로
+- 단축키 숫자가 프레임 오른쪽 위 모서리에 걸침
+
+### [20261118-hud-g8-mock] 웨이브 호출 버튼·우상단 패널·중앙 상태 GPT 시안
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), OpenAI Images API(gpt-image-2.6-sunburst)
+- 목적 및 적용 위치: 새 HUD 요소 3종(우하단 다음 웨이브 조기 호출 버튼, 우상단 설정/배속 패널, 상단 중앙 스테이지·타이머·경합 적 수)의 시안. `Tools/_out/g8/`(git 제외), 게임 미적용
+- 사용 방식: 테스트 씬 전투 캡처, 좌상단 HUD B안, 팔레트 견본을 입력으로 주고 같은 프레임 양식(꿀색 테두리, 자두 갈색 면)과 색 hex를 프롬프트에 명시. 인게임 목업 1장과 부품 시트 1장 생성
+- 결과 및 확인 방법: 성공. 두 이미지 직접 검토(요소 3종 모두 포함, 글자 정상)
+- 사람의 개입: 요소 구성과 배치 지시("5시", 우측 상단, 중앙), 팔레트 테마 지정
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Tools/_out/g8/g8_A_ingame.png` | GPT 이미지 | 생성 | 인게임 목업. 미적용 |
+| `Tools/_out/g8/g8_B_parts.png` | GPT 이미지 | 생성 | 부품 시트(버튼 3상태, 패널 2상태, 상태판, 아이콘 5종). 미적용 |
+
+#### 증거
+- 위 두 파일과 `Tools/_out/g8/prompt_A.txt`, `prompt_B.txt`
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Images API 편집 2회(병렬)
+- 사용 방식: 참조 3장(화면, 프레임 양식, 팔레트) + 요소별 지시
+- 특별히 활용한 점: 분절하기 쉽게 회색 배경의 부품 시트를 따로 생성
+
+#### 미확인 및 후속 확인
+- 두 시안의 호출 버튼 디자인이 다름(A: 금색 면, B: 자두색 면에 금색 링). 선택 필요
+- 조기 호출·타이머·설정은 게임 기능이 아직 없음
+
+### [20261118-battle-info-hud] 전투 정보 HUD 3종 적용(상단 중앙·우상단·웨이브 호출)
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), Python(Pillow·NumPy·OpenCV·SciPy), Unity CLI (입력: GPT 부품 시트 `Tools/_out/g8/g8_B_parts.png`)
+- 목적 및 적용 위치: GPT 부품 시트를 분절해 테스트 씬 `GameScene_LeftCoreHud`에 적용. `BattleInfoHud.cs`, `03_Prefabs/05_UI/BattleInfoHud.prefab`, `07_UI/01_Icons/Hud/BattleInfo/`
+- 사용 방식:
+  - 회색 배경 시트에서 부품 12개를 자동 분리(배경 추정 후 차이 마스크), 중앙 판은 글자·아이콘을 인페인팅으로 지워 빈 판으로 만들고 128px 이하 타일(2px 여유)로 저장
+  - `BattleInfoHud.cs` 신규: 스테이지·전투 경과 시간·진영별 생존 수와 비율 바, 배속 상태 그림 전환, 설정·배속·웨이브 호출 버튼
+  - `VoxelDefensePrototype`에 선택 필드 `battleInfoHud` 추가(웨이브 호출=전투 시작, 배속=기존 함수, 설정=알림 문구), `DefenseHud.UseExternalBattleInfo`로 기존 라운드 표시·배속 버튼·시작 버튼을 숨기고 벽 개수 표시를 패널 아래로 이동
+- 결과 및 확인 방법: 성공. 컴파일 오류 0. Play Mode에서 웨이브 버튼 onClick → 전투 단계 전환, 2배속 전환(값 2), 설정 클릭, 준비·전투 화면 캡처 확인
+- 사람의 개입: 요소 구성 지시, 시안 승인("일단 넣어보자")
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/BattleInfoHud.cs` | Claude Code | 생성 | 전투 정보 HUD 런타임. 사용 |
+| `Assets/02_Scripts/06_UI/DefenseHud.cs`, `Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs` | Claude Code | 수정 | 선택 연결 지점 추가 |
+| `Assets/03_Prefabs/05_UI/BattleInfoHud.prefab` | Unity CLI | 생성 | 사용 |
+| `Assets/07_UI/01_Icons/Hud/BattleInfo/` | GPT 이미지 + Python 분절 | 생성 | 타일 17장(모두 128px 이하). 사용 |
+
+#### 증거
+- `Tools/_out/g8/unity_prep2.jpg`, `unity_battle_2x.png`, `pieces/_pieces.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 텍스처 임포트, 프리팹 조립, 씬 배치, Play Mode에서 버튼 onClick 호출과 캡처
+- 활용 방식: 매니페스트에서 생성한 빌더를 `script eval --file`로 실행
+- 잘된 점: 버튼 동작을 값으로 확인(전투 단계, 배속)
+- 잘 안된 점 및 개선 필요: 사용자가 Play Mode를 켜 둔 상태라 빌드가 한 번 거부됨(Play Mode를 끄고 재실행)
+
+#### 미확인 및 후속 확인
+- 웨이브 버튼의 카운트다운 링은 그림에 고정(약 2/3). 실제 웨이브 타이머 기능이 없음
+- "경합 중인 적 수"는 진영별 생존 수로 임시 구현. 스테이지 번호는 라운드 값 사용
+- 설정 버튼은 알림 문구만 표시. 실제 마우스 클릭으로는 미확인(onClick 직접 호출로 검증)
+
+### [20261118-dialogue-h1] 캐릭터 대사창 UI 목업 제작
+- 시각: 2026-11-18 22:26:41 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / imagegen CLI·OpenAI Image API gpt-image-2.6-sunburst high / Python Pillow·NumPy
+- 목적 및 적용 위치: 비대칭 손그림 프레임과 자두색/모브 팔레트의 캐릭터 대사창 시안.
+- 사용 방식: 사용자 요청을 캐릭터 대사창으로 해석한다고 알리고 빈 패널/이름표를API1회 생성. 기존 주인공 초상과 게임 폰트netmarbleM.ttf를 로컬 합성. 역할명·게임 핵심 규칙 기반 예시 대사2줄·다음 진행 표시 배치.
+- 결과 및 확인 방법: 성공.1536×1024 완성 목업 및 확대 크롭. 프레임/이름표/초상/본문/진행 표시 육안 확인, 본문 폭·초상과 비중첩 계산, 원본 초상 해시 불변·ZIP 무결성 확인. 실제 대사 동작/Unity 적용은 미실행.
+- 사람의 개입: 사용자가 “다이얼로그 UI 한 번 만들어볼래?”라고 요청. 대사창 해석 및 예시 내용의 최종 채택 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/H1_Dialogue_20261118/ | Codex·Image API·Pillow | 생성 | 빈 아트 원본·완성 목업·확인 크롭·요청/프롬프트/참고/로그/배치/검증/재현/README·ZIP. 상세 목록 README.md 참조. 게임 미적용 |
+| Art2D/Portraits/Caster/Caster_Portrait_neutral.png | 기존 사용자 에셋 | 수정 없음 | 초상 원본을 재사용. 목업에서만 크기/하단 끝 페더링 처리 |
+| ProjectBeViolenceDefense/Assets/07_UI/00_Fonts/netmarbleM.ttf | 기존 프로젝트 폰트 | 수정 없음 | 이름/본문/진행 표시 래스터 렌더에 사용. 폰트 재배포 없음 |
+
+#### 증거
+- ArtDirection/Mockups/H1_Dialogue_20261118/api-generation.log
+- ArtDirection/Mockups/H1_Dialogue_20261118/validation.json
+- ArtDirection/Mockups/H1_Dialogue_20261118/Dialogue_H1_Mockup.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: 기존 승인 imagegen CLI edit 경로, gpt-image-2.6-sunburst high,1536×1024,참고2장.
+- 사용 방식: 빈 대사창 아트 생성1회40.0초. 캐릭터와 문자는 추가 생성 없이 기존 초상/폰트로 합성. 비밀키 출력·저장 없음.
+
+#### 주요 프롬프트
+- 사용 도구: Codex·Image API
+- 프롬프트 원문: “다이얼로그 UI 한 번 만들어볼래?”
+- 실제 전송 프롬프트: ArtDirection/Mockups/H1_Dialogue_20261118/PROMPTS.txt
+- 결과 및 실제 활용 방식: 기존 아트 테마의 캐릭터 대사창 목업으로 제작.
+- 선정 이유: 새로운 UI 종류의 시안 제작을 요청한 핵심 입력.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 캐릭터 대사창인지 확인/취소 팝업인지 의도 최종 확인. 이름과 대사는 배치 예시이며 확정 기획이 아님. 생산 에셋 분절·동적 텍스트/다국어·입력·Unity 적용 검증 필요. 코드·씬·프리팹·토큰·메타 변경 없음.
+
+### [20261118-merge-hud] 원격 병합(방어력 버프·스킬 이펙트·밸런싱)과 HUD 재연결
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), git, Unity CLI
+- 목적 및 적용 위치: 원격 main 3개 커밋 위로 로컬 2개 커밋 리베이스. `VoxelDefensePrototype.cs`, `DefenseHud.cs`, `UIPalette.cs`, `docs/ui-flow.md` 충돌 해결
+- 사용 방식: 양쪽 변경을 모두 유지(범위 조절 인자 + 외부 HUD 갱신, 방어력 색은 팀원의 `Armor` 토큰 사용, 문서 마나 색만 새 값). 진영 구조 변경에 맞춰 적 수 집계를 `FactionIndex`로 수정. 방어력 슬롯용 선택 아이콘 필드 `ArmorBuff` 추가. 테스트 씬은 최신 GameScene을 다시 복사해 HUD 프리팹 3종과 hudArt 값을 재연결
+- 결과 및 확인 방법: 성공. 컴파일 오류 0, 콘솔 오류 0, 테스트 씬 Play Mode에서 전투 시작·조준·마나 부족 캡처 확인(슬롯 4개 모두 프레임·아이콘 표시). GameScene 파일은 변경 없음
+- 사람의 개입: pull·충돌 해결·커밋·푸시 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/DefenseHud.cs`, `Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs` | Claude Code | 수정 | 충돌 해결, 병합 후 컴파일 오류 2건 수정, `ArmorBuff` 필드 |
+| `Assets/01_Scenes/03_Test/GameScene_LeftCoreHud.unity` | Unity CLI | 교체 | 최신 GameScene 기반으로 재생성 |
+
+#### 증거
+- `Tools/_out/ui_mock/merged_aim.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 병합 후 컴파일 확인, 테스트 씬 재생성, Play Mode 캡처
+- 활용 방식: `script eval --file`
+- 잘된 점: 직렬화 필드 중 비어 있는 참조를 나열해 누락(enemyCatalog) 발견
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음

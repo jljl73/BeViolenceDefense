@@ -32,24 +32,24 @@ UI 색은 `Assets/02_Scripts/06_UI/UIPalette.cs`의 토큰만 사용한다. 코�
 
 | 그룹 | 토큰 | 값 | 용도 |
 | --- | --- | --- | --- |
-| 배경·패널 | `Background` | `#0B0D2B` | 화면 전체 배경 |
-| | `Panel` | `#1D1A38` | 기본 패널 |
-| | `PanelRaised` | `#32273F` | 패널 위에 올라오는 상위 패널 |
-| | `PanelBrown` | `#583642` | 보상·경고·팝업 헤더 등 강조 패널 |
-| | `Overlay` | `#0B0D2B` 72% | 모달 뒤 화면 |
-| | `BarTrack` | `#120F26` | 게이지 빈 부분 |
-| 외곽선 | `Outline` | `#4A3B5C` | 패널·버튼 기본 테두리 |
-| | `OutlineStrong` | `#7A5A78` | 호버, 갈색 패널 테두리 |
-| | `OutlineFocus` | `#FFD170` | 선택·포커스 |
-| 텍스트 | `TextPrimary` | `#F3E9E2` | 본문, 제목 |
-| | `TextSecondary` | `#B9A9BE` | 보조 설명, 비활성 버튼 글자 |
-| | `TextDisabled` | `#6E6280` | 완전히 꺼진 항목 |
-| | `TextOnAccent` | `#1D1A38` | 밝은 버튼 위 글자·아이콘 |
-| 버튼 | `ButtonPrimary` | `#FFD170` | 전투 시작, 재시작 |
-| | `ButtonSecondary` | `#4A3B5C` | 일반 행동 |
-| | `ButtonDisabled` | `#3A3148` | 사용 불가, 미선택 |
+| 배경·패널 | `Background` | `#17121F` | 화면 전체 배경 |
+| | `Panel` | `#2A2030` | 기본 패널 |
+| | `PanelRaised` | `#3B2D3D` | 패널 위에 올라오는 상위 패널 |
+| | `PanelBrown` | `#5E3F3C` | 보상·경고·팝업 헤더 등 강조 패널 |
+| | `Overlay` | `#17121F` 72% | 모달 뒤 화면 |
+| | `BarTrack` | `#150F1A` | 게이지 빈 부분 |
+| 외곽선 | `Outline` | `#7D6654` | 패널·버튼 기본 테두리 |
+| | `OutlineStrong` | `#C9A77C` | 호버, 갈색 패널 테두리 |
+| | `OutlineFocus` | `#FFD98A` | 선택·포커스 |
+| 텍스트 | `TextPrimary` | `#F6EDE6` | 본문, 제목 |
+| | `TextSecondary` | `#C7B6AD` | 보조 설명, 비활성 버튼 글자 |
+| | `TextDisabled` | `#7A6A6C` | 완전히 꺼진 항목 |
+| | `TextOnAccent` | `#2A2030` | 밝은 버튼 위 글자·아이콘 |
+| 버튼 | `ButtonPrimary` | `#FFD27A` | 전투 시작, 재시작 |
+| | `ButtonSecondary` | `#5A4650` | 일반 행동 |
+| | `ButtonDisabled` | `#3E3138` | 사용 불가, 미선택 |
 | | `ButtonDanger` | `#E5484D` | 되돌릴 수 없는 행동 |
-| 게임 의미 | `Mana` · `Attack` · `Heal` · `MoveSpeed` · `Armor` | `#64C4FF` · `#FFA588` · `#99F5A0` · `#66DAFF` · `#C5A7FF` | 해당 기능을 가리킬 때만 사용 |
+| 게임 의미 | `Mana` · `Attack` · `Heal` · `MoveSpeed` · `Armor` | `#4BDEFB` · `#FFA588` · `#99F5A0` · `#66DAFF` · `#C5A7FF` | 해당 기능을 가리킬 때만 사용 |
 
 - 깊이는 `Background` → `Panel` → `PanelRaised` 순으로 밝아진다. 위에 올라오는 요소일수록 한 단계 밝은 면을 쓴다.
 - 외곽선은 면보다 한 단계 밝게 쓰고, 선택·포커스에만 금색을 쓴다.

@@ -1,0 +1,31 @@
+# [UI] 04 — 액티브 버프 스킬 슬롯 내부 아이콘 (NAI V5). 한 장에 아이콘 하나, 투명 배경.
+# 생성: python -I ~/.claude/skills/nai-image/scripts/nai_gen.py 04:1-A --n 3 --out Tools/_nai_out
+# 스타일 단어는 여기 적지 않는다. 화풍은 [Base Prompts].txt가 정한다.
+# 색은 Assets/02_Scripts/06_UI/UIPalette.cs 의미 색을 따른다(Attack #FFA588, Heal #99F5A0, MoveSpeed #66DAFF).
+# 방어력은 UIPalette에 토큰이 아직 없어 은색+연보라로 임시 지정(금색은 선택·포커스 전용이라 피함).
+# 게임 HUD 이미지는 128px 이하로 줄여 쓴다(AGENTS.md). 작게 줄여도 읽히도록 굵고 단순한 형태로.
+
+---
+
+## 1. 액티브 버프 (1:1)
+### 1-A. 공격력 — 위 화살표가 붙은 검
+no humans, -3::1girl, 1boy, human, hand, holding, character::, game icon, ui icon, skill icon, {{black background, simple background}}, single object, centered, isolated, simple shape, chunky, bold silhouette, -3::text, letters, number, frame, border, button, panel, multiple objects, scenery, realistic, metallic reflections::,
+short broadsword pointing up and to the right at a diagonal, coral orange sword, soft peach highlight on the blade, simple crossguard, small round pommel, one small coral up arrow beside the blade at the lower right, two tiny sparkles,
+A single chunky game skill icon: a short coral-orange cartoon sword tilted diagonally with its tip at the upper right, with a small bold coral up arrow beside it at the lower right, meaning attack power up. Simple bold shapes with soft shading that stay readable when shrunk to a small icon. Isolated on a solid black background.
+
+### 1-B. 체력 — 십자가가 박힌 하트
+no humans, -3::1girl, 1boy, human, hand, holding, character::, game icon, ui icon, skill icon, {{black background, simple background}}, single object, centered, isolated, simple shape, chunky, bold silhouette, -3::text, letters, number, frame, border, button, panel, multiple objects, scenery, realistic, broken heart::,
+plump rounded heart, soft mint green heart, glossy light green highlight on the upper left, dark green plus sign in the center of the heart, one small mint plus sparkle at the lower right,
+A single chunky game skill icon: a plump soft mint-green heart with a dark green plus sign in its centre and one small plus sparkle at the lower right, meaning healing and health. Simple bold shapes with soft shading that stay readable when shrunk to a small icon. Isolated on a solid black background.
+
+### 1-C. 이동속도 — 날개 달린 장화
+no humans, -3::1girl, 1boy, human, leg, foot, wearing, character::, game icon, ui icon, skill icon, {{black background, simple background}}, single object, centered, isolated, simple shape, chunky, bold silhouette, -3::text, letters, number, frame, border, button, panel, multiple objects, pair of boots, scenery, realistic::,
+single winged boot, side view of one boot facing right, sky blue boot, small white feathered wing on the heel, short speed lines behind the boot, one small sky blue plus sparkle at the upper right,
+A single chunky game skill icon: one sky-blue boot seen from the side, facing right, with a small white feathered wing on its heel and a few short speed lines behind it, meaning movement speed up. Simple bold shapes with soft shading that stay readable when shrunk to a small icon. Isolated on a solid black background.
+
+### 1-D. 방어력 — 위 화살표가 붙은 방패
+// v1(시드 3장)은 둥근 판·클립보드처럼 보이고 화살표가 작아 폐기. v2: 아래가 뾰족한 방패 + 금속 테두리 + 큰 화살표
+// v2 4장은 방패는 좋으나 화살표가 아래·양방향·망치로 나옴. v3: 위쪽 화살표만 강조, 반대 방향 금지
+no humans, -3::1girl, 1boy, human, hand, holding, character, sword::, game icon, ui icon, skill icon, {{black background, simple background}}, single object, centered, isolated, simple shape, chunky, bold silhouette, -3::text, letters, number, frame, button, panel, multiple objects, scenery, realistic, rounded rectangle, tablet, clipboard, plate, coat of arms, down arrow, double-headed arrow, hammer, pointing down::,
+1.3::heater shield with a pointed bottom, classic knight shield shape::, slightly tilted to the left, steel grey metal rim with small rivets, lavender shield face, a vertical silver stripe down the middle, light highlight on the upper left, 1.4::big bold lavender upward arrow pointing up, arrowhead at the top::, the up arrow overlapping the lower right corner of the shield, two tiny sparkles,
+A single chunky game skill icon: a classic knight's heater shield with a pointed bottom, slightly tilted, with a steel-grey riveted metal rim and a lavender face, and a big bold lavender up arrow overlapping its lower right corner, meaning defense up. Simple bold shapes with soft shading that stay readable when shrunk to a small icon. Isolated on a solid black background.
