@@ -1788,6 +1788,28 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 8baef2a60b080ba44ad0848397cfa2c1, type: 3}
   - {fileID: 2800000, guid: f8f1f0fc97aee584a9d6f4afc557d430, type: 3}
   - {fileID: 2800000, guid: 9871f9b85a0a7b34c9abdb655b24bc65, type: 3}
+  portraitSheets:
+  - texture: {fileID: 2800000, guid: 5c9182512d686da4dac4e145a001e1e8, type: 3}
+    columns: 7
+    rows: 4
+    frames: 28
+  - texture: {fileID: 2800000, guid: e1a6f1b38042fe8418e53a1036705a50, type: 3}
+    columns: 7
+    rows: 4
+    frames: 28
+  - texture: {fileID: 2800000, guid: 55ac710f62cc22f4a9d91268a5213c74, type: 3}
+    columns: 7
+    rows: 4
+    frames: 28
+  - texture: {fileID: 2800000, guid: 60eee6cf5b0c86b4686b8a406723dfef, type: 3}
+    columns: 7
+    rows: 4
+    frames: 28
+  - texture: {fileID: 2800000, guid: 1f4d553ee75f9f54e8f6bfe2872b59f1, type: 3}
+    columns: 7
+    rows: 4
+    frames: 28
+  portraitFps: 14
   box: {fileID: 958713423403038043}
   boxGroup: {fileID: 2598192860102053604}
   nameTab: {fileID: 1328749918129331858}
@@ -2051,7 +2073,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: -461.40625, y: 116}
-  m_SizeDelta: {x: 517.1875, y: 800}
+  m_SizeDelta: {x: 533.3333, y: 800}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &5831144681630244029
 CanvasRenderer:
@@ -2081,13 +2103,13 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: c88228509ee7b2144a82abca51ebdb47, type: 3}
+  m_Texture: {fileID: 2800000, guid: 5c9182512d686da4dac4e145a001e1e8, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
-    y: 0
-    width: 1
-    height: 1
+    y: 0.75
+    width: 0.14285715
+    height: 0.25
 --- !u!225 &8451223571613950575
 CanvasGroup:
   m_ObjectHideFlags: 0

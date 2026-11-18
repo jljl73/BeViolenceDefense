@@ -1847,3 +1847,69 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 코어가 3×3이 되면서 Stage1의 코어 주변 동선이 의도와 맞는지. `Caster.mat` 변경으로 GameScene 주인공 모습이 달라짐. Meshy 크레딧 약 360 사용(메쉬 10건 300, 리깅·동작 28, 사각 성채 30 포함)
+
+### [20261119-wallfx-dialogue-sheets-graveyard] 벽 설치 연출, 대화창 초상 시트, 스테이지 3(묘지·무너진 성채) 테마, 멧돼지·거대 늑대
+- 시각: 2026-11-19 05:00:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / NovelAI Diffusion V5 / OpenAI Images API (gpt-image-2.6-sunburst) / Meshy API / spriteLab MCP / Codex CLI + Blender MCP / Unity CLI
+- 목적 및 적용 위치: 벽 설치·철거 연출과 놓을 칸 미리보기, 대화창 초상을 표정별 스프라이트 시트로 재생, 세 번째 스테이지 테마 테스트 씬, 밸런스 표의 남은 야수 2종
+- 사용 방식: (벽) `DefenseGrid.CheckPlace`를 분리하고 `DefenseBoardView`에 LitMotion 낙하·스쿼시·돌 조각·금색 번쩍임, 철거 축소, 미리보기 벽을 추가. (대화창) spriteLab으로 기쁨·놀람·삐짐 idle을 생성하고 기존 기본·곤란 시트와 함께 움직이는 구간만 28프레임 7×4 시트로 재포장, `DialogueHud`가 uvRect로 재생. (묘지) GPT 방향 시안 → NAI 소품·바닥·전경 원화 → Meshy 메쉬 4종 → 스테이지 빌더에 세 번째 테마 추가(달빛 조명, 보라 환경광, 바닥 안개, 쓰러질 때 오르는 혼불). (야수) Codex가 Blender에서 4족 리깅과 동작 4개 제작
+- 결과 및 확인 방법: 성공 / Play Mode에서 벽 3개 설치·1개 철거·미리보기(금/적) 캡처, 남은 조각 0개 확인. 대화창은 시트 프레임이 진행되는 것을 uvRect 값과 캡처로 확인(첫 대사에서 재생이 시작되지 않는 버그를 발견해 수정). 묘지 씬은 첫 빌드가 너무 어두워 두 차례 조정 후 캡처 확인. 멧돼지·거대 늑대 필름스트립 확인. 콘솔 오류 0. 실제 마우스 입력에 따른 미리보기 추적은 미확인
+- 사람의 개입: 벽 연출 제안안 승인, 대화창 시트 도입과 스테이지 3 테마 지시. 원화 선택은 AI가 수행
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseGrid.cs, DefenseBoardView.cs, 00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 배치 가능 검사 분리, 벽 연출·미리보기, 미리보기 갱신 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DialogueHud.cs, 03_Prefabs/05_UI/DialogueHud.prefab | Claude Code + Unity CLI | 수정 | 초상 시트 재생 / 테스트 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/CasterDialogue/Sheet_*.png (5장) | spriteLab + Python 재포장 | 생성 | 표정별 28프레임 3584×3072 / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Environment/ (DeadTree, Tombstones, RuinTower, RuinWall) + 03_Prefabs/04_World/Env_*.prefab | NAI + Meshy | 생성 | Tombstones 텍스처만 Python으로 밝기·채도 조정 / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/06_Textures/Stage/Ground_Graveyard.png, 00_Sprites/Stage/Branch_Thorn*.png, 03_VFX/Stage/Mist.* | NAI / Python | 생성 | 바닥 타일화, 전경 가지 외곽선 제거, 안개 입자 절차 생성 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/Stage_Graveyard.unity, Assets/Settings/Stage/Stage_Graveyard_* | Unity CLI | 생성 | 묘지 테마 테스트 씬 / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Enemies/Boar, DireWolf + 03_Prefabs/02_Enemies/ 프리팹 | NAI + GPT + Meshy + Codex/Blender | 생성 | 메쉬·리깅·동작 4개 / 미연결 |
+| Art Prompts/[Environment] 05_StageProps.txt | Claude Code | 수정 | 7-A~7-F 추가 |
+
+#### 증거
+- Tools/_out/wallfx/wallfx.jpg, Tools/_out/stage/grave_v3.jpg, Tools/_out/stage/grave_v3_dlg.jpg, Tools/_out/stage/dir_grave.png, Tools/_out/units/beasts_strip.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 스테이지 씬 3종 빌드, Play Mode에서 벽 연출·대화창·묘지 씬 캡처, 유닛 임포트와 필름스트립
+- 활용 방식: 리플렉션으로 격자·보드 뷰를 직접 호출해 연출을 재현
+- 잘된 점: 캡처와 값 조회로 초상 시트 미재생 버그와 묘지 씬 과도한 어두움을 바로 발견
+- 잘 안된 점 및 개선 필요: 돌 조각이 튀는 순간은 캡처 타이밍에 잡히지 않아 생성·소멸만 수치로 확인
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex CLI (Blender MCP) — 멧돼지·거대 늑대 4족 리깅과 동작. Images API — 묘지 방향 시안
+- 사용 방식: 늑대 때의 요청서를 바탕으로 `Art3D/<유닛>/Blender/REQUEST.md`를 작성해 순차 실행, 결과 README와 Unity 필름스트립으로 검수
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 미리보기 벽은 반투명이 아니라 색을 입힌 불투명 벽임(빌드에서 셰이더 변형 누락을 피하려는 선택). 묘지 씬의 스테이지 표기는 STAGE 1 그대로. Meshy 크레딧 120 추가 사용
+
+### [20261119-stage-extra-props] 스테이지 테마 3종 추가 소품 10종 (묘지 랜턴·울타리, 단풍 4종, 설원 4종)
+- 시각: 2026-11-19 06:00:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / NovelAI Diffusion V5 / Meshy API / Blender(헤드리스 변환) / Unity CLI
+- 목적 및 적용 위치: 단조롭던 단풍 평원·설원 테스트 씬에 소품 종류를 늘리고, 묘지 씬에 시안에 있던 랜턴 불빛·울타리·납골당 빛을 보충
+- 사용 방식: NAI 원화 10종(각 3장 중 AI가 선택) → Meshy 단일 이미지 메쉬 → FBX 변환 → 스테이지 빌더의 배치 단계에 추가. 묘지 랜턴은 보드 근처 최대 8개에 따뜻한 포인트 라이트, 기존 언데드 납골당 프리팹 1개를 보드 옆에 두고 초록 포인트 라이트
+- 결과 및 확인 방법: 성공 / 세 씬을 Play Mode에서 캡처해 육안 확인, 콘솔 오류 0. 묘지는 첫 배치에서 랜턴이 보드 근처에 놓이지 않아 배치 순서를 바꿔 재확인. 성능 수치(삼각형·배치 수)는 이번에 다시 재지 않음
+- 사람의 개입: 단풍·설원에 3D 에셋 추가 지시, 완료 후 커밋 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Environment/ (GraveLantern, GraveFence, AutumnBush, WheatStook, MushroomStump, BrokenCart, IceCrystals, BerryShrub, SnowLogs, SnowCairn) | NAI + Meshy | 생성 | FBX·텍스처·머티리얼, 수정 없음 / 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/04_World/Env_*.prefab (10종) | Unity CLI | 생성 | 높이 1 정규화 (WheatStook만 두께 2배) / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/Stage_GoldenMaple, Stage_Snowfield, Stage_Graveyard | Unity CLI | 수정 | 소품 재배치 / 사용 |
+| Art Prompts/[Environment] 05_StageProps.txt | Claude Code | 수정 | 8-A~10-D 추가 |
+
+#### 증거
+- Tools/_out/stage/maple_v10.jpg, snow_v10.jpg, grave_v11.jpg, Tools/_out/extra/all_views.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 소품 프리팹 생성, 스테이지 씬 3종 재빌드, Play Mode 캡처
+- 활용 방식: 재실행 가능한 스테이지 빌더를 `script eval --file`로 실행
+- 잘된 점: 캡처로 랜턴 배치 누락을 바로 확인
+- 잘 안된 점 및 개선 필요: 소품이 늘어난 뒤의 성능은 측정하지 않음
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: GraveFence는 창살이 판처럼 뭉친 메쉬로 나옴. Meshy 크레딧 300 사용

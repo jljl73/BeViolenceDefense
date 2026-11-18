@@ -1,3 +1,5 @@
+using LitMotion;
+using LitMotion.Extensions;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -765,12 +767,145 @@ internal sealed class DefenseBoardView
         return mesh;
     }
 
-    public void PlaceWall(Vector2Int cell) => wallViews.Add(cell, CreateWall(cell, $"Wall {cell.x},{cell.y}", buildWall));
+    public void PlaceWall(Vector2Int cell)
+    {
+        Transform wall = CreateWall(cell, $"Wall {cell.x},{cell.y}", buildWall);
+        wallViews.Add(cell, wall);
+        PlayWallPlaced(wall);
+    }
 
     public void RemoveWall(Vector2Int cell)
     {
         if (wallViews.Remove(cell, out Transform wall))
-            Object.Destroy(wall.gameObject);
+            PlayWallRemoved(wall);
+    }
+
+    // ── 벽 설치·철거 연출 ──
+    // 판정은 이미 끝난 뒤의 보여 주기다. 준비 단계에서만 일어나므로 전투 시계와 무관하게 실시간으로 재생한다.
+    private const float WallDropHeight = 0.9f;
+    private const float WallDropTime = 0.13f;
+    private const float WallSettleTime = 0.28f;
+    private const float WallRemoveTime = 0.16f;
+    private static readonly Color WallFlash = new(1f, 0.82f, 0.42f);
+    private Transform buildGhost;
+    private MaterialPropertyBlock ghostBlock;
+    private Renderer[] ghostRenderers;
+
+    private void PlayWallPlaced(Transform wall)
+    {
+        Vector3 rest = wall.localPosition;
+        Vector3 baseScale = wall.localScale;
+        wall.localPosition = rest + Vector3.up * WallDropHeight;
+        wall.localScale = Vector3.Scale(baseScale, new Vector3(0.9f, 1.15f, 0.9f));
+        LMotion.Create(rest.y + WallDropHeight, rest.y, WallDropTime)
+            .WithEase(Ease.InQuad)
+            .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+            .WithOnComplete(() => SpawnWallChips(rest, 8))
+            .BindToLocalPositionY(wall)
+            .AddTo(wall.gameObject);
+        // 착지: 납작하게 눌렸다가 튀어 오른다.
+        LMotion.Create(new Vector3(1.22f, 0.68f, 1.22f), Vector3.one, WallSettleTime)
+            .WithEase(Ease.OutBack)
+            .WithDelay(WallDropTime)
+            .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+            .Bind(wall, (squash, target) => target.localScale = Vector3.Scale(baseScale, squash))
+            .AddTo(wall.gameObject);
+
+        Renderer[] renderers = wall.GetComponentsInChildren<Renderer>();
+        Color settled = wallPrefab != null ? Color.white : buildWall.color;
+        var block = new MaterialPropertyBlock();
+        LMotion.Create(1f, 0f, 0.35f)
+            .WithDelay(WallDropTime)
+            .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+            .WithOnComplete(() =>
+            {
+                foreach (Renderer renderer in renderers)
+                    if (renderer != null)
+                        renderer.SetPropertyBlock(null);
+            })
+            .Bind(flash =>
+            {
+                block.SetColor(BaseColor, Color.Lerp(settled, WallFlash * 1.5f, flash));
+                foreach (Renderer renderer in renderers)
+                    if (renderer != null)
+                        renderer.SetPropertyBlock(block);
+            })
+            .AddTo(wall.gameObject);
+    }
+
+    private void PlayWallRemoved(Transform wall)
+    {
+        Vector3 rest = wall.localPosition;
+        Vector3 baseScale = wall.localScale;
+        GameObject target = wall.gameObject;
+        SpawnWallChips(rest, 6);
+        LMotion.Create(0f, 1f, WallRemoveTime)
+            .WithEase(Ease.InCubic)
+            .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+            .WithOnComplete(() => Object.Destroy(target))
+            .Bind(wall, (t, tr) =>
+            {
+                tr.localScale = Vector3.Scale(baseScale, new Vector3(1f - 0.45f * t, 1f - t, 1f - 0.45f * t));
+                tr.localPosition = rest + Vector3.down * (0.1f * t);
+            })
+            .AddTo(target);
+    }
+
+    // 착지 자리에서 사방으로 튀는 작은 돌 조각.
+    private void SpawnWallChips(Vector3 center, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            float angle = (i + Random.value * 0.6f) / count * Mathf.PI * 2f;
+            var direction = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+            float size = Random.Range(0.08f, 0.15f);
+            float distance = Random.Range(0.55f, 0.95f);
+            float height = Random.Range(0.25f, 0.5f);
+            Vector3 start = center + direction * 0.3f + Vector3.up * 0.08f;
+            Transform chip = Box("Wall chip", root, start, Vector3.one * size, trim);
+            chip.localRotation = Random.rotation;
+            GameObject chipObject = chip.gameObject;
+            LMotion.Create(0f, 1f, Random.Range(0.32f, 0.5f))
+                .WithEase(Ease.OutQuad)
+                .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                .WithOnComplete(() => Object.Destroy(chipObject))
+                .Bind(chip, (t, tr) =>
+                {
+                    tr.localPosition = start + direction * (distance * t) + Vector3.up * (height * 4f * t * (1f - t));
+                    tr.localScale = Vector3.one * (size * (1f - t * t));
+                })
+                .AddTo(chipObject);
+        }
+    }
+
+    /// <summary>놓을 칸 미리보기. 놓을 수 있으면 금색, 없으면(길을 막거나 한도 초과) 붉은색으로 떠 있는 벽을 보여 준다.</summary>
+    public void ShowBuildGhost(Vector2Int cell, bool canPlace)
+    {
+        if (buildGhost == null)
+        {
+            buildGhost = CreateWall(cell, "Wall ghost", buildWall);
+            ghostRenderers = buildGhost.GetComponentsInChildren<Renderer>();
+            foreach (Renderer renderer in ghostRenderers)
+            {
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+            }
+            ghostBlock = new MaterialPropertyBlock();
+            buildGhost.localScale *= 0.82f;
+        }
+
+        buildGhost.gameObject.SetActive(true);
+        float bob = 0.16f + Mathf.Sin(Time.unscaledTime * 5f) * 0.05f;
+        buildGhost.localPosition = DefenseGrid.CellPosition(cell) + Vector3.up * bob;
+        ghostBlock.SetColor(BaseColor, canPlace ? WallFlash * 1.25f : new Color(1.2f, 0.32f, 0.3f));
+        foreach (Renderer renderer in ghostRenderers)
+            renderer.SetPropertyBlock(ghostBlock);
+    }
+
+    public void HideBuildGhost()
+    {
+        if (buildGhost != null)
+            buildGhost.gameObject.SetActive(false);
     }
 
     public bool TryPickCell(Vector2 pointer, out Vector2Int cell) => TryPickCell(BoardRay(pointer), out cell);

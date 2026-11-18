@@ -85,6 +85,21 @@ public sealed class DefenseGrid
 
     public BuildResult TryPlace(Vector2Int cell)
     {
+        BuildResult result = CheckPlace(cell, out Vector3[][] updated);
+        if (result != BuildResult.Placed)
+            return result;
+
+        placed.Add(cell);
+        routes = updated;
+        return BuildResult.Placed;
+    }
+
+    /// <summary>벽을 놓지 않고 그 칸에 놓을 수 있는지만 본다. 놓을 수 있으면 <see cref="BuildResult.Placed"/>.</summary>
+    public BuildResult CheckPlace(Vector2Int cell) => CheckPlace(cell, out _);
+
+    private BuildResult CheckPlace(Vector2Int cell, out Vector3[][] updated)
+    {
+        updated = null;
         if (!InBounds(cell))
             return BuildResult.Outside;
         if (!IsWalkable(cell) || Array.IndexOf(spawns, cell) >= 0)
@@ -92,13 +107,8 @@ public sealed class DefenseGrid
         if (placed.Count >= WallLimit)
             return BuildResult.LimitReached;
 
-        Vector3[][] updated = FindRoutes(cell);
-        if (updated == null)
-            return BuildResult.BlocksRoute;
-
-        placed.Add(cell);
-        routes = updated;
-        return BuildResult.Placed;
+        updated = FindRoutes(cell);
+        return updated == null ? BuildResult.BlocksRoute : BuildResult.Placed;
     }
 
     public bool TryRemove(Vector2Int cell)
