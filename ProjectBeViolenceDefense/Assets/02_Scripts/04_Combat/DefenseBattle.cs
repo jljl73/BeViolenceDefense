@@ -135,13 +135,30 @@ internal sealed class DefenseBattle
 
         for (int i = 0; i < factions.Length; i++)
         {
-            int baseCount = factionSpawns[i].Length > 0 ? factions[i].SpawnCount : 0;
-            // Faction 1 (Undead) receives the first larger reinforcement, then it alternates with the others.
-            int largerReinforcements = roundsCleared / 2 + (i == 1 ? roundsCleared % 2 : 0);
-            int reinforcements = roundsCleared * ReinforcementsPerFaction + largerReinforcements * ExtraReinforcements;
-            roundSpawnCounts[i] = baseCount > 0 ? baseCount + reinforcements : 0;
+            roundSpawnCounts[i] = ReinforcedSpawnCount(i, roundsCleared);
             EnemiesPerRound += roundSpawnCounts[i];
         }
+    }
+
+    private int ReinforcedSpawnCount(int side, int roundsCleared)
+    {
+        int baseCount = factionSpawns[side].Length > 0 ? factions[side].SpawnCount : 0;
+        // Faction 1 (Undead) receives the first larger reinforcement, then it alternates with the others.
+        int largerReinforcements = roundsCleared / 2 + (side == 1 ? roundsCleared % 2 : 0);
+        int reinforcements = roundsCleared * ReinforcementsPerFaction + largerReinforcements * ExtraReinforcements;
+        return baseCount > 0 ? baseCount + reinforcements : 0;
+    }
+
+    /// <summary>다음 라운드에 진영(편) side 가 내보낼 유닛 수. 지금 라운드의 상태는 바꾸지 않는다.</summary>
+    public int NextRoundSpawnCount(int side)
+    {
+        if (factionSpawns[side].Length == 0)
+            return 0;
+        if (roundLineup == null)
+            return ReinforcedSpawnCount(side, Round);
+
+        IReadOnlyList<EnemyFaction>[] next = roundLineup(Round + 1);
+        return next != null && side < next.Length && next[side] != null ? next[side].Count : 0;
     }
 
     public void StartRound()
@@ -319,40 +336,95 @@ internal sealed class DefenseBattle
         return GameText.Format("cast.taunted", pulled);
     }
 
+    /// <summary>두 진영의 선두가 처음 만날 것으로 보이는 지점.</summary>
+    public readonly struct EncounterForecast
+    {
+        public EncounterForecast(Vector2Int cell, int sideA, int sideB, float seconds)
+        {
+            Cell = cell;
+            SideA = sideA;
+            SideB = sideB;
+            Seconds = seconds;
+        }
+
+        public Vector2Int Cell { get; }
+        public int SideA { get; }
+        public int SideB { get; }
+        public float Seconds { get; }
+    }
+
     public IReadOnlyCollection<Vector2Int> ForecastEncounterCells()
     {
-        // 임시 가정: 모든 스폰의 선두가 동시에 출발한다. 서로 다른 진영의 스폰 쌍마다 교전 칸 하나.
         var cells = new HashSet<Vector2Int>();
+        foreach (EncounterForecast forecast in ForecastEncounters())
+            cells.Add(forecast.Cell);
+        return cells;
+    }
+
+    public IReadOnlyList<EncounterForecast> ForecastEncounters()
+    {
+        // 임시 가정: 모든 스폰의 선두가 동시에 출발해 각자의 이동속도로 경로를 따라 걷는다.
+        // 서로 다른 진영의 스폰 쌍마다 교전 칸 하나.
+        var forecasts = new List<EncounterForecast>();
         for (int a = 0; a < factions.Length; a++)
         for (int b = a + 1; b < factions.Length; b++)
         {
             if (roundSpawnCounts[a] == 0 || roundSpawnCounts[b] == 0)
                 continue;
-            float range = Mathf.Max(RoundUnit(a, 0).AttackRange, RoundUnit(b, 0).AttackRange);
+            EnemyFaction leaderA = RoundUnit(a, 0);
+            EnemyFaction leaderB = RoundUnit(b, 0);
+            float range = Mathf.Max(leaderA.AttackRange, leaderB.AttackRange);
             foreach (int first in factionSpawns[a])
                 foreach (int second in factionSpawns[b])
-                    if (ForecastEncounter(grid.Routes[first], grid.Routes[second], range) is { } cell)
-                        cells.Add(cell);
+                    if (ForecastEncounter(grid.Routes[first], grid.Routes[second], leaderA.MoveSpeed,
+                            leaderB.MoveSpeed, range) is { } hit)
+                        forecasts.Add(new EncounterForecast(hit.Cell, a, b, hit.Seconds));
         }
-        return cells;
+        return forecasts;
     }
 
-    private Vector2Int? ForecastEncounter(Vector3[] firstRoute, Vector3[] secondRoute, float range)
+    private (Vector2Int Cell, float Seconds)? ForecastEncounter(Vector3[] firstRoute, Vector3[] secondRoute,
+        float firstSpeed, float secondSpeed, float range)
     {
-        // Compare the leaders after each tile step. The last point is a core contact, not a tile.
-        int tileCount = Mathf.Min(firstRoute.Length, secondRoute.Length) - 1;
-        for (int step = 0; step < tileCount; step++)
+        // Walk both leaders along their routes in small steps. A leader that reaches the core is gone.
+        const float step = 0.1f;
+        float firstLength = RouteLength(firstRoute);
+        float secondLength = RouteLength(secondRoute);
+        for (float seconds = 0f; ; seconds += step)
         {
-            Vector3 first = firstRoute[step];
-            Vector3 second = secondRoute[step];
+            float firstDistance = firstSpeed * seconds;
+            float secondDistance = secondSpeed * seconds;
+            if (firstDistance >= firstLength || secondDistance >= secondLength)
+                return null;
+
+            Vector3 first = PointAlong(firstRoute, firstDistance);
+            Vector3 second = PointAlong(secondRoute, secondDistance);
             if ((first - second).sqrMagnitude > range * range || !grid.HasLineOfSight(first, second))
                 continue;
 
             Vector2Int center = DefenseGrid.PositionToCell((first + second) * 0.5f);
-            return grid.IsWalkable(center) ? center : DefenseGrid.PositionToCell(first);
+            return (grid.IsWalkable(center) ? center : DefenseGrid.PositionToCell(first), seconds);
         }
+    }
 
-        return null;
+    private static float RouteLength(Vector3[] route)
+    {
+        float length = 0f;
+        for (int i = 1; i < route.Length; i++)
+            length += Vector3.Distance(route[i - 1], route[i]);
+        return length;
+    }
+
+    private static Vector3 PointAlong(Vector3[] route, float distance)
+    {
+        for (int i = 1; i < route.Length; i++)
+        {
+            float segment = Vector3.Distance(route[i - 1], route[i]);
+            if (distance <= segment)
+                return Vector3.Lerp(route[i - 1], route[i], segment > 0f ? distance / segment : 0f);
+            distance -= segment;
+        }
+        return route[^1];
     }
 
     // 게임에서는 항상 TickDuration 으로 부른다. 다른 값은 시험용이다.

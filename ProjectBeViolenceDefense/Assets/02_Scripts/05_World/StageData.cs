@@ -21,8 +21,9 @@ public sealed class StageData : ScriptableObject
         GameText.Get("faction.goblin"), GameText.Get("faction.undead"),
         GameText.Get("faction.beast"), GameText.Get("faction.dragon_demon")
     };
+    // 진영 색: 고블린 초록, 언데드 보라, 짐승 노랑, 드래곤·악마 빨강. 경로·스폰 표지·체력바·마법 대상 빗금이 모두 이 색을 쓴다.
     public static readonly Color[] FactionColors =
-        { new(1f, 0.45f, 0.34f), new(0.27f, 0.87f, 0.81f), new(0.95f, 0.78f, 0.3f), new(0.68f, 0.45f, 0.95f) };
+        { new(0.42f, 0.86f, 0.40f), new(0.70f, 0.47f, 1f), new(1f, 0.84f, 0.26f), new(1f, 0.36f, 0.30f) };
 
     [System.Serializable]
     public struct Spawn

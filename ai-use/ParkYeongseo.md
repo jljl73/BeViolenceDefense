@@ -1913,3 +1913,125 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: GraveFence는 창살이 판처럼 뭉친 메쉬로 나옴. Meshy 크레딧 300 사용
+
+### [20261119-wave-ux] 웨이브 UX 연출 6종, 새 유닛 4종·스폰 구조물 4종 게임 연결
+- 시각: 2026-11-19 07:30:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Unity CLI
+- 목적 및 적용 위치: 벽으로 길이 바뀐 것, 이번·다음 웨이브의 등장 위치, 웨이브 시작 시 선두의 경로와 예상 교전 지점을 화면에서 바로 읽히게 함. 앞서 만든 유닛·스폰 구조물을 공용 적 카탈로그에 연결
+- 사용 방식: `DefenseBoardView`에 LitMotion 기반 연출 추가(길 갱신 강조, 스폰 예고 표지, 경로 선분, 교전 표지), 마법 대상 빗금을 진영별 색으로 변경, `DefenseBattle`의 교전 예측을 선두 이동속도 기준으로 교체하고 다음 라운드 편성 조회 추가, `EnemyCatalog`에 종족별 스폰 구조물 항목 추가. 카탈로그 에셋에는 Unity 스크립트로 유닛 4종(임시 수치)과 구조물 4종 등록
+- 결과 및 확인 방법: 성공 / EditMode 테스트 42건 통과. Play Mode에서 리플렉션으로 벽 설치·웨이브 시작·마법 조준을 재현해 수치와 캡처 확인(강조 칸 12, 선분 10, 교전 표지 3, 예고 종료 후 잔여 오브젝트 0, 준비 단계 ×4/×6 표지, 전투 중 버튼 호버 시 NEXT ×6/×3). 새 유닛 4종은 씬을 저장하지 않은 임시 편성으로 실제 전투 루프에서 스폰·교전 확인. 콘솔 오류 0. 실제 마우스 호버·조준 입력은 미확인
+- 사람의 개입: 연출 항목과 진영별 빗금 색 예시(고블린 초록, 언데드 보라, 용족 빨강, 야수 노랑) 제시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Claude Code | 수정 | 길 갱신 강조, 스폰 예고, 경로 선분, 교전 표지, 진영별 빗금 색, 스폰 구조물 배치 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs | Claude Code | 수정 | 이동속도 반영 교전 예측, `NextRoundSpawnCount` / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 연출 호출, 교전 예고 유지 시간(5초) / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyCatalog.cs, 06_UI/BattleInfoHud.cs, 06_UI/DefenseHud.cs | Claude Code | 수정 | 스폰 구조물 항목, 버튼 호버 노출, 전투 중 교전 아이콘 허용 / 사용 |
+| ProjectBeViolenceDefense/Assets/04_Data/03_Balance/EnemyCatalog.asset | Unity CLI | 수정 | goblin-charger, goblin-chief, boar, dire-wolf 추가(임시 수치), 스폰 구조물 4종 연결 / 사용 |
+
+#### 증거
+- Tools/_out/waveux/prep.jpg, wave_frames.jpg, wave_frames2.jpg, units_game.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 카탈로그 등록, EditMode 테스트, Play Mode 연출 검증과 캡처, 새 유닛 임시 편성 전투
+- 활용 방식: 리플렉션으로 격자·보드 뷰·전투 객체를 호출, 씬은 저장하지 않고 디스크에서 다시 열어 원복
+- 잘된 점: 연출 오브젝트 개수와 정리 여부를 수치로 확인
+- 잘 안된 점 및 개선 필요: CLI 호출 지연 때문에 1초 남짓한 경로 선분은 별도로 다시 재생해 캡처함
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 교전 예측이 "같은 걸음 수"에서 "선두 이동속도" 기준으로 바뀌어 준비 단계의 예상 교전 칸 위치가 달라질 수 있음. 새 유닛 4종 수치는 기존 카탈로그 규모에 맞춘 임시 값이며 밸런스 표와 다름. 스폰 구조물은 공용 카탈로그에 연결되어 GameScene에도 나타남
+
+### [20261119-faction-colors] 진영 색을 빗금 색과 통일 (초록·보라·노랑·빨강)
+- 시각: 2026-11-19 08:00:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Unity CLI
+- 목적 및 적용 위치: 경로·스폰 표지·체력바에 쓰이는 진영 색과 마법 대상 빗금 색이 달라 헷갈리던 것을 한 팔레트로 통일
+- 사용 방식: `StageData.FactionColors`를 고블린 초록, 언데드 보라, 짐승 노랑, 드래곤 빨강으로 바꾸고 빗금도 같은 값을 쓰게 함. 테스트 씬 4종에 저장된 슬롯 색 갱신. 상단 HUD의 고블린·해골 아이콘은 색상만 Python으로 바꿈(명암 유지)
+- 결과 및 확인 방법: 부분 성공 / 단풍 테스트 씬 Play Mode 캡처에서 경로·스폰 표지·HUD 아이콘·빗금이 같은 색으로 나오는 것 확인, 콘솔 오류 0. GameScene에 저장된 슬롯 색(산호·청록)은 팀원 씬이라 바꾸지 않음
+- 사람의 개입: 진영 색과 빗금 색을 통일하도록 결정. 수치는 본인 담당이 아니라고 명시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/StageData.cs, DefenseBoardView.cs | Claude Code | 수정 | 진영 색 정의 변경, 빗금이 진영 색을 쓰도록 단일화 / 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/01_Icons/Hud/BattleInfo/Icon_Goblin_r0c0.png, Icon_Skull_r0c0.png | Python (색상 변환) | 수정 | 산호→초록, 청록→보라 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/ (GameScene_LeftCoreHud, Stage_* 3종) | Unity CLI | 수정 | 고블린·언데드 슬롯 색 갱신 / 사용 |
+
+#### 증거
+- Tools/_out/waveux/colors_unified.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 테스트 씬 슬롯 색 갱신, Play Mode 캡처
+- 활용 방식: `SerializedObject`로 색 값만 수정 후 저장
+- 잘된 점: 색 값 외의 씬 내용은 건드리지 않음
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: GameScene의 `Voxel Defense Prototype` 진영 슬롯 색 4개를 새 진영 색으로 바꿔야 실제 게임 씬도 통일됨. 문서(balance.md 등)의 Coral/Teal 표기는 그대로 둠
+
+### [20261119-result-panels-coast-highland-skillbar] 승리·패배 패널 idle, Stage1 해안가·Stage4 고원 테마, 스킬 바 재작업(검토 대기)
+- 시각: 2026-11-19 10:30:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / NovelAI Diffusion V5 / OpenAI Images API (gpt-image-2.6-sunburst) / Meshy API / spriteLab MCP / Blender(헤드리스 변환) / Unity CLI
+- 목적 및 적용 위치: 결과 화면 주인공 그림 애니메이션화와 패배 패널 신설, 팀원이 만든 Stage1·Stage4 지형에 테마 입히기, "밤티난다"는 의견이 있던 스킬 슬롯 프레임·아이콘 재작업
+- 사용 방식: (결과 패널) NAI로 패배 포즈 생성 → spriteLab idle → 28프레임 시트로 재포장, `VictoryPanelHud`를 승리·패배 공용 `ResultPanelHud`로 바꾸고 테스트 씬에서 패배 판정과 연결. (스테이지) GPT 방향 시안 → NAI 소품·바닥·전경 원화 → Meshy 메쉬 10종 → 스테이지 데이터의 보드 크기를 읽는 새 빌더로 테마 씬 생성. (스킬 바) GPT로 장식 없는 프레임+글자 칸 3상태, NAI로 아이콘 4종 후보
+- 결과 및 확인 방법: 부분 성공 / 승리·패배 패널은 Play Mode에서 띄워 프레임 진행과 캡처 확인, 패배는 코어 체력을 0으로 만들어 실제 판정 경로로 확인. 두 스테이지 씬은 Play Mode 캡처 확인(콘솔 오류 0). 스킬 바는 미리보기 이미지만 만들었고 게임에는 아직 넣지 않음
+- 사람의 개입: 패배 포즈 선택(눈이 뱅글뱅글 도는 2안), 승리·패배 애니메이션을 과한 동작에서 포즈 유지 idle로 바꾸도록 지시, 스테이지 컨셉 지정(Stage1 해안가, Stage4 고원), 스킬 아이콘은 NAI로·프레임은 장식 없이 글자 칸만 두도록 지시(GPT 목업은 반려)
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/ResultPanelHud.cs (구 VictoryPanelHud.cs) | Claude Code | 수정 | 승리·패배 공용화, 캐릭터 시트 재생, 버튼 동작 연결 / 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/DefeatPanelHud.prefab, VictoryPanelHud.prefab | Claude Code + Unity CLI | 생성·수정 | 패배 패널 신설, 두 패널에 idle 시트 연결 / 테스트 씬 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/CasterVictory/Sheet_Victory.png, CasterDefeat/ (Caster_Defeat.png, Sheet_Defeat.png) | NAI(02:1-I seed 432816350) + spriteLab + Python 재포장 | 생성 | 28프레임 7×4 시트 / 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/01_Icons/Hud/VictoryPanel/RibbonDefeat_*.png | Python (색 변환) | 생성 | 승리 리본을 보라색으로 변환 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 선택 항목 `defeatPanel` 추가(연결한 씬에서만 기본 팝업 대체) |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Environment/ (PalmTree, SeaRock, Driftwood, WreckedBoat, ShellCoral, WindPine, HighlandRock, HeatherBush, StandingStone, GrassTussock) + Env_*.prefab | NAI + Meshy | 생성 | 수정 없음(WindPine은 머티리얼 색조만 조정) / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/06_Textures/Stage/Ground_Sand.png, Ground_HighlandGrass.png, 00_Sprites/Stage/Branch_Palm*.png, Branch_Highland*.png | NAI + Python | 생성 | 타일화, 외곽선 제거 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/ShoreFoam.cs | Claude Code | 생성 | 해안 거품 띠 왕복 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/Stage1_Coast.unity, Stage4_Highland.unity, Assets/Settings/Stage/ 해당 머티리얼·볼륨 | Unity CLI | 생성 | 테마 테스트 씬 / 사용 |
+| Art Prompts/[Characters] 02_Party.txt, [Environment] 05_StageProps.txt, [UI] 04_SkillIcons.txt | Claude Code | 수정 | 1-H·1-I, 11-A~12-G, 2-A~3-C 추가 (1-H·2-A~2-C는 미채택) |
+| Tools/_out/g12/ (Frame_*.png, skillbar_preview.jpg) | GPT + NAI + Python | 생성 | 스킬 바 미리보기 / 검토 대기 (git 제외) |
+
+#### 증거
+- Tools/_out/victory/result_idle.jpg, defeat_panel.jpg, Tools/_out/stage/coast_v2.jpg, highland_v3.jpg, dir_coast.png, dir_highland.png, Tools/_out/g12/skillbar_preview.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 패널 프리팹 조립·시트 연결, 테마 씬 생성, Play Mode 캡처, 저장 없이 스테이지를 바꿔 보는 확인
+- 활용 방식: 테마별 빌더를 Python에서 생성해 `script eval --file`로 실행
+- 잘된 점: 캡처로 스테이지 참조가 저장되지 않은 문제를 바로 발견(씬을 연 뒤 에셋을 다시 불러오도록 수정)
+- 잘 안된 점 및 개선 필요: spriteLab 재추출 호출이 매번 응답 대기 중 시간 초과됨(서버에서는 완료되어 결과 조회로 받음)
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 패배 패널의 "코어에 닿은 적"은 잃은 코어 체력, "서로 싸우다 쓰러진 적"은 나머지 제거 수로 계산함. Stage4는 보드가 커서 기본 시점에서 유닛·표지가 작게 보임. Meshy 크레딧 300, Anlas(패배 포즈 8장) 사용
+
+### [20261119-coast-shore-highland-hills] 해안가 곡선 해안선, 고원 구릉 지형으로 재작업
+- 시각: 2026-11-19 11:30:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Unity CLI
+- 목적 및 적용 위치: `Stage1_Coast`, `Stage4_Highland` 테스트 씬을 사용자 피드백(스케치)에 맞게 수정
+- 사용 방식: 해안은 보드의 왼쪽 윤곽을 따라가는 해안선 함수를 만들어 바다를 왼쪽에 두고 무대 주위로 육지가 튀어나오게 함. 물은 해안선 거리 기반의 자체 셰이더(얕은→깊은 색, 밀려오는 거품 줄, 젖은 모래)로 그림. 고원은 절벽·구름바다를 없애고 보드 주변은 평평하고 바깥으로 완만히 솟는 구릉 메쉬로 교체, 나무를 8그루 안팎으로 줄임
+- 결과 및 확인 방법: 성공 / 두 씬 Play Mode 캡처 육안 확인, 콘솔 오류 0. 물 움직임과 구릉의 입체감은 정지 캡처로만 확인
+- 사람의 개입: 해안 배치 스케치 제공(바다는 왼쪽, 무대에 따라 해안이 튀어나옴), 고원은 구릉 테마에 나무 듬성듬성으로 지시. 스킬 바 재작업은 보류 지시(후보 반려)
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/02_Materials/ShoreWater.shader | Claude Code | 생성 | 해안 물 셰이더 / 사용 |
+| ProjectBeViolenceDefense/Assets/Settings/Stage/Stage1_Coast_Water.mat, _WaterMesh.asset, Stage4_Highland_Hills.asset | Unity CLI | 생성 | 해안 물 메쉬·머티리얼, 구릉 지형 메쉬 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/Stage1_Coast.unity, Stage4_Highland.unity | Unity CLI | 수정 | 재생성 / 사용 |
+
+#### 증거
+- Tools/_out/stage/coast_v4.jpg, highland_v5.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 셰이더 컴파일 확인, 테마 씬 재생성, Play Mode 캡처
+- 활용 방식: 테마 빌더를 생성해 `script eval --file`로 실행
+- 잘된 점: 해안선·지형을 스테이지 크기에서 계산하므로 다른 스테이지에도 재사용 가능
+- 잘 안된 점 및 개선 필요: 첫 구릉은 화면 아래쪽에서 카메라에 잘려 앞쪽 높이를 낮춤
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 이전 빌드에서 만든 `ShoreFoam.cs`와 Stage1_Coast_Sea/Foam/WetSand, Stage4_Highland_Cliff/Clouds 머티리얼은 더 이상 쓰이지 않음(정리 대상)

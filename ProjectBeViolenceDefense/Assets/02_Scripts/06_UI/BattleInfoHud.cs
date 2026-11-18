@@ -37,6 +37,9 @@ public sealed class BattleInfoHud : MonoBehaviour
     [SerializeField] private TextMeshProUGUI waveCaption;
 
     private bool waveHovered;
+
+    /// <summary>마우스가 웨이브 호출 버튼 위에 있는지. 전투 중 다음 웨이브의 스폰 위치 예고에 쓴다.</summary>
+    public bool WaveButtonHovered => waveHovered;
     private bool wasInCombat;
     private float combatSeconds;
     private int shownSeconds = -1;

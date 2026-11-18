@@ -78,6 +78,12 @@ public sealed class EnemyCatalog : ScriptableObject
 
     [SerializeField] private Entry[] entries = Array.Empty<Entry>();
 
+    [SerializeField, Tooltip("종족별 스폰 지점 구조물 (고블린·언데드·짐승·드래곤 순). 비우면 스폰 패드만 보인다. 모델은 가로 1칸 크기에 입구가 -Z를 향해야 한다.")]
+    private GameObject[] spawnStructures = Array.Empty<GameObject>();
+
+    internal GameObject SpawnStructure(int faction) =>
+        spawnStructures != null && faction >= 0 && faction < spawnStructures.Length ? spawnStructures[faction] : null;
+
     internal bool TryGetFactionGroup(string unitId, out EnemyFactionGroup group)
     {
         foreach (Entry entry in entries)

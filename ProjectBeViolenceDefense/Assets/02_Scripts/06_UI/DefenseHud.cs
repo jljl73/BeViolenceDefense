@@ -458,7 +458,8 @@ internal sealed class DefenseHud
     private void RefreshEncounterMarkers(DefenseBattle battle, DefenseBoardView view)
     {
         int visible = 0;
-        if (battle.CurrentPhase == DefenseBattle.Phase.Preparation && encounterIcon != null)
+        // 준비 단계의 예상 교전 칸, 그리고 웨이브 시작 직후 잠깐 남겨 두는 교전 예고 칸에 아이콘을 띄운다.
+        if (battle.CurrentPhase != DefenseBattle.Phase.Defeat && encounterIcon != null)
         {
             foreach (Vector2Int cell in view.PlannedEncounters)
             {

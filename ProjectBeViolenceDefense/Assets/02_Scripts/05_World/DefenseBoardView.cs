@@ -181,7 +181,7 @@ internal sealed class DefenseBoardView
     private readonly Material moveSpeedBuffMarkMaterial;
     private readonly Material armorBuffMarkMaterial;
     private readonly Quaternion buffMarkRotation;
-    private readonly Dictionary<DefenseBattle.Spell, Material> targetSilhouettes = new();
+    private readonly Dictionary<(DefenseBattle.Spell Spell, int Faction), Material> targetSilhouettes = new();
     private readonly Dictionary<(Material Preview, Material Source), Material> texturedSilhouettes = new();
     private readonly MeshRenderer areaSpellPreview;
     private readonly Mesh areaSpellPreviewMesh;
@@ -281,6 +281,17 @@ internal sealed class DefenseBoardView
             Box($"{faction.DisplayName} spawn pad", root, position + Vector3.up * 0.035f,
                 padScale, FactionMaterial(faction), padMesh);
             Box("Spawn pad center", root, position + Vector3.up * 0.075f, new Vector3(0.55f, 0.03f, 0.55f), foundation);
+
+            // 종족별 스폰 지점 구조물(막사·납골당·굴·둥지). 유닛은 그 안에서 걸어 나온다.
+            GameObject structure = catalog != null ? catalog.SpawnStructure(spawnFactions[i]) : null;
+            if (structure != null)
+            {
+                Transform model = Object.Instantiate(structure, root, false).transform;
+                model.name = $"{faction.DisplayName} spawn structure";
+                model.localPosition = position + Vector3.up * SpawnPadHeight;
+                model.localScale *= SpawnStructureScale;
+                spawnStructures.Add((i, model));
+            }
         }
 
         CreateCore(grid, theme, foundation, fixedWall, core);
@@ -301,12 +312,15 @@ internal sealed class DefenseBoardView
         Shader silhouetteShader = Resources.Load<Shader>("SpellTargetSilhouette");
         foreach (DefenseBattle.Spell spell in System.Enum.GetValues(typeof(DefenseBattle.Spell)))
         {
-            var silhouette = new Material(silhouetteShader) { name = $"{spell} Target Silhouette" };
-            Color color = SpellEffects.SpellColor(spell);
-            silhouette.SetColor("_SilhouetteColor", color);
-            silhouette.SetColor("_OutlineColor", UIPalette.Background);
-            targetSilhouettes.Add(spell, silhouette);
-            materials.Add(silhouette);
+            // 빗금은 마법 종류가 아니라 대상의 진영 색으로 나눈다. 마법 종류는 범위 원의 색이 알려 준다.
+            for (int faction = 0; faction < factions.Count; faction++)
+            {
+                var silhouette = new Material(silhouetteShader) { name = $"{spell} Target Silhouette {faction}" };
+                silhouette.SetColor("_SilhouetteColor", factions[faction].Color);
+                silhouette.SetColor("_OutlineColor", UIPalette.Background);
+                targetSilhouettes.Add((spell, faction), silhouette);
+                materials.Add(silhouette);
+            }
         }
         areaSpellPreview.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         areaSpellPreview.receiveShadows = false;
@@ -623,13 +637,25 @@ internal sealed class DefenseBoardView
         IReadOnlyCollection<Vector2Int> encounters = null)
         => ShowRoutes(routes, encounters, false);
 
-    public void ShowBattleRoutes(IReadOnlyList<Vector3[]> routes)
-        => ShowRoutes(routes, null, true);
+    /// <summary>전투 중 경로 표시. <paramref name="encounters"/>를 주면 웨이브 시작 직후의 교전 예고 칸도 함께 남긴다.</summary>
+    public void ShowBattleRoutes(IReadOnlyList<Vector3[]> routes, IReadOnlyCollection<Vector2Int> encounters = null)
+        => ShowRoutes(routes, encounters, true);
 
     private void ShowRoutes(IReadOnlyList<Vector3[]> routes,
         IReadOnlyCollection<Vector2Int> encounters, bool subdued)
     {
         PlannedEncounters = encounters ?? System.Array.Empty<Vector2Int>();
+        // 스폰 구조물의 입구(-Z)를 경로의 첫 걸음 쪽으로 돌린다.
+        if (routes != null)
+            foreach (var (spawn, model) in spawnStructures)
+            {
+                Vector3[] path = routes[spawn];
+                if (path.Length < 2)
+                    continue;
+                Vector3 heading = Vector3.ProjectOnPlane(path[1] - path[0], Vector3.up);
+                if (heading.sqrMagnitude > 0.0001f)
+                    model.localRotation = Quaternion.LookRotation(-heading.normalized, Vector3.up);
+            }
         for (int x = 0; x < boardWidth; x++)
             for (int z = 0; z < boardDepth; z++)
                 floor[x, z].sharedMaterial = tiles[(x + z) % tiles.Length];
@@ -814,6 +840,261 @@ internal sealed class DefenseBoardView
     private const float WallRemoveTime = 0.16f;
     private static readonly Color WallFlash = new(1f, 0.82f, 0.42f);
     private Transform buildGhost;
+    private const float SpawnStructureScale = 1.1f;
+    private readonly List<(int Spawn, Transform Model)> spawnStructures = new();
+    private readonly List<SpawnBeacon> spawnBeacons = new();
+    private Mesh spawnBeaconRing;
+
+    private sealed class SpawnBeacon
+    {
+        public Transform Root;
+        public MeshRenderer[] Rings;
+        public MeshRenderer Arrow;
+        public TMPro.TextMeshPro Label;
+        public int ShownCount = -1;
+        public bool ShownNext;
+    }
+
+    // ── 길 갱신 강조 ──
+    /// <summary>벽을 놓거나 치워서 새로 길이 된 칸을 경로 순서대로 한 번 번쩍인다.</summary>
+    public void FlashRouteCells(IReadOnlyList<Vector2Int> cells)
+    {
+        for (int i = 0; i < cells.Count; i++)
+        {
+            Vector2Int cell = cells[i];
+            Color settled = floor[cell.x, cell.y].sharedMaterial.color;
+            Transform flash = Box("Route flash", root, DefenseGrid.CellPosition(cell) + Vector3.up * 0.02f,
+                new Vector3(0.9f, 0.04f, 0.9f), routeMarkerMaterial);
+            var renderer = flash.GetComponent<MeshRenderer>();
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            var block = new MaterialPropertyBlock();
+            block.SetColor(BaseColor, settled);
+            renderer.SetPropertyBlock(block);
+            GameObject flashObject = flash.gameObject;
+            LMotion.Create(0f, 1f, 0.55f)
+                .WithDelay(i * 0.035f)
+                .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                .WithOnComplete(() => Object.Destroy(flashObject))
+                .Bind(t =>
+                {
+                    // 금색으로 솟았다가 바닥색으로 가라앉는다.
+                    float pulse = Mathf.Sin(t * Mathf.PI);
+                    block.SetColor(BaseColor, Color.Lerp(settled, WallFlash * 1.5f, pulse));
+                    renderer.SetPropertyBlock(block);
+                    flash.localScale = new Vector3(0.9f, 0.04f + 0.12f * pulse, 0.9f);
+                })
+                .AddTo(flashObject);
+        }
+    }
+
+    // ── 스폰 위치 예고 ──
+    /// <summary>
+    /// 스폰 지점마다 등장 예고를 띄운다. <paramref name="countsPerFaction"/>이 null이면 숨긴다.
+    /// 매 프레임 부르며, 고리가 퍼지고 화살표가 들썩이는 움직임은 실시간으로 진행한다.
+    /// </summary>
+    public void ShowSpawnForecast(IReadOnlyList<int> countsPerFaction, bool nextWave, IReadOnlyList<Vector2Int> cells)
+    {
+        float clock = Time.unscaledTime;
+        for (int i = 0; i < cells.Count; i++)
+        {
+            int count = countsPerFaction != null ? countsPerFaction[spawnFactions[i]] : 0;
+            if (count <= 0)
+            {
+                if (i < spawnBeacons.Count)
+                    spawnBeacons[i].Root.gameObject.SetActive(false);
+                continue;
+            }
+
+            while (spawnBeacons.Count <= i)
+                spawnBeacons.Add(CreateSpawnBeacon(cells[spawnBeacons.Count], spawnFactions[spawnBeacons.Count]));
+            SpawnBeacon beacon = spawnBeacons[i];
+            beacon.Root.gameObject.SetActive(true);
+            Color color = factions[spawnFactions[i]].Color;
+            Color padColor = Color.Lerp(color, Color.black, 0.55f);
+            for (int ring = 0; ring < beacon.Rings.Length; ring++)
+            {
+                float phase = Mathf.Repeat(clock * 0.8f + ring / (float)beacon.Rings.Length, 1f);
+                float scale = Mathf.Lerp(1.0f, 2.5f, phase);
+                beacon.Rings[ring].transform.localScale = new Vector3(scale, 1f, scale);
+                tintBlock.SetColor(BaseColor, Color.Lerp(color * 1.3f, padColor, phase));
+                beacon.Rings[ring].SetPropertyBlock(tintBlock);
+            }
+            beacon.Arrow.transform.localPosition = Vector3.up * (1.75f + Mathf.Sin(clock * 4f) * 0.12f);
+            tintBlock.SetColor(BaseColor, color * 1.2f);
+            beacon.Arrow.SetPropertyBlock(tintBlock);
+            beacon.Label.transform.rotation = camera.transform.rotation;
+            if (beacon.ShownCount != count || beacon.ShownNext != nextWave)
+            {
+                beacon.ShownCount = count;
+                beacon.ShownNext = nextWave;
+                beacon.Label.text = nextWave ? $"<size=60%>NEXT</size>\n×{count}" : $"×{count}";
+                beacon.Label.color = Color.Lerp(color, Color.white, 0.55f);
+            }
+        }
+    }
+
+    private SpawnBeacon CreateSpawnBeacon(Vector2Int cell, int faction)
+    {
+        if (spawnBeaconRing == null)
+        {
+            spawnBeaconRing = CreateRingMesh("Spawn Beacon Ring", 0.5f, 0.07f, 32);
+            meshes.Add(spawnBeaconRing);
+        }
+
+        var beaconRoot = new GameObject("Spawn forecast").transform;
+        beaconRoot.SetParent(root, false);
+        beaconRoot.gameObject.SetActive(false);
+        beaconRoot.localPosition = DefenseGrid.CellPosition(cell);
+        var rings = new MeshRenderer[2];
+        for (int i = 0; i < rings.Length; i++)
+        {
+            var ring = new GameObject("Ring", typeof(MeshFilter), typeof(MeshRenderer));
+            ring.transform.SetParent(beaconRoot, false);
+            ring.transform.localPosition = Vector3.up * (SpawnPadHeight + 0.03f + i * 0.004f);
+            ring.GetComponent<MeshFilter>().sharedMesh = spawnBeaconRing;
+            rings[i] = ring.GetComponent<MeshRenderer>();
+            rings[i].sharedMaterial = routeMarkerMaterial;
+            rings[i].shadowCastingMode = ShadowCastingMode.Off;
+            rings[i].receiveShadows = false;
+        }
+
+        // 아래를 가리키는 화살표: 경로 화살표 메시를 세워서 쓴다.
+        var arrow = new GameObject("Arrow", typeof(MeshFilter), typeof(MeshRenderer));
+        arrow.transform.SetParent(beaconRoot, false);
+        arrow.transform.localRotation = Quaternion.LookRotation(Vector3.down, buffMarkRotation * Vector3.forward);
+        arrow.transform.localScale = Vector3.one * 3.4f;
+        arrow.GetComponent<MeshFilter>().sharedMesh = routeMarkerMesh;
+        var arrowRenderer = arrow.GetComponent<MeshRenderer>();
+        arrowRenderer.sharedMaterial = routeMarkerMaterial;
+        arrowRenderer.shadowCastingMode = ShadowCastingMode.Off;
+        arrowRenderer.receiveShadows = false;
+
+        var labelObject = new GameObject("Count", typeof(TMPro.TextMeshPro));
+        labelObject.transform.SetParent(beaconRoot, false);
+        labelObject.transform.localPosition = Vector3.up * 2.75f;
+        var label = labelObject.GetComponent<TMPro.TextMeshPro>();
+        label.font = TMPro.TMP_Settings.defaultFontAsset;
+        label.fontSize = 8.5f;
+        label.fontStyle = TMPro.FontStyles.Bold;
+        label.alignment = TMPro.TextAlignmentOptions.Center;
+        label.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
+        label.outlineWidth = 0.28f;
+        label.outlineColor = UIPalette.Background;
+        label.rectTransform.sizeDelta = new Vector2(6f, 2.6f);
+        label.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.Off;
+        return new SpawnBeacon { Root = beaconRoot, Rings = rings, Arrow = arrowRenderer, Label = label };
+    }
+
+    // ── 웨이브 시작 연출 ──
+    /// <summary>웨이브가 시작되면 각 스폰의 선두가 갈 길을 짧은 선분들이 먼저 달려 보여 준다.</summary>
+    public void PlayRouteTracers(IReadOnlyList<Vector3[]> routes, IReadOnlyList<int> countsPerFaction)
+    {
+        const int dashes = 5;
+        const float speed = 10f;      // 칸/초. 유닛보다 훨씬 빨라서 길을 먼저 훑는다.
+        const float spacing = 0.085f; // 선분 사이의 출발 간격(초)
+        for (int spawn = 0; spawn < routes.Count; spawn++)
+        {
+            if (countsPerFaction[spawnFactions[spawn]] <= 0)
+                continue;
+
+            Vector3[] path = routes[spawn];
+            float length = 0f;
+            for (int i = 1; i < path.Length; i++)
+                length += Vector3.Distance(path[i - 1], path[i]);
+            if (length <= 0.01f)
+                continue;
+
+            Color color = factions[spawnFactions[spawn]].Color * 1.45f;
+            float duration = length / speed;
+            for (int dash = 0; dash < dashes; dash++)
+            {
+                Transform segment = Box("Route tracer", root, path[0], new Vector3(0.24f, 0.07f, 0.75f), routeMarkerMaterial);
+                var renderer = segment.GetComponent<MeshRenderer>();
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+                var block = new MaterialPropertyBlock();
+                block.SetColor(BaseColor, color);
+                renderer.SetPropertyBlock(block);
+                segment.localScale = Vector3.zero;
+                GameObject segmentObject = segment.gameObject;
+                float tail = 1f - dash / (float)dashes * 0.55f;   // 뒤따르는 선분일수록 짧다
+                LMotion.Create(0f, length, duration)
+                    .WithDelay(dash * spacing)
+                    .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                    .WithOnComplete(() => Object.Destroy(segmentObject))
+                    .Bind(distance =>
+                    {
+                        Vector3 point = PointAlongRoute(path, distance, out Vector3 heading);
+                        float fade = Mathf.Clamp01(Mathf.Min(distance, length - distance) / 0.8f);
+                        segment.localPosition = point + Vector3.up * (RouteMarkerHeight + 0.09f);
+                        segment.localRotation = Quaternion.LookRotation(heading, Vector3.up);
+                        segment.localScale = new Vector3(0.24f * fade, 0.07f, 0.75f * tail * fade);
+                    })
+                    .AddTo(segmentObject);
+            }
+        }
+    }
+
+    /// <summary>예상 교전 칸에 고리가 퍼지는 표지를 잠깐 띄운다. <paramref name="delay"/>는 선두가 닿을 길을 선분이 훑는 시간만큼 준다.</summary>
+    public void PlayEncounterBeacons(IReadOnlyCollection<Vector2Int> cells, float delay)
+    {
+        if (spawnBeaconRing == null)
+        {
+            spawnBeaconRing = CreateRingMesh("Spawn Beacon Ring", 0.5f, 0.07f, 32);
+            meshes.Add(spawnBeaconRing);
+        }
+
+        Color hot = encounterTile.color * 1.5f;
+        foreach (Vector2Int cell in cells)
+        {
+            Color settled = encounterTile.color;
+            for (int i = 0; i < 3; i++)
+            {
+                var ring = new GameObject("Encounter beacon", typeof(MeshFilter), typeof(MeshRenderer));
+                ring.transform.SetParent(root, false);
+                ring.transform.localPosition = DefenseGrid.CellPosition(cell) + Vector3.up * (0.05f + i * 0.004f);
+                ring.transform.localScale = Vector3.zero;
+                ring.GetComponent<MeshFilter>().sharedMesh = spawnBeaconRing;
+                var renderer = ring.GetComponent<MeshRenderer>();
+                renderer.sharedMaterial = routeMarkerMaterial;
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+                var block = new MaterialPropertyBlock();
+                Transform ringTransform = ring.transform;
+                LMotion.Create(0f, 1f, 0.9f)
+                    .WithEase(Ease.OutCubic)
+                    .WithDelay(delay + i * 0.32f)
+                    .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                    .WithOnComplete(() => Object.Destroy(ring))
+                    .Bind(t =>
+                    {
+                        float scale = Mathf.Lerp(0.5f, 3.2f, t);
+                        ringTransform.localScale = new Vector3(scale, 1f, scale);
+                        block.SetColor(BaseColor, Color.Lerp(hot, settled, t));
+                        renderer.SetPropertyBlock(block);
+                    })
+                    .AddTo(ring);
+            }
+        }
+    }
+
+    private static Vector3 PointAlongRoute(Vector3[] path, float distance, out Vector3 heading)
+    {
+        heading = Vector3.forward;
+        for (int i = 1; i < path.Length; i++)
+        {
+            Vector3 step = path[i] - path[i - 1];
+            float segment = step.magnitude;
+            if (segment <= 0.0001f)
+                continue;
+            heading = step / segment;
+            if (distance <= segment)
+                return path[i - 1] + heading * distance;
+            distance -= segment;
+        }
+        return path[^1];
+    }
     private MaterialPropertyBlock ghostBlock;
     private Renderer[] ghostRenderers;
 
@@ -1007,14 +1288,15 @@ internal sealed class DefenseBoardView
             UpdateAreaSpellRing(point, radius);
         }
 
-        Material silhouette = material != null ? targetSilhouettes[spell.Value] : null;
         foreach (var entry in enemyViews)
         {
-            bool eligible = silhouette != null && (spell == DefenseBattle.Spell.Taunt
+            bool eligible = material != null && (spell == DefenseBattle.Spell.Taunt
                 ? entry.Key == tauntTarget || DefenseBattle.IsTauntable(tauntTarget, entry.Key)
                 : DefenseBattle.IsInAreaSpellRange(entry.Key, point, radius) &&
                     DefenseBattle.CanReceiveAreaSpell(entry.Key, spell.Value));
-            SetEnemyPreviewMaterial(entry.Value, eligible ? silhouette : null);
+            // 빗금은 대상의 진영 색으로 칠한다.
+            SetEnemyPreviewMaterial(entry.Value,
+                eligible ? targetSilhouettes[(spell.Value, entry.Key.FactionIndex)] : null);
         }
     }
 
