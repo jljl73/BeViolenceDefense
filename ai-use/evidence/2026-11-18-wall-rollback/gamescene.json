@@ -1,0 +1,10 @@
+{
+  "scene": "GameScene",
+  "frame": 2530,
+  "fixedMesh": "Cube",
+  "placedMesh": "Cube",
+  "fixedTint": "RGBA(0.000, 0.000, 0.000, 0.000)",
+  "removed": true,
+  "geometry": "Block + Cap",
+  "passed": true
+}

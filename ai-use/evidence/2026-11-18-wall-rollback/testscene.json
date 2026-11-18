@@ -1,0 +1,10 @@
+{
+  "scene": "TestScene",
+  "frame": 14208,
+  "fixedMesh": "WoodBlock",
+  "placedMesh": "WoodBlock",
+  "fixedTint": "RGBA(0.627, 0.518, 0.439, 1.000)",
+  "removed": true,
+  "geometry": "WoodBlockWall",
+  "passed": true
+}

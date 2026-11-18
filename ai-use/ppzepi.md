@@ -93,3 +93,46 @@
 - Unity CLI는 사용하지 않음. 컴파일·Play Mode 확인은 Unity Editor MCP로 수행.
 - 에디터 콘솔에 에러 2건이 표시되나 캡처 버퍼에는 이번 작업 이후 새 항목이 없음. 이전 폴더 정리 작업에서 남은 것으로 보이나 확인 필요.
 - 2단계(타일 형태·질감), 3단계(지면·나무·안개·후처리)는 미구현.
+
+### [20261118-1900-main-wall-rollback] 메인 씬 벽 외형 선택 복원
+- 시각: 2026-11-18 19:00:00 +09:00
+- 작업자: ppzepi (git config user.name)
+- 사용 도구: OpenAI Codex / GPT-6, Unity CLI 1.0.0, Unity Editor 6000.3.28f1
+- 목적 및 적용 위치: af8883f의 나무 벽 적용을 메인 GameScene에서 되돌리고 TestScene의 나무 벽을 유지.
+- 사용 방식: 커밋과 실제 씬·공유 코드 확인 후 BoardTheme에 선택적 wallPrefab을 추가. 미지정 시 기존 블록·캡 생성, TestScene에 기존 WoodBlockWall 연결.
+- 결과 및 확인 방법: 성공 / Unity 컴파일 오류·경고 0. 두 씬 Play Mode에서 프레임 진행, 고정 벽·배치 벽 메쉬, 배치·철거 확인. TestScene 고정 벽 색 유지. 새 Console 오류 없음. GameScene 및 프리팹·meta 파일 변경 없음.
+- 사람의 개입: 사용자가 롤백 범위와 TestScene 유지 조건 지정. 결과의 사람 검토 여부 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/BoardTheme.cs | Codex | 수정 | 씬별 선택적 벽 프리팹 필드 추가, 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Codex | 수정 | 전역 나무 벽 로드 대신 테마 프리팹 사용, 미지정 시 기존 외형, 적용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/TestScene.unity | Codex + Unity CLI/Editor | 수정 | 기존 WoodBlockWall 프리팹 참조 1줄 추가로 기존 외형 유지, 적용 |
+| ai-use/evidence/2026-11-18-wall-rollback/ | Codex + Unity CLI | 생성 | 검증 C# 및 컴파일·Play Mode·Console·최종 상태 JSON, 검증 증거로 사용 |
+| ai-use/ppzepi.md | Codex | 추가 | 본 작업 기록, 적용 |
+
+#### 증거
+- ai-use/evidence/2026-11-18-wall-rollback/compile.json
+- ai-use/evidence/2026-11-18-wall-rollback/testscene.json
+- ai-use/evidence/2026-11-18-wall-rollback/gamescene.json
+- ai-use/evidence/2026-11-18-wall-rollback/gamescene-frames.json
+- ai-use/evidence/2026-11-18-wall-rollback/console.json
+- ai-use/evidence/2026-11-18-wall-rollback/final-editor-state.json
+- ai-use/evidence/2026-11-18-wall-rollback/validate-walls.cs
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 연결 상태·오류 기준선 조회, 컴파일, TestScene 프리팹 연결·저장, 두 씬 Play Mode 검증, 원래 씬 복귀.
+- 활용 방식: Codex가 Git 조사·코드 수정을 담당하고 CLI의 recompile, script eval, scene open, editor.playmode, job wait, console get으로 Editor 작업·검증 수행.
+- 잘된 점: 실제 생성된 벽 메쉬와 고정 벽 색을 확인했고 프레임 진행·벽 배치·철거를 양쪽 씬에서 검증. 종료 시 TestScene 편집 모드로 복귀하고 빌드 씬 목록을 작업 전 상태로 복원.
+- 잘 안된 점 및 개선 필요: 기본 PATH에서 CLI가 검색되지 않아 설치 경로로 실행. 샌드박스 밖 설치 CLI 실행에는 권한 확장이 필요했음. 일회성 검증 코드의 색상 형변환 오류와 스폰 칸 배치 실패를 수정 후 재검증 통과. CLI 1.0.1 업데이트 확인했으나 도구 업데이트는 수행하지 않음.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 위 코드·씬·검증 기록.
+- 사용 방식: 사용자 요청 해석, 변경 범위 조사, 최소 코드 수정, Unity CLI 검증, 결과 기록.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: 커밋 기록 af8883f7ba6c26a62c82fd1839407090798e0b68 에 적용했던 MainScene의 벽 프리팹을 변경했던 것을 롤백해줘. TestScene에 적용된 벽은 그대로 두고.
+- 결과 및 실제 활용 방식: 실제 메인 씬 파일명 GameScene 확인 후 씬별 외형 설정으로 요청 적용.
+- 선정 이유: 메인 씬만 복원하고 TestScene 외형을 유지해야 하는 변경 범위를 지정.

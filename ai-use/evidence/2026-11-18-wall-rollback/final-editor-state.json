@@ -1,0 +1,7 @@
+{
+  "scene": "Assets/01_Scenes/03_Test/TestScene.unity",
+  "isDirty": false,
+  "playing": false,
+  "wallPrefab": "WoodBlockWall",
+  "buildScenes": 1
+}

@@ -47,6 +47,7 @@ internal sealed class DefenseBoardView
     private readonly Material encounterTile;
     private readonly Material buildWall;
     private readonly Material trim;
+    private readonly GameObject wallPrefab;
     private readonly Color fixedWallTint;
     private readonly Material attackBuffPreviewMaterial;
     private readonly Material moveSpeedBuffPreviewMaterial;
@@ -84,6 +85,7 @@ internal sealed class DefenseBoardView
         buildWall = Palette(theme.buildWall);
         Material fixedWall = Palette(theme.fixedWall);
         trim = Palette(theme.trim);
+        wallPrefab = theme.wallPrefab;
         fixedWallTint = theme.fixedWallTint;
         Material core = Palette(CoreColor);
 
@@ -434,10 +436,9 @@ internal sealed class DefenseBoardView
 
     private Transform CreateWall(Vector2Int cell, string label, Material material)
     {
-        var prefab = AssetLoader.Global.Load<GameObject>(AssetPaths.Prefabs.WoodBlockWall);
-        if (prefab != null)
+        if (wallPrefab != null)
         {
-            Transform woodWall = Object.Instantiate(prefab, root, false).transform;
+            Transform woodWall = Object.Instantiate(wallPrefab, root, false).transform;
             woodWall.name = label;
             woodWall.localPosition = DefenseGrid.CellPosition(cell);
             // 고정 벽은 배치한 벽과 구분되도록 어둡게 칠한다.
