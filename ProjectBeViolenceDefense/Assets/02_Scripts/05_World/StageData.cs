@@ -15,7 +15,12 @@ public sealed class StageData : ScriptableObject
     public const int MaxSize = 40;
     // 진영 = 종족. 순서는 EnemyFactionGroup 과 같다. 스테이지마다 일부 종족만 나올 수 있다.
     public const int FactionCount = 4;
-    public static readonly string[] FactionNames = { "고블린", "언데드", "짐승", "드래곤·악마" };
+    private static string[] factionNames;
+    public static string[] FactionNames => factionNames ??= new[]
+    {
+        GameText.Get("faction.goblin"), GameText.Get("faction.undead"),
+        GameText.Get("faction.beast"), GameText.Get("faction.dragon_demon")
+    };
     public static readonly Color[] FactionColors =
         { new(1f, 0.45f, 0.34f), new(0.27f, 0.87f, 0.81f), new(0.95f, 0.78f, 0.3f), new(0.68f, 0.45f, 0.95f) };
 
@@ -42,6 +47,9 @@ public sealed class StageData : ScriptableObject
         public RectInt Footprint => new(cell, size);
         public Vector3 Center => new(cell.x + (size.x - 1) * 0.5f, 0f, cell.y + (size.y - 1) * 0.5f);
     }
+
+    [Tooltip("결과 화면에 표시할 스테이지 이름의 텍스트 키")]
+    public string displayNameKey;
 
     [Range(MinSize, MaxSize)] public int width = DefenseGrid.DefaultSize;
     [Range(MinSize, MaxSize)] public int depth = DefenseGrid.DefaultSize;

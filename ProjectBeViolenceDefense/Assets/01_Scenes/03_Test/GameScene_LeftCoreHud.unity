@@ -1033,21 +1033,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueHudTester
   dialogue: {fileID: 764363402}
-  lines:
-  - speaker: Mage
-    expression: 0
-    text: Two armies are marching on the core...
-  - speaker: Mage
-    expression: 3
-    text: 'I can''t fight either of them.
-
-      Not even a little.'
-  - speaker: Mage
-    expression: 2
-    text: Wait. They hate each other more than they hate me?
-  - speaker: Mage
-    expression: 1
-    text: If I can make them meet, they will wear each other down!
 --- !u!4 &1220946919
 Transform:
   m_ObjectHideFlags: 0
@@ -1688,12 +1673,12 @@ MonoBehaviour:
     border: {r: 0.15686275, g: 0.21176471, b: 0.27058825, a: 1}
   coral:
     unitId: goblin-grunt-1500
-    displayName: Goblin
+    displayNameKey: faction.goblin
     color: {r: 1, g: 0.4509804, b: 0.34117648, a: 1}
     spawnCount: 6
   teal:
     unitId: zombie
-    displayName: Undead
+    displayNameKey: faction.undead
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
     spawnCount: 4
   rounds:

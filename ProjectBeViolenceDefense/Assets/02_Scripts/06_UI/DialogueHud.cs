@@ -19,9 +19,9 @@ public sealed class DialogueHud : MonoBehaviour
     [Serializable]
     public struct Line
     {
-        public string speaker;
+        public string speakerKey;
         public Expression expression;
-        [TextArea] public string text;
+        public string textKey;
     }
 
     /// <summary>표정 하나의 움직이는 초상. 프레임을 격자로 이어 붙인 텍스처 한 장.</summary>
@@ -54,6 +54,7 @@ public sealed class DialogueHud : MonoBehaviour
     [Tooltip("화면 전체를 덮는 투명 버튼. 누르면 다음 대사로 넘어간다.")]
     [SerializeField] private Button advanceButton;
     [SerializeField] private Button skipButton;
+    [SerializeField] private TextMeshProUGUI skipCaption;
 
     [Header("Timing (unscaled seconds)")]
     [SerializeField] private float charactersPerSecond = 45f;
@@ -89,6 +90,7 @@ public sealed class DialogueHud : MonoBehaviour
         boxShown = box.anchoredPosition;
         portraitShown = portrait.anchoredPosition;
         nextShown = nextMark.anchoredPosition;
+        skipCaption.text = GameText.Get("dialogue.skip");
         advanceButton.onClick.AddListener(Advance);
         skipButton.onClick.AddListener(Close);
         initialized = true;
@@ -133,9 +135,10 @@ public sealed class DialogueHud : MonoBehaviour
     private void ShowLine(bool hop)
     {
         Line line = lines[index];
-        bool speakerChanged = nameText.text != line.speaker;
-        nameText.text = line.speaker;
-        nameTab.gameObject.SetActive(!string.IsNullOrEmpty(line.speaker));
+        string speaker = GameText.Get(line.speakerKey);
+        bool speakerChanged = nameText.text != speaker;
+        nameText.text = speaker;
+        nameTab.gameObject.SetActive(!string.IsNullOrEmpty(speaker));
         int face = (int)line.expression;
         bool hasSheet = face < portraitSheets.Length && portraitSheets[face].texture != null && portraitSheets[face].frames > 0;
         Texture2D next = hasSheet ? portraitSheets[face].texture : face < portraits.Length ? portraits[face] : null;
@@ -151,7 +154,7 @@ public sealed class DialogueHud : MonoBehaviour
             PlayPortraitSheet();
         }
 
-        bodyText.text = line.text;
+        bodyText.text = GameText.Get(line.textKey);
         bodyText.maxVisibleCharacters = 0;
         bodyText.ForceMeshUpdate();
         totalCharacters = bodyText.textInfo.characterCount;

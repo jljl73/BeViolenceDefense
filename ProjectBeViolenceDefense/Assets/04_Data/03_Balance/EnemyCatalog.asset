@@ -15,7 +15,7 @@ MonoBehaviour:
   entries:
   - factionGroup: 0
     id: goblin-grunt-1500
-    displayName: "\uACE0\uBE14\uB9B0 \uC804\uC0AC (1500)"
+    displayNameKey: unit.goblin-grunt-1500
     model: {fileID: 6069468936470726084, guid: 218af73703ffe4b5ca096770dcbf9665, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
@@ -30,7 +30,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 1
     id: zombie
-    displayName: "\uC880\uBE44"
+    displayNameKey: unit.zombie
     model: {fileID: 919132149155446097, guid: ae4a287ea2455b04c98140f1d60b3e6b, type: 3}
     animations: {fileID: 9100000, guid: 540f004d4dada8344ba500c596233a98, type: 2}
     skin: {fileID: 2100000, guid: fc637a2448e415743b7c00a46b74d135, type: 2}
@@ -45,7 +45,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 2
     id: bat
-    displayName: "\uBC15\uC950"
+    displayNameKey: unit.bat
     model: {fileID: 9142216904294559398, guid: cd6b2187ced7a484581ce48b96e2961b, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
@@ -60,7 +60,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 3
     id: demon
-    displayName: "\uC545\uB9C8"
+    displayNameKey: unit.demon
     model: {fileID: 919132149155446097, guid: 759038a512e5aca40a9ca6a3a6a0d770, type: 3}
     animations: {fileID: 9100000, guid: b481ee71520a5aa448de50425f225b37, type: 2}
     skin: {fileID: 2100000, guid: 9b7b9ea496f1d114e98e9120e0f9b578, type: 2}
@@ -75,7 +75,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 0
     id: goblin-slinger
-    displayName: "\uACE0\uBE14\uB9B0 \uD22C\uC11D\uBCD1"
+    displayNameKey: unit.goblin-slinger
     model: {fileID: 919132149155446097, guid: a436b0d7324bfa04290a4fa08eec81b0, type: 3}
     animations: {fileID: 9100000, guid: 1818da51ac2a08e48b886e831995dcaf, type: 2}
     skin: {fileID: 2100000, guid: 24c4952b37de50d499781472544db53e, type: 2}
@@ -90,7 +90,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 3
     id: hatchling
-    displayName: "\uD574\uCE28\uB9C1"
+    displayNameKey: unit.hatchling
     model: {fileID: 8523329212451943726, guid: cfc71b86f7594d44d999dde218625b23, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
@@ -105,7 +105,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 1
     id: living-armor
-    displayName: "\uB9AC\uBE59 \uC544\uBA38"
+    displayNameKey: unit.living-armor
     model: {fileID: 1474687742719612628, guid: 1a4f91a6fe09419488d2951105eca5bd, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
@@ -120,7 +120,7 @@ MonoBehaviour:
     armor: 3
   - factionGroup: 1
     id: necromancer
-    displayName: "\uB124\uD06C\uB85C\uB9E8\uC11C"
+    displayNameKey: unit.necromancer
     model: {fileID: 738508159450999057, guid: d315cd44faed3a14f9369080b2edf30a, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
@@ -135,7 +135,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 0
     id: orc
-    displayName: "\uC624\uD06C"
+    displayNameKey: unit.orc
     model: {fileID: 5797661131896500938, guid: 5706c7920d3e65f43b23b2ac83c2c352, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
@@ -150,7 +150,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 1
     id: reaper
-    displayName: "\uC0AC\uC2E0"
+    displayNameKey: unit.reaper
     model: {fileID: 7061331611392860295, guid: 02f39df419ab7eb49987e2a46e04002e, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
@@ -165,7 +165,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 1
     id: skeleton-archer
-    displayName: "\uD574\uACE8 \uAD81\uC218"
+    displayNameKey: unit.skeleton-archer
     model: {fileID: 8018881163147974876, guid: 9a714bab17b6b1841b2fb281051d5b40, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
@@ -180,7 +180,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 3
     id: wyvern
-    displayName: "\uC640\uC774\uBC88"
+    displayNameKey: unit.wyvern
     model: {fileID: 2269374595641088485, guid: 6003c4e604cf8e54a8812fb36be2b948, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
@@ -195,7 +195,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 1
     id: skeleton
-    displayName: "\uD574\uACE8"
+    displayNameKey: unit.skeleton
     model: {fileID: 919132149155446097, guid: 9abb0a4070ff90e4c89d7fe1a87db330, type: 3}
     animations: {fileID: 9100000, guid: fb00204cc67e22b48a664e92fbb7cf5c, type: 2}
     skin: {fileID: 2100000, guid: 95ed19e22b42a924fb3f35eaabf97c13, type: 2}
@@ -210,7 +210,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 2
     id: werewolf
-    displayName: "\uB291\uB300\uC778\uAC04"
+    displayNameKey: unit.werewolf
     model: {fileID: 919132149155446097, guid: 4ab228fa7f34111489e3aa81272a85c5, type: 3}
     animations: {fileID: 9100000, guid: b4e7b0c936910404284f23a2d8b542f6, type: 2}
     skin: {fileID: 2100000, guid: c549a8a7d07a26c4698a9e8f8781c9ad, type: 2}
@@ -225,7 +225,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 2
     id: wolf
-    displayName: "\uB291\uB300"
+    displayNameKey: unit.wolf
     model: {fileID: 919132149155446097, guid: 05ae39b36f8dc5e4d8211ccd3c5ffb41, type: 3}
     animations: {fileID: 9100000, guid: e10db4c737a2d7246854adba68c78e59, type: 2}
     skin: {fileID: 2100000, guid: fe2ccf3da61a7e94f9d885f26ee00a62, type: 2}
@@ -240,7 +240,7 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 0
     id: goblin-grunt
-    displayName: "\uACE0\uBE14\uB9B0 \uC804\uC0AC (\uC6D0\uBCF8)"
+    displayNameKey: unit.goblin-grunt
     model: {fileID: 919132149155446097, guid: 7951bd0e291782d47b076f0c75b53dd4, type: 3}
     animations: {fileID: 9100000, guid: 6f19d133efd6a6548846102a198a70f2, type: 2}
     skin: {fileID: 2100000, guid: e45168a647c3dfd4999443dbc29f0f03, type: 2}

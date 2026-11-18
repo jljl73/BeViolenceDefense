@@ -18,7 +18,7 @@ public sealed class EnemyCatalog : ScriptableObject
     {
         [SerializeField] private EnemyFactionGroup factionGroup;
         [SerializeField] private string id;
-        [SerializeField] private string displayName;
+        [SerializeField] private string displayNameKey;
         [SerializeField] private GameObject model;
         [SerializeField] private RuntimeAnimatorController animations;
         [SerializeField] private Material skin;
@@ -36,7 +36,7 @@ public sealed class EnemyCatalog : ScriptableObject
         [SerializeField, Min(0)] private int armor;
 
         public string Id => id;
-        public string DisplayName => displayName;
+        public string DisplayName => string.IsNullOrWhiteSpace(displayNameKey) ? id : GameText.Get(displayNameKey);
         public EnemyFactionGroup FactionGroup => factionGroup;
 
         public EnemyFaction CreateFaction(string factionName, Color color, int spawnCount) =>
@@ -100,8 +100,7 @@ public sealed class EnemyCatalog : ScriptableObject
         Entry entry = Find(unitId, context);
         if (entry == null)
             return null;
-        string name = string.IsNullOrWhiteSpace(entry.DisplayName) ? entry.Id : entry.DisplayName;
-        return entry.CreateFaction(name, sideColor, 0);
+        return entry.CreateFaction(entry.DisplayName, sideColor, 0);
     }
 
     private Entry Find(string unitId, string context)

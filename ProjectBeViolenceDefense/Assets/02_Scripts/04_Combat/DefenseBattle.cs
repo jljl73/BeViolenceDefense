@@ -219,9 +219,9 @@ internal sealed class DefenseBattle
     public string SpellBlockReason(Spell spell, int rangeStep)
     {
         if (CurrentPhase != Phase.Combat)
-            return "Battle only";
+            return GameText.Get("cast.combat_only");
         if (Mana < ManaCost(spell, rangeStep))
-            return "Not enough mana";
+            return GameText.Get("cast.not_enough_mana");
         return null;
     }
 
@@ -242,7 +242,7 @@ internal sealed class DefenseBattle
     {
         recipients?.Clear();
         if (!IsAreaSpell(spell))
-            return "Pick a unit to cast this spell.";
+            return GameText.Get("cast.pick_target");
         string blocked = SpellBlockReason(spell, rangeStep);
         if (blocked != null)
             return blocked;
@@ -274,11 +274,10 @@ internal sealed class DefenseBattle
         }
 
         if (affected == 0)
-            return spell == Spell.Heal ? "No injured enemies in range." : "No eligible enemies in range.";
+            return spell == Spell.Heal ? GameText.Get("cast.no_injured_units") : GameText.Get("cast.no_eligible_units");
 
         Mana -= ManaCost(spell, rangeStep);
-        string action = spell == Spell.Heal ? "Healed" : "Buffed";
-        return affected == 1 ? $"{action} 1 enemy." : $"{action} {affected} enemies.";
+        return spell == Spell.Heal ? GameText.Format("cast.healed", affected) : GameText.Format("cast.buffed", affected);
     }
 
     // 도발에 끌려올 유닛: 살아 있는 다른 진영 유닛 중 도발 유닛 둘레 반경 안. 벽은 막지 않는다.
@@ -300,7 +299,7 @@ internal sealed class DefenseBattle
             if (enemy.SpawnOrder == targetSpawnOrder && enemy.IsAlive)
                 taunter = enemy;
         if (taunter == null)
-            return "The target is gone.";
+            return GameText.Get("cast.target_gone");
 
         taunter.ApplyTaunt(TauntDuration);
         recipients?.Add(taunter);
@@ -317,7 +316,7 @@ internal sealed class DefenseBattle
         Mana -= ManaCost(Spell.Taunt);
         // 끌려온 유닛이 다음 계획까지 기다리지 않고 바로 방향을 바꾼다.
         untilCombatPlan = 0f;
-        return pulled == 1 ? "Taunted 1 enemy." : $"Taunted {pulled} enemies.";
+        return GameText.Format("cast.taunted", pulled);
     }
 
     public IReadOnlyCollection<Vector2Int> ForecastEncounterCells()

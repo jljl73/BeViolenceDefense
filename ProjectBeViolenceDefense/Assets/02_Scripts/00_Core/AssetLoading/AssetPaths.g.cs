@@ -9,6 +9,7 @@ public static class AssetPaths
     public static readonly IReadOnlyList<string> All = new string[]
     {
         "Fonts & Materials/Netmarble Medium SDF",
+        "GameText.ko",
         "LineBreaking Following Characters",
         "LineBreaking Leading Characters",
         "Meshy_AppIcon_16",
@@ -18,6 +19,7 @@ public static class AssetPaths
         "TMP Settings",
     };
 
+    public const string GameText_ko = "GameText.ko";
     public const string LineBreaking_Following_Characters = "LineBreaking Following Characters";
     public const string LineBreaking_Leading_Characters = "LineBreaking Leading Characters";
     public const string Meshy_AppIcon_16 = "Meshy_AppIcon_16";

@@ -860,7 +860,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: STAGE 1
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
@@ -2002,7 +2002,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Next wave  <size=75%><color=#C7B6AD>Space</color></size>
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}

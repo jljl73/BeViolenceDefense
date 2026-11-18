@@ -13,22 +13,26 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     {
         [SerializeField, Tooltip("Enemy Catalog의 유닛 ID. 비우면 이 종족은 라운드 편성으로만 나온다.")]
         private string unitId;
-        [SerializeField] private string displayName;
+        [SerializeField] private string displayNameKey;
         [SerializeField] private Color color;
         [SerializeField, Min(0)] private int spawnCount;
 
         public FactionSlot() { }
-        public FactionSlot(string displayName, Color color)
+        public FactionSlot(string displayNameKey, Color color)
         {
-            this.displayName = displayName;
+            this.displayNameKey = displayNameKey;
             this.color = color;
         }
 
         public Color Color => color;
 
-        public EnemyFaction GetFaction(EnemyCatalog catalog) => string.IsNullOrWhiteSpace(unitId)
-            ? new EnemyFaction(displayName, color, spawnCount: 0)
-            : catalog.GetFaction(unitId, displayName, color, spawnCount);
+        public EnemyFaction GetFaction(EnemyCatalog catalog)
+        {
+            string displayName = GameText.Get(displayNameKey);
+            return string.IsNullOrWhiteSpace(unitId)
+                ? new EnemyFaction(displayName, color, spawnCount: 0)
+                : catalog.GetFaction(unitId, displayName, color, spawnCount);
+        }
     }
 
     [SerializeField] private Camera boardCamera;
@@ -53,11 +57,11 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private BoardTheme boardTheme = new();
     // 진영 = 종족. 순서는 EnemyFactionGroup 과 같다.
     [SerializeField, FormerlySerializedAs("coral")]
-    private FactionSlot greenHorde = new("Goblin", StageData.FactionColors[0]);
+    private FactionSlot greenHorde = new("faction.goblin", StageData.FactionColors[0]);
     [SerializeField, FormerlySerializedAs("teal")]
-    private FactionSlot undead = new("Undead", StageData.FactionColors[1]);
-    [SerializeField] private FactionSlot beasts = new("Beasts", StageData.FactionColors[2]);
-    [SerializeField] private FactionSlot dragonAndDemon = new("Dragon", StageData.FactionColors[3]);
+    private FactionSlot undead = new("faction.undead", StageData.FactionColors[1]);
+    [SerializeField] private FactionSlot beasts = new("faction.beast", StageData.FactionColors[2]);
+    [SerializeField] private FactionSlot dragonAndDemon = new("faction.dragon_demon", StageData.FactionColors[3]);
     [SerializeField, Tooltip("보드 크기·코어·스폰·고정 장애물·웨이브 편성. Tools/Stage Editor에서 편집한다. 비우면 기본 지형을 쓴다.")]
     private StageData stage;
     [Tooltip("선택. 연결하면 마지막 웨이브를 클리어했을 때 승리 패널을 띄운다.")]
@@ -135,7 +139,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (battleInfoHud != null)
         {
             hud.UseExternalBattleInfo();
-            battleInfoHud.Bind(StartBattle, SetBattleSpeed, () => hud.Notify("Settings are not available yet."));
+            battleInfoHud.Bind(StartBattle, SetBattleSpeed, () => hud.Notify(GameText.Get("notice.settings_pending")));
         }
         RefreshPlanningTiles();
     }
@@ -283,7 +287,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 if (battle.CurrentPhase == DefenseBattle.Phase.Preparation)
                 {
                     RefreshPlanningTiles();
-                    hud.Notify("Round cleared. Adjust walls before the next battle.");
+                    hud.Notify(GameText.Get("notice.wave_cleared"));
                     if (leftCoreHud != null)
                         leftCoreHud.Cheer();
                 }
@@ -305,11 +309,11 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             leftCoreHud.Cheer();
         if (victoryPanelHud == null)
         {
-            hud.Notify("Victory! Press R to restart.");
+            hud.Notify(GameText.Get("notice.victory_restart"));
             return;
         }
         int coreMax = DefenseBattle.CoreMaxHealth;
-        victoryPanelHud.Show(usedStage != null ? usedStage.name : "", battle.CoreHealth, coreMax,
+        victoryPanelHud.Show(usedStage != null ? GameText.Get(usedStage.displayNameKey) : null, battle.CoreHealth, coreMax,
             coreMax - battle.CoreHealth, fallenEnemies);
     }
 
@@ -484,13 +488,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 hud.Notify("");
                 break;
             case DefenseGrid.BuildResult.Occupied:
-                hud.Notify("That tile is occupied.");
+                hud.Notify(GameText.Get("notice.cell_occupied"));
                 break;
             case DefenseGrid.BuildResult.LimitReached:
-                hud.Notify("Wall limit reached. Remove a wall to free a slot.");
+                hud.Notify(GameText.Get("notice.no_walls"));
                 break;
             case DefenseGrid.BuildResult.BlocksRoute:
-                hud.Notify("Each spawn needs an open path to the core.");
+                hud.Notify(GameText.Get("notice.keep_routes"));
                 break;
         }
     }
@@ -544,7 +548,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             if (view.TryPickEnemy(pointer, battle.Enemies, out EnemyUnit target))
                 CastTaunt(target);
             else
-                hud.Notify("Click a unit to taunt.");
+                hud.Notify(GameText.Get("notice.pick_taunt_target"));
             return;
         }
         if (TryPickAreaSpellCenter(mouse, out Vector3 center))

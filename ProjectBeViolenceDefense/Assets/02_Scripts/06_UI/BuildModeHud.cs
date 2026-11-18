@@ -49,6 +49,7 @@ public sealed class BuildModeHud : MonoBehaviour
     /// <summary>버튼 동작을 연결한다. <paramref name="replacedBar"/>는 건설 모드에서 자리를 내주는 기존 하단 UI다.</summary>
     public void Bind(Action toggle, Action<Tool> selectTool, RectTransform replacedBar)
     {
+        toggleCaption.text = GameText.Get("hud.build");
         toggleButton.onClick.AddListener(() => toggle());
         placeButton.onClick.AddListener(() => selectTool(Tool.Place));
         removeButton.onClick.AddListener(() => selectTool(Tool.Remove));

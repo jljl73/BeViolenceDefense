@@ -26,6 +26,12 @@ public sealed class VictoryPanelHud : MonoBehaviour
     [SerializeField] private RectTransform panel;
     [SerializeField] private CanvasGroup panelGroup;
     [SerializeField] private TextMeshProUGUI stageText;
+    [SerializeField] private TextMeshProUGUI titleText;
+    [SerializeField] private TextMeshProUGUI retryCaption;
+    [SerializeField] private TextMeshProUGUI coreCaption;
+    [SerializeField] private TextMeshProUGUI nextCaption;
+    [SerializeField] private TextMeshProUGUI leakedCaption;
+    [SerializeField] private TextMeshProUGUI fallenCaption;
     [SerializeField] private TextMeshProUGUI coreText;
     [SerializeField] private TextMeshProUGUI leakedText;
     [SerializeField] private TextMeshProUGUI fallenText;
@@ -82,6 +88,12 @@ public sealed class VictoryPanelHud : MonoBehaviour
         for (int i = 0; i < leaves.Length; i++)
             leafAngles[i] = leaves[i].localEulerAngles.z;
         leafSway = new MotionHandle[leaves.Length];
+        titleText.text = GameText.Get("result.complete");
+        retryCaption.text = GameText.Get("result.retry");
+        coreCaption.text = GameText.Get("result.core_health");
+        nextCaption.text = GameText.Get("result.next");
+        leakedCaption.text = GameText.Get("result.leaked");
+        fallenCaption.text = GameText.Get("result.fallen");
         content.SetActive(false);
         initialized = true;
     }
@@ -93,7 +105,7 @@ public sealed class VictoryPanelHud : MonoBehaviour
         if (IsOpen)
             Hide();
         else
-            Show("1", 96, 120, 24, 58);
+            Show(GameText.Get("stage.1"), 96, 120, 24, 58);
     }
 
     /// <summary>결과 값을 채우고 패널을 띄운다.</summary>
@@ -101,7 +113,7 @@ public sealed class VictoryPanelHud : MonoBehaviour
     {
         Initialize();
         Cancel();
-        stageText.text = $"STAGE {stage}";
+        stageText.text = string.IsNullOrWhiteSpace(stage) ? GameText.Get("result.stage") : stage;
         coreText.text = $"{coreHealth} <size=70%>/ {coreMax}</size>";
         leakedText.text = leaked.ToString();
         fallenText.text = fallen.ToString();

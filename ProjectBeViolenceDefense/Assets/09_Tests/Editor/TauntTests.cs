@@ -152,8 +152,10 @@ public sealed class TauntTests
             battle.Tick(DefenseBattle.TickDuration, false);
             if (battle.Enemies.Count == 0 || battle.Mana < DefenseBattle.ManaCost(DefenseBattle.Spell.AttackBuff))
                 continue;
-            string message = battle.CastAreaSpell(DefenseBattle.Spell.AttackBuff, battle.Enemies[0].Position, 0);
-            Assert.That(message, Does.StartWith("Buffed"), $"Cast {casts + 1} failed: {message}");
+            EnemyUnit target = battle.Enemies[0];
+            int previousStacks = target.AttackBuffStacks;
+            battle.CastAreaSpell(DefenseBattle.Spell.AttackBuff, target.Position, 0);
+            Assert.That(target.AttackBuffStacks, Is.EqualTo(previousStacks + 1), $"Cast {casts + 1} failed.");
             casts++;
         }
         Assert.That(casts, Is.EqualTo(5));

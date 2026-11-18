@@ -913,22 +913,22 @@ MonoBehaviour:
     border: {r: 0.15686275, g: 0.21176471, b: 0.27058825, a: 1}
   greenHorde:
     unitId: goblin-grunt-1500
-    displayName: Goblin
+    displayNameKey: faction.goblin
     color: {r: 1, g: 0.4509804, b: 0.34117648, a: 1}
     spawnCount: 6
   undead:
     unitId: zombie
-    displayName: Undead
+    displayNameKey: faction.undead
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
     spawnCount: 4
   beasts:
     unitId: 
-    displayName: Beasts
+    displayNameKey: faction.beast
     color: {r: 0.95, g: 0.78, b: 0.3, a: 1}
     spawnCount: 0
   dragonAndDemon:
     unitId: 
-    displayName: Dragon
+    displayNameKey: faction.dragon_demon
     color: {r: 0.68, g: 0.45, b: 0.95, a: 1}
     spawnCount: 0
   stage: {fileID: 11400000, guid: 851ed955543d64d46b3e858f7a9cb1c1, type: 2}

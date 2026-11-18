@@ -855,12 +855,12 @@ MonoBehaviour:
     border: {r: 0.47843137, g: 0.2901961, b: 0.2, a: 1}
   coral:
     unitId: coral-block
-    displayName: Goblin
+    displayNameKey: faction.goblin
     color: {r: 1, g: 0.4509804, b: 0.34117648, a: 1}
     spawnCount: 6
   teal:
     unitId: teal-block
-    displayName: Undead
+    displayNameKey: faction.undead
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
     spawnCount: 4
 --- !u!1660057539 &9223372036854775807

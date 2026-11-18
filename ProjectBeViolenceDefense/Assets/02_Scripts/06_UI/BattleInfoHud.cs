@@ -47,6 +47,7 @@ public sealed class BattleInfoHud : MonoBehaviour
     /// <summary>버튼 동작을 연결한다. 씬을 여는 쪽(VoxelDefensePrototype)이 한 번 호출한다.</summary>
     public void Bind(UnityAction callWave, Action<int> setSpeed, UnityAction openSettings)
     {
+        waveCaption.text = GameText.Format("hud.next_wave", GameText.Get("key.space"));
         waveButton.onClick.AddListener(callWave);
         speed1xButton.onClick.AddListener(() => setSpeed(1));
         speed2xButton.onClick.AddListener(() => setSpeed(2));
@@ -62,7 +63,7 @@ public sealed class BattleInfoHud : MonoBehaviour
     {
         if (stage != shownStage)
         {
-            stageText.text = $"STAGE {stage}";
+            stageText.text = GameText.Format("hud.wave", stage);
             shownStage = stage;
         }
 

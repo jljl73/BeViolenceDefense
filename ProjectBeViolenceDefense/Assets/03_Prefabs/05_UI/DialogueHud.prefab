@@ -1818,6 +1818,7 @@ MonoBehaviour:
   nextMark: {fileID: 6174735085106904855}
   advanceButton: {fileID: 235309591148971475}
   skipButton: {fileID: 7431944231419735805}
+  skipCaption: {fileID: 2733320298355492582}
   charactersPerSecond: 45
   boxOffset: 320
   portraitOffset: 360
@@ -2439,7 +2440,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Mage
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
@@ -3453,7 +3454,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Skip
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}

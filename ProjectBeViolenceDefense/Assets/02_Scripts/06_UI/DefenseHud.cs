@@ -146,13 +146,13 @@ internal sealed class DefenseHud
         actionBar = Rect("Actions", ui.HudLayer, bottomCenter, bottomCenter, new Vector2(0, 46), ActionsSize);
         preparePanel = Rect("Prepare", actionBar, Vector2.up, Vector2.up, Vector2.zero, ActionsSize);
         startBattle = ActionButton("Start Battle", preparePanel, new Vector2(222, -44), new Vector2(156, 140),
-            start, this.art.Start, "Space", 43, flat: true);
+            start, this.art.Start, GameText.Get("key.space"), 43, flat: true);
         RectTransform startRect = startBattle.Button.image.rectTransform;
         startBattle.Icon.rectTransform.anchoredPosition = new Vector2(56.5f, -19);
         startBattle.Caption.rectTransform.anchoredPosition = new Vector2(0, -103);
         startBattle.Caption.fontSize = 19;
         TextMeshProUGUI startLabel = Label("Start Label", startRect, 0, -76, 156, 29, 23, TextAlignmentOptions.Center);
-        startLabel.text = "Start battle";
+        startLabel.text = GameText.Get("ui.start");
         startLabel.color = UIPalette.ButtonPrimary;
         AddFocusRing(startBattle, new Vector2(43, -6), 70);
 
@@ -184,8 +184,8 @@ internal sealed class DefenseHud
             new Vector2(290, 196), UIPalette.PanelRaised);
         defeatPopup.gameObject.SetActive(false);
         AddIcon("Broken Core", defeatPopup, this.art.Core, new Vector2(120, -13), 50, UIPalette.ButtonDanger);
-        TextMeshProUGUI title = Label("Title", defeatPopup, 20, -62, 250, 32, 28, TextAlignmentOptions.Center);
-        title.text = "Core destroyed";
+        TextMeshProUGUI title = Label("Title", defeatPopup, 20, -60, 250, 38, 28, TextAlignmentOptions.Center);
+        title.text = GameText.Get("result.core_destroyed");
         restartButton = ActionButton("Restart", defeatPopup, new Vector2(89, -105), new Vector2(112, 72),
             restart, this.art.Restart, "R", 39);
     }
@@ -269,7 +269,7 @@ internal sealed class DefenseHud
             int count = 0;
             for (int i = 0; i < battle.RoundSpawnCount(side); i++)
             {
-                string name = UnitLabel(battle.RoundUnit(side, i));
+                string name = battle.RoundUnit(side, i).DisplayName;
                 if (name == last)
                 {
                     count++;
@@ -285,19 +285,7 @@ internal sealed class DefenseHud
             string color = ColorUtility.ToHtmlStringRGB(battle.RoundUnit(side, 0).Color);
             sides.Add($"<color=#{color}>{string.Join(", ", parts)}</color>");
         }
-        return sides.Count > 0 ? string.Join("   vs   ", sides) : "-";
-    }
-
-    // 카탈로그 ID를 HUD 폰트로 읽을 수 있는 영어 이름으로 바꾼다. goblin-grunt-1500 -> Goblin Grunt
-    private static string UnitLabel(EnemyFaction unit)
-    {
-        if (string.IsNullOrEmpty(unit.UnitId))
-            return unit.DisplayName;
-        var words = new List<string>();
-        foreach (string word in unit.UnitId.Split('-'))
-            if (word.Length > 0 && !char.IsDigit(word[0]))
-                words.Add(char.ToUpperInvariant(word[0]) + word.Substring(1));
-        return string.Join(" ", words);
+        return sides.Count > 0 ? string.Join(GameText.Get("hud.versus"), sides) : "-";
     }
 
     public void Refresh(DefenseBattle battle, DefenseGrid grid, DefenseBoardView view,
@@ -308,8 +296,8 @@ internal sealed class DefenseHud
         // 승리도 패배처럼 판이 끝난 상태로 그린다.
         bool won = battle.CurrentPhase == DefenseBattle.Phase.Victory;
         bool defeated = won || battle.CurrentPhase == DefenseBattle.Phase.Defeat;
-        round.text = $"Round {battle.Round}";
-        phase.text = won ? "Victory" : defeated ? "Defeat" : aimedSpell.HasValue ? $"Slow {BattleClock.AimSpeed:0.0}×" : inCombat ? "Battle" : "Build";
+        round.text = GameText.Format("hud.wave", battle.Round);
+        phase.text = won ? GameText.Get("hud.victory") : defeated ? GameText.Get("hud.defeat") : aimedSpell.HasValue ? GameText.Format("hud.aim_speed", BattleClock.AimSpeed) : inCombat ? GameText.Get("hud.combat") : GameText.Get("hud.preparation");
         phase.color = aimedSpell.HasValue ? UIPalette.TextPrimary : UIPalette.TextSecondary;
         combatBalance.Refresh(battle.Enemies, inCombat, ShownSides(battle));
         lineup.gameObject.SetActive(!inCombat && !defeated);
@@ -327,7 +315,7 @@ internal sealed class DefenseHud
         if (!inCombat && !defeated)
         {
             int wallsLeft = DefenseGrid.WallLimit - grid.WallCount;
-            wallCount.text = $"Walls {wallsLeft} / {DefenseGrid.WallLimit}";
+            wallCount.text = GameText.Format("hud.walls", wallsLeft, DefenseGrid.WallLimit);
             for (int i = 0; i < wallIcons.Length; i++)
                 wallIcons[i].color = i < wallsLeft ? UIPalette.TextPrimary : UIPalette.TextDisabled;
         }
@@ -346,8 +334,8 @@ internal sealed class DefenseHud
         help.Button.interactable = !blocked;
         StyleFlatButton(help, help.ShowTip ? UIPalette.TextPrimary : UIPalette.TextSecondary);
         SetTip(helpTip, !blocked && !defeated && (help.ShowTip || helpPinned)
-            ? (inCombat ? "1–5 aim · Left click casts · Esc cancels" : "Left click builds · Right click removes") +
-              "\nWASD / RMB drag · " + (aimedSpell.HasValue ? "Wheel radius" : "Wheel zoom") + " · R restart"
+            ? GameText.Format("help.layout", GameText.Get(inCombat ? "help.combat" : "help.build"),
+                GameText.Get(aimedSpell.HasValue ? "help.radius" : "help.zoom"))
             : null);
         StyleButton(restartButton, UIPalette.ButtonPrimary, UIPalette.TextOnAccent);
 
@@ -386,7 +374,7 @@ internal sealed class DefenseHud
             leftCount = Label("Left Alive", root, 0, -4, 112, 25, 19, TextAlignmentOptions.Right);
             rightCount = Label("Right Alive", root, 388, -4, 112, 25, 19);
             TextMeshProUGUI caption = Label("Metric", root, 122, 0, 256, 17, 15, TextAlignmentOptions.Center);
-            caption.text = "Field HP";
+            caption.text = GameText.Get("hud.field_health");
             caption.color = UIPalette.TextSecondary;
 
             leftFill = Bar("Field Health", root, Vector2.up, Vector2.up, new Vector2(122, -18),
@@ -534,9 +522,9 @@ internal sealed class DefenseHud
                     if (DefenseBattle.IsTauntable(tauntTarget, enemy))
                         pulled++;
             string reason = battle.SpellBlockReason(DefenseBattle.Spell.Taunt, 0);
-            string controls = reason ?? (tauntTarget != null ? "Click to cast · Esc" : "Point at a unit · Esc");
-            SetTip(actionTip, $"<color=#{tint}>◆ {taunt.Name}</color> · Radius {DefenseBattle.TauntRadius:0.0} · " +
-                $"{DefenseBattle.ManaCost(DefenseBattle.Spell.Taunt)} mana · Pulls {pulled}\n{controls}");
+            string controls = reason ?? (tauntTarget != null ? GameText.Get("aim.taunt_ready") : GameText.Get("aim.taunt_pick"));
+            SetTip(actionTip, GameText.Format("aim.taunt", tint, taunt.Name, DefenseBattle.TauntRadius,
+                DefenseBattle.ManaCost(DefenseBattle.Spell.Taunt), pulled, controls));
         }
         else if (!blocked && aimedSpell is { } spell)
         {
@@ -559,8 +547,8 @@ internal sealed class DefenseHud
             string tint = ColorUtility.ToHtmlStringRGB(slot.Tint);
             int cost = DefenseBattle.ManaCost(spell, rangeStep);
             string reason = battle.SpellBlockReason(spell, rangeStep);
-            string controls = reason == null ? "Wheel adjusts radius · Click to cast · Esc" : $"{reason} · Wheel to adjust · Esc";
-            SetTip(actionTip, $"<color=#{tint}>◆ {slot.Name}</color> · Radius {radius:0.0} · {cost} mana · Targets {targets}\n{controls}");
+            string controls = reason == null ? GameText.Get("aim.area_ready") : GameText.Format("aim.area_blocked", reason);
+            SetTip(actionTip, GameText.Format("aim.area", tint, slot.Name, radius, cost, targets, controls));
         }
         else
         {
@@ -629,16 +617,21 @@ internal sealed class DefenseHud
         // 사용 횟수 제한이 없으므로 마나 비용만 슬롯 아래 가운데에 보여 준다.
         TextMeshProUGUI cost = Label("Cost", rect, 36, costY, 38, 24, 21, TextAlignmentOptions.Center);
         cost.text = DefenseBattle.ManaCost(spell).ToString();
-        string effect = spell switch
+        var (displayName, description) = spell switch
         {
-            DefenseBattle.Spell.Taunt => $"Taunt · Pick a unit · It grows with +{EnemyUnit.TauntHealthBonusPercent:P0} max HP " +
-                $"and pulls foes within {DefenseBattle.TauntRadius:0.0} tiles, even through walls, for {DefenseBattle.TauntDuration:0}s",
-            DefenseBattle.Spell.AttackBuff => $"Attack buff · +{EnemyUnit.AttackBonus} damage for {DefenseBattle.BuffDuration:0}s · Stacks",
-            DefenseBattle.Spell.Heal => $"Area heal · +{DefenseBattle.HealPercent:P0} max HP to injured enemies",
-            DefenseBattle.Spell.MoveSpeedBuff => $"Move speed · +{EnemyUnit.MoveSpeedBonusPercent:P0} per stack for {DefenseBattle.BuffDuration:0}s",
-            _ => $"Armor buff · +{EnemyUnit.ArmorBonus} armor for {DefenseBattle.BuffDuration:0}s · Stacks"
+            DefenseBattle.Spell.AttackBuff => (GameText.Get("spell.attack.name"),
+                GameText.Format("spell.attack.description", DefenseBattle.BuffDuration, EnemyUnit.AttackBonus)),
+            DefenseBattle.Spell.Heal => (GameText.Get("spell.heal.name"),
+                GameText.Format("spell.heal.description", DefenseBattle.HealPercent * 100)),
+            DefenseBattle.Spell.MoveSpeedBuff => (GameText.Get("spell.move_speed.name"),
+                GameText.Format("spell.move_speed.description", DefenseBattle.BuffDuration, EnemyUnit.MoveSpeedBonusPercent * 100)),
+            DefenseBattle.Spell.ArmorBuff => (GameText.Get("spell.armor.name"),
+                GameText.Format("spell.armor.description", DefenseBattle.BuffDuration, EnemyUnit.ArmorBonus)),
+            _ => (GameText.Get("spell.taunt.name"),
+                GameText.Format("spell.taunt.description", DefenseBattle.TauntDuration,
+                    EnemyUnit.TauntHealthBonusPercent * 100, DefenseBattle.TauntRadius))
         };
-        return new SpellSlot(control, spell, tint, cost, name, effect, frame, tintIcon);
+        return new SpellSlot(control, spell, tint, cost, displayName, $"{displayName} · {description}", frame, tintIcon);
     }
 
     private HudButton ActionButton(string name, RectTransform parent, Vector2 position, Vector2 size,
