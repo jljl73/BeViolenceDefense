@@ -888,3 +888,27 @@
 - SharedSceneHasOneSelectorWithFourDistinctStageChoices는 이번 변경 전부터 실패(씬 슬롯 5개, 기대값 4).
 - Stage2_Temp(19×18)·Stage3(19×20)는 17×17 기준으로 만든 황금 단풍·설원 프리팹 장식과 크기가 달라 화면상 겹침·빈 공간 직접 확인 필요.
 - 두 SO 모두 StageTEST_Waves를 써 진영 2·3 스폰 없음 경고가 뜸.
+
+### [20261119-crypt-obstacle-review] 언데드 묘지 프리팹의 고정 장애물 사용 검토
+- 시각: 2026-11-19 07:56:31 +09:00
+- 작업자: ppzepi
+- 사용 도구: OpenAI Codex / PowerShell, rg
+- 목적 및 적용 위치: Struct_SpawnUndeadCrypt의 사전 배치 경로 장애물 사용 가능성 검토
+- 사용 방식: 프리팹 구성, StageData·DefenseGrid·DefenseBoardView·StageEditorWindow 및 EnemyCatalog 참조를 정적으로 확인.
+- 결과 및 확인 방법: 성공(정적 검토) / 프리팹은 메시 표시 전용이며 경로 차단은 StageData 점유 칸에 의존. 이름에 크기 표기가 없어 팔레트 기본 1x1, X축 기준 균일 크기 맞춤, 스폰 건물 공유 참조 확인. 게임 파일 변경 없음.
+- 사람의 개입: 사용 가능성 질문 제공. 실제 배치 선택은 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ai-use/ppzepi.md | Codex | 추가 | 검토 기록 적용 |
+
+#### 증거
+- 저장소 소스: ProjectBeViolenceDefense/Assets/02_Scripts/05_World/StageData.cs, DefenseGrid.cs, DefenseBoardView.cs 및 Editor/StageEditorWindow.cs. 별도 실행 증거 없음.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 현재 프로젝트.
+- 사용 방식: 로컬 파일·참조 분석 후 위험과 사용 조건 설명.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 실제 메시의 깊이·피벗과 점유 칸 일치 및 플레이 화면. 이번 검토는 정적 분석으로 Unity CLI·Play Mode 검증은 수행하지 않음.
