@@ -8,6 +8,7 @@ public sealed class DefenseGrid
     public const int WallLimit = 8;
     public const float WallWidth = 0.92f;
     public const float WallHeight = 0.8f;
+    // 칸 한 변 대비 벽 가장자리 여유.
     private const float SightInset = (1f - WallWidth) * 0.5f;
 
     private static readonly Vector2Int[] Directions =
@@ -28,6 +29,9 @@ public sealed class DefenseGrid
 
     public int Width { get; }
     public int Depth { get; }
+    // 전투 좌표에서 칸 한 변의 길이. 유닛의 몸통·사거리·속도는 이 값과 관계없이 그대로라서,
+    // 2면 유닛 대비 맵(벽·길·코어)이 2배로 커진다. 맵 크기 실험용이며 기본값은 1.
+    public float CellSize { get; }
     public IReadOnlyList<Vector2Int> SpawnCells => spawns;
     // 스폰별 진영 인덱스. Routes[i]는 SpawnCells[i]에서 출발한다.
     public IReadOnlyList<int> SpawnFactions => spawnFactions;
@@ -38,20 +42,22 @@ public sealed class DefenseGrid
     public int UnreachableSpawn { get; private set; } = -1;
     public int WallCount => placed.Count;
     public int NavigationVersion { get; private set; }
-    public Vector3 CorePosition => new(coreFootprint.center.x - 0.5f, 0f, coreFootprint.center.y - 0.5f);
+    public Vector3 CorePosition => new Vector3(coreFootprint.center.x - 0.5f, 0f, coreFootprint.center.y - 0.5f) * CellSize;
+    // 코어가 차지하는 칸 수.
     public Vector2Int CoreSize => coreFootprint.size;
-    public Vector3 Center => new((Width - 1) * 0.5f, 0, (Depth - 1) * 0.5f);
+    public Vector3 Center => new Vector3((Width - 1) * 0.5f, 0, (Depth - 1) * 0.5f) * CellSize;
 
     // 기본 지형: 17x17, 가운데 한 칸만 열린 가로 벽.
-    public DefenseGrid() : this(DefaultSize, DefaultSize, new RectInt(DefaultSize / 2 - 1, DefaultSize - 3, 3, 3),
-        new[] { new Vector2Int(2, 2), new Vector2Int(DefaultSize - 3, 2) }, new[] { 0, 1 }, DefaultWalls())
+    public DefenseGrid(float cellSize = 1f) : this(DefaultSize, DefaultSize, new RectInt(DefaultSize / 2 - 1, DefaultSize - 3, 3, 3),
+        new[] { new Vector2Int(2, 2), new Vector2Int(DefaultSize - 3, 2) }, new[] { 0, 1 }, DefaultWalls(), cellSize)
     {
     }
 
     // 범위 밖·코어·스폰 위에 놓인 벽 칸은 무시한다. 경로가 없으면 Routes가 null이다.
     public DefenseGrid(int width, int depth, RectInt core, IReadOnlyList<Vector2Int> spawnCells,
-        IReadOnlyList<int> spawnFactionIndices, IEnumerable<Vector2Int> fixedWallCells)
+        IReadOnlyList<int> spawnFactionIndices, IEnumerable<Vector2Int> fixedWallCells, float cellSize = 1f)
     {
+        CellSize = cellSize;
         Width = width;
         Depth = depth;
         coreFootprint = core;
@@ -82,10 +88,10 @@ public sealed class DefenseGrid
 
     public bool IsFixedWall(Vector2Int cell) => fixedWalls.Contains(cell);
 
-    private Vector3 ClosestCorePoint(Vector3 position) => new(
-        Mathf.Clamp(position.x, coreFootprint.xMin - 0.5f, coreFootprint.xMax - 0.5f),
+    private Vector3 ClosestCorePoint(Vector3 position) => new Vector3(
+        Mathf.Clamp(position.x / CellSize, coreFootprint.xMin - 0.5f, coreFootprint.xMax - 0.5f),
         0f,
-        Mathf.Clamp(position.z, coreFootprint.yMin - 0.5f, coreFootprint.yMax - 0.5f));
+        Mathf.Clamp(position.z / CellSize, coreFootprint.yMin - 0.5f, coreFootprint.yMax - 0.5f)) * CellSize;
 
     public BuildResult TryPlace(Vector2Int cell)
     {
@@ -129,7 +135,7 @@ public sealed class DefenseGrid
     // 코어도 벽처럼 시야와 공격을 막는다. 벽과 같은 여유(칸 가장자리에서 SightInset)를 두어
     // 모서리를 스치는 시선은 통과시킨다.
     public bool HasLineOfSight(Vector3 from, Vector3 to)
-        => !CrossesCore(from, to, SightInset) && IsWallFree(from, to, 0f);
+        => !CrossesCore(from, to, SightInset * CellSize) && IsWallFree(from, to, 0f);
 
     public bool CanPursue(Vector3 from, Vector3 to)
         => !CrossesCore(from, to, 0f) && IsWallFree(from, to, 0.24f);
@@ -141,7 +147,8 @@ public sealed class DefenseGrid
         if (length == 0f)
             return false;
 
-        var coreBounds = new Bounds(CorePosition, new Vector3(CoreSize.x - inset * 2f, 1f, CoreSize.y - inset * 2f));
+        var coreBounds = new Bounds(CorePosition,
+            new Vector3(CoreSize.x * CellSize - inset * 2f, 1f, CoreSize.y * CellSize - inset * 2f));
         return coreBounds.IntersectRay(new Ray(from, step / length), out float distance) && distance <= length;
     }
 
@@ -166,6 +173,7 @@ public sealed class DefenseGrid
         return true;
     }
 
+    // 아래 정적 함수 셋은 칸 한 변이 1인 칸 좌표(화면 보드 좌표)다. 전투 좌표는 CellToWorld·WorldToCell을 쓴다.
     public static Bounds WallBounds(Vector2Int cell) =>
         new(CellPosition(cell) + Vector3.up * (WallHeight * 0.5f), new Vector3(WallWidth, WallHeight, WallWidth));
 
@@ -174,9 +182,14 @@ public sealed class DefenseGrid
     public static Vector2Int PositionToCell(Vector3 position) =>
         new(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.z));
 
-    private static bool IntersectsWall(Vector2Int cell, Ray ray, float length, float expansion)
+    public Vector3 CellToWorld(Vector2Int cell) => CellPosition(cell) * CellSize;
+
+    public Vector2Int WorldToCell(Vector3 position) => PositionToCell(position / CellSize);
+
+    private bool IntersectsWall(Vector2Int cell, Ray ray, float length, float expansion)
     {
-        Bounds bounds = WallBounds(cell);
+        var bounds = new Bounds(CellToWorld(cell) + Vector3.up * (WallHeight * 0.5f),
+            new Vector3(WallWidth * CellSize, WallHeight, WallWidth * CellSize));
         bounds.Expand(expansion);
         return bounds.IntersectRay(ray, out float distance) && distance <= length;
     }
@@ -187,7 +200,7 @@ public sealed class DefenseGrid
     // 코어까지 길이 없으면 null.
     public Vector3[] RouteFrom(Vector3 position)
     {
-        Vector2Int cell = PositionToCell(position);
+        Vector2Int cell = WorldToCell(position);
         if (!IsWalkable(cell))
             return null;
         if (coreDistancesVersion != NavigationVersion || coreDistances == null)
@@ -269,7 +282,7 @@ public sealed class DefenseGrid
         // Mirror the tie-break for spawns right of center so equally short paths stay symmetric.
         bool mirrored = cell.x * 2 > Width - 1;
 
-        path.Add(CellPosition(cell));
+        path.Add(CellToWorld(cell));
         while (distance > 1)
         {
             foreach (Vector2Int direction in Directions)
@@ -281,11 +294,11 @@ public sealed class DefenseGrid
 
                 cell = next;
                 distance--;
-                path.Add(CellPosition(cell));
+                path.Add(CellToWorld(cell));
                 break;
             }
         }
-        path.Add(ClosestCorePoint(CellPosition(cell)));
+        path.Add(ClosestCorePoint(CellToWorld(cell)));
     }
 
     public bool InBounds(Vector2Int cell) =>

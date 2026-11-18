@@ -1,0 +1,200 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
+[InitializeOnLoad]
+public static class BuffLightningValidation
+{
+    const string Key = "BuffLightningValidation.Running";
+    const string Folder = "/tmp/buff-lightning-captures";
+    static readonly DefenseBattle.Spell[] Spells = { DefenseBattle.Spell.AttackBuff, DefenseBattle.Spell.Heal,
+        DefenseBattle.Spell.MoveSpeedBuff, DefenseBattle.Spell.ArmorBuff, DefenseBattle.Spell.Taunt };
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static DefenseBoardView view;
+    static SpellEffects effects;
+    static Camera camera;
+    static EnemyUnit target;
+    static Vector3 center;
+    static EnemyUnit[] recipients;
+    static Transform tracked;
+    static int phase, spellIndex, frame;
+    static double start;
+    static object Field(object obj, string name) => obj.GetType().GetField(name,
+        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(obj);
+    static IList Bursts => (IList)Field(effects, "bursts");
+    static IList Bolts => (IList)Field(effects, "lightning");
+    static void Check(bool pass, string message) { if (!pass) throw new Exception(message); }
+    static BuffLightningValidation() { EditorApplication.update += Update; }
+    public static void Run()
+    {
+        EditorSceneManager.OpenScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");
+        Directory.CreateDirectory(Folder);
+        SessionState.SetBool(Key, true);
+        EditorApplication.EnterPlaymode();
+    }
+    static void Update()
+    {
+        if (!SessionState.GetBool(Key, false) || !EditorApplication.isPlaying || EditorApplication.isCompiling) return;
+        try
+        {
+            if (start == 0) start = EditorApplication.timeSinceStartup;
+            Check(EditorApplication.timeSinceStartup - start < 120, "Validation timeout");
+            if (phase == 0)
+            {
+                var selection = Object.FindFirstObjectByType<StageSelectionController>();
+                if (selection == null) return;
+                if (selection.CurrentStage == null)
+                {
+                    var ui = Object.FindFirstObjectByType<UIManager>();
+                    if (ui != null && ui.HasOpenPopup) selection.SelectStage(1);
+                    return;
+                }
+                if (game == null)
+                {
+                    game = Object.FindFirstObjectByType<VoxelDefensePrototype>();
+                    battle = (DefenseBattle)Field(game, "battle");
+                    if (battle == null) { game = null; return; }
+                    typeof(VoxelDefensePrototype).GetMethod("StartBattle", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(game, null);
+                    return;
+                }
+                if (battle.Enemies.Count == 0) return;
+                game.enabled = false;
+                view = (DefenseBoardView)Field(game, "view");
+                effects = (SpellEffects)Field(view, "spellEffects");
+                camera = (Camera)Field(game, "boardCamera");
+                target = battle.Enemies[0];
+                center = target.Position;
+                camera.orthographicSize = 3.1f;
+                camera.transform.position = game.transform.TransformPoint(center) - camera.transform.forward * 18f;
+                Capture("before.png");
+                int health = target.Health;
+                battle.QueueSpell(DefenseBattle.Spell.ArmorBuff, center, 0);
+                battle.Tick(DefenseBattle.TickDuration, false);
+                Check(Bursts.Count == 1 && Bolts.Count >= 1, "Successful queued cast must launch area flash and recipient lightning");
+                Check(target.ArmorBuffStacks == 1 && target.Health == health, "Presentation affected simulation");
+                var burst = Bursts[0];
+                Check((float)Field(burst, "Age") == 0f, "Burst did not start at full flash");
+                effects.Advance(0f);
+                Check((float)Field(burst, "Age") == 0f, "Pause advanced burst");
+                effects.Advance(.56f);
+                Check(Bursts.Count == 0, "Burst did not expire");
+                view.AdvanceEffects(1f);
+                var grid = (DefenseGrid)Field(game, "grid");
+                Vector3 place = new Vector3(8, 0, 10);
+                float best = float.PositiveInfinity;
+                for (int z = 2; z < grid.Depth - 3; z++)
+                for (int x = 2; x < grid.Width - 3; x++)
+                {
+                    bool open = true;
+                    for (int dx = 0; dx < 2; dx++) for (int dz = 0; dz < 2; dz++)
+                        open &= grid.IsWalkable(new Vector2Int(x + dx, z + dz));
+                    float score = (new Vector2(x, z) - new Vector2(8, 10)).sqrMagnitude;
+                    if (open && score < best) { best = score; place = new Vector3(x + .5f, 0, z + .5f); }
+                }
+                center = view.ToWorld(place);
+                var catalog = (EnemyCatalog)Field(game, "enemyCatalog");
+                recipients = new EnemyUnit[3];
+                var offsets = new[] { new Vector3(-.48f, 0, -.2f), new Vector3(.48f, 0, -.2f), new Vector3(0, 0, .5f) };
+                for (int i = 0; i < 3; i++)
+                {
+                    var pos = center + offsets[i] * grid.CellSize;
+                    recipients[i] = new EnemyUnit(catalog.GetUnit("zombie", Color.cyan, "lightning validation"), 1,
+                        new[] { pos, pos + Vector3.forward }, 100 + i);
+                    view.AddEnemy(recipients[i]);
+                    view.SyncEnemy(recipients[i], 0f, 0f);
+                }
+                tracked = (Transform)Field(((IDictionary)Field(view, "enemyViews"))[recipients[0]], "Root");
+                camera.orthographicSize = 2.1f;
+                camera.transform.position = game.transform.TransformPoint(place + Vector3.up * .65f) - camera.transform.forward * 18f;
+                Capture("before.png");
+                phase = 1;
+                return;
+            }
+            if (phase == 1)
+            {
+                if (frame == 0)
+                {
+                    float cell = ((DefenseGrid)Field(game, "grid")).CellSize;
+                    view.PlayAreaSpell(Spells[spellIndex], center, 1.1f * cell, recipients);
+                    Check(Bolts.Count == (Spells[spellIndex] == DefenseBattle.Spell.Taunt ? 1 : 3), "Recipient lightning selection failed");
+                    var bolt = Bolts[0];
+                    float age = (float)Field(bolt, "age");
+                    effects.Advance(0f);
+                    Check((float)Field(bolt, "age") == age, "Pause advanced lightning");
+                }
+                Capture($"{spellIndex}-{frame:D2}.png");
+                view.AdvanceEffects(1f / 30f);
+                frame++;
+                if (frame < 21) return;
+                Check(Bursts.Count == 0, "Effect failed to expire");
+                frame = 0;
+                if (++spellIndex < Spells.Length) return;
+                phase = 2;
+                return;
+            }
+            if (phase == 2)
+            {
+                effects.PlayBuffLightning(tracked, DefenseBattle.Spell.ArmorBuff, .5f, 10);
+                var bolt = (BuffLightning)Bolts[0];
+                Vector3 before = bolt.Root.transform.position;
+                tracked.position += Vector3.right * .3f;
+                effects.Advance(0f);
+                Check(Vector3.Distance(bolt.Root.transform.position, before + Vector3.right * .3f) < .001f, "Lightning detached from moving target");
+                tracked.position -= Vector3.right * .3f;
+                effects.Advance(1f);
+                var vanished = new GameObject("Removed recipient");
+                effects.PlayBuffLightning(vanished.transform, DefenseBattle.Spell.Heal, .3f, 1);
+                Object.DestroyImmediate(vanished);
+                effects.Advance(0f);
+                Check(Bolts.Count == 0, "Destroyed target left active lightning");
+                for (int i = 0; i < 160; i++) effects.PlayBuffLightning(tracked, Spells[i % 5], .4f, i);
+                Check(Bolts.Count == 128, "Lightning pool cap failed");
+                effects.Advance(1f);
+                Check(Bolts.Count == 0, "Lightning pool failed to retire");
+                var shader = Resources.Load<Shader>("BuffLightning");
+                Check(shader != null && shader.isSupported && !ShaderUtil.ShaderHasError(shader), "Lightning shader failed compilation/support");
+                effects.Release();
+                phase = 3;
+                return;
+            }
+            Check(game.GetComponentsInChildren<MeshRenderer>(true).Length > 0, "Scene lost its renderers");
+            foreach (var renderer in game.GetComponentsInChildren<MeshRenderer>(true))
+                Check(renderer.name != "Spell Area Flash", "Burst objects leaked after release");
+            foreach (var child in game.GetComponentsInChildren<Transform>(true))
+                Check(child.name != "Buff Lightning", "Lightning objects leaked after release");
+            Debug.Log("BUFF_LIGHTNING_PLAY_PASS actual queued cast, three recipients/five colors, taunt target only, pause, moving/removed target, expiry, 128-bolt pool, cleanup, shader compilation");
+            SessionState.SetBool(Key, false);
+            EditorApplication.Exit(0);
+        }
+        catch (Exception error)
+        {
+            Debug.LogException(error);
+            SessionState.SetBool(Key, false);
+            EditorApplication.Exit(1);
+        }
+    }
+    static void Capture(string name)
+    {
+        var rt = new RenderTexture(960, 640, 24);
+        var previous = camera.targetTexture;
+        var active = RenderTexture.active;
+        camera.targetTexture = rt;
+        camera.Render();
+        RenderTexture.active = rt;
+        var image = new Texture2D(960, 640, TextureFormat.RGB24, false);
+        image.ReadPixels(new Rect(0, 0, 960, 640), 0, 0);
+        image.Apply();
+        File.WriteAllBytes(Path.Combine(Folder, name), image.EncodeToPNG());
+        camera.targetTexture = previous;
+        RenderTexture.active = active;
+        Object.Destroy(image);
+        rt.Release();
+        Object.Destroy(rt);
+    }
+}

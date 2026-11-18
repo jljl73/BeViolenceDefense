@@ -1,0 +1,4 @@
+BUFF_LIGHTNING_PLAY_PASS actual queued cast, three recipients/five colors, taunt target only, pause, moving/removed target, expiry, 128-bolt pool, cleanup, shader compilation
+Leak Detected : Persistent allocates 9 individual allocations. To find out more please enable 'Settings > Jobs > Leak Detection Level > Enabled With Stack Trace' and reproduce the leak again.
+
+UnityEditor.Search.SearchDatabase startup ArgumentOutOfRangeException also observed. Play validation exited 0.

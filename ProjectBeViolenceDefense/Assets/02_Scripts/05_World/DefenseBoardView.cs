@@ -219,6 +219,10 @@ internal sealed class DefenseBoardView
     private bool coreHitPlaying;
     private Vector3 cameraFocus;
     private float viewScale = 1f;
+    // 전투 좌표의 칸 한 변(DefenseGrid.CellSize). 보드는 칸 한 변이 1인 좌표로 그리므로 전투 좌표를 이 값으로 나누고,
+    // 유닛 모델과 유닛 기준 오프셋은 UnitScale 로 줄인다. 1이면 이전과 같다.
+    private readonly float cellSize = 1f;
+    private float UnitScale => 1f / cellSize;
     private float targetViewScale = 1f;
     private Vector2? zoomAnchorViewport;
 
@@ -232,7 +236,8 @@ internal sealed class DefenseBoardView
         this.catalog = catalog;
         this.playHitSound = playHitSound;
         this.root = root;
-        coreShockwaveCenter = grid.CorePosition + Vector3.up * CoreShockwaveHeight;
+        cellSize = grid.CellSize;
+        coreShockwaveCenter = ToBoard(grid.CorePosition) + Vector3.up * CoreShockwaveHeight;
         this.camera = camera;
         this.shader = shader;
         this.factions = factions;
@@ -245,7 +250,7 @@ internal sealed class DefenseBoardView
         // Aim slightly toward the near corner to leave room for the battle controls.
         Vector3 boardForward = root.InverseTransformDirection(camera.transform.forward);
         buffMarkRotation = Quaternion.LookRotation(-Vector3.ProjectOnPlane(boardForward, Vector3.up));
-        cameraFocus = grid.Center - Vector3.ProjectOnPlane(boardForward, Vector3.up).normalized * CameraFocusOffset;
+        cameraFocus = ToBoard(grid.Center) - Vector3.ProjectOnPlane(boardForward, Vector3.up).normalized * CameraFocusOffset;
         PositionCamera();
         camera.orthographic = true;
         camera.clearFlags = CameraClearFlags.SolidColor;
@@ -272,7 +277,7 @@ internal sealed class DefenseBoardView
         fixedWallTint = theme.fixedWallTint;
         Material core = Palette(CoreColor);
 
-        Box("Board base", root, grid.Center - Vector3.up * 0.55f,
+        Box("Board base", root, ToBoard(grid.Center) - Vector3.up * 0.55f,
             new Vector3(boardWidth, 0.6f, boardDepth), foundation);
         float tileSize = 1f - theme.tileGap;
         singleLaneRouteWidth = Mathf.Max(1f, (tileSize - SingleLaneRouteMargin) / routeMarkerMesh.bounds.size.x);
@@ -448,7 +453,7 @@ internal sealed class DefenseBoardView
         float height = top - bottom;
         float bevel = Mathf.Max(theme.tileBevel, 0.04f);
         float y = (top + bottom) * 0.5f;
-        Vector3 center = grid.Center;
+        Vector3 center = ToBoard(grid.Center);
         float halfX = boardWidth * 0.5f + width * 0.5f;
         float halfZ = boardDepth * 0.5f + width * 0.5f;
 
@@ -473,7 +478,7 @@ internal sealed class DefenseBoardView
     {
         var model = new GameObject("Core").transform;
         model.SetParent(root, false);
-        model.localPosition = grid.CorePosition;
+        model.localPosition = ToBoard(grid.CorePosition);
 
         float width = grid.CoreSize.x - 0.04f;
         float depth = grid.CoreSize.y - 0.04f;
@@ -668,6 +673,7 @@ internal sealed class DefenseBoardView
     private void ShowRoutes(IReadOnlyList<Vector3[]> routes,
         IReadOnlyCollection<Vector2Int> encounters, bool subdued)
     {
+        routes = ToBoard(routes);
         PlannedEncounters = encounters ?? System.Array.Empty<Vector2Int>();
         // 스폰 구조물의 입구(-Z)를 경로의 첫 걸음 쪽으로 돌린다.
         if (routes != null)
@@ -1023,6 +1029,7 @@ internal sealed class DefenseBoardView
         const int dashes = 5;
         const float speed = 10f;      // 칸/초. 유닛보다 훨씬 빨라서 길을 먼저 훑는다.
         const float spacing = 0.085f; // 선분 사이의 출발 간격(초)
+        routes = ToBoard(routes);
         for (int spawn = 0; spawn < routes.Count; spawn++)
         {
             Vector3[] path = routes[spawn];
@@ -1247,7 +1254,15 @@ internal sealed class DefenseBoardView
 
     public bool TryPickCell(Vector2 pointer, out Vector2Int cell) => TryPickCell(BoardRay(pointer), out cell);
 
+    // 전투 좌표로 돌려준다.
     public bool TryPickBoardPoint(Vector2 pointer, out Vector3 point)
+    {
+        bool picked = TryPickBoardLocal(pointer, out point);
+        point = ToWorld(point);
+        return picked;
+    }
+
+    private bool TryPickBoardLocal(Vector2 pointer, out Vector3 point)
     {
         Ray ray = BoardRay(pointer);
         point = default;
@@ -1264,10 +1279,11 @@ internal sealed class DefenseBoardView
     public bool TryPickEnemy(Vector2 pointer, IReadOnlyList<EnemyUnit> enemies, out EnemyUnit picked)
     {
         picked = null;
-        if (!TryPickBoardPoint(pointer, out Vector3 point))
+        if (!TryPickBoardLocal(pointer, out Vector3 point))
             return false;
 
-        float nearest = TauntPickRadius * TauntPickRadius;
+        float pickRadius = TauntPickRadius * UnitScale;
+        float nearest = pickRadius * pickRadius;
         foreach (EnemyUnit enemy in enemies)
         {
             if (!enemy.IsAlive || !enemyViews.TryGetValue(enemy, out EnemyView view))
@@ -1290,7 +1306,7 @@ internal sealed class DefenseBoardView
         if (spell == DefenseBattle.Spell.Taunt)
         {
             center = tauntTarget != null && enemyViews.TryGetValue(tauntTarget, out EnemyView targetView)
-                ? targetView.Root.localPosition
+                ? ToWorld(targetView.Root.localPosition)
                 : null;
             radius = DefenseBattle.TauntRadius;
         }
@@ -1312,10 +1328,12 @@ internal sealed class DefenseBoardView
             Material ring = AimOverlay(material);
             if (areaSpellPreview.sharedMaterial != ring)
                 areaSpellPreview.sharedMaterial = ring;
-            areaSpellPreview.transform.localPosition = point + Vector3.up * 0.04f;
-            float scale = radius / DefenseBattle.DefaultAreaSpellRadius;
+            Vector3 boardPoint = ToBoard(point);
+            float boardRadius = radius * UnitScale;
+            areaSpellPreview.transform.localPosition = boardPoint + Vector3.up * 0.04f;
+            float scale = boardRadius / DefenseBattle.DefaultAreaSpellRadius;
             areaSpellPreview.transform.localScale = new Vector3(scale, 1f, scale);
-            UpdateAreaSpellRing(point, radius);
+            UpdateAreaSpellRing(boardPoint, boardRadius);
         }
 
         foreach (var entry in enemyViews)
@@ -1336,7 +1354,7 @@ internal sealed class DefenseBoardView
         if (recipients.Count == 0)
             return;
 
-        spellEffects.PlayArea(spell, center, radius);
+        spellEffects.PlayArea(spell, ToBoard(center), radius * UnitScale);
         Color flashColor = SpellEffects.SpellColor(spell);
         foreach (EnemyUnit enemy in recipients)
         {
@@ -1345,6 +1363,9 @@ internal sealed class DefenseBoardView
                 view.SpellFlashColor = flashColor;
                 view.SpellFlashRemaining = SpellBodyFlashDuration;
                 ApplyEnemyTint(view);
+                // 도발은 거대화 버프를 받은 첫 유닛에만 낙뢰를 표시한다.
+                if (spell != DefenseBattle.Spell.Taunt || enemy == recipients[0])
+                    spellEffects.PlayBuffLightning(view.Root, spell, UnitScale * view.GiantScale, enemy.SpawnOrder);
             }
         }
     }
@@ -1575,8 +1596,8 @@ internal sealed class DefenseBoardView
     private Vector3 EnemyMarkerPoint(EnemyUnit enemy, float height)
     {
         bool hasView = enemyViews.TryGetValue(enemy, out EnemyView view);
-        Vector3 shown = hasView ? view.Root.localPosition : enemy.Position;
-        Vector3 worldPoint = root.TransformPoint(shown + Vector3.up * height);
+        Vector3 shown = hasView ? view.Root.localPosition : ToBoard(enemy.Position);
+        Vector3 worldPoint = root.TransformPoint(shown + Vector3.up * (height * UnitScale));
         if (hasView && view.Animator != null)
         {
             foreach (Renderer renderer in view.Renderers)
@@ -1585,6 +1606,26 @@ internal sealed class DefenseBoardView
         return worldPoint;
     }
 
+    // 전투 좌표 → 보드 좌표(칸 한 변 1).
+    public Vector3 ToBoard(Vector3 world) => world * UnitScale;
+
+    public Vector3 ToWorld(Vector3 board) => board * cellSize;
+
+    private IReadOnlyList<Vector3[]> ToBoard(IReadOnlyList<Vector3[]> routes)
+    {
+        if (routes == null || cellSize == 1f)
+            return routes;
+        var board = new Vector3[routes.Count][];
+        for (int i = 0; i < board.Length; i++)
+        {
+            board[i] = new Vector3[routes[i].Length];
+            for (int j = 0; j < board[i].Length; j++)
+                board[i][j] = ToBoard(routes[i][j]);
+        }
+        return board;
+    }
+
+    // 보드 좌표(칸 한 변 1)를 받는다.
     public Vector3 ScreenPoint(Vector3 boardPosition) =>
         camera.WorldToScreenPoint(root.TransformPoint(boardPosition));
 
@@ -1603,7 +1644,7 @@ internal sealed class DefenseBoardView
         Material material = FactionMaterial(enemy.Faction);
         Transform model = new GameObject($"{enemy.Faction.DisplayName} enemy").transform;
         model.SetParent(root, false);
-        model.localPosition = enemy.Position;
+        model.localPosition = ToBoard(enemy.Position);
         Transform body = new GameObject("Body Reaction").transform;
         body.SetParent(model, false);
         EnemyView view;
@@ -1644,6 +1685,7 @@ internal sealed class DefenseBoardView
         view.Body = body;
         view.BodyScale = body.localScale;
         view.TintSlots = CollectTintSlots(view.Renderers);
+        model.localScale *= UnitScale;
         view.BaseScale = model.localScale;
         enemyViews.Add(enemy, view);
         SyncEnemy(enemy);
@@ -1834,9 +1876,9 @@ internal sealed class DefenseBoardView
         {
             View = view,
             From = view.Root.localPosition,
-            Stance = enemy.Position - heading * 0.32f,
-            Impact = enemy.Position + heading * (animated ? 0.58f : 0.16f) +
-                Vector3.up * (animated ? 0.85f : 0.45f),
+            Stance = ToBoard(enemy.Position - heading * 0.32f),
+            Impact = ToBoard(enemy.Position + heading * (animated ? 0.58f : 0.16f) +
+                Vector3.up * (animated ? 0.85f : 0.45f)),
             Heading = heading,
             Animated = animated,
             CoreDamage = coreDamage
@@ -1872,7 +1914,7 @@ internal sealed class DefenseBoardView
                 strike.HasHit = true;
                 PendingCoreDamage -= strike.CoreDamage;
                 coreImpacted = true;
-                NextHitEffect().Play(root.TransformPoint(strike.Impact), CoreDamageColor, CoreStrikeFlashScale,
+                NextHitEffect().Play(root.TransformPoint(strike.Impact), CoreDamageColor, CoreStrikeFlashScale * UnitScale,
                     colorEmphasis: 0.85f);
                 PrepareEnemyFade(strike.View);
             }
@@ -2025,7 +2067,7 @@ internal sealed class DefenseBoardView
     public void SyncEnemy(EnemyUnit enemy, float deltaTime = 0f, float playbackSpeed = 1f, float interpolation = 1f)
     {
         EnemyView view = enemyViews[enemy];
-        Vector3 shown = Vector3.Lerp(enemy.PreviousPosition, enemy.Position, interpolation);
+        Vector3 shown = ToBoard(Vector3.Lerp(enemy.PreviousPosition, enemy.Position, interpolation));
         Vector3 step = shown - view.Root.localPosition;
         view.Root.localPosition = shown;
         if (view.Animator != null)
@@ -2156,14 +2198,14 @@ internal sealed class DefenseBoardView
 
         Vector3 toAttacker = attacker.Position - target.Position;
         toAttacker.y = 0f;
-        Vector3 point = target.Position + Vector3.up * HitHeight + Vector3.ClampMagnitude(toAttacker, HitForwardOffset);
-        NextHitEffect().Play(root.TransformPoint(point), attacker.Faction.Color, boosted ? 1.12f : 0.85f);
+        Vector3 point = ToBoard(target.Position + Vector3.up * HitHeight + Vector3.ClampMagnitude(toAttacker, HitForwardOffset));
+        NextHitEffect().Play(root.TransformPoint(point), attacker.Faction.Color, (boosted ? 1.12f : 0.85f) * UnitScale);
         ReactToHit(target, -toAttacker, boosted, targetArmored);
         playHitSound?.Invoke();
         if (boosted)
-            spellEffects.PlayAttack(attacker.Position, target.Position);
+            spellEffects.PlayAttack(ToBoard(attacker.Position), ToBoard(target.Position));
         if (targetArmored)
-            spellEffects.PlayArmorImpact(target.Position);
+            spellEffects.PlayArmorImpact(ToBoard(target.Position));
     }
 
     private HitEffect NextHitEffect()

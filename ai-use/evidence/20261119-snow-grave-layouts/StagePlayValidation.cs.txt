@@ -1,0 +1,86 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
+using Object = UnityEngine.Object;
+
+// 임시 확인용(프로젝트 복사본에만 둔다): 선택 목록의 설원(2)·묘지(3)가 새 지형을 불러오고 전투가 진행되는지 Play Mode에서 본다.
+[InitializeOnLoad]
+public static class StagePlayValidation
+{
+    const string Key = "StagePlayValidation.Running";
+    const string Scene = "Assets/01_Scenes/02_Gameplay/GameScene.unity";
+    const string Folder = "/private/tmp/claude-501/-Users-mignon--claude-spares-spare-fzcBUL/e0a6e47a-e4d2-4799-8854-0fd2c15ee288/scratchpad/unity/shots";
+    static int phase, frames, settled;
+    static int Index => SessionState.GetInt(Key + ".Index", 2);
+    static string Asset => Index == 2 ? "Stage_Snowfield" : "Stage_Graveyard";
+    static int Walls => Index == 2 ? 45 : 41;
+    static int Route => Index == 2 ? 18 : 16;
+    static double start;
+    static StageSelectionController controller;
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static StagePlayValidation() { EditorApplication.update += Update; }
+    public static void RunSnowfield() => Run(2);
+    public static void RunGraveyard() => Run(3);
+    static void Run(int index) { EditorSceneManager.OpenScene(Scene); SessionState.SetInt(Key + ".Index", index); SessionState.SetBool(Key, true); EditorApplication.EnterPlaymode(); }
+    static object Field(object obj, string name) => obj.GetType().GetField(name, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(obj);
+    static void Check(bool value, string message) { if (!value) throw new Exception(message); }
+    static void Update()
+    {
+        if (!SessionState.GetBool(Key, false) || !EditorApplication.isPlaying || EditorApplication.isCompiling) return;
+        try
+        {
+            if (start == 0) start = EditorApplication.timeSinceStartup;
+            if (EditorApplication.timeSinceStartup - start > 120) throw new Exception("Stage play validation timed out.");
+            if (controller == null)
+            {
+                controller = Object.FindFirstObjectByType<StageSelectionController>(); if (controller == null) return;
+                game = Object.FindFirstObjectByType<VoxelDefensePrototype>(); frames = 0;
+            }
+            frames++;
+            if (phase == 0)
+            {
+                if (frames < 8) return;
+                Debug.Log("STAGE_PLAY_SELECT " + Index);
+                controller.SelectStage(Index);
+                phase = 1; frames = 0; return;
+            }
+            if (phase == 1)
+            {
+                if (controller.CurrentStage == null || controller.SelectedStage != Index) return;
+                if (++settled < 30) return;
+                var content = controller.CurrentStage;
+                Check(AssetDatabase.GetAssetPath(content.Data) == "Assets/04_Data/04_Stages/" + Asset + ".asset", "Wrong stage data: " + AssetDatabase.GetAssetPath(content.Data));
+                var grid = (DefenseGrid)Field(game, "grid");
+                Check(grid.Width == 17 && grid.Depth == 17 && grid.FixedWalls.Count == Walls, "Wrong terrain " + grid.FixedWalls.Count);
+                Check(grid.Routes.All(r => r.Length - 2 == Route), "Wrong routes " + string.Join(",", grid.Routes.Select(r => r.Length - 2)));
+                battle = (DefenseBattle)Field(game, "battle"); Check(battle.CurrentPhase == DefenseBattle.Phase.Preparation, "Not in preparation");
+                Capture(content.BoardCamera, Asset + ".png");
+                typeof(VoxelDefensePrototype).GetMethod("StartBattle", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(game, null);
+                phase = 2; return;
+            }
+            if (phase == 2)
+            {
+                if (battle.TickIndex < 600) return;
+                Check(battle.Enemies.Count > 0, "No enemies spawned");
+                Capture(controller.CurrentStage.BoardCamera, Asset + "-battle.png");
+                Debug.Log($"STAGE_PLAY_PASS stage={controller.CurrentStage.name} walls={((DefenseGrid)Field(game, "grid")).FixedWalls.Count} ticks={battle.TickIndex} units={battle.Enemies.Count}");
+                SessionState.SetBool(Key, false); EditorApplication.Exit(0);
+            }
+        }
+        catch (Exception e) { Debug.LogException(e); SessionState.SetBool(Key, false); EditorApplication.Exit(1); }
+    }
+    static void Capture(Camera camera, string name)
+    {
+        var rt = new RenderTexture(1280, 720, 24); var previous = camera.targetTexture; var active = RenderTexture.active;
+        camera.targetTexture = rt; camera.Render(); RenderTexture.active = rt;
+        var image = new Texture2D(1280, 720, TextureFormat.RGB24, false); image.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0); image.Apply();
+        File.WriteAllBytes(Folder + "/" + name, image.EncodeToPNG());
+        camera.targetTexture = previous; RenderTexture.active = active; Object.Destroy(image); rt.Release(); Object.Destroy(rt);
+    }
+}

@@ -34,3 +34,12 @@ Unity Play Mode에서 카탈로그16종의 사망 상태 선택, 대체 동작, 
 - `SpellEffects.Advance`로 전달받은 `BattleClock.DeltaTime`만 사용한다. 셰이더는 `_Time`을 읽지 않는다. 동시에 재생하는 범위 섬광은 최대 16개이며 렌더러를 재사용하고 보드 종료 시 메시·재질을 해제한다.
 - 구현: `Assets/02_Scripts/00_Core/Effects/SpellEffects.cs`, `Assets/Resources/SpellAreaBurst.shader`. 셰이더를 Resources에 넣어 런타임 로드와 빌드 포함을 보장한다.
 - Unity 6000.3.28f1 Play Mode에서 실제 시전 연결, 5색 렌더 캡처, 정지, 범위 배율, 만료, 연속 시전 제한, 정리를 확인했다. [5색 미리보기](../ai-use/evidence/20261119-spell-flash/preview.gif).
+
+## 유닛별 버프 낙뢰
+
+- 실제 스킬 적용 대상마다 위에서 꺾인 빛줄기가 내려온다. 공격력·회복·이동속도·방어막은 모든 수신자, 도발은 거대화하는 첫 수신자에게만 표시한다.
+- 스킬 색상의 부드러운 광채와 흰 중심선을 겹친다. 약 0.065초에 유닛에 도달하면 십자 섬광이 생기고, 전체는 0.38초 안에 사라진다. 기존 범위 섬광·몸 색상 플래시·버프 표식은 유지한다.
+- 화면 유닛의 위치를 따라가고 대상 화면 오브젝트가 사라지면 즉시 정리한다. `BattleClock.DeltaTime`을 `SpellEffects.Advance`에서 받아 정지·슬로우·배속에 연동한다. 전투 모델은 수정하지 않는다.
+- 빛줄기 높이는 `max(18, 32 × 유닛 축척)`으로, 초기 구현보다 10배 높여 화면 위쪽까지 길게 이어지게 했다. 축소된 유닛도 보드 기준 최소 18칸 위에서 내려온다. 꺾임은 SpawnOrder로 구분하고 전투 난수는 사용하지 않는다. 동시에 최대 128개를 재사용하며 보드 종료 시 재질과 화면 오브젝트를 해제한다.
+- 구현: `Assets/02_Scripts/00_Core/Effects/BuffLightning.cs`, `SpellEffects.cs`, `Assets/Resources/BuffLightning.shader`. `DefenseBoardView.PlayAreaSpell`의 실제 수신자 목록에 연결했다.
+- 실제 GameScene Play Mode에서 시전 큐 연결·3유닛 동시 적용·5색·도발 대상 구분·델타 0·이동 추종·대상 제거·만료·풀 제한·해제·셰이더 컴파일을 확인했다. [낙뢰 미리보기](../ai-use/evidence/20261119-buff-lightning/preview.gif).

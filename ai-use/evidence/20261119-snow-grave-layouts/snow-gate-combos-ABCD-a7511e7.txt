@@ -1,0 +1,1645 @@
+snow: 문 조합 x 편성 ABCD = 1644건, {'ok': 1408, 'rejected': 236}
+ok	-	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	-	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	-	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	-	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 
+ok	topL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 32.6s | 진영0 출전 6 코어도달 0 공격 34회 | 진영1 출전 6 코어도달 3 공격 42회 | 첫 타격 11.9s (8.8,12.7), �
+ok	topL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.2s | 진영0 출전 5 코어도달 0 공격 15회 | 진영1 출전 5 코어도달 4 공격 30회 | 첫 타격 11.2s (8.6,11.8)
+ok	topL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 27.6s | 진영0 출전 5 코어도달 2 공격 18회 | 진영1 출전 6 코어도달 5 공격 20�
+ok	topR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 30.3s | 진영0 출전 6 코어도달 2 공격 33회 | 진영1 출전 6 코어도달 2 공격 28회 | 첫 타격 12.2s (7.4,12.4), �
+ok	topR	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.1s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 17회 | 첫 타격 11.3s (5.8,13.5)
+ok	topR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.8s | 진영0 출전 5 코어도달 3 공격 64회 | 진영1 출전 6 코어도달 0 공격 32�
+ok	midL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.2s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 3회 | 첫 타격 15.2s (8.6,12.4), 타�
+ok	midL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.8s (8.5,13.1), 
+ok	midL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.4s | 진영0 출전 5 코어도달 4 공격 40회 | 진영1 출전 6 코어도달 2 공격 28�
+ok	midR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s (5.5,10.0), 
+ok	midR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.4s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5 공격 3회
+ok	exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회
+ok	sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격 0�
+ok	sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격 0�
+ok	ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격 0�
+ok	ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격 0�
+ok	topL+topR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 27.5s | 진영0 출전 6 코어도달 1 공격 42회 | 진영1 출전 6 코어도달 0 공격 40회 | 첫 타격 9.8s (7.7,9.9),
+ok	topL+topR	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.8s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 25회 | 첫 타격 9.3s (6.9,1
+ok	topL+topR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.6s | 진영0 출전 5 코어도달 4 공격 57회 | 진영1 출전 6 코어도달 0 공�
+ok	topL+midL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.6,12.4),
+ok	topL+midL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.6s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.8s (8.5,13
+ok	topL+midL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.4s | 진영0 출전 5 코어도달 4 공격 40회 | 진영1 출전 6 코어도달 2 공�
+ok	topL+midR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 27.9s | 진영0 출전 6 코어도달 2 공격 24회 | 진영1 출전 6 코어도달 4 공격 28회 | 첫 타격 10.5s (4.9,7.0)
+ok	topL+midR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.7s | 진영0 출전 5 코어도달 3 공격 24회 | 진영1 출전 5 코어도달 2 공격 17회 | 첫 타격 9.6s (5.4,6
+ok	topL+midR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.9s | 진영0 출전 5 코어도달 1 공격 52회 | 진영1 출전 6 코어도달 2 공�
+ok	topL+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit	B	전투[wolf*6|zombie*3]: 종료 34.4s | 진영0 출전 6 코어도달 1 공격 30회 | 진영1 출전 3 코어도달 2 공격 23회 | 첫 타격 8.6s (13.7,8.8), 타격 많은
+ok	topL+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topL+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.6s | 진영0 출전 5 코어도달 4 공격 9회 | 진영1 출전 6 코어도달 3 공격
+ok	topL+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.6,12.4)
+ok	topL+sideL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.6s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.8s (8.5,1
+ok	topL+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.4s | 진영0 출전 5 코어도달 4 공격 40회 | 진영1 출전 6 코어도달 2 공�
+ok	topL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 38.9s | 진영0 출전 6 코어도달 3 공격 25회 | 진영1 출전 6 코어도달 3 공격 24회 | 첫 타격 11.9s (8.8,12.
+ok	topL+sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.2s | 진영0 출전 5 코어도달 0 공격 15회 | 진영1 출전 5 코어도달 4 공격 30회 | 첫 타격 11.2s (8.6
+ok	topL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.0s | 진영0 출전 5 코어도달 3 공격 14회 | 진영1 출전 6 코어도달 5 공�
+ok	topL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 32.6s | 진영0 출전 6 코어도달 0 공격 34회 | 진영1 출전 6 코어도달 3 공격 42회 | 첫 타격 11.9s (8.8,12
+ok	topL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.2s | 진영0 출전 5 코어도달 0 공격 15회 | 진영1 출전 5 코어도달 4 공격 30회 | 첫 타격 11.2s (8.
+ok	topL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 27.6s | 진영0 출전 5 코어도달 2 공격 18회 | 진영1 출전 6 코어도달 5 공
+ok	topL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 35.4s | 진영0 출전 6 코어도달 2 공격 29회 | 진영1 출전 6 코어도달 3 공격 31회 | 첫 타격 11.9s (8.8,12
+ok	topL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.2s | 진영0 출전 5 코어도달 0 공격 15회 | 진영1 출전 5 코어도달 4 공격 30회 | 첫 타격 11.2s (8.
+ok	topL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 27.6s | 진영0 출전 5 코어도달 2 공격 18회 | 진영1 출전 6 코어도달 5 공
+ok	topR+midL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 35.6s | 진영0 출전 6 코어도달 2 공격 38회 | 진영1 출전 6 코어도달 1 공격 31회 | 첫 타격 10.0s (11.1,7.2
+ok	topR+midL	B	전투[wolf*6|zombie*3]: 종료 30.7s | 진영0 출전 6 코어도달 5 공격 17회 | 진영1 출전 3 코어도달 2 공격 5회 | 첫 타격 8.8s (13.0,9.0), 타격 많은 
+ok	topR+midL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.6s | 진영0 출전 5 코어도달 3 공격 23회 | 진영1 출전 5 코어도달 2 공격 18회 | 첫 타격 9.1s (10.5,
+ok	topR+midL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 43.3s | 진영0 출전 5 코어도달 5 공격 38회 | 진영1 출전 6 코어도달 3 공�
+ok	topR+midR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s (5.5,10
+ok	topR+midR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.4s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5 공격
+ok	topR+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topR+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격
+ok	topR+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 38.4s | 진영0 출전 6 코어도달 3 공격 35회 | 진영1 출전 6 코어도달 1 공격 21회 | 첫 타격 12.2s (7.4,12.
+ok	topR+sideL	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.1s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 17회 | 첫 타격 11.3s (5.8
+ok	topR+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.1s | 진영0 출전 5 코어도달 3 공격 64회 | 진영1 출전 6 코어도달 0 공�
+ok	topR+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+sideR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s (5.5,1
+ok	topR+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.4s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5 공�
+ok	topR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 26.8s | 진영0 출전 6 코어도달 2 공격 29회 | 진영1 출전 6 코어도달 2 공격 28회 | 첫 타격 12.2s (7.4,12
+ok	topR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.1s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 17회 | 첫 타격 11.3s (5.
+ok	topR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.8s | 진영0 출전 5 코어도달 3 공격 64회 | 진영1 출전 6 코어도달 0 공
+ok	topR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 30.3s | 진영0 출전 6 코어도달 2 공격 33회 | 진영1 출전 6 코어도달 2 공격 28회 | 첫 타격 12.2s (7.4,12
+ok	topR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.1s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 17회 | 첫 타격 11.3s (5.
+ok	topR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.8s | 진영0 출전 5 코어도달 3 공격 64회 | 진영1 출전 6 코어도달 0 공
+ok	midL+midR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5,2.9),
+ok	midL+midR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 많은
+ok	midL+midR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s (6.7,3
+ok	midL+midR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0 공�
+ok	midL+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit	B	전투[wolf*6|zombie*3]: 종료 31.4s | 진영0 출전 6 코어도달 0 공격 30회 | 진영1 출전 3 코어도달 3 공격 24회 | 첫 타격 8.8s (13.2,8.7), 타격 많은
+ok	midL+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midL+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.9s | 진영0 출전 5 코어도달 5 공격 11회 | 진영1 출전 6 코어도달 3 공�
+ok	midL+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.6,12.4)
+ok	midL+sideL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.6s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.8s (8.5,1
+ok	midL+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.4s | 진영0 출전 5 코어도달 4 공격 40회 | 진영1 출전 6 코어도달 2 공�
+ok	midL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.2s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 3회 | 첫 타격 15.2s (8.6,12.4)
+ok	midL+sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 36.4s | 진영0 출전 5 코어도달 4 공격 7회 | 진영1 출전 5 코어도달 4 공격 8회 | 첫 타격 14.4s (7.7,1
+ok	midL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.7s | 진영0 출전 5 코어도달 2 공격 25회 | 진영1 출전 6 코어도달 6 공�
+ok	midL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.2s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 3회 | 첫 타격 15.2s (8.6,12.4
+ok	midL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.8s (8.5,
+ok	midL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.8s | 진영0 출전 5 코어도달 5 공격 15회 | 진영1 출전 6 코어도달 3 공
+ok	midL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 3회 | 첫 타격 15.2s (8.6,12.4
+ok	midL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.9s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.3s (8.2,
+ok	midL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.1s | 진영0 출전 5 코어도달 1 공격 38회 | 진영1 출전 6 코어도달 5 공
+ok	midR+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midR+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격
+ok	midR+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideL	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s (5.5,1
+ok	midR+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 29.4s | 진영0 출전 5 코어도달 4 공격 15회 | 진영1 출전 6 코어도달 5 공�
+ok	midR+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s (5.5,1
+ok	midR+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.4s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5 공�
+ok	midR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 18.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 29.9s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5 공�
+ok	midR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s (5.5,
+ok	midR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.4s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5 공�
+ok	exit+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공�
+ok	exit+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공�
+ok	exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공�
+ok	exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공�
+ok	sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공�
+ok	sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공
+ok	sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공
+ok	sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공
+ok	sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공
+ok	ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 �
+ok	topL+topR+midL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 35.6s | 진영0 출전 6 코어도달 2 공격 38회 | 진영1 출전 6 코어도달 1 공격 31회 | 첫 타격 10.0s (11.
+ok	topL+topR+midL	B	전투[wolf*6|zombie*3]: 종료 30.7s | 진영0 출전 6 코어도달 5 공격 17회 | 진영1 출전 3 코어도달 2 공격 5회 | 첫 타격 8.8s (13.0,9.0), 타격 �
+ok	topL+topR+midL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.6s | 진영0 출전 5 코어도달 3 공격 23회 | 진영1 출전 5 코어도달 2 공격 18회 | 첫 타격 9.1s (
+ok	topL+topR+midL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 43.3s | 진영0 출전 5 코어도달 5 공격 38회 | 진영1 출전 6 코어도달 3 
+ok	topL+topR+midR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 27.9s | 진영0 출전 6 코어도달 2 공격 24회 | 진영1 출전 6 코어도달 4 공격 28회 | 첫 타격 10.5s (4.9
+ok	topL+topR+midR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+midR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.7s | 진영0 출전 5 코어도달 3 공격 24회 | 진영1 출전 5 코어도달 2 공격 17회 | 첫 타격 9.6s (
+ok	topL+topR+midR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.9s | 진영0 출전 5 코어도달 1 공격 52회 | 진영1 출전 6 코어도달 2 
+rejected	topL+topR+exit	A	
+rejected	topL+topR+exit	B	
+rejected	topL+topR+exit	C	
+rejected	topL+topR+exit	D	
+ok	topL+topR+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 35.6s | 진영0 출전 6 코어도달 2 공격 38회 | 진영1 출전 6 코어도달 1 공격 31회 | 첫 타격 10.0s (11
+ok	topL+topR+sideL	B	전투[wolf*6|zombie*3]: 종료 30.7s | 진영0 출전 6 코어도달 5 공격 17회 | 진영1 출전 3 코어도달 2 공격 5회 | 첫 타격 8.8s (13.0,9.0), 타격 �
+ok	topL+topR+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.6s | 진영0 출전 5 코어도달 3 공격 23회 | 진영1 출전 5 코어도달 2 공격 18회 | 첫 타격 9.1s 
+ok	topL+topR+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 43.3s | 진영0 출전 5 코어도달 5 공격 38회 | 진영1 출전 6 코어도달 3
+ok	topL+topR+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 27.9s | 진영0 출전 6 코어도달 2 공격 24회 | 진영1 출전 6 코어도달 4 공격 28회 | 첫 타격 10.5s (4.
+ok	topL+topR+sideR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.7s | 진영0 출전 5 코어도달 3 공격 24회 | 진영1 출전 5 코어도달 2 공격 17회 | 첫 타격 9.6s 
+ok	topL+topR+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.9s | 진영0 출전 5 코어도달 1 공격 52회 | 진영1 출전 6 코어도달 2
+ok	topL+topR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 33.6s | 진영0 출전 6 코어도달 4 공격 35회 | 진영1 출전 6 코어도달 1 공격 25회 | 첫 타격 9.8s (7.
+ok	topL+topR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.7s | 진영0 출전 5 코어도달 0 공격 23회 | 진영1 출전 5 코어도달 3 공격 30회 | 첫 타격 9.3s
+ok	topL+topR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.3s | 진영0 출전 5 코어도달 4 공격 47회 | 진영1 출전 6 코어도달 
+ok	topL+topR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 27.1s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 29회 | 첫 타격 9.8s (7.
+ok	topL+topR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.3s | 진영0 출전 5 코어도달 2 공격 29회 | 진영1 출전 5 코어도달 1 공격 22회 | 첫 타격 9.3s
+ok	topL+topR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.1s | 진영0 출전 5 코어도달 2 공격 63회 | 진영1 출전 6 코어도달 
+ok	topL+midL+midR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5,
+ok	topL+midL+midR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 �
+ok	topL+midL+midR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s (
+ok	topL+midL+midR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0 
+ok	topL+midL+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+midL+exit	B	전투[wolf*6|zombie*3]: 종료 28.7s | 진영0 출전 6 코어도달 1 공격 44회 | 진영1 출전 3 코어도달 1 공격 22회 | 첫 타격 8.6s (13.6,8.8), 타격 �
+ok	topL+midL+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topL+midL+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.3s | 진영0 출전 5 코어도달 5 공격 12회 | 진영1 출전 6 코어도달 3 
+ok	topL+midL+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.6,
+ok	topL+midL+sideL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.6s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.8s (
+ok	topL+midL+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.4s | 진영0 출전 5 코어도달 4 공격 40회 | 진영1 출전 6 코어도달 2
+ok	topL+midL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.6,
+ok	topL+midL+sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 40.1s | 진영0 출전 5 코어도달 4 공격 7회 | 진영1 출전 5 코어도달 4 공격 8회 | 첫 타격 14.4s (
+ok	topL+midL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.1s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어도달 6
+ok	topL+midL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.6
+ok	topL+midL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.6s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.8s 
+ok	topL+midL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.8s | 진영0 출전 5 코어도달 5 공격 15회 | 진영1 출전 6 코어도달 
+ok	topL+midL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.3s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.6
+ok	topL+midL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.1s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.3s 
+ok	topL+midL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.4s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어도달 
+ok	topL+midR+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 39.7s | 진영0 출전 6 코어도달 2 공격 39회 | 진영1 출전 6 코어도달 1 공격 29회 | 첫 타격 10.7s (10.
+ok	topL+midR+exit	B	전투[wolf*6|zombie*3]: 종료 27.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 34.2s | 진영0 출전 5 코어도달 2 공격 35회 | 진영1 출전 5 코어도달 0 공격 27회 | 첫 타격 10.3s 
+ok	topL+midR+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.5s | 진영0 출전 5 코어도달 3 공격 41회 | 진영1 출전 6 코어도달 0 
+ok	topL+midR+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5
+ok	topL+midR+sideL	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 
+ok	topL+midR+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s 
+ok	topL+midR+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0
+ok	topL+midR+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 27.9s | 진영0 출전 6 코어도달 2 공격 24회 | 진영1 출전 6 코어도달 4 공격 28회 | 첫 타격 10.5s (4.
+ok	topL+midR+sideR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.7s | 진영0 출전 5 코어도달 3 공격 24회 | 진영1 출전 5 코어도달 2 공격 17회 | 첫 타격 9.6s 
+ok	topL+midR+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.9s | 진영0 출전 5 코어도달 1 공격 52회 | 진영1 출전 6 코어도달 2
+ok	topL+midR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 25.4s | 진영0 출전 6 코어도달 4 공격 6회 | 진영1 출전 6 코어도달 6 공격 14회 | 첫 타격 12.9s (10
+ok	topL+midR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.8s | 진영0 출전 5 코어도달 2 공격 22회 | 진영1 출전 5 코어도달 2 공격 23회 | 첫 타격 11.0
+ok	topL+midR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 27.3s | 진영0 출전 5 코어도달 2 공격 21회 | 진영1 출전 6 코어도달 
+ok	topL+midR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 36.2s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 18회 | 첫 타격 10.5s (4
+ok	topL+midR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.1s | 진영0 출전 5 코어도달 3 공격 28회 | 진영1 출전 5 코어도달 1 공격 18회 | 첫 타격 9.6s
+ok	topL+midR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 49.1s | 진영0 출전 5 코어도달 2 공격 57회 | 진영1 출전 6 코어도달 
+ok	topL+exit+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit+sideL	B	전투[wolf*6|zombie*3]: 종료 28.7s | 진영0 출전 6 코어도달 1 공격 44회 | 진영1 출전 3 코어도달 1 공격 22회 | 첫 타격 8.6s (13.6,8.8), 타격 
+ok	topL+exit+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topL+exit+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.3s | 진영0 출전 5 코어도달 5 공격 12회 | 진영1 출전 6 코어도달 3
+ok	topL+exit+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit+sideR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7), 타격 
+ok	topL+exit+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topL+exit+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코어도달 4 
+ok	topL+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 33.7s | 진영0 출전 6 코어도달 1 공격 32회 | 진영1 출전 3 코어도달 2 공격 23회 | 첫 타격 8.6s (13.7,8.8), 타격
+ok	topL+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topL+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.6s | 진영0 출전 5 코어도달 4 공격 9회 | 진영1 출전 6 코어도달 3
+ok	topL+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.0s | 진영0 출전 6 코어도달 3 공격 27회 | 진영1 출전 3 코어도달 2 공격 15회 | 첫 타격 8.6s (13.7,8.8), 타격
+ok	topL+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topL+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.6s | 진영0 출전 5 코어도달 4 공격 9회 | 진영1 출전 6 코어도달 3
+ok	topL+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.6
+ok	topL+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 40.1s | 진영0 출전 5 코어도달 4 공격 7회 | 진영1 출전 5 코어도달 4 공격 8회 | 첫 타격 14.4s 
+ok	topL+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.1s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어도달 
+ok	topL+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.
+ok	topL+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.6s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.8s
+ok	topL+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.8s | 진영0 출전 5 코어도달 5 공격 15회 | 진영1 출전 6 코어도달
+ok	topL+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.3s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.
+ok	topL+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.1s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.3s
+ok	topL+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.4s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어도달
+ok	topL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 46.1s | 진영0 출전 6 코어도달 2 공격 39회 | 진영1 출전 6 코어도달 1 공격 34회 | 첫 타격 11.9s (
+ok	topL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.2s | 진영0 출전 5 코어도달 0 공격 15회 | 진영1 출전 5 코어도달 4 공격 30회 | 첫 타격 11.
+ok	topL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 31.9s | 진영0 출전 5 코어도달 3 공격 14회 | 진영1 출전 6 코어도달
+ok	topL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 30.0s | 진영0 출전 6 코어도달 2 공격 26회 | 진영1 출전 6 코어도달 3 공격 28회 | 첫 타격 11.9s (
+ok	topL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.2s | 진영0 출전 5 코어도달 0 공격 15회 | 진영1 출전 5 코어도달 4 공격 30회 | 첫 타격 11.
+ok	topL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.3s | 진영0 출전 5 코어도달 2 공격 18회 | 진영1 출전 6 코어도달
+ok	topL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.1s | 진영0 출전 6 코어도달 1 공격 30회 | 진영1 출전 6 코어도달 3 공격 35회 | 첫 타격 11.9s 
+ok	topL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.2s | 진영0 출전 5 코어도달 0 공격 15회 | 진영1 출전 5 코어도달 4 공격 30회 | 첫 타격 11
+ok	topL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 27.6s | 진영0 출전 5 코어도달 2 공격 18회 | 진영1 출전 6 코어도�
+ok	topR+midL+midR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5,
+ok	topR+midL+midR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 �
+ok	topR+midL+midR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s (
+ok	topR+midL+midR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0 
+ok	topR+midL+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 33.4s | 진영0 출전 6 코어도달 1 공격 42회 | 진영1 출전 6 코어도달 0 공격 37회 | 첫 타격 10.7s (5.6
+ok	topR+midL+exit	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midL+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 36.5s | 진영0 출전 5 코어도달 1 공격 26회 | 진영1 출전 5 코어도달 2 공격 24회 | 첫 타격 10.2s 
+ok	topR+midL+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 44.1s | 진영0 출전 5 코어도달 1 공격 43회 | 진영1 출전 6 코어도달 3 
+ok	topR+midL+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 35.6s | 진영0 출전 6 코어도달 2 공격 38회 | 진영1 출전 6 코어도달 1 공격 31회 | 첫 타격 10.0s (11
+ok	topR+midL+sideL	B	전투[wolf*6|zombie*3]: 종료 30.7s | 진영0 출전 6 코어도달 5 공격 17회 | 진영1 출전 3 코어도달 2 공격 5회 | 첫 타격 8.8s (13.0,9.0), 타격 �
+ok	topR+midL+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.6s | 진영0 출전 5 코어도달 3 공격 23회 | 진영1 출전 5 코어도달 2 공격 18회 | 첫 타격 9.1s 
+ok	topR+midL+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 43.3s | 진영0 출전 5 코어도달 5 공격 38회 | 진영1 출전 6 코어도달 3
+ok	topR+midL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5
+ok	topR+midL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 
+ok	topR+midL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s 
+ok	topR+midL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0
+ok	topR+midL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 42.9s | 진영0 출전 6 코어도달 3 공격 39회 | 진영1 출전 6 코어도달 1 공격 31회 | 첫 타격 10.0s (1
+ok	topR+midL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 35.4s | 진영0 출전 6 코어도달 2 공격 50회 | 진영1 출전 3 코어도달 1 공격 17회 | 첫 타격 8.8s (13.0,9.0), 타격
+ok	topR+midL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.6s | 진영0 출전 5 코어도달 3 공격 19회 | 진영1 출전 5 코어도달 3 공격 18회 | 첫 타격 9.1s
+ok	topR+midL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.3s | 진영0 출전 5 코어도달 4 공격 28회 | 진영1 출전 6 코어도달 
+ok	topR+midL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 25.3s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 15회 | 첫 타격 12.3s (6
+ok	topR+midL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 4 공격 11회 | 진영1 출전 3 코어도달 3 공격 8회 | 첫 타격 11.9s (10.3,9.9), 타격
+ok	topR+midL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.0s | 진영0 출전 5 코어도달 2 공격 35회 | 진영1 출전 5 코어도달 0 공격 23회 | 첫 타격 10.6
+ok	topR+midL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 35.3s | 진영0 출전 5 코어도달 4 공격 37회 | 진영1 출전 6 코어도달 
+ok	topR+midR+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+exit	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topR+midR+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 �
+ok	topR+midR+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+sideL	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s (
+ok	topR+midR+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.1s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5 
+ok	topR+midR+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+sideR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s (
+ok	topR+midR+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.4s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5 
+ok	topR+midR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 18.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topR+midR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 29.9s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5
+ok	topR+midR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s 
+ok	topR+midR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.4s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5
+ok	topR+exit+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit+sideL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topR+exit+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 
+ok	topR+exit+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit+sideR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topR+exit+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 
+ok	topR+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topR+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6
+ok	topR+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topR+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6
+ok	topR+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s 
+ok	topR+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.1s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5
+ok	topR+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 38.7s | 진영0 출전 6 코어도달 4 공격 35회 | 진영1 출전 6 코어도달 1 공격 20회 | 첫 타격 12.2s (
+ok	topR+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.1s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 17회 | 첫 타격 11.
+ok	topR+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.9s | 진영0 출전 5 코어도달 1 공격 50회 | 진영1 출전 6 코어도달
+ok	topR+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 28.6s | 진영0 출전 6 코어도달 4 공격 21회 | 진영1 출전 6 코어도달 3 공격 19회 | 첫 타격 12.2s (
+ok	topR+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.1s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 17회 | 첫 타격 11.
+ok	topR+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.9s | 진영0 출전 5 코어도달 3 공격 64회 | 진영1 출전 6 코어도달
+ok	topR+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 18.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topR+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 29.9s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 
+ok	topR+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s
+ok	topR+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.4s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 
+ok	topR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 27.5s | 진영0 출전 6 코어도달 2 공격 29회 | 진영1 출전 6 코어도달 2 공격 28회 | 첫 타격 12.2s 
+ok	topR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.1s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 17회 | 첫 타격 11
+ok	topR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.8s | 진영0 출전 5 코어도달 3 공격 64회 | 진영1 출전 6 코어도�
+ok	midL+midR+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5,
+ok	midL+midR+exit	B	전투[wolf*6|zombie*3]: 종료 36.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 �
+ok	midL+midR+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.5s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s (
+ok	midL+midR+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0 
+ok	midL+midR+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5
+ok	midL+midR+sideL	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 
+ok	midL+midR+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s 
+ok	midL+midR+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0
+ok	midL+midR+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5
+ok	midL+midR+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 
+ok	midL+midR+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s 
+ok	midL+midR+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0
+ok	midL+midR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.
+ok	midL+midR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격
+ok	midL+midR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s
+ok	midL+midR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 
+ok	midL+midR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.
+ok	midL+midR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격
+ok	midL+midR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s
+ok	midL+midR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 
+ok	midL+exit+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit+sideL	B	전투[wolf*6|zombie*3]: 종료 28.7s | 진영0 출전 6 코어도달 1 공격 44회 | 진영1 출전 3 코어도달 1 공격 22회 | 첫 타격 8.6s (13.6,8.8), 타격 
+ok	midL+exit+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midL+exit+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.3s | 진영0 출전 5 코어도달 5 공격 12회 | 진영1 출전 6 코어도달 3
+ok	midL+exit+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit+sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+exit+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midL+exit+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 
+ok	midL+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 29.5s | 진영0 출전 6 코어도달 2 공격 28회 | 진영1 출전 3 코어도달 2 공격 16회 | 첫 타격 9.0s (13.1,9.3), 타격
+ok	midL+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midL+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 35.2s | 진영0 출전 5 코어도달 5 공격 11회 | 진영1 출전 6 코어도달 
+ok	midL+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midL+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6
+ok	midL+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.6
+ok	midL+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 40.1s | 진영0 출전 5 코어도달 4 공격 7회 | 진영1 출전 5 코어도달 4 공격 8회 | 첫 타격 14.4s 
+ok	midL+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.1s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어도달 
+ok	midL+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.
+ok	midL+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.6s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.8s
+ok	midL+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.8s | 진영0 출전 5 코어도달 5 공격 15회 | 진영1 출전 6 코어도달
+ok	midL+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.3s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s (8.
+ok	midL+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.1s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.3s
+ok	midL+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.4s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어도달
+ok	midL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.2s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 3회 | 첫 타격 15.2s (8.
+ok	midL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.6s | 진영0 출전 5 코어도달 5 공격 14회 | 진영1 출전 5 코어도달 3 공격 10회 | 첫 타격 14.
+ok	midL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.5s | 진영0 출전 5 코어도달 2 공격 25회 | 진영1 출전 6 코어도달
+ok	midL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 3회 | 첫 타격 15.2s (8.
+ok	midL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.4s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 14.3s
+ok	midL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.5s | 진영0 출전 5 코어도달 2 공격 36회 | 진영1 출전 6 코어도달
+ok	midL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7), 타�
+ok	midL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.3s | 진영0 출전 5 코어도달 5 공격 10회 | 진영1 출전 6 코어도�
+ok	midR+exit+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit+sideL	B	전투[wolf*6|zombie*3]: 종료 27.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midR+exit+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 
+ok	midR+exit+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit+sideR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midR+exit+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 
+ok	midR+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 27.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midR+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6
+ok	midR+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midR+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6
+ok	midR+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s 
+ok	midR+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.1s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 5
+ok	midR+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 18.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midR+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.4s | 진영0 출전 5 코어도달 4 공격 15회 | 진영1 출전 6 코어도달
+ok	midR+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s
+ok	midR+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.3s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 
+ok	midR+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 18.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midR+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 29.9s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 
+ok	midR+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 13.9s
+ok	midR+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.4s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도달 
+ok	midR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	midR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달
+ok	exit+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6
+ok	exit+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 
+ok	exit+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 
+ok	exit+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 
+ok	exit+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 
+ok	exit+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	exit+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달
+ok	sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달
+ok	sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달
+ok	sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도�
+ok	sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도�
+ok	topL+topR+midL+midR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s 
+ok	topL+topR+midL+midR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타
+ok	topL+topR+midL+midR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5
+ok	topL+topR+midL+midR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도�
+rejected	topL+topR+midL+exit	A	
+rejected	topL+topR+midL+exit	B	
+rejected	topL+topR+midL+exit	C	
+rejected	topL+topR+midL+exit	D	
+ok	topL+topR+midL+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 35.6s | 진영0 출전 6 코어도달 2 공격 38회 | 진영1 출전 6 코어도달 1 공격 31회 | 첫 타격 10.0
+ok	topL+topR+midL+sideL	B	전투[wolf*6|zombie*3]: 종료 30.7s | 진영0 출전 6 코어도달 5 공격 17회 | 진영1 출전 3 코어도달 2 공격 5회 | 첫 타격 8.8s (13.0,9.0), 타
+ok	topL+topR+midL+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.6s | 진영0 출전 5 코어도달 3 공격 23회 | 진영1 출전 5 코어도달 2 공격 18회 | 첫 타격 
+ok	topL+topR+midL+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 43.3s | 진영0 출전 5 코어도달 5 공격 38회 | 진영1 출전 6 코어도
+ok	topL+topR+midL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s
+ok	topL+topR+midL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topL+topR+midL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 
+ok	topL+topR+midL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도
+ok	topL+topR+midL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 42.9s | 진영0 출전 6 코어도달 3 공격 39회 | 진영1 출전 6 코어도달 1 공격 31회 | 첫 타격 10.
+ok	topL+topR+midL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 35.4s | 진영0 출전 6 코어도달 2 공격 50회 | 진영1 출전 3 코어도달 1 공격 17회 | 첫 타격 8.8s (13.0,9.0), �
+ok	topL+topR+midL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.3s | 진영0 출전 5 코어도달 3 공격 19회 | 진영1 출전 5 코어도달 3 공격 18회 | 첫 타격
+ok	topL+topR+midL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.3s | 진영0 출전 5 코어도달 4 공격 28회 | 진영1 출전 6 코어�
+ok	topL+topR+midL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 25.8s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 15회 | 첫 타격 12.
+ok	topL+topR+midL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 4 공격 11회 | 진영1 출전 3 코어도달 3 공격 8회 | 첫 타격 11.9s (10.3,9.9), �
+ok	topL+topR+midL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.9s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 20회 | 첫 타격
+ok	topL+topR+midL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.4s | 진영0 출전 5 코어도달 4 공격 36회 | 진영1 출전 6 코어�
+rejected	topL+topR+midR+exit	A	
+rejected	topL+topR+midR+exit	B	
+rejected	topL+topR+midR+exit	C	
+rejected	topL+topR+midR+exit	D	
+ok	topL+topR+midR+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s
+ok	topL+topR+midR+sideL	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topL+topR+midR+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 
+ok	topL+topR+midR+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도
+ok	topL+topR+midR+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 27.9s | 진영0 출전 6 코어도달 2 공격 24회 | 진영1 출전 6 코어도달 4 공격 28회 | 첫 타격 10.5
+ok	topL+topR+midR+sideR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+midR+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.7s | 진영0 출전 5 코어도달 3 공격 24회 | 진영1 출전 5 코어도달 2 공격 17회 | 첫 타격 
+ok	topL+topR+midR+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.9s | 진영0 출전 5 코어도달 1 공격 52회 | 진영1 출전 6 코어도
+ok	topL+topR+midR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 25.3s | 진영0 출전 6 코어도달 4 공격 7회 | 진영1 출전 6 코어도달 6 공격 14회 | 첫 타격 12.9
+ok	topL+topR+midR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+midR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.9s | 진영0 출전 5 코어도달 2 공격 28회 | 진영1 출전 5 코어도달 1 공격 23회 | 첫 타격
+ok	topL+topR+midR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 27.3s | 진영0 출전 5 코어도달 2 공격 21회 | 진영1 출전 6 코어�
+ok	topL+topR+midR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 30.9s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 18회 | 첫 타격 10.
+ok	topL+topR+midR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+midR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.1s | 진영0 출전 5 코어도달 3 공격 28회 | 진영1 출전 5 코어도달 1 공격 18회 | 첫 타격
+ok	topL+topR+midR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 49.1s | 진영0 출전 5 코어도달 2 공격 57회 | 진영1 출전 6 코어�
+rejected	topL+topR+exit+sideL	A	
+rejected	topL+topR+exit+sideL	B	
+rejected	topL+topR+exit+sideL	C	
+rejected	topL+topR+exit+sideL	D	
+rejected	topL+topR+exit+sideR	A	
+rejected	topL+topR+exit+sideR	B	
+rejected	topL+topR+exit+sideR	C	
+rejected	topL+topR+exit+sideR	D	
+rejected	topL+topR+exit+ridgeL	A	
+rejected	topL+topR+exit+ridgeL	B	
+rejected	topL+topR+exit+ridgeL	C	
+rejected	topL+topR+exit+ridgeL	D	
+rejected	topL+topR+exit+ridgeR	A	
+rejected	topL+topR+exit+ridgeR	B	
+rejected	topL+topR+exit+ridgeR	C	
+rejected	topL+topR+exit+ridgeR	D	
+ok	topL+topR+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5
+ok	topL+topR+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topL+topR+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	topL+topR+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	topL+topR+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 42.9s | 진영0 출전 6 코어도달 3 공격 39회 | 진영1 출전 6 코어도달 1 공격 31회 | 첫 타격 10
+ok	topL+topR+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 35.4s | 진영0 출전 6 코어도달 2 공격 50회 | 진영1 출전 3 코어도달 1 공격 17회 | 첫 타격 8.8s (13.0,9.0), 
+ok	topL+topR+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.3s | 진영0 출전 5 코어도달 3 공격 19회 | 진영1 출전 5 코어도달 3 공격 18회 | 첫 타�
+ok	topL+topR+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.3s | 진영0 출전 5 코어도달 4 공격 28회 | 진영1 출전 6 코어�
+ok	topL+topR+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 25.8s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 15회 | 첫 타격 12
+ok	topL+topR+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 4 공격 11회 | 진영1 출전 3 코어도달 3 공격 8회 | 첫 타격 11.9s (10.3,9.9), 
+ok	topL+topR+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.0s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 21회 | 첫 타�
+ok	topL+topR+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.4s | 진영0 출전 5 코어도달 4 공격 36회 | 진영1 출전 6 코어�
+ok	topL+topR+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 25.3s | 진영0 출전 6 코어도달 4 공격 7회 | 진영1 출전 6 코어도달 6 공격 14회 | 첫 타격 12.
+ok	topL+topR+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.8s | 진영0 출전 5 코어도달 1 공격 25회 | 진영1 출전 5 코어도달 2 공격 24회 | 첫 타�
+ok	topL+topR+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 27.3s | 진영0 출전 5 코어도달 2 공격 21회 | 진영1 출전 6 코어�
+ok	topL+topR+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 30.9s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 18회 | 첫 타격 10
+ok	topL+topR+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.1s | 진영0 출전 5 코어도달 3 공격 28회 | 진영1 출전 5 코어도달 1 공격 18회 | 첫 타�
+ok	topL+topR+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 49.1s | 진영0 출전 5 코어도달 2 공격 57회 | 진영1 출전 6 코어�
+ok	topL+topR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 26.5s | 진영0 출전 6 코어도달 2 공격 42회 | 진영1 출전 6 코어도달 0 공격 33회 | 첫 타격 9
+ok	topL+topR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.1s | 진영0 출전 5 코어도달 0 공격 27회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타�
+ok	topL+topR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 43.6s | 진영0 출전 5 코어도달 1 공격 56회 | 진영1 출전 6 코어
+ok	topL+midL+midR+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s 
+ok	topL+midL+midR+exit	B	전투[wolf*6|zombie*3]: 종료 36.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타
+ok	topL+midL+midR+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.3s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5
+ok	topL+midL+midR+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도�
+ok	topL+midL+midR+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s
+ok	topL+midL+midR+sideL	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topL+midL+midR+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 
+ok	topL+midL+midR+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도
+ok	topL+midL+midR+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s
+ok	topL+midL+midR+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topL+midL+midR+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 
+ok	topL+midL+midR+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도
+ok	topL+midL+midR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5
+ok	topL+midL+midR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topL+midL+midR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	topL+midL+midR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	topL+midL+midR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5
+ok	topL+midL+midR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topL+midL+midR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	topL+midL+midR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	topL+midL+exit+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+midL+exit+sideL	B	전투[wolf*6|zombie*3]: 종료 28.7s | 진영0 출전 6 코어도달 1 공격 44회 | 진영1 출전 3 코어도달 1 공격 22회 | 첫 타격 8.6s (13.6,8.8), �
+ok	topL+midL+exit+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topL+midL+exit+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.3s | 진영0 출전 5 코어도달 5 공격 12회 | 진영1 출전 6 코어도
+ok	topL+midL+exit+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+midL+exit+sideR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7), �
+ok	topL+midL+exit+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topL+midL+exit+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코어도�
+ok	topL+midL+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+midL+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 46.2s | 진영0 출전 6 코어도달 1 공격 29회 | 진영1 출전 3 코어도달 2 공격 20회 | 첫 타격 8.8s (13.0,9.1), �
+ok	topL+midL+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topL+midL+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 39.3s | 진영0 출전 5 코어도달 5 공격 11회 | 진영1 출전 6 코어�
+ok	topL+midL+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+midL+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 24.4s | 진영0 출전 6 코어도달 3 공격 34회 | 진영1 출전 3 코어도달 1 공격 13회 | 첫 타격 7.1s (14.6,4.7), �
+ok	topL+midL+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topL+midL+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.0s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코어도
+ok	topL+midL+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2s
+ok	topL+midL+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 40.1s | 진영0 출전 5 코어도달 4 공격 7회 | 진영1 출전 5 코어도달 4 공격 8회 | 첫 타격 1
+ok	topL+midL+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.1s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어�
+ok	topL+midL+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2
+ok	topL+midL+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.6s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 
+ok	topL+midL+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.8s | 진영0 출전 5 코어도달 5 공격 15회 | 진영1 출전 6 코어�
+ok	topL+midL+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.3s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2
+ok	topL+midL+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.1s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 
+ok	topL+midL+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.4s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어�
+ok	topL+midL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2
+ok	topL+midL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 37.9s | 진영0 출전 5 코어도달 5 공격 14회 | 진영1 출전 5 코어도달 3 공격 10회 | 첫 타�
+ok	topL+midL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 35.1s | 진영0 출전 5 코어도달 2 공격 23회 | 진영1 출전 6 코어�
+ok	topL+midL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.6s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.2
+ok	topL+midL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 32.5s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격 
+ok	topL+midL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.4s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어�
+ok	topL+midL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+midL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7),
+ok	topL+midL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	topL+midL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.3s | 진영0 출전 5 코어도달 5 공격 10회 | 진영1 출전 6 코어
+ok	topL+midR+exit+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s
+ok	topL+midR+exit+sideL	B	전투[wolf*6|zombie*3]: 종료 36.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topL+midR+exit+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.3s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 
+ok	topL+midR+exit+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도
+rejected	topL+midR+exit+sideR	A	
+rejected	topL+midR+exit+sideR	B	
+rejected	topL+midR+exit+sideR	C	
+rejected	topL+midR+exit+sideR	D	
+ok	topL+midR+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 41.6s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 19회 | 첫 타격 10.
+ok	topL+midR+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 27.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 36.1s | 진영0 출전 5 코어도달 1 공격 35회 | 진영1 출전 5 코어도달 0 공격 27회 | 첫 타격
+ok	topL+midR+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 50.7s | 진영0 출전 5 코어도달 4 공격 43회 | 진영1 출전 6 코어�
+ok	topL+midR+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 38.8s | 진영0 출전 6 코어도달 3 공격 23회 | 진영1 출전 6 코어도달 3 공격 21회 | 첫 타격 10.
+ok	topL+midR+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 32.3s | 진영0 출전 5 코어도달 4 공격 21회 | 진영1 출전 5 코어도달 2 공격 14회 | 첫 타격
+ok	topL+midR+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 42.9s | 진영0 출전 5 코어도달 1 공격 47회 | 진영1 출전 6 코어�
+ok	topL+midR+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5
+ok	topL+midR+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topL+midR+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	topL+midR+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	topL+midR+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.
+ok	topL+midR+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 
+ok	topL+midR+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타�
+ok	topL+midR+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	topL+midR+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.
+ok	topL+midR+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 
+ok	topL+midR+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타�
+ok	topL+midR+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	topL+midR+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 25.3s | 진영0 출전 6 코어도달 4 공격 7회 | 진영1 출전 6 코어도달 6 공격 14회 | 첫 타격 12.
+ok	topL+midR+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.8s | 진영0 출전 5 코어도달 1 공격 25회 | 진영1 출전 5 코어도달 2 공격 24회 | 첫 타�
+ok	topL+midR+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 27.3s | 진영0 출전 5 코어도달 2 공격 21회 | 진영1 출전 6 코어�
+ok	topL+midR+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 30.9s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 18회 | 첫 타격 10
+ok	topL+midR+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.1s | 진영0 출전 5 코어도달 3 공격 28회 | 진영1 출전 5 코어도달 1 공격 18회 | 첫 타�
+ok	topL+midR+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 49.1s | 진영0 출전 5 코어도달 2 공격 57회 | 진영1 출전 6 코어�
+ok	topL+midR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 24.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+midR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 30.3s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 24.0s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	topL+midR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.6s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	topL+exit+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7), �
+ok	topL+exit+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topL+exit+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코어도
+ok	topL+exit+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 46.2s | 진영0 출전 6 코어도달 1 공격 29회 | 진영1 출전 3 코어도달 2 공격 20회 | 첫 타격 8.8s (13.0,9.1), 
+ok	topL+exit+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topL+exit+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 39.3s | 진영0 출전 5 코어도달 5 공격 11회 | 진영1 출전 6 코어�
+ok	topL+exit+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 24.4s | 진영0 출전 6 코어도달 3 공격 34회 | 진영1 출전 3 코어도달 1 공격 13회 | 첫 타격 7.1s (14.6,4.7), 
+ok	topL+exit+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topL+exit+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.0s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코어�
+ok	topL+exit+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7), 
+ok	topL+exit+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topL+exit+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코어�
+ok	topL+exit+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7), 
+ok	topL+exit+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topL+exit+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코어�
+ok	topL+exit+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+exit+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 30.0s | 진영0 출전 6 코어도달 2 공격 33회 | 진영1 출전 3 코어도달 2 공격 17회 | 첫 타격 8.6s (13.7,8.8),
+ok	topL+exit+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	topL+exit+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.6s | 진영0 출전 5 코어도달 4 공격 9회 | 진영1 출전 6 코어�
+ok	topL+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.
+ok	topL+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 37.9s | 진영0 출전 5 코어도달 5 공격 14회 | 진영1 출전 5 코어도달 3 공격 10회 | 첫 타�
+ok	topL+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 35.1s | 진영0 출전 5 코어도달 2 공격 23회 | 진영1 출전 6 코어
+ok	topL+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.6s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.
+ok	topL+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 32.5s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격
+ok	topL+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.4s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어
+ok	topL+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topL+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7)
+ok	topL+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 �
+ok	topL+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.3s | 진영0 출전 5 코어도달 5 공격 10회 | 진영1 출전 6 코�
+ok	topL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 30.0s | 진영0 출전 6 코어도달 1 공격 42회 | 진영1 출전 6 코어도달 0 공격 35회 | 첫 타격 
+ok	topL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.2s | 진영0 출전 5 코어도달 0 공격 15회 | 진영1 출전 5 코어도달 4 공격 30회 | 첫 타
+ok	topL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.2s | 진영0 출전 5 코어도달 3 공격 14회 | 진영1 출전 6 코�
+ok	topR+midL+midR+exit	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s 
+ok	topR+midL+midR+exit	B	전투[wolf*6|zombie*3]: 종료 36.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타
+ok	topR+midL+midR+exit	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.5s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5
+ok	topR+midL+midR+exit	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.4s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도�
+ok	topR+midL+midR+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s
+ok	topR+midL+midR+sideL	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topR+midL+midR+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 
+ok	topR+midL+midR+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도
+ok	topR+midL+midR+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s
+ok	topR+midL+midR+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topR+midL+midR+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 
+ok	topR+midL+midR+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도
+ok	topR+midL+midR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5
+ok	topR+midL+midR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topR+midL+midR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	topR+midL+midR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	topR+midL+midR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5
+ok	topR+midL+midR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topR+midL+midR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	topR+midL+midR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+rejected	topR+midL+exit+sideL	A	
+rejected	topR+midL+exit+sideL	B	
+rejected	topR+midL+exit+sideL	C	
+rejected	topR+midL+exit+sideL	D	
+ok	topR+midL+exit+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s
+ok	topR+midL+exit+sideR	B	전투[wolf*6|zombie*3]: 종료 36.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topR+midL+exit+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.5s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 
+ok	topR+midL+exit+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.4s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도
+ok	topR+midL+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 40.4s | 진영0 출전 6 코어도달 3 공격 29회 | 진영1 출전 6 코어도달 2 공격 26회 | 첫 타격 9.9
+ok	topR+midL+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 41.3s | 진영0 출전 6 코어도달 4 공격 34회 | 진영1 출전 3 코어도달 1 공격 11회 | 첫 타격 8.8s (13.0,9.0), �
+ok	topR+midL+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 36.0s | 진영0 출전 5 코어도달 4 공격 10회 | 진영1 출전 5 코어도달 4 공격 11회 | 첫 타격
+ok	topR+midL+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 48.9s | 진영0 출전 5 코어도달 4 공격 35회 | 진영1 출전 6 코어�
+ok	topR+midL+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 39.1s | 진영0 출전 6 코어도달 1 공격 39회 | 진영1 출전 6 코어도달 1 공격 35회 | 첫 타격 10.
+ok	topR+midL+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midL+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 35.4s | 진영0 출전 5 코어도달 0 공격 25회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	topR+midL+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.4s | 진영0 출전 5 코어도달 2 공격 37회 | 진영1 출전 6 코어�
+ok	topR+midL+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5
+ok	topR+midL+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	topR+midL+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	topR+midL+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	topR+midL+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 42.9s | 진영0 출전 6 코어도달 3 공격 39회 | 진영1 출전 6 코어도달 1 공격 31회 | 첫 타격 10
+ok	topR+midL+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 35.4s | 진영0 출전 6 코어도달 2 공격 50회 | 진영1 출전 3 코어도달 1 공격 17회 | 첫 타격 8.8s (13.0,9.0), 
+ok	topR+midL+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.3s | 진영0 출전 5 코어도달 3 공격 19회 | 진영1 출전 5 코어도달 3 공격 18회 | 첫 타�
+ok	topR+midL+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.3s | 진영0 출전 5 코어도달 4 공격 28회 | 진영1 출전 6 코어�
+ok	topR+midL+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 25.8s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 15회 | 첫 타격 12
+ok	topR+midL+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 4 공격 11회 | 진영1 출전 3 코어도달 3 공격 8회 | 첫 타격 11.9s (10.3,9.9), 
+ok	topR+midL+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.0s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 21회 | 첫 타�
+ok	topR+midL+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.4s | 진영0 출전 5 코어도달 4 공격 36회 | 진영1 출전 6 코어�
+ok	topR+midL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.
+ok	topR+midL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 
+ok	topR+midL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타�
+ok	topR+midL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	topR+midL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.
+ok	topR+midL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 
+ok	topR+midL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타�
+ok	topR+midL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	topR+midL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.4s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7),
+ok	topR+midL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.0s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	topR+midL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.3s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어�
+ok	topR+midR+exit+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도�
+ok	topR+midR+exit+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도�
+ok	topR+midR+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topR+midR+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도
+ok	topR+midR+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topR+midR+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도
+ok	topR+midR+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 1
+ok	topR+midR+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.1s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어도
+ok	topR+midR+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 18.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topR+midR+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.3s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어�
+ok	topR+midR+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 
+ok	topR+midR+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어�
+ok	topR+midR+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 18.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topR+midR+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 29.9s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어�
+ok	topR+midR+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 
+ok	topR+midR+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.4s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어�
+ok	topR+midR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+midR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	topR+midR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	topR+exit+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topR+exit+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도
+ok	topR+exit+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topR+exit+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	topR+exit+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topR+exit+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	topR+exit+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topR+exit+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	topR+exit+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	topR+exit+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	topR+exit+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+exit+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	topR+exit+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	topR+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 18.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	topR+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.3s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어�
+ok	topR+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격
+ok	topR+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어�
+ok	topR+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 37.8s | 진영0 출전 6 코어도달 3 공격 35회 | 진영1 출전 6 코어도달 1 공격 26회 | 첫 타격 
+ok	topR+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.1s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 17회 | 첫 타
+ok	topR+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 43.2s | 진영0 출전 5 코어도달 3 공격 25회 | 진영1 출전 6 코�
+ok	topR+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	topR+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 �
+ok	topR+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어
+ok	midL+midR+exit+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s
+ok	midL+midR+exit+sideL	B	전투[wolf*6|zombie*3]: 종료 36.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	midL+midR+exit+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.3s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 
+ok	midL+midR+exit+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도
+ok	midL+midR+exit+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s
+ok	midL+midR+exit+sideR	B	전투[wolf*6|zombie*3]: 종료 36.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	midL+midR+exit+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.5s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 
+ok	midL+midR+exit+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.4s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도
+ok	midL+midR+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5
+ok	midL+midR+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 36.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	midL+midR+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.3s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	midL+midR+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	midL+midR+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5
+ok	midL+midR+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 36.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	midL+midR+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.5s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	midL+midR+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.4s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	midL+midR+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5
+ok	midL+midR+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), �
+ok	midL+midR+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격
+ok	midL+midR+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	midL+midR+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.
+ok	midL+midR+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 
+ok	midL+midR+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타�
+ok	midL+midR+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	midL+midR+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.
+ok	midL+midR+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 
+ok	midL+midR+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타�
+ok	midL+midR+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	midL+midR+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.
+ok	midL+midR+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 
+ok	midL+midR+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타�
+ok	midL+midR+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+ok	midL+midR+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.
+ok	midL+midR+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 
+ok	midL+midR+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타�
+ok	midL+midR+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어�
+rejected	midL+midR+ridgeL+ridgeR	A	
+rejected	midL+midR+ridgeL+ridgeR	B	
+rejected	midL+midR+ridgeL+ridgeR	C	
+rejected	midL+midR+ridgeL+ridgeR	D	
+ok	midL+exit+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7), �
+ok	midL+exit+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	midL+exit+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코어도
+ok	midL+exit+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 46.2s | 진영0 출전 6 코어도달 1 공격 29회 | 진영1 출전 3 코어도달 2 공격 20회 | 첫 타격 8.8s (13.0,9.1), 
+ok	midL+exit+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	midL+exit+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 39.3s | 진영0 출전 5 코어도달 5 공격 11회 | 진영1 출전 6 코어�
+ok	midL+exit+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 24.4s | 진영0 출전 6 코어도달 3 공격 34회 | 진영1 출전 3 코어도달 1 공격 13회 | 첫 타격 7.1s (14.6,4.7), 
+ok	midL+exit+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	midL+exit+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.0s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코어�
+ok	midL+exit+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 25.4s | 진영0 출전 6 코어도달 4 공격 34회 | 진영1 출전 3 코어도달 1 공격 11회 | 첫 타격 7.1s (14.6,4.7), 
+ok	midL+exit+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	midL+exit+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 48.0s | 진영0 출전 5 코어도달 5 공격 10회 | 진영1 출전 6 코어�
+ok	midL+exit+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+exit+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	midL+exit+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	midL+exit+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+exit+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7),
+ok	midL+exit+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	midL+exit+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.9s | 진영0 출전 5 코어도달 5 공격 10회 | 진영1 출전 6 코어
+ok	midL+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.
+ok	midL+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 37.9s | 진영0 출전 5 코어도달 5 공격 14회 | 진영1 출전 5 코어도달 3 공격 10회 | 첫 타�
+ok	midL+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 35.1s | 진영0 출전 5 코어도달 2 공격 23회 | 진영1 출전 6 코어
+ok	midL+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.6s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타격 15.
+ok	midL+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midL+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 32.5s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 타격
+ok	midL+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.4s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 코어
+ok	midL+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7)
+ok	midL+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 �
+ok	midL+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.3s | 진영0 출전 5 코어도달 5 공격 10회 | 진영1 출전 6 코�
+ok	midL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.7)
+ok	midL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 �
+ok	midL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코어
+ok	midR+exit+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	midR+exit+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도
+ok	midR+exit+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 27.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	midR+exit+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	midR+exit+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	midR+exit+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	midR+exit+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	midR+exit+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	midR+exit+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없�
+ok	midR+exit+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	midR+exit+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+exit+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	midR+exit+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	midR+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 18.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	midR+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.3s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어�
+ok	midR+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격
+ok	midR+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 코어�
+ok	midR+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 �
+ok	midR+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어
+ok	midR+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	midR+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 �
+ok	midR+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어
+ok	exit+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	exit+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	exit+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없
+ok	exit+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어�
+ok	exit+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 �
+ok	exit+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어
+ok	exit+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+ok	exit+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 �
+ok	exit+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어
+ok	sideL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없�
+ok	sideL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	sideL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 �
+ok	sideL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코�
+rejected	topL+topR+midL+midR+exit	A	
+rejected	topL+topR+midL+midR+exit	B	
+rejected	topL+topR+midL+midR+exit	C	
+rejected	topL+topR+midL+midR+exit	D	
+ok	topL+topR+midL+midR+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격
+ok	topL+topR+midL+midR+sideL	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8
+ok	topL+topR+midL+midR+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topL+topR+midL+midR+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코�
+ok	topL+topR+midL+midR+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격
+ok	topL+topR+midL+midR+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8
+ok	topL+topR+midL+midR+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topL+topR+midL+midR+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코�
+ok	topL+topR+midL+midR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+topR+midL+midR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.
+ok	topL+topR+midL+midR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topL+topR+midL+midR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코
+ok	topL+topR+midL+midR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+topR+midL+midR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.
+ok	topL+topR+midL+midR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topL+topR+midL+midR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코
+rejected	topL+topR+midL+exit+sideL	A	
+rejected	topL+topR+midL+exit+sideL	B	
+rejected	topL+topR+midL+exit+sideL	C	
+rejected	topL+topR+midL+exit+sideL	D	
+rejected	topL+topR+midL+exit+sideR	A	
+rejected	topL+topR+midL+exit+sideR	B	
+rejected	topL+topR+midL+exit+sideR	C	
+rejected	topL+topR+midL+exit+sideR	D	
+rejected	topL+topR+midL+exit+ridgeL	A	
+rejected	topL+topR+midL+exit+ridgeL	B	
+rejected	topL+topR+midL+exit+ridgeL	C	
+rejected	topL+topR+midL+exit+ridgeL	D	
+rejected	topL+topR+midL+exit+ridgeR	A	
+rejected	topL+topR+midL+exit+ridgeR	B	
+rejected	topL+topR+midL+exit+ridgeR	C	
+rejected	topL+topR+midL+exit+ridgeR	D	
+ok	topL+topR+midL+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+topR+midL+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.
+ok	topL+topR+midL+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topL+topR+midL+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코
+ok	topL+topR+midL+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 42.9s | 진영0 출전 6 코어도달 3 공격 39회 | 진영1 출전 6 코어도달 1 공격 31회 | 첫 타�
+ok	topL+topR+midL+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 35.4s | 진영0 출전 6 코어도달 2 공격 50회 | 진영1 출전 3 코어도달 1 공격 17회 | 첫 타격 8.8s (13.0,9
+ok	topL+topR+midL+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.3s | 진영0 출전 5 코어도달 3 공격 19회 | 진영1 출전 5 코어도달 3 공격 18회 | 첫 
+ok	topL+topR+midL+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 36.3s | 진영0 출전 5 코어도달 4 공격 28회 | 진영1 출전 6 �
+ok	topL+topR+midL+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 25.8s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 15회 | 첫 타�
+ok	topL+topR+midL+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 4 공격 11회 | 진영1 출전 3 코어도달 3 공격 8회 | 첫 타격 11.9s (10.3,9
+ok	topL+topR+midL+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 28.0s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 21회 | 첫 
+ok	topL+topR+midL+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 40.4s | 진영0 출전 5 코어도달 4 공격 36회 | 진영1 출전 6 �
+ok	topL+topR+midL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+topR+midL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topL+topR+midL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topL+topR+midL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+topR+midL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+topR+midL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topL+topR+midL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topL+topR+midL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+topR+midL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+topR+midL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.4s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,
+ok	topL+topR+midL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.0s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+topR+midL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.3s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 �
+rejected	topL+topR+midR+exit+sideL	A	
+rejected	topL+topR+midR+exit+sideL	B	
+rejected	topL+topR+midR+exit+sideL	C	
+rejected	topL+topR+midR+exit+sideL	D	
+rejected	topL+topR+midR+exit+sideR	A	
+rejected	topL+topR+midR+exit+sideR	B	
+rejected	topL+topR+midR+exit+sideR	C	
+rejected	topL+topR+midR+exit+sideR	D	
+rejected	topL+topR+midR+exit+ridgeL	A	
+rejected	topL+topR+midR+exit+ridgeL	B	
+rejected	topL+topR+midR+exit+ridgeL	C	
+rejected	topL+topR+midR+exit+ridgeL	D	
+rejected	topL+topR+midR+exit+ridgeR	A	
+rejected	topL+topR+midR+exit+ridgeR	B	
+rejected	topL+topR+midR+exit+ridgeR	C	
+rejected	topL+topR+midR+exit+ridgeR	D	
+ok	topL+topR+midR+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+topR+midR+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.
+ok	topL+topR+midR+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topL+topR+midR+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코
+ok	topL+topR+midR+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+topR+midR+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topL+topR+midR+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topL+topR+midR+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+topR+midR+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+topR+midR+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topL+topR+midR+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topL+topR+midR+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+topR+midR+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 25.3s | 진영0 출전 6 코어도달 4 공격 7회 | 진영1 출전 6 코어도달 6 공격 14회 | 첫 타�
+ok	topL+topR+midR+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+midR+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.8s | 진영0 출전 5 코어도달 1 공격 25회 | 진영1 출전 5 코어도달 2 공격 24회 | 첫 
+ok	topL+topR+midR+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 27.3s | 진영0 출전 5 코어도달 2 공격 21회 | 진영1 출전 6 �
+ok	topL+topR+midR+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 30.9s | 진영0 출전 6 코어도달 5 공격 28회 | 진영1 출전 6 코어도달 2 공격 18회 | 첫 타�
+ok	topL+topR+midR+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+midR+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.1s | 진영0 출전 5 코어도달 3 공격 28회 | 진영1 출전 5 코어도달 1 공격 18회 | 첫 
+ok	topL+topR+midR+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 49.1s | 진영0 출전 5 코어도달 2 공격 57회 | 진영1 출전 6 �
+ok	topL+topR+midR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 24.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+topR+midR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 30.3s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+midR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 24.0s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+topR+midR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.6s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+rejected	topL+topR+exit+sideL+sideR	A	
+rejected	topL+topR+exit+sideL+sideR	B	
+rejected	topL+topR+exit+sideL+sideR	C	
+rejected	topL+topR+exit+sideL+sideR	D	
+rejected	topL+topR+exit+sideL+ridgeL	A	
+rejected	topL+topR+exit+sideL+ridgeL	B	
+rejected	topL+topR+exit+sideL+ridgeL	C	
+rejected	topL+topR+exit+sideL+ridgeL	D	
+rejected	topL+topR+exit+sideL+ridgeR	A	
+rejected	topL+topR+exit+sideL+ridgeR	B	
+rejected	topL+topR+exit+sideL+ridgeR	C	
+rejected	topL+topR+exit+sideL+ridgeR	D	
+rejected	topL+topR+exit+sideR+ridgeL	A	
+rejected	topL+topR+exit+sideR+ridgeL	B	
+rejected	topL+topR+exit+sideR+ridgeL	C	
+rejected	topL+topR+exit+sideR+ridgeL	D	
+rejected	topL+topR+exit+sideR+ridgeR	A	
+rejected	topL+topR+exit+sideR+ridgeR	B	
+rejected	topL+topR+exit+sideR+ridgeR	C	
+rejected	topL+topR+exit+sideR+ridgeR	D	
+rejected	topL+topR+exit+ridgeL+ridgeR	A	
+rejected	topL+topR+exit+ridgeL+ridgeR	B	
+rejected	topL+topR+exit+ridgeL+ridgeR	C	
+rejected	topL+topR+exit+ridgeL+ridgeR	D	
+ok	topL+topR+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타
+ok	topL+topR+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,
+ok	topL+topR+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫
+ok	topL+topR+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+topR+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타
+ok	topL+topR+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,
+ok	topL+topR+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫
+ok	topL+topR+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+topR+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+topR+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.4s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6
+ok	topL+topR+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.0s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+topR+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.3s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 �
+ok	topL+topR+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 24.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+topR+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 30.3s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+topR+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 24.0s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+topR+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.6s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	topL+midL+midR+exit+sideL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격
+ok	topL+midL+midR+exit+sideL	B	전투[wolf*6|zombie*3]: 종료 36.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8
+ok	topL+midL+midR+exit+sideL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.3s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topL+midL+midR+exit+sideL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코�
+rejected	topL+midL+midR+exit+sideR	A	
+rejected	topL+midL+midR+exit+sideR	B	
+rejected	topL+midL+midR+exit+sideR	C	
+rejected	topL+midL+midR+exit+sideR	D	
+ok	topL+midL+midR+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+midL+midR+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 36.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.
+ok	topL+midL+midR+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.3s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topL+midL+midR+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코
+ok	topL+midL+midR+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 37.6s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+midL+midR+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 41.6s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.
+ok	topL+midL+midR+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.7s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topL+midL+midR+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코
+ok	topL+midL+midR+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+midL+midR+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.
+ok	topL+midL+midR+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topL+midL+midR+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코
+ok	topL+midL+midR+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+midL+midR+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topL+midL+midR+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topL+midL+midR+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+midL+midR+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+midL+midR+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topL+midL+midR+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topL+midL+midR+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+midL+midR+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+midL+midR+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topL+midL+midR+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topL+midL+midR+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+midL+midR+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+midL+midR+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topL+midL+midR+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topL+midL+midR+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+midL+exit+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없�
+ok	topL+midL+exit+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4.
+ok	topL+midL+exit+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 
+ok	topL+midL+exit+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코�
+ok	topL+midL+exit+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.8s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없
+ok	topL+midL+exit+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 46.2s | 진영0 출전 6 코어도달 1 공격 29회 | 진영1 출전 3 코어도달 2 공격 20회 | 첫 타격 8.8s (13.0,9
+ok	topL+midL+exit+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.2s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전
+ok	topL+midL+exit+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 39.3s | 진영0 출전 5 코어도달 5 공격 11회 | 진영1 출전 6 �
+ok	topL+midL+exit+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없
+ok	topL+midL+exit+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 24.4s | 진영0 출전 6 코어도달 3 공격 34회 | 진영1 출전 3 코어도달 1 공격 13회 | 첫 타격 7.1s (14.6,4
+ok	topL+midL+exit+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전
+ok	topL+midL+exit+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.0s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코
+ok	topL+midL+exit+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없
+ok	topL+midL+exit+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4
+ok	topL+midL+exit+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전
+ok	topL+midL+exit+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코
+ok	topL+midL+exit+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없
+ok	topL+midL+exit+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,4
+ok	topL+midL+exit+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전
+ok	topL+midL+exit+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 코
+ok	topL+midL+exit+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+midL+exit+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,
+ok	topL+midL+exit+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+midL+exit+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 �
+ok	topL+midL+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 21.4s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타�
+ok	topL+midL+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 37.9s | 진영0 출전 5 코어도달 5 공격 14회 | 진영1 출전 5 코어도달 3 공격 10회 | 첫
+ok	topL+midL+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 35.1s | 진영0 출전 5 코어도달 2 공격 23회 | 진영1 출전 6 �
+ok	topL+midL+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.6s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 4회 | 첫 타�
+ok	topL+midL+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midL+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 32.5s | 진영0 출전 5 코어도달 5 공격 7회 | 진영1 출전 5 코어도달 4 공격 5회 | 첫 �
+ok	topL+midL+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 37.4s | 진영0 출전 5 코어도달 1 공격 30회 | 진영1 출전 6 �
+ok	topL+midL+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+midL+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6
+ok	topL+midL+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+midL+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.3s | 진영0 출전 5 코어도달 5 공격 10회 | 진영1 출전 6 
+ok	topL+midL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+midL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6
+ok	topL+midL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+midL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 �
+rejected	topL+midR+exit+sideL+sideR	A	
+rejected	topL+midR+exit+sideL+sideR	B	
+rejected	topL+midR+exit+sideL+sideR	C	
+rejected	topL+midR+exit+sideL+sideR	D	
+ok	topL+midR+exit+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+midR+exit+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 36.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topL+midR+exit+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.3s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topL+midR+exit+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+midR+exit+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 37.6s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topL+midR+exit+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 41.6s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topL+midR+exit+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.7s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topL+midR+exit+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+rejected	topL+midR+exit+sideR+ridgeL	A	
+rejected	topL+midR+exit+sideR+ridgeL	B	
+rejected	topL+midR+exit+sideR+ridgeL	C	
+rejected	topL+midR+exit+sideR+ridgeL	D	
+rejected	topL+midR+exit+sideR+ridgeR	A	
+rejected	topL+midR+exit+sideR+ridgeR	B	
+rejected	topL+midR+exit+sideR+ridgeR	C	
+rejected	topL+midR+exit+sideR+ridgeR	D	
+ok	topL+midR+exit+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+midR+exit+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 39.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+exit+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+midR+exit+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 43.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	topL+midR+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타
+ok	topL+midR+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,
+ok	topL+midR+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫
+ok	topL+midR+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topL+midR+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타
+ok	topL+midR+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,
+ok	topL+midR+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫
+ok	topL+midR+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+rejected	topL+midR+sideL+ridgeL+ridgeR	A	
+rejected	topL+midR+sideL+ridgeL+ridgeR	B	
+rejected	topL+midR+sideL+ridgeL+ridgeR	C	
+rejected	topL+midR+sideL+ridgeL+ridgeR	D	
+ok	topL+midR+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 24.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+midR+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 30.3s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topL+midR+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 24.0s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+midR+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.6s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	topL+exit+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+exit+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,
+ok	topL+exit+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+exit+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 �
+ok	topL+exit+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+exit+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,
+ok	topL+exit+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+exit+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 �
+ok	topL+exit+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+exit+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6
+ok	topL+exit+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+exit+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 �
+ok	topL+exit+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topL+exit+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6
+ok	topL+exit+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topL+exit+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 �
+ok	topL+sideL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 
+ok	topL+sideL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.
+ok	topL+sideL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교
+ok	topL+sideL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 
+rejected	topR+midL+midR+exit+sideL	A	
+rejected	topR+midL+midR+exit+sideL	B	
+rejected	topR+midL+midR+exit+sideL	C	
+rejected	topR+midL+midR+exit+sideL	D	
+ok	topR+midL+midR+exit+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격
+ok	topR+midL+midR+exit+sideR	B	전투[wolf*6|zombie*3]: 종료 36.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8
+ok	topR+midL+midR+exit+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.5s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topR+midL+midR+exit+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.4s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코�
+ok	topR+midL+midR+exit+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 37.6s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topR+midL+midR+exit+ridgeL	B	전투[wolf*6|zombie*3]: 종료 41.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.
+ok	topR+midL+midR+exit+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.6s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topR+midL+midR+exit+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.5s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코
+ok	topR+midL+midR+exit+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topR+midL+midR+exit+ridgeR	B	전투[wolf*6|zombie*3]: 종료 36.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.
+ok	topR+midL+midR+exit+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.5s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topR+midL+midR+exit+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.4s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코
+ok	topR+midL+midR+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topR+midL+midR+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.
+ok	topR+midL+midR+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 �
+ok	topR+midL+midR+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코
+ok	topR+midL+midR+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topR+midL+midR+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topR+midL+midR+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topR+midL+midR+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topR+midL+midR+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topR+midL+midR+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topR+midL+midR+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topR+midL+midR+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topR+midL+midR+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topR+midL+midR+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topR+midL+midR+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topR+midL+midR+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topR+midL+midR+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topR+midL+midR+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topR+midL+midR+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topR+midL+midR+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+rejected	topR+midL+exit+sideL+sideR	A	
+rejected	topR+midL+exit+sideL+sideR	B	
+rejected	topR+midL+exit+sideL+sideR	C	
+rejected	topR+midL+exit+sideL+sideR	D	
+rejected	topR+midL+exit+sideL+ridgeL	A	
+rejected	topR+midL+exit+sideL+ridgeL	B	
+rejected	topR+midL+exit+sideL+ridgeL	C	
+rejected	topR+midL+exit+sideL+ridgeL	D	
+rejected	topR+midL+exit+sideL+ridgeR	A	
+rejected	topR+midL+exit+sideL+ridgeR	B	
+rejected	topR+midL+exit+sideL+ridgeR	C	
+rejected	topR+midL+exit+sideL+ridgeR	D	
+ok	topR+midL+exit+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 37.6s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topR+midL+exit+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 41.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topR+midL+exit+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.6s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topR+midL+exit+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.5s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topR+midL+exit+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	topR+midL+exit+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 36.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	topR+midL+exit+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.5s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	topR+midL+exit+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.4s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topR+midL+exit+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 30.2s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+midL+exit+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.8s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,
+ok	topR+midL+exit+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 29.6s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topR+midL+exit+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 56.0s | 진영0 출전 5 코어도달 4 공격 24회 | 진영1 출전 6 �
+ok	topR+midL+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타
+ok	topR+midL+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,
+ok	topR+midL+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫
+ok	topR+midL+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topR+midL+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타
+ok	topR+midL+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,
+ok	topR+midL+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫
+ok	topR+midL+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	topR+midL+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.6s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+midL+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.4s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6
+ok	topR+midL+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.0s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topR+midL+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.3s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 �
+rejected	topR+midL+sideR+ridgeL+ridgeR	A	
+rejected	topR+midL+sideR+ridgeL+ridgeR	B	
+rejected	topR+midL+sideR+ridgeL+ridgeR	C	
+rejected	topR+midL+sideR+ridgeL+ridgeR	D	
+ok	topR+midR+exit+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없�
+ok	topR+midR+exit+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 
+ok	topR+midR+exit+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코�
+ok	topR+midR+exit+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없
+ok	topR+midR+exit+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전
+ok	topR+midR+exit+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코
+ok	topR+midR+exit+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없
+ok	topR+midR+exit+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전
+ok	topR+midR+exit+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코
+ok	topR+midR+exit+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없
+ok	topR+midR+exit+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전
+ok	topR+midR+exit+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코
+ok	topR+midR+exit+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 22.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없
+ok	topR+midR+exit+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 27.7s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.1s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전
+ok	topR+midR+exit+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 30.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코
+ok	topR+midR+exit+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+midR+exit+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topR+midR+exit+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	topR+midR+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+midR+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 23.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 18.9s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topR+midR+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.3s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 �
+ok	topR+midR+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+midR+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 �
+ok	topR+midR+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 5 공격 9회 | 진영1 출전 6 �
+ok	topR+midR+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+midR+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topR+midR+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	topR+midR+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+midR+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topR+midR+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	topR+exit+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+exit+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topR+exit+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	topR+exit+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+exit+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topR+exit+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	topR+exit+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+exit+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topR+exit+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	topR+exit+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	topR+exit+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	topR+exit+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	topR+sideL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 
+ok	topR+sideL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+sideL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교
+ok	topR+sideL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 
+rejected	midL+midR+exit+sideL+sideR	A	
+rejected	midL+midR+exit+sideL+sideR	B	
+rejected	midL+midR+exit+sideL+sideR	C	
+rejected	midL+midR+exit+sideL+sideR	D	
+ok	midL+midR+exit+sideL+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	midL+midR+exit+sideL+ridgeL	B	전투[wolf*6|zombie*3]: 종료 36.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	midL+midR+exit+sideL+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.3s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	midL+midR+exit+sideL+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	midL+midR+exit+sideL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 37.6s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	midL+midR+exit+sideL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 41.6s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	midL+midR+exit+sideL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.7s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	midL+midR+exit+sideL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	midL+midR+exit+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 37.6s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	midL+midR+exit+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 41.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	midL+midR+exit+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 30.6s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	midL+midR+exit+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 45.5s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	midL+midR+exit+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타�
+ok	midL+midR+exit+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 36.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2
+ok	midL+midR+exit+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.5s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 
+ok	midL+midR+exit+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.4s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	midL+midR+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타
+ok	midL+midR+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,
+ok	midL+midR+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫
+ok	midL+midR+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	midL+midR+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타
+ok	midL+midR+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,
+ok	midL+midR+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫
+ok	midL+midR+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 �
+ok	midL+exit+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	midL+exit+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,
+ok	midL+exit+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	midL+exit+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 �
+ok	midL+exit+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	midL+exit+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6,
+ok	midL+exit+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	midL+exit+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 �
+ok	midL+exit+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	midL+exit+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6
+ok	midL+exit+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	midL+exit+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 �
+ok	midL+exit+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	midL+exit+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.6
+ok	midL+exit+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	midL+exit+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 �
+ok	midL+sideL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 
+ok	midL+sideL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (14.
+ok	midL+sideL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교
+ok	midL+sideL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전 6 
+ok	midR+exit+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	midR+exit+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	midR+exit+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	midR+exit+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	midR+exit+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	midR+exit+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	midR+exit+sideL+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	midR+exit+sideL+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideL+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	midR+exit+sideL+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	midR+exit+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 �
+ok	midR+exit+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+exit+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교�
+ok	midR+exit+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 �
+ok	midR+sideL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 
+ok	midR+sideL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	midR+sideL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교
+ok	midR+sideL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 
+ok	exit+sideL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 
+ok	exit+sideL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	exit+sideL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교
+ok	exit+sideL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 
+rejected	topL+topR+midL+midR+exit+sideL	A	
+rejected	topL+topR+midL+midR+exit+sideL	B	
+rejected	topL+topR+midL+midR+exit+sideL	C	
+rejected	topL+topR+midL+midR+exit+sideL	D	
+rejected	topL+topR+midL+midR+exit+sideR	A	
+rejected	topL+topR+midL+midR+exit+sideR	B	
+rejected	topL+topR+midL+midR+exit+sideR	C	
+rejected	topL+topR+midL+midR+exit+sideR	D	
+ok	topL+topR+midL+midR+sideL+sideR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 
+ok	topL+topR+midL+midR+sideL+sideR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10
+ok	topL+topR+midL+midR+sideL+sideR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 
+ok	topL+topR+midL+midR+sideL+sideR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 
+rejected	topL+topR+midL+exit+sideL+sideR	A	
+rejected	topL+topR+midL+exit+sideL+sideR	B	
+rejected	topL+topR+midL+exit+sideL+sideR	C	
+rejected	topL+topR+midL+exit+sideL+sideR	D	
+rejected	topL+topR+midL+exit+sideL+ridgeL	A	
+rejected	topL+topR+midL+exit+sideL+ridgeL	B	
+rejected	topL+topR+midL+exit+sideL+ridgeL	C	
+rejected	topL+topR+midL+exit+sideL+ridgeL	D	
+rejected	topL+topR+midL+exit+sideL+ridgeR	A	
+rejected	topL+topR+midL+exit+sideL+ridgeR	B	
+rejected	topL+topR+midL+exit+sideL+ridgeR	C	
+rejected	topL+topR+midL+exit+sideL+ridgeR	D	
+rejected	topL+topR+midL+exit+sideR+ridgeL	A	
+rejected	topL+topR+midL+exit+sideR+ridgeL	B	
+rejected	topL+topR+midL+exit+sideR+ridgeL	C	
+rejected	topL+topR+midL+exit+sideR+ridgeL	D	
+rejected	topL+topR+midL+exit+sideR+ridgeR	A	
+rejected	topL+topR+midL+exit+sideR+ridgeR	B	
+rejected	topL+topR+midL+exit+sideR+ridgeR	C	
+rejected	topL+topR+midL+exit+sideR+ridgeR	D	
+ok	topL+topR+midL+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | �
+ok	topL+topR+midL+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (
+ok	topL+topR+midL+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 
+ok	topL+topR+midL+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출�
+ok	topL+topR+midL+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | �
+ok	topL+topR+midL+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (
+ok	topL+topR+midL+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 
+ok	topL+topR+midL+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출�
+rejected	topL+topR+midR+exit+sideL+sideR	A	
+rejected	topL+topR+midR+exit+sideL+sideR	B	
+rejected	topL+topR+midR+exit+sideL+sideR	C	
+rejected	topL+topR+midR+exit+sideL+sideR	D	
+rejected	topL+topR+midR+exit+sideL+ridgeL	A	
+rejected	topL+topR+midR+exit+sideL+ridgeL	B	
+rejected	topL+topR+midR+exit+sideL+ridgeL	C	
+rejected	topL+topR+midR+exit+sideL+ridgeL	D	
+rejected	topL+topR+midR+exit+sideL+ridgeR	A	
+rejected	topL+topR+midR+exit+sideL+ridgeR	B	
+rejected	topL+topR+midR+exit+sideL+ridgeR	C	
+rejected	topL+topR+midR+exit+sideL+ridgeR	D	
+rejected	topL+topR+midR+exit+sideR+ridgeL	A	
+rejected	topL+topR+midR+exit+sideR+ridgeL	B	
+rejected	topL+topR+midR+exit+sideR+ridgeL	C	
+rejected	topL+topR+midR+exit+sideR+ridgeL	D	
+rejected	topL+topR+midR+exit+sideR+ridgeR	A	
+rejected	topL+topR+midR+exit+sideR+ridgeR	B	
+rejected	topL+topR+midR+exit+sideR+ridgeR	C	
+rejected	topL+topR+midR+exit+sideR+ridgeR	D	
+ok	topL+topR+midR+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | �
+ok	topL+topR+midR+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (
+ok	topL+topR+midR+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.0s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 
+ok	topL+topR+midR+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출�
+ok	topL+topR+midR+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | �
+ok	topL+topR+midR+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (
+ok	topL+topR+midR+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 
+ok	topL+topR+midR+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.1s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출�
+rejected	topL+topR+exit+sideL+sideR+ridgeL	A	
+rejected	topL+topR+exit+sideL+sideR+ridgeL	B	
+rejected	topL+topR+exit+sideL+sideR+ridgeL	C	
+rejected	topL+topR+exit+sideL+sideR+ridgeL	D	
+rejected	topL+topR+exit+sideL+sideR+ridgeR	A	
+rejected	topL+topR+exit+sideL+sideR+ridgeR	B	
+rejected	topL+topR+exit+sideL+sideR+ridgeR	C	
+rejected	topL+topR+exit+sideL+sideR+ridgeR	D	
+rejected	topL+topR+exit+sideL+ridgeL+ridgeR	A	
+rejected	topL+topR+exit+sideL+ridgeL+ridgeR	B	
+rejected	topL+topR+exit+sideL+ridgeL+ridgeR	C	
+rejected	topL+topR+exit+sideL+ridgeL+ridgeR	D	
+rejected	topL+topR+exit+sideR+ridgeL+ridgeR	A	
+rejected	topL+topR+exit+sideR+ridgeL+ridgeR	B	
+rejected	topL+topR+exit+sideR+ridgeL+ridgeR	C	
+rejected	topL+topR+exit+sideR+ridgeL+ridgeR	D	
+rejected	topL+topR+sideL+sideR+ridgeL+ridgeR	A	
+rejected	topL+topR+sideL+sideR+ridgeL+ridgeR	B	
+rejected	topL+topR+sideL+sideR+ridgeL+ridgeR	C	
+rejected	topL+topR+sideL+sideR+ridgeL+ridgeR	D	
+rejected	topL+midL+midR+exit+sideL+sideR	A	
+rejected	topL+midL+midR+exit+sideL+sideR	B	
+rejected	topL+midL+midR+exit+sideL+sideR	C	
+rejected	topL+midL+midR+exit+sideL+sideR	D	
+ok	topL+midL+exit+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교�
+ok	topL+midL+exit+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (
+ok	topL+midL+exit+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 
+ok	topL+midL+exit+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전
+ok	topL+midL+exit+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교�
+ok	topL+midL+exit+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s (
+ok	topL+midL+exit+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 
+ok	topL+midL+exit+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출전
+rejected	topL+midR+exit+sideL+sideR+ridgeL	A	
+rejected	topL+midR+exit+sideL+sideR+ridgeL	B	
+rejected	topL+midR+exit+sideL+sideR+ridgeL	C	
+rejected	topL+midR+exit+sideL+sideR+ridgeL	D	
+rejected	topL+midR+exit+sideL+sideR+ridgeR	A	
+rejected	topL+midR+exit+sideL+sideR+ridgeR	B	
+rejected	topL+midR+exit+sideL+sideR+ridgeR	C	
+rejected	topL+midR+exit+sideL+sideR+ridgeR	D	
+ok	topL+exit+sideL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.0s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | �
+ok	topL+exit+sideL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 25.5s | 진영0 출전 6 코어도달 2 공격 51회 | 진영1 출전 3 코어도달 0 공격 17회 | 첫 타격 7.1s
+ok	topL+exit+sideL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.4s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 
+ok	topL+exit+sideL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.3s | 진영0 출전 5 코어도달 5 공격 6회 | 진영1 출�
+rejected	topR+midL+midR+exit+sideL+sideR	A	
+rejected	topR+midL+midR+exit+sideL+sideR	B	
+rejected	topR+midL+midR+exit+sideL+sideR	C	
+rejected	topR+midL+midR+exit+sideL+sideR	D	
+rejected	topR+midL+exit+sideL+sideR+ridgeL	A	
+rejected	topR+midL+exit+sideL+sideR+ridgeL	B	
+rejected	topR+midL+exit+sideL+sideR+ridgeL	C	
+rejected	topR+midL+exit+sideL+sideR+ridgeL	D	
+rejected	topR+midL+exit+sideL+sideR+ridgeR	A	
+rejected	topR+midL+exit+sideL+sideR+ridgeR	B	
+rejected	topR+midL+exit+sideL+sideR+ridgeR	C	
+rejected	topR+midL+exit+sideL+sideR+ridgeR	D	
+ok	topR+midR+exit+sideL+sideR+ridgeL	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교�
+ok	topR+midR+exit+sideL+sideR+ridgeL	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideL+sideR+ridgeL	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 
+ok	topR+midR+exit+sideL+sideR+ridgeL	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전
+ok	topR+midR+exit+sideL+sideR+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교�
+ok	topR+midR+exit+sideL+sideR+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+midR+exit+sideL+sideR+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 
+ok	topR+midR+exit+sideL+sideR+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전
+ok	topR+exit+sideL+sideR+ridgeL+ridgeR	A	전투[goblin-grunt-1500*6|skeleton*6]: 종료 23.9s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | �
+ok	topR+exit+sideL+sideR+ridgeL+ridgeR	B	전투[wolf*6|zombie*3]: 종료 29.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+ok	topR+exit+sideL+sideR+ridgeL+ridgeR	C	전투[goblin-slinger*5|skeleton-archer*5]: 종료 23.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 
+ok	topR+exit+sideL+sideR+ridgeL+ridgeR	D	전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 32.7s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출�

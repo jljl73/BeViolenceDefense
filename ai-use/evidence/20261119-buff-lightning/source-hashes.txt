@@ -1,0 +1,5 @@
+Validated clone SHA-256:
+6b2a9f41e9bbd7f85732b33a671444e1eb622ad7c5710a774c2602cc8ede9450  Assets/02_Scripts/00_Core/Effects/BuffLightning.cs
+77646a405f0ce0b28941e86a4b72940902bcac0e2bdc8d2bc05370bf44235b12  Assets/02_Scripts/00_Core/Effects/SpellEffects.cs
+ca0f01853f911233a0d75b277bd71927c2eaac9a7ee95aa14bf5ee7d3d744097  Assets/02_Scripts/05_World/DefenseBoardView.cs
+70eac8c2b3b0232b5f67ee3b040d876e1006d5b2da5b01585f3c415cb6ac518d  Assets/Resources/BuffLightning.shader

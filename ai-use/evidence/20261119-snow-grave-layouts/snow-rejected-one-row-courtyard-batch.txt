@@ -1,0 +1,217 @@
+# 벽 없음
+벽 0개 []  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+벽 0개 []  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+벽 0개 []  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+벽 0개 []  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+벽 0개 []  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 21.7s | 진영0 출전 12 코어도달 12 공격 0회 | 진영1 출전 8 코어도달 8 공격 0회 | 교전 없음
+벽 0개 []  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 25.7s | 진영0 출전 15 코어도달 15 공격 0회 | 진영1 출전 16 코어도달 16 공격 0회 | 교전 없음
+# 고개 윗목 양쪽
+벽 2개 [2,12;14,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 19칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 28.4s | 진영0 출전 6 코어도달 1 공격 37회 | 진영1 출전 6 코어도달 2 공격 40회 | 첫 타격 10.4s (7.8,10.9), 타격 많은 칸 (8,11)x10 (9,11)x6 (8,10)x6
+벽 2개 [2,12;14,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 19칸
+  전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+벽 2개 [2,12;14,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 19칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 22.2s | 진영0 출전 5 코어도달 2 공격 35회 | 진영1 출전 5 코어도달 0 공격 23회 | 첫 타격 9.9s (6.9,11.0), 타격 많은 칸 (10,11)x12 (10,9)x12 (7,11)x10
+벽 2개 [2,12;14,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 19칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.5s | 진영0 출전 5 코어도달 1 공격 46회 | 진영1 출전 6 코어도달 3 공격 44회 | 첫 타격 11.0s (6.8,10.9), 타격 많은 칸 (9,11)x25 (8,11)x21 (8,10)x15
+벽 2개 [2,12;14,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 19칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 38.8s | 진영0 출전 12 코어도달 2 공격 51회 | 진영1 출전 8 코어도달 6 공격 50회 | 첫 타격 12.8s (10.3,10.8), 타격 많은 칸 (10,11)x11 (9,8)x11 (9,9)x11
+벽 2개 [2,12;14,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 19칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 44.4s | 진영0 출전 15 코어도달 4 공격 121회 | 진영1 출전 16 코어도달 0 공격 99회 | 첫 타격 11.0s (6.8,10.9), 타격 많은 칸 (9,9)x25 (10,10)x25 (8,10)x24
+# 고개 윗목 한쪽
+벽 1개 [2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 18칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 36.1s | 진영0 출전 6 코어도달 1 공격 35회 | 진영1 출전 6 코어도달 1 공격 38회 | 첫 타격 12.1s (9.0,12.8), 타격 많은 칸 (9,13)x29 (8,13)x10 (10,13)x10
+벽 1개 [2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 18칸
+  전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+벽 1개 [2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 18칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 34.4s | 진영0 출전 5 코어도달 0 공격 32회 | 진영1 출전 5 코어도달 1 공격 30회 | 첫 타격 11.4s (10.7,14.0), 타격 많은 칸 (8,12)x20 (11,14)x16 (11,13)x6
+벽 1개 [2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 18칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+벽 1개 [2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 18칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 52.8s | 진영0 출전 12 코어도달 5 공격 46회 | 진영1 출전 8 코어도달 5 공격 35회 | 첫 타격 15.4s (10.3,13.5), 타격 많은 칸 (9,13)x33 (10,13)x19 (8,12)x10
+벽 1개 [2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 18칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 89.5s | 진영0 출전 15 코어도달 2 공격 71회 | 진영1 출전 16 코어도달 6 공격 125회 | 첫 타격 13.6s (9.2,12.9), 타격 많은 칸 (9,13)x105 (10,14)x30 (11,13)x14
+벽 1개 [14,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 19칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.7s | 진영0 출전 6 코어도달 3 공격 34회 | 진영1 출전 6 코어도달 2 공격 24회 | 첫 타격 12.3s (7.4,12.7), 타격 많은 칸 (7,13)x20 (6,13)x12 (8,12)x10
+벽 1개 [14,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 19칸
+  전투[wolf*6|zombie*3]: 종료 18.4s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+벽 1개 [14,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 19칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 31.0s | 진영0 출전 5 코어도달 3 공격 35회 | 진영1 출전 5 코어도달 0 공격 21회 | 첫 타격 12.1s (5.2,14.0), 타격 많은 칸 (8,12)x12 (5,14)x7 (3,10)x6
+벽 1개 [14,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 19칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 42.1s | 진영0 출전 5 코어도달 1 공격 49회 | 진영1 출전 6 코어도달 3 공격 33회 | 첫 타격 12.6s (5.9,13.3), 타격 많은 칸 (6,13)x30 (8,13)x13 (7,13)x10
+벽 1개 [14,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 19칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 56.6s | 진영0 출전 12 코어도달 7 공격 41회 | 진영1 출전 8 코어도달 6 공격 25회 | 첫 타격 16.2s (7.5,12.6), 타격 많은 칸 (7,13)x15 (8,12)x14 (8,13)x13
+벽 1개 [14,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 19칸
+    #2 진영0: SpawnOrder=2 Health=210 MaxHealth=210 Position=(6.10,14.00) PreviousPosition=(6.10,14.00) RoutePosition=(6.10,14.00) RouteWaypoint=(6.50,14.00) RemainingRouteWaypoints=1 Heading=(1.90,-2.09) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True PursuitTarget=#11 LastKnownTargetPosition=(8.00,11.91) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 PathRetryRemaining=0.48 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) CombatQueue=(EnemyUnit, 35) AttackSlot=-1 SidestepDirection=(0.71,0.71) CombatProgressTarget=#11 CombatBestRemainingDistance=2.83 CombatApproachTailLength=2.14 CombatStalledTime=0.08 RouteBypassOffset=-1 
+    #4 진영0: SpawnOrder=4 Health=54 MaxHealth=210 Position=(6.73,13.15) PreviousPosition=(6.73,13.15) RoutePosition=(3.75,14.00) RouteWaypoint=(4.00,14.00) RemainingRouteWaypoints=4 Heading=(1.27,-0.80) AttacksPerformed=10 AttackHeading=(1.27,-0.80) LastAttack=(EnemyUnit, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(8.00,12.35) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 PathRetryRemaining=0.23 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.71,-0.71) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.28 
+    #6 진영0: SpawnOrder=6 Health=75 MaxHealth=75 Position=(5.09,13.08) PreviousPosition=(5.09,13.08) RoutePosition=(2.94,14.00) RouteWaypoint=(3.00,14.00) RemainingRouteWaypoints=5 Heading=(2.91,-0.73) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(8.00,12.35) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 PathRetryRemaining=0.23 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(1.00,0.00) CombatBestRemainingDistance=Infinity CombatApproachTailLength=3.76 RouteBypassOffset=-1 BlockedRouteTime=0.28 
+    #8 진영0: SpawnOrder=8 Health=75 MaxHealth=75 Position=(5.28,14.00) PreviousPosition=(5.28,14.00) RoutePosition=(5.28,14.00) RouteWaypoint=(6.00,14.00) RemainingRouteWaypoints=2 Heading=(0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(8.00,12.35) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(1.00,0.00) CombatBestRemainingDistance=Infinity CombatApproachTailLength=4.59 RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #10 진영0: SpawnOrder=10 Health=75 MaxHealth=75 Position=(3.01,12.75) PreviousPosition=(3.01,12.75) RoutePosition=(2.00,13.26) RouteWaypoint=(2.00,14.00) RemainingRouteWaypoints=6 Heading=(-0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(7.35,13.28) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 PathRetryRemaining=0.07 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.71,-0.71) CombatBestRemainingDistance=Infinity CombatApproachTailLength=4.91 RouteBypassOffset=-1 
+    #11 진영1: SpawnOrder=11 FactionIndex=1 Health=70 MaxHealth=70 Position=(8.00,11.91) PreviousPosition=(8.00,11.91) RoutePosition=(8.00,11.91) RouteWaypoint=(8.00,12.00) RemainingRouteWaypoints=3 Heading=(-1.90,2.09) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True PursuitTarget=#2 LastKnownTargetPosition=(6.10,14.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 PathRetryRemaining=0.48 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) CombatQueue=(EnemyUnit, 36) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatProgressTarget=#2 CombatBestRemainingDistance=2.83 CombatStalledTime=0.08 RouteBypassOffset=-1 
+    #12 진영0: SpawnOrder=12 Health=75 MaxHealth=75 Position=(3.91,13.10) PreviousPosition=(3.91,13.10) RoutePosition=(3.91,14.00) RouteWaypoint=(4.00,14.00) RemainingRouteWaypoints=4 Heading=(3.93,-0.59) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(7.83,12.51) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 PathRetryRemaining=0.57 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,-1.00) CombatBestRemainingDistance=Infinity CombatApproachTailLength=4.94 RouteBypassOffset=-1 BlockedRouteTime=0.20 
+    #13 진영1: SpawnOrder=13 FactionIndex=1 Health=70 MaxHealth=70 Position=(8.00,11.27) PreviousPosition=(8.00,11.27) RoutePosition=(8.00,11.27) RouteWaypoint=(8.00,12.00) RemainingRouteWaypoints=3 Heading=(0.00,0.03) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #14 진영0: SpawnOrder=14 Health=75 MaxHealth=75 Position=(4.54,14.00) PreviousPosition=(4.54,14.00) RoutePosition=(4.54,14.00) RouteWaypoint=(5.00,14.00) RemainingRouteWaypoints=3 Heading=(0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(8.00,12.35) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.71,0.71) CombatBestRemainingDistance=Infinity CombatApproachTailLength=5.26 RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #15 진영1: SpawnOrder=15 FactionIndex=1 Health=70 MaxHealth=70 Position=(8.57,11.00) PreviousPosition=(8.57,11.00) RoutePosition=(8.57,11.00) RouteWaypoint=(8.00,11.00) RemainingRouteWaypoints=4 Heading=(-0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #16 진영0: SpawnOrder=16 Health=75 MaxHealth=75 Position=(3.79,14.00) PreviousPosition=(3.79,14.00) RoutePosition=(3.79,14.00) RouteWaypoint=(4.00,14.00) RemainingRouteWaypoints=4 Heading=(0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #17 진영1: SpawnOrder=17 FactionIndex=1 Health=60 MaxHealth=60 Position=(9.23,11.00) PreviousPosition=(9.23,11.00) RoutePosition=(9.23,11.00) RouteWaypoint=(9.00,11.00) RemainingRouteWaypoints=5 Heading=(-0.02,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #18 진영0: SpawnOrder=18 Health=75 MaxHealth=75 Position=(3.03,14.00) PreviousPosition=(3.03,14.00) RoutePosition=(3.03,14.00) RouteWaypoint=(4.00,14.00) RemainingRouteWaypoints=4 Heading=(0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #19 진영1: SpawnOrder=19 FactionIndex=1 Health=55 MaxHealth=55 Position=(9.89,11.00) PreviousPosition=(9.89,11.00) RoutePosition=(9.89,11.00) RouteWaypoint=(9.00,11.00) RemainingRouteWaypoints=5 Heading=(-0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #20 진영0: SpawnOrder=20 Health=75 MaxHealth=75 Position=(2.28,14.00) PreviousPosition=(2.28,14.00) RoutePosition=(2.28,14.00) RouteWaypoint=(3.00,14.00) RemainingRouteWaypoints=5 Heading=(0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #21 진영1: SpawnOrder=21 FactionIndex=1 Health=55 MaxHealth=55 Position=(10.57,11.00) PreviousPosition=(10.57,11.00) RoutePosition=(10.57,11.00) RouteWaypoint=(10.00,11.00) RemainingRouteWaypoints=6 Heading=(-0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #22 진영0: SpawnOrder=22 Health=55 MaxHealth=55 Position=(2.00,13.31) PreviousPosition=(2.00,13.31) RoutePosition=(2.00,13.31) RouteWaypoint=(2.00,14.00) RemainingRouteWaypoints=6 Heading=(0.00,0.03) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #23 진영1: SpawnOrder=23 FactionIndex=1 Health=55 MaxHealth=55 Position=(11.25,11.00) PreviousPosition=(11.25,11.00) RoutePosition=(11.25,11.00) RouteWaypoint=(11.00,11.00) RemainingRouteWaypoints=7 Heading=(-0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #24 진영0: SpawnOrder=24 Health=55 MaxHealth=55 Position=(2.00,12.57) PreviousPosition=(2.00,12.57) RoutePosition=(2.00,12.57) RouteWaypoint=(2.00,13.00) RemainingRouteWaypoints=7 Heading=(0.00,0.03) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #25 진영1: SpawnOrder=25 FactionIndex=1 Health=55 MaxHealth=55 Position=(11.92,11.00) PreviousPosition=(11.92,11.00) RoutePosition=(11.92,11.00) RouteWaypoint=(11.00,11.00) RemainingRouteWaypoints=7 Heading=(-0.03,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #26 진영0: SpawnOrder=26 Health=55 MaxHealth=55 Position=(2.00,11.82) PreviousPosition=(2.00,11.82) RoutePosition=(2.00,11.82) RouteWaypoint=(2.00,12.00) RemainingRouteWaypoints=8 Heading=(0.00,0.03) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #27 진영1: SpawnOrder=27 FactionIndex=1 Health=135 MaxHealth=135 Position=(12.00,10.32) PreviousPosition=(12.00,10.32) RoutePosition=(12.00,10.32) RouteWaypoint=(12.00,11.00) RemainingRouteWaypoints=8 Heading=(0.00,0.02) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.28 
+    #28 진영0: SpawnOrder=28 Health=55 MaxHealth=55 Position=(2.00,11.09) PreviousPosition=(2.00,11.09) RoutePosition=(2.00,11.09) RouteWaypoint=(2.00,12.00) RemainingRouteWaypoints=8 Heading=(0.00,0.03) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.15 
+    #29 진영1: SpawnOrder=29 FactionIndex=1 Health=135 MaxHealth=135 Position=(12.62,10.00) PreviousPosition=(12.62,10.00) RoutePosition=(12.62,10.00) RouteWaypoint=(12.00,10.00) RemainingRouteWaypoints=9 Heading=(-0.02,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.30 
+    #30 진영1: SpawnOrder=30 FactionIndex=1 Health=135 MaxHealth=135 Position=(13.32,10.00) PreviousPosition=(13.32,10.00) RoutePosition=(13.32,10.00) RouteWaypoint=(13.00,10.00) RemainingRouteWaypoints=10 Heading=(-0.02,0.00) AttackHeading=(0.00,0.00) LastAttack=(, False, False) IsAlive=True CanAttack=True LastKnownTargetPosition=(0.00,0.00) CombatPathAnchor=(0.00,0.00) ReturnRouteOffset=-1 UnreachableTargetPosition=(0.00,0.00) UnreachableFromPosition=(0.00,0.00) AttackSlot=-1 SidestepDirection=(0.00,0.00) CombatBestRemainingDistance=Infinity RouteBypassOffset=-1 BlockedRouteTime=0.30 
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 미종료! 300.0s | 진영0 출전 15 코어도달 0 공격 20회 | 진영1 출전 16 코어도달 0 공격 31회 | 첫 타격 12.6s (5.9,13.3), 타격 많은 칸 (6,13)x22 (7,13)x14 (8,12)x5
+# 고개 가운데 목 양쪽
+벽 4개 [0,7;1,7;15,7;16,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5,2.9), 타격 많은 칸 (9,3)x12 (8,2)x12 (9,2)x12
+벽 4개 [0,7;1,7;15,7;16,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 많은 칸 (10,2)x15 (10,3)x7 (11,2)x5
+벽 4개 [0,7;1,7;15,7;16,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s (6.7,3.0), 타격 많은 칸 (9,1)x8 (10,3)x6 (7,3)x5
+벽 4개 [0,7;1,7;15,7;16,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0 공격 41회 | 첫 타격 5.7s (8.6,2.7), 타격 많은 칸 (7,3)x22 (9,3)x20 (8,3)x14
+벽 4개 [0,7;1,7;15,7;16,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 43.8s | 진영0 출전 12 코어도달 0 공격 86회 | 진영1 출전 8 코어도달 3 공격 60회 | 첫 타격 6.2s (8.7,2.9), 타격 많은 칸 (10,3)x18 (8,2)x16 (8,0)x13
+벽 4개 [0,7;1,7;15,7;16,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 47.8s | 진영0 출전 15 코어도달 7 공격 96회 | 진영1 출전 16 코어도달 0 공격 87회 | 첫 타격 5.8s (7.1,2.9), 타격 많은 칸 (12,1)x23 (10,0)x13 (8,2)x12
+# 고개 가운데 목 한쪽
+벽 2개 [0,7;1,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 18칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 29.7s | 진영0 출전 6 코어도달 6 공격 7회 | 진영1 출전 6 코어도달 5 공격 5회 | 첫 타격 15.4s (8.7,12.7), 타격 많은 칸 (10,14)x6 (9,13)x5
+벽 2개 [0,7;1,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 18칸
+  전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+벽 2개 [0,7;1,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 18칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 29.7s | 진영0 출전 5 코어도달 4 공격 14회 | 진영1 출전 5 코어도달 3 공격 9회 | 첫 타격 13.3s (10.5,11.0), 타격 많은 칸 (10,14)x6 (10,11)x4 (11,13)x4
+벽 2개 [0,7;1,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 18칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 28.1s | 진영0 출전 5 코어도달 4 공격 16회 | 진영1 출전 6 코어도달 3 공격 21회 | 첫 타격 12.8s (11.0,9.5), 타격 많은 칸 (13,10)x11 (9,13)x5 (14,10)x4
+벽 2개 [0,7;1,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 18칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 54.0s | 진영0 출전 12 코어도달 2 공격 89회 | 진영1 출전 8 코어도달 2 공격 53회 | 첫 타격 15.8s (9.1,12.9), 타격 많은 칸 (9,13)x33 (8,13)x15 (10,13)x14
+벽 2개 [0,7;1,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 18칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 55.6s | 진영0 출전 15 코어도달 7 공격 52회 | 진영1 출전 16 코어도달 10 공격 66회 | 첫 타격 13.2s (11.0,10.1), 타격 많은 칸 (13,10)x22 (14,10)x20 (12,10)x15
+벽 2개 [15,7;16,7]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 19.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+벽 2개 [15,7;16,7]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 25칸
+  전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+벽 2개 [15,7;16,7]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 25칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 21.7s | 진영0 출전 5 코어도달 4 공격 4회 | 진영1 출전 5 코어도달 5 공격 6회 | 첫 타격 14.5s (5.5,11.0), 타격 많은 칸 (6,14)x5 (6,11)x4
+벽 2개 [15,7;16,7]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 25칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 26.3s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+벽 2개 [15,7;16,7]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 27.7s | 진영0 출전 12 코어도달 12 공격 0회 | 진영1 출전 8 코어도달 8 공격 0회 | 교전 없음
+벽 2개 [15,7;16,7]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 25칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 46.6s | 진영0 출전 15 코어도달 9 공격 63회 | 진영1 출전 16 코어도달 10 공격 38회 | 첫 타격 14.0s (5.0,9.8), 타격 많은 칸 (3,10)x14 (5,10)x9 (4,10)x9
+# 한쪽 가운데 목, 한쪽 윗목
+벽 3개 [0,7;1,7;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.9s | 진영0 출전 6 코어도달 2 공격 28회 | 진영1 출전 6 코어도달 2 공격 33회 | 첫 타격 10.6s (11.2,8.1), 타격 많은 칸 (12,8)x11 (10,8)x11 (11,8)x10
+벽 3개 [0,7;1,7;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[wolf*6|zombie*3]: 종료 28.1s | 진영0 출전 6 코어도달 6 공격 17회 | 진영1 출전 3 코어도달 2 공격 3회 | 첫 타격 9.8s (12.9,10.0), 타격 많은 칸 (13,10)x12 (12,9)x3
+벽 3개 [0,7;1,7;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.4s | 진영0 출전 5 코어도달 3 공격 21회 | 진영1 출전 5 코어도달 2 공격 14회 | 첫 타격 9.6s (11.2,6.5), 타격 많은 칸 (12,10)x12 (11,7)x7 (11,10)x6
+벽 3개 [0,7;1,7;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.4s | 진영0 출전 5 코어도달 5 공격 21회 | 진영1 출전 6 코어도달 5 공격 6회 | 첫 타격 12.3s (11.5,8.6), 타격 많은 칸 (12,10)x20 (12,9)x6
+벽 3개 [0,7;1,7;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 49.7s | 진영0 출전 12 코어도달 0 공격 78회 | 진영1 출전 8 코어도달 4 공격 60회 | 첫 타격 10.7s (11.2,8.3), 타격 많은 칸 (11,8)x38 (12,9)x19 (12,8)x13
+벽 3개 [0,7;1,7;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 66.1s | 진영0 출전 15 코어도달 6 공격 88회 | 진영1 출전 16 코어도달 3 공격 106회 | 첫 타격 11.9s (11.2,8.2), 타격 많은 칸 (13,10)x27 (12,9)x23 (11,8)x21
+벽 3개 [15,7;16,7;2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 26.3s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 6 코어도달 3 공격 28회 | 첫 타격 11.1s (4.6,7.9), 타격 많은 칸 (5,8)x12 (4,9)x12 (4,8)x6
+벽 3개 [15,7;16,7;2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 25칸
+  전투[wolf*6|zombie*3]: 종료 23.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+벽 3개 [15,7;16,7;2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 25칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 26.0s | 진영0 출전 5 코어도달 2 공격 24회 | 진영1 출전 5 코어도달 2 공격 18회 | 첫 타격 10.5s (4.9,6.7), 타격 많은 칸 (5,6)x8 (5,7)x6 (4,7)x6
+벽 3개 [15,7;16,7;2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 25칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 35.8s | 진영0 출전 5 코어도달 1 공격 47회 | 진영1 출전 6 코어도달 3 공격 35회 | 첫 타격 10.2s (5.0,6.6), 타격 많은 칸 (5,8)x31 (5,10)x13 (4,10)x7
+벽 3개 [15,7;16,7;2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 43.4s | 진영0 출전 12 코어도달 6 공격 59회 | 진영1 출전 8 코어도달 5 공격 30회 | 첫 타격 14.7s (4.9,8.0), 타격 많은 칸 (5,8)x23 (4,8)x17 (5,7)x13
+벽 3개 [15,7;16,7;2,12]  경로: 스폰0(진영0) 19칸 / 스폰1(진영1) 25칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 50.0s | 진영0 출전 15 코어도달 8 공격 80회 | 진영1 출전 16 코어도달 4 공격 74회 | 첫 타격 11.2s (4.9,8.1), 타격 많은 칸 (5,6)x26 (5,7)x22 (4,6)x15
+# 가운데 목 양쪽 + 호수 윗문
+벽 5개 [0,7;1,7;15,7;16,7;8,12]  경로: 스폰0(진영0) 30칸 / 스폰1(진영1) 30칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 34.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5,2.9), 타격 많은 칸 (9,3)x12 (8,2)x12 (9,2)x12
+벽 5개 [0,7;1,7;15,7;16,7;8,12]  경로: 스폰0(진영0) 30칸 / 스폰1(진영1) 30칸
+  전투[wolf*6|zombie*3]: 종료 36.7s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 많은 칸 (10,2)x15 (10,3)x7 (11,2)x5
+벽 5개 [0,7;1,7;15,7;16,7;8,12]  경로: 스폰0(진영0) 30칸 / 스폰1(진영1) 30칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 27.7s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s (6.7,3.0), 타격 많은 칸 (9,1)x8 (10,3)x6 (7,3)x5
+벽 5개 [0,7;1,7;15,7;16,7;8,12]  경로: 스폰0(진영0) 30칸 / 스폰1(진영1) 30칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 41.6s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0 공격 41회 | 첫 타격 5.7s (8.6,2.7), 타격 많은 칸 (7,3)x22 (9,3)x20 (8,3)x14
+벽 5개 [0,7;1,7;15,7;16,7;8,12]  경로: 스폰0(진영0) 30칸 / 스폰1(진영1) 30칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 48.1s | 진영0 출전 12 코어도달 0 공격 86회 | 진영1 출전 8 코어도달 3 공격 60회 | 첫 타격 6.2s (8.7,2.9), 타격 많은 칸 (10,3)x18 (8,2)x16 (8,0)x13
+벽 5개 [0,7;1,7;15,7;16,7;8,12]  경로: 스폰0(진영0) 30칸 / 스폰1(진영1) 30칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 51.2s | 진영0 출전 15 코어도달 7 공격 96회 | 진영1 출전 16 코어도달 0 공격 87회 | 첫 타격 5.8s (7.1,2.9), 타격 많은 칸 (12,1)x23 (10,0)x13 (8,2)x12
+# 윗목 양쪽 + 옆문 한쪽
+벽 3개 [2,12;14,12;3,10]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.9s | 진영0 출전 6 코어도달 2 공격 28회 | 진영1 출전 6 코어도달 2 공격 33회 | 첫 타격 10.6s (11.2,8.1), 타격 많은 칸 (12,8)x11 (10,8)x11 (11,8)x10
+벽 3개 [2,12;14,12;3,10]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[wolf*6|zombie*3]: 종료 28.1s | 진영0 출전 6 코어도달 6 공격 17회 | 진영1 출전 3 코어도달 2 공격 3회 | 첫 타격 9.8s (12.9,10.0), 타격 많은 칸 (13,10)x12 (12,9)x3
+벽 3개 [2,12;14,12;3,10]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 33.4s | 진영0 출전 5 코어도달 3 공격 21회 | 진영1 출전 5 코어도달 2 공격 14회 | 첫 타격 9.6s (11.2,6.5), 타격 많은 칸 (12,10)x12 (11,7)x7 (11,10)x6
+벽 3개 [2,12;14,12;3,10]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 33.4s | 진영0 출전 5 코어도달 5 공격 21회 | 진영1 출전 6 코어도달 5 공격 6회 | 첫 타격 12.3s (11.5,8.6), 타격 많은 칸 (12,10)x20 (12,9)x6
+벽 3개 [2,12;14,12;3,10]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 49.7s | 진영0 출전 12 코어도달 0 공격 78회 | 진영1 출전 8 코어도달 4 공격 60회 | 첫 타격 10.7s (11.2,8.3), 타격 많은 칸 (11,8)x38 (12,9)x19 (12,8)x13
+벽 3개 [2,12;14,12;3,10]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 19칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 66.1s | 진영0 출전 15 코어도달 7 공격 87회 | 진영1 출전 16 코어도달 3 공격 105회 | 첫 타격 11.9s (11.2,8.2), 타격 많은 칸 (13,10)x27 (12,9)x23 (11,8)x21
+# 가운데 목 양쪽 + 얼음 능선 틈 한쪽
+벽 6개 [0,7;1,7;15,7;16,7;4,7;5,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5,2.9), 타격 많은 칸 (9,3)x12 (8,2)x12 (9,2)x12
+벽 6개 [0,7;1,7;15,7;16,7;4,7;5,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[wolf*6|zombie*3]: 종료 32.4s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 많은 칸 (10,2)x15 (10,3)x7 (11,2)x5
+벽 6개 [0,7;1,7;15,7;16,7;4,7;5,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 24.9s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s (6.7,3.0), 타격 많은 칸 (9,1)x8 (10,3)x6 (7,3)x5
+벽 6개 [0,7;1,7;15,7;16,7;4,7;5,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0 공격 41회 | 첫 타격 5.7s (8.6,2.7), 타격 많은 칸 (7,3)x22 (9,3)x20 (8,3)x14
+벽 6개 [0,7;1,7;15,7;16,7;4,7;5,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 41.4s | 진영0 출전 12 코어도달 0 공격 86회 | 진영1 출전 8 코어도달 3 공격 60회 | 첫 타격 6.2s (8.7,2.9), 타격 많은 칸 (10,3)x18 (8,2)x16 (8,0)x13
+벽 6개 [0,7;1,7;15,7;16,7;4,7;5,7]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 47.8s | 진영0 출전 15 코어도달 7 공격 96회 | 진영1 출전 16 코어도달 0 공격 87회 | 첫 타격 5.8s (7.1,2.9), 타격 많은 칸 (12,1)x23 (10,0)x13 (8,2)x12
+# 가운데 목 양쪽 + 윗목 양쪽
+벽 6개 [0,7;1,7;15,7;16,7;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5,2.9), 타격 많은 칸 (9,3)x12 (8,2)x12 (9,2)x12
+벽 6개 [0,7;1,7;15,7;16,7;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 많은 칸 (10,2)x15 (10,3)x7 (11,2)x5
+벽 6개 [0,7;1,7;15,7;16,7;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s (6.7,3.0), 타격 많은 칸 (9,1)x8 (10,3)x6 (7,3)x5
+벽 6개 [0,7;1,7;15,7;16,7;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0 공격 41회 | 첫 타격 5.7s (8.6,2.7), 타격 많은 칸 (7,3)x22 (9,3)x20 (8,3)x14
+벽 6개 [0,7;1,7;15,7;16,7;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 43.8s | 진영0 출전 12 코어도달 0 공격 86회 | 진영1 출전 8 코어도달 3 공격 60회 | 첫 타격 6.2s (8.7,2.9), 타격 많은 칸 (10,3)x18 (8,2)x16 (8,0)x13
+벽 6개 [0,7;1,7;15,7;16,7;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 47.8s | 진영0 출전 15 코어도달 7 공격 96회 | 진영1 출전 16 코어도달 0 공격 87회 | 첫 타격 5.8s (7.1,2.9), 타격 많은 칸 (12,1)x23 (10,0)x13 (8,2)x12
+# 호수 윗문만
+벽 1개 [8,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 15.1s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+벽 1개 [8,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[wolf*6|zombie*3]: 종료 17.5s | 진영0 출전 6 코어도달 6 공격 0회 | 진영1 출전 3 코어도달 3 공격 0회 | 교전 없음
+벽 1개 [8,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 14.5s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 5 코어도달 5 공격 0회 | 교전 없음
+벽 1개 [8,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 19.8s | 진영0 출전 5 코어도달 5 공격 0회 | 진영1 출전 6 코어도달 6 공격 0회 | 교전 없음
+벽 1개 [8,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 21.7s | 진영0 출전 12 코어도달 12 공격 0회 | 진영1 출전 8 코어도달 8 공격 0회 | 교전 없음
+벽 1개 [8,12]  경로: 스폰0(진영0) 18칸 / 스폰1(진영1) 18칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 25.7s | 진영0 출전 15 코어도달 15 공격 0회 | 진영1 출전 16 코어도달 16 공격 0회 | 교전 없음
+# 옆문 양쪽 + 윗목 양쪽 (어귀로만)
+벽 4개 [3,10;13,10;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*6|skeleton*6]: 종료 31.0s | 진영0 출전 6 코어도달 3 공격 42회 | 진영1 출전 6 코어도달 0 공격 32회 | 첫 타격 5.5s (7.5,2.9), 타격 많은 칸 (9,3)x12 (8,2)x12 (9,2)x12
+벽 4개 [3,10;13,10;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[wolf*6|zombie*3]: 종료 32.5s | 진영0 출전 6 코어도달 2 공격 27회 | 진영1 출전 3 코어도달 3 공격 16회 | 첫 타격 6.0s (10.4,2.8), 타격 많은 칸 (10,2)x15 (10,3)x7 (11,2)x5
+벽 4개 [3,10;13,10;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-slinger*5|skeleton-archer*5]: 종료 25.1s | 진영0 출전 5 코어도달 0 공격 26회 | 진영1 출전 5 코어도달 2 공격 30회 | 첫 타격 5.0s (6.7,3.0), 타격 많은 칸 (9,1)x8 (10,3)x6 (7,3)x5
+벽 4개 [3,10;13,10;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[orc*2,goblin-slinger*3|skeleton*2,living-armor*1,skeleton-archer*3]: 종료 38.2s | 진영0 출전 5 코어도달 2 공격 61회 | 진영1 출전 6 코어도달 0 공격 41회 | 첫 타격 5.7s (8.6,2.7), 타격 많은 칸 (7,3)x22 (9,3)x20 (8,3)x14
+벽 4개 [3,10;13,10;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[goblin-grunt-1500*12|zombie*8]: 종료 43.8s | 진영0 출전 12 코어도달 0 공격 86회 | 진영1 출전 8 코어도달 3 공격 60회 | 첫 타격 6.2s (8.7,2.9), 타격 많은 칸 (10,3)x18 (8,2)x16 (8,0)x13
+벽 4개 [3,10;13,10;2,12;14,12]  경로: 스폰0(진영0) 25칸 / 스폰1(진영1) 25칸
+  전투[orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3]: 종료 47.8s | 진영0 출전 15 코어도달 7 공격 96회 | 진영1 출전 16 코어도달 0 공격 87회 | 첫 타격 5.8s (7.1,2.9), 타격 많은 칸 (12,1)x23 (10,0)x13 (8,2)x12

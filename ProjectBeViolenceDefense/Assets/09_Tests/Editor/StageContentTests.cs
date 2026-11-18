@@ -78,7 +78,7 @@ public sealed class StageContentTests
     }
 
     [Test]
-    public void SharedSceneHasOneSelectorWithFourDistinctStageChoices()
+    public void SharedSceneHasOneSelectorWithFiveDistinctStageChoices()
     {
         var scene = EditorSceneManager.OpenPreviewScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");
         try
@@ -88,7 +88,8 @@ public sealed class StageContentTests
             Assert.That(selectors.Length, Is.EqualTo(1));
             var selection = new SerializedObject(selectors[0]);
             var choices = selection.FindProperty("stages");
-            Assert.That(choices.arraySize, Is.EqualTo(4));
+            // 해안가·단풍·설원·묘지·왕도.
+            Assert.That(choices.arraySize, Is.EqualTo(5));
             var seen = new HashSet<Object>();
             for (int i = 0; i < choices.arraySize; i++)
                 Assert.That(seen.Add(choices.GetArrayElementAtIndex(i).objectReferenceValue), Is.True);

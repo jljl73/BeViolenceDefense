@@ -311,6 +311,15 @@ internal sealed class EnemyUnit
 
     public Vector3 GetRouteWaypoint(int offset) => path[waypoint + offset];
 
+    // 남은 경로에서 offset 번째 웨이포인트부터 코어까지의 길이.
+    public float RouteLengthFrom(int offset)
+    {
+        float length = 0f;
+        for (int i = waypoint + offset; i < path.Length - 1; i++)
+            length += Vector3.Distance(path[i], path[i + 1]);
+        return length;
+    }
+
     // 지금 위치에서 시작하는 새 코어 경로로 갈아탄다. route[0]은 현재 위치여야 한다.
     public void Reroute(Vector3[] route)
     {

@@ -1,0 +1,32 @@
+--- src/00_Core/CombatPositioning.cs	2026-11-19 07:34:47
++++ src-cap6/00_Core/CombatPositioning.cs	2026-11-19 07:37:06
+@@ -3,7 +3,7 @@
+ 
+ internal sealed class CombatPositioning
+ {
+-    internal const int MaxAttackersPerTarget = 3;
++    internal const int MaxAttackersPerTarget = 6;
+     internal const float StalledRetargetDelay = 0.6f;
+     internal const float CombatJoinRange = 4.5f;
+     internal const float LostTargetSearchDuration = 4f;
+--- src/05_World/DefenseGrid.cs	2026-11-19 07:34:47
++++ src-sight/05_World/DefenseGrid.cs	2026-11-19 07:38:13
+@@ -135,7 +135,7 @@
+     // 코어도 벽처럼 시야와 공격을 막는다. 벽과 같은 여유(칸 가장자리에서 SightInset)를 두어
+     // 모서리를 스치는 시선은 통과시킨다.
+     public bool HasLineOfSight(Vector3 from, Vector3 to)
+-        => !CrossesCore(from, to, SightInset * CellSize) && IsWallFree(from, to, 0f);
++        => !CrossesCore(from, to, 0f) && IsWallFree(from, to, 0.24f); // 실험: 시야를 이동 판정과 같게
+ 
+     public bool CanPursue(Vector3 from, Vector3 to)
+         => !CrossesCore(from, to, 0f) && IsWallFree(from, to, 0.24f);
+--- src/00_Core/CombatPositioning.cs	2026-11-19 07:34:47
++++ src-over/00_Core/CombatPositioning.cs	2026-11-19 07:37:06
+@@ -928,6 +928,7 @@
+ 
+     private bool ClearOfUnits(EnemyUnit enemy, EnemyUnit target, Vector3 from, Vector3 to, bool attacking)
+     {
++        if (attacking) return true; // 실험: 공격선은 다른 유닛 몸통에 막히지 않는다
+         Vector3 step = to - from;
+         float lengthSquared = step.sqrMagnitude;
+         foreach (EnemyUnit other in enemies)

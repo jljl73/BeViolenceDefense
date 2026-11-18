@@ -19,7 +19,8 @@ public sealed class RerouteAfterCombatTests
         Vector3[] route = grid.RouteFrom(start);
         Assert.That(route, Is.Not.Null);
         Assert.That(route[0], Is.EqualTo(start));
-        for (int i = 1; i < route.Length; i++)
+        // 마지막 점은 코어 외곽이라 코어에 닿는 것으로 판정된다. 그 앞까지만 본다.
+        for (int i = 1; i < route.Length - 1; i++)
             Assert.That(grid.CanPursue(route[i - 1], route[i]), Is.True, $"Step {i} crosses a wall.");
         Assert.That(route.All(point => point.x > 8.5f), Is.True, "The right side has its own way to the core.");
         Assert.That(grid.RouteFrom(new Vector3(8, 0, 6)), Is.Null, "A wall cell has no route.");

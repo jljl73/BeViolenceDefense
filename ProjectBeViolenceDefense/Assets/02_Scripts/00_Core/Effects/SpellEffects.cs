@@ -36,6 +36,10 @@ internal sealed class SpellEffects
     private readonly Material burstMaterial;
     private readonly Mesh burstMesh;
     private readonly MaterialPropertyBlock burstProperties = new();
+    private readonly List<BuffLightning> lightning = new();
+    private readonly Stack<BuffLightning> availableLightning = new();
+    private readonly Material lightningMaterial;
+    private const int MaxLightning = 128;
 
     public SpellEffects(Transform board, Camera camera, Material material, int pulseSortingOrder)
     {
@@ -43,6 +47,7 @@ internal sealed class SpellEffects
         this.camera = camera.transform;
         this.material = material;
         this.pulseSortingOrder = pulseSortingOrder;
+        lightningMaterial = new Material(Resources.Load<Shader>("BuffLightning")) { name = "Buff Lightning" };
         // Resources에 두어 플레이어 빌드에도 포함한다. 시간은 BattleClock에서만 전달한다.
         burstMaterial = new Material(Resources.Load<Shader>("SpellAreaBurst")) { name = "Spell Area Burst" };
         burstMesh = new Mesh
@@ -68,6 +73,22 @@ internal sealed class SpellEffects
     {
         Play(AreaRing, board.TransformPoint(center), Vector3.zero, color, 0.32f, 0.12f,
             rotation: board.rotation * Quaternion.Euler(90f, 0f, 0f), scale: 0.50f, scaleGrowth: 0.86f);
+    }
+
+    public void PlayBuffLightning(Transform target, DefenseBattle.Spell spell, float scale, int seed)
+    {
+        BuffLightning effect;
+        if (availableLightning.Count > 0)
+            effect = availableLightning.Pop();
+        else if (lightning.Count >= MaxLightning)
+        {
+            effect = lightning[0];
+            lightning.RemoveAt(0);
+        }
+        else
+            effect = new BuffLightning(board, camera, lightningMaterial, pulseSortingOrder + 2);
+        effect.Play(target, SpellColor(spell), scale, seed);
+        lightning.Add(effect);
     }
 
     public static Color SpellColor(DefenseBattle.Spell spell) => spell switch
@@ -141,6 +162,16 @@ internal sealed class SpellEffects
 
     public void Advance(float deltaTime)
     {
+        for (int i = lightning.Count - 1; i >= 0; i--)
+        {
+            BuffLightning effect = lightning[i];
+            effect.Advance(deltaTime);
+            if (!effect.IsPlaying)
+            {
+                availableLightning.Push(effect);
+                lightning.RemoveAt(i);
+            }
+        }
         for (int i = bursts.Count - 1; i >= 0; i--)
         {
             AreaBurst burst = bursts[i];
@@ -213,6 +244,13 @@ internal sealed class SpellEffects
 
     public void Release()
     {
+        foreach (BuffLightning effect in lightning)
+            ReleaseObject(effect.Root);
+        foreach (BuffLightning effect in availableLightning)
+            ReleaseObject(effect.Root);
+        lightning.Clear();
+        availableLightning.Clear();
+        ReleaseObject(lightningMaterial);
         foreach (AreaBurst burst in bursts)
             ReleaseObject(burst.Renderer.gameObject);
         foreach (AreaBurst burst in availableBursts)
