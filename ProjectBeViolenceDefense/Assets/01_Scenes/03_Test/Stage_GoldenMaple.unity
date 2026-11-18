@@ -27081,15 +27081,16 @@ MonoBehaviour:
     Mana: {fileID: 21300000, guid: bddccabed31f41598fd449b1dc6bf524, type: 3}
     Lock: {fileID: 21300000, guid: 4ff7c9dc22374be0a4bfb9b29de52b0d, type: 3}
     ArmorBuff: {fileID: 21300000, guid: d02d4a57e1b44ca383921414a16cb43e, type: 3}
+    Taunt: {fileID: 21300000, guid: 750f82dc02b04321bb09b8f168386388, type: 3}
     SlotFrame: {fileID: 21300000, guid: 38ceb414ff0bb13488736c79148cdee9, type: 3}
     SlotFrameSelected: {fileID: 21300000, guid: 411c54d21f7c1f442b5fbf2d7f6f10b9, type: 3}
     ColoredSkillIcons: 1
-    Taunt: {fileID: 21300000, guid: 750f82dc02b04321bb09b8f168386388, type: 3}
   leftCoreHud: {fileID: 1100666558}
   manaBarHud: {fileID: 1607539364}
   battleInfoHud: {fileID: 1863337268}
   stageAmbience: {fileID: 1105037678}
   buildModeHud: {fileID: 1758100843}
+  defeatPanel: {fileID: 0}
   boardTheme:
     background: {r: 0.9137255, g: 0.84313726, b: 0.6509804, a: 1}
     foundation: {r: 0.43137255, g: 0.35686275, b: 0.2, a: 1}
@@ -27112,45 +27113,29 @@ MonoBehaviour:
     tileTexture: {fileID: 2800000, guid: 84c230f27efaf9b4488a7b52ab7e85ed, type: 3}
     borderWidth: 0.3
     border: {r: 0.52156866, g: 0.45490196, b: 0.25490198, a: 1}
-  coral:
+  greenHorde:
     unitId: goblin-grunt-1500
     displayNameKey: faction.coral
     color: {r: 1, g: 0.4509804, b: 0.34117648, a: 1}
     spawnCount: 6
-  teal:
+  undead:
     unitId: zombie
     displayNameKey: faction.teal
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
     spawnCount: 4
-  rounds:
-  - note: "W1 \uAD11\uC7A5\uC758 \uCCAB \uCDA9\uB3CC"
-    coral:
-    - unitId: goblin-grunt-1500
-      count: 4
-    teal:
-    - unitId: skeleton
-      count: 6
-  - note: "W2 \uC5C7\uAC08\uB9AC\uB294 \uBC1C\uAC78\uC74C"
-    coral:
-    - unitId: wolf
-      count: 6
-    teal:
-    - unitId: zombie
-      count: 3
-  - note: "W3 \uC131\uBB38 \uC55E \uACB0\uC804"
-    coral:
-    - unitId: orc
-      count: 2
-    - unitId: goblin-slinger
-      count: 3
-    teal:
-    - unitId: skeleton
-      count: 2
-    - unitId: living-armor
-      count: 1
-    - unitId: skeleton-archer
-      count: 3
-  stage: {fileID: 0}
+  beasts:
+    unitId: 
+    displayNameKey: faction.beast
+    color: {r: 1, g: 0.84, b: 0.26, a: 1}
+    spawnCount: 0
+  dragonAndDemon:
+    unitId: 
+    displayNameKey: faction.dragon_demon
+    color: {r: 1, g: 0.36, b: 0.3, a: 1}
+    spawnCount: 0
+  stage: {fileID: 11400000, guid: 23b6f8bf5a21a5643abb5c4659d41103, type: 2}
+  victoryPanelHud: {fileID: 0}
+  waitForStageSelection: 0
 --- !u!1001 &1985436459
 PrefabInstance:
   m_ObjectHideFlags: 0

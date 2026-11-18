@@ -912,3 +912,31 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 실제 메시의 깊이·피벗과 점유 칸 일치 및 플레이 화면. 이번 검토는 정적 분석으로 Unity CLI·Play Mode 검증은 수행하지 않음.
+
+### [20261119-0843-stage2-waves2] 2스테이지 10웨이브 설계 및 단풍 씬 연결
+- 시각: 2026-11-19 08:43:08 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (데스크톱 앱) / Claude Opus 5.5, Unity Editor MCP
+- 목적 및 적용 위치: `Waves2` 에셋에 2스테이지 10웨이브 편성. 단풍 테스트 씬의 StageData를 `Stage2_Temp`로 교체하고 `Stage2_Temp.waves`를 `Waves2`로 연결.
+- 사용 방식: AI가 지형·카탈로그를 읽고, 기존 2스테이지 검증 도구(`StageCheck.cs`)를 현재 전투 코드로 스크래치 경로에 다시 빌드해 마법 없는 전투를 돌림. 무작위 벽 220종에서 기준 벽 배치를 고르고, 10웨이브 후보를 벽 4가지 조건(없음·(3,3)·(3,3)+(13,3)·5벽 R5)으로 비교해 편성 확정.
+- 결과 및 확인 방법: 성공. Unity Editor MCP로 에셋 재임포트 후 `StageWaves.Validate()` OK, 10웨이브, 유닛 ID 전부 카탈로그에 존재, `Stage2_Temp.waves == Waves2`, 씬 `stage` 참조 확인. Unity 밖 시뮬레이션(마법 없음): 10웨이브 코어 도달 합계 벽 없음 134 / R5 약 89 (코어 체력 120). Play Mode는 하지 않음.
+- 사람의 개입: 처음 AI는 `Stage_GoldenMaple.asset`(단일 관문 지형) 기준으로 계산하다가, 사용자가 씬 StageData를 stage02로 바꾸고 그 기준으로 계산하라고 지시함. 이에 따라 `Stage2_Temp`를 대상으로 다시 계산.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `ProjectBeViolenceDefense/Assets/04_Data/04_Stages/Waves2.asset` | Claude Code | 수정 | 빈 10웨이브를 고블린·언데드 편성으로 채움. 사용 |
+| `ProjectBeViolenceDefense/Assets/04_Data/04_Stages/Stage2_Temp.asset` | Claude Code | 수정 | `waves`를 `StageTEST_Waves`에서 `Waves2`로 교체. 사용 |
+| `ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/Stage_GoldenMaple.unity` | Claude Code | 수정 | `VoxelDefensePrototype.stage`를 빈 값에서 `Stage2_Temp`로 연결. 사용 |
+
+#### 증거
+- 없음 (시뮬레이션 출력은 세션 스크래치 경로에만 있음)
+
+#### 주요 프롬프트
+- 사용 도구: Claude Code
+- 프롬프트 원문: "Waves2 SO데이터는 2스테이지에 들어갈 데이터인데 너가 한번 10개의 웨이브를 설계해봐" / "GoldenMapleScene의 StageData를 stage02 SOdata로 교체한다. 그리고 이를 토대로 계산해라 그쪽이 맞는 방향이다."
+- 결과 및 실제 활용 방식: Stage2_Temp 지형 기준 10웨이브를 Waves2에 기록하고 씬에 연결.
+- 선정 이유: 웨이브 설계 대상 지형을 바로잡은 지시.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: "stage02"를 `Stage2_Temp.asset`으로 해석함(다른 후보 없음). Play Mode에서 마법을 쓴 실제 난이도 확인. 이전에 `Stage_GoldenMaple.asset.waves`를 Waves2로 바꾼 미커밋 변경은 그대로 둠.
