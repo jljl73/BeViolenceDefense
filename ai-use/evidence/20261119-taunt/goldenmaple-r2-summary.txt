@@ -1,0 +1,12 @@
+scene=Assets/01_Scenes/03_Test/Stage_GoldenMaple.unity screen=640x480 popupOpen=False
+hud slots=Attack Buff@-3, Heal@121, Move Speed Buff@245, Armor Buff@369, Taunt@493
+target spawn=2 faction=0 tick=442 score=11
+captured 1-aiming
+cast tick=444 maxHealth=75->113 pulled=1 (engagedElsewhere≈1, behindWall=0)
+captured 2-giant
+captured 2-giant-zoom
+taunt over: taunterAlive=False peakScale=2.00 turned=1/1 struckTaunter=1 engagedElsewhereTurned=1/1 behindWallTurned=0/0
+wave finished: phase=Preparation core=119 remaining=0
+errors:
+  Exception: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index

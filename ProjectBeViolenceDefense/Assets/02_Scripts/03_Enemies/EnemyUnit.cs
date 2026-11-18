@@ -45,6 +45,8 @@ internal sealed class EnemyUnit
     public const int AttackBonus = 15;
     public const float MoveSpeedBonusPercent = 0.5f;
     public const int ArmorBonus = 5;
+    // 도발로 거대해진 유닛이 얻는 추가 최대 체력(기본 최대 체력 대비). 첫 테스트용 임시 값.
+    public const float TauntHealthBonusPercent = 0.5f;
     internal const float RetaliationDuration = 4f;
 
     private readonly Vector3[] path;
@@ -57,12 +59,21 @@ internal sealed class EnemyUnit
     private bool retaliationRequested;
     private float cooldown;
     private float attackFlash;
+    private int tauntBonusHealth;
 
     public EnemyFaction Faction { get; }
     public int SpawnOrder { get; }
     public int FactionIndex { get; }
     public int Health { get; private set; }
-    public int MaxHealth => Faction.MaxHealth;
+    public int MaxHealth => Faction.MaxHealth + tauntBonusHealth;
+    // 도발 중(거대화)인 남은 시간. 0 이면 도발하지 않는다.
+    public float TauntRemaining { get; private set; }
+    public bool IsTaunting => TauntRemaining > 0f;
+    // 이 유닛을 끌어당긴 도발 유닛. 남은 시간이 끝나거나 도발이 풀리면 null 로 본다.
+    public EnemyUnit TauntedBy { get; private set; }
+    public float TauntedRemaining { get; private set; }
+    public EnemyUnit ActiveTaunter =>
+        TauntedRemaining > 0f && TauntedBy is { IsAlive: true, IsTaunting: true } taunter ? taunter : null;
     public Vector3 Position { get; private set; }
     // 직전 틱 시작 때의 위치. 화면이 틱 사이를 보간할 때만 쓴다.
     public Vector3 PreviousPosition { get; private set; }
@@ -147,6 +158,41 @@ internal sealed class EnemyUnit
         TickBuffs(attackBuffTimers, deltaTime);
         TickBuffs(moveSpeedBuffTimers, deltaTime);
         TickBuffs(armorBuffTimers, deltaTime);
+        if (TauntRemaining > 0f)
+        {
+            TauntRemaining = Mathf.Max(0f, TauntRemaining - deltaTime);
+            if (TauntRemaining <= 0f)
+                EndTaunt();
+        }
+        TauntedRemaining = Mathf.Max(0f, TauntedRemaining - deltaTime);
+        if (ActiveTaunter == null)
+        {
+            TauntedBy = null;
+            TauntedRemaining = 0f;
+        }
+    }
+
+    // 다시 걸면 시간만 새로 채운다. 추가 체력은 겹치지 않는다.
+    public void ApplyTaunt(float duration)
+    {
+        TauntRemaining = duration;
+        if (tauntBonusHealth > 0)
+            return;
+        tauntBonusHealth = Mathf.CeilToInt(Faction.MaxHealth * TauntHealthBonusPercent);
+        Health += tauntBonusHealth;
+    }
+
+    // 끝나면 늘어난 만큼 체력을 되돌린다. 이것만으로는 죽지 않는다.
+    private void EndTaunt()
+    {
+        Health = Mathf.Max(1, Health - tauntBonusHealth);
+        tauntBonusHealth = 0;
+    }
+
+    public void ApplyTauntedBy(EnemyUnit taunter, float duration)
+    {
+        TauntedBy = taunter;
+        TauntedRemaining = duration;
     }
 
     private static void TickBuffs(List<float> timers, float deltaTime)

@@ -54,6 +54,11 @@ internal sealed class DefenseBoardView
     private const float SpellBodyFlashDuration = 0.26f;
     private const float SpellBodyFlashBrightness = 1.8f;
     private const float BuffMarkSpacing = 0.20f;
+    // 도발 중인 유닛의 화면 크기 배율과 커지고 줄어드는 속도(초당 배율 변화). 충돌 크기는 바꾸지 않는다.
+    private const float TauntGiantScale = 2f;
+    private const float TauntGrowSpeed = 4f;
+    // 도발 조준 중 마우스에서 이 거리(칸) 안의 가장 가까운 유닛을 고른다.
+    private const float TauntPickRadius = 0.7f;
     private const float BuffMarkOffset = 0.32f;
     private const float BuffMarkDarkeningPerStack = 0.14f;
     private const float BuffMarkMinimumBrightness = 0.58f;
@@ -93,6 +98,8 @@ internal sealed class DefenseBoardView
         public (Renderer Renderer, Material[] Original, Material[] Preview, int Order)[] PreviewSurfaces;
         public Color SpellFlashColor;
         public float SpellFlashRemaining;
+        public Vector3 BaseScale;
+        public float GiantScale = 1f;
     }
 
     private readonly struct RouteMarkerMotion
@@ -173,6 +180,7 @@ internal sealed class DefenseBoardView
     private readonly Material moveSpeedBuffPreviewMaterial;
     private readonly Material healPreviewMaterial;
     private readonly Material armorBuffPreviewMaterial;
+    private readonly Material tauntPreviewMaterial;
     private readonly Material attackBuffMarkMaterial;
     private readonly Material moveSpeedBuffMarkMaterial;
     private readonly Material armorBuffMarkMaterial;
@@ -290,6 +298,7 @@ internal sealed class DefenseBoardView
         moveSpeedBuffPreviewMaterial = Palette(MoveSpeedBuffColor);
         healPreviewMaterial = Palette(UIPalette.Heal);
         armorBuffPreviewMaterial = Palette(UIPalette.Armor);
+        tauntPreviewMaterial = Palette(UIPalette.Taunt);
         attackBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.Attack, 0.72f));
         moveSpeedBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.MoveSpeed, 0.72f));
         armorBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.Armor, 0.72f));
@@ -685,13 +694,13 @@ internal sealed class DefenseBoardView
             floor[cell.x, cell.y].sharedMaterial = subdued
                 ? battleRouteTiles[(cell.x + cell.y) % battleRouteTiles.Length]
                 : routeTile;
-            if (routeChevron == null)
+            // 스폰 패드가 시작점을 표시하므로 그 위에는 방향 꺾쇠를 겹치지 않는다.
+            if (routeChevron == null || spawnCells.Contains(cell))
                 continue;
 
             // Both arrows use one lateral axis so opposite headings stay in separate lanes.
             Vector3 side = Vector3.Cross(Vector3.up, steps[0].Direction);
-            float height = RouteMarkerHeight + (spawnCells.Contains(cell) ? SpawnPadHeight : 0f);
-            Vector3 center = DefenseGrid.CellPosition(cell) + Vector3.up * height;
+            Vector3 center = DefenseGrid.CellPosition(cell) + Vector3.up * RouteMarkerHeight;
             Color floorColor = floor[cell.x, cell.y].sharedMaterial.color;
             for (int i = 0; i < steps.Count; i++)
             {
@@ -927,14 +936,47 @@ internal sealed class DefenseBoardView
             point.z >= -0.5f && point.z < boardDepth - 0.5f;
     }
 
-    public void ShowAreaSpellPreview(DefenseBattle.Spell? spell, Vector3? center, float radius)
+    // 도발 조준용: 마우스 아래 가장 가까운 살아 있는 유닛.
+    public bool TryPickEnemy(Vector2 pointer, IReadOnlyList<EnemyUnit> enemies, out EnemyUnit picked)
     {
+        picked = null;
+        if (!TryPickBoardPoint(pointer, out Vector3 point))
+            return false;
+
+        float nearest = TauntPickRadius * TauntPickRadius;
+        foreach (EnemyUnit enemy in enemies)
+        {
+            if (!enemy.IsAlive || !enemyViews.TryGetValue(enemy, out EnemyView view))
+                continue;
+            // 화면에 그려진(보간된) 위치로 고른다.
+            Vector3 offset = view.Root.localPosition - point;
+            float distance = offset.x * offset.x + offset.z * offset.z;
+            if (distance > nearest)
+                continue;
+            nearest = distance;
+            picked = enemy;
+        }
+        return picked != null;
+    }
+
+    // 도발은 center 대신 tauntTarget 을 둘레로 반경을 그리고, 끌려올 유닛과 대상만 강조한다.
+    public void ShowAreaSpellPreview(DefenseBattle.Spell? spell, Vector3? center, float radius,
+        EnemyUnit tauntTarget = null)
+    {
+        if (spell == DefenseBattle.Spell.Taunt)
+        {
+            center = tauntTarget != null && enemyViews.TryGetValue(tauntTarget, out EnemyView targetView)
+                ? targetView.Root.localPosition
+                : null;
+            radius = DefenseBattle.TauntRadius;
+        }
         Material material = center.HasValue ? spell switch
         {
             DefenseBattle.Spell.MoveSpeedBuff => moveSpeedBuffPreviewMaterial,
             DefenseBattle.Spell.Heal => healPreviewMaterial,
             DefenseBattle.Spell.AttackBuff => attackBuffPreviewMaterial,
             DefenseBattle.Spell.ArmorBuff => armorBuffPreviewMaterial,
+            DefenseBattle.Spell.Taunt => tauntPreviewMaterial,
             _ => null
         } : null;
 
@@ -955,8 +997,10 @@ internal sealed class DefenseBoardView
         Material silhouette = material != null ? targetSilhouettes[spell.Value] : null;
         foreach (var entry in enemyViews)
         {
-            bool eligible = silhouette != null && DefenseBattle.IsInAreaSpellRange(entry.Key, point, radius) &&
-                DefenseBattle.CanReceiveAreaSpell(entry.Key, spell.Value);
+            bool eligible = silhouette != null && (spell == DefenseBattle.Spell.Taunt
+                ? entry.Key == tauntTarget || DefenseBattle.IsTauntable(tauntTarget, entry.Key)
+                : DefenseBattle.IsInAreaSpellRange(entry.Key, point, radius) &&
+                    DefenseBattle.CanReceiveAreaSpell(entry.Key, spell.Value));
             SetEnemyPreviewMaterial(entry.Value, eligible ? silhouette : null);
         }
     }
@@ -1267,6 +1311,7 @@ internal sealed class DefenseBoardView
             view = CreateBlockEnemy(model, material, enemy.FactionIndex);
         }
         view.TintSlots = CollectTintSlots(view.Renderers);
+        view.BaseScale = model.localScale;
         enemyViews.Add(enemy, view);
         SyncEnemy(enemy);
     }
@@ -1555,8 +1600,19 @@ internal sealed class DefenseBoardView
         }
         SyncHit(view, enemy);
         SyncBuffMarks(view, enemy);
+        SyncGiantScale(view, enemy, deltaTime);
         bool movingWithBuff = enemy.MoveSpeedBuffStacks > 0 && IsMoving(step, deltaTime, playbackSpeed);
         spellEffects.SyncMoveTrail(view.Root, step, movingWithBuff, ref view.MoveSpeedTrails);
+    }
+
+    // 도발 중이면 서서히 커지고, 끝나면 원래 크기로 돌아간다.
+    private static void SyncGiantScale(EnemyView view, EnemyUnit enemy, float deltaTime)
+    {
+        float target = enemy.IsTaunting ? TauntGiantScale : 1f;
+        if (view.GiantScale == target)
+            return;
+        view.GiantScale = Mathf.MoveTowards(view.GiantScale, target, TauntGrowSpeed * deltaTime);
+        view.Root.localScale = view.BaseScale * view.GiantScale;
     }
 
     private void SyncBuffMarks(EnemyView view, EnemyUnit enemy)

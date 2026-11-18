@@ -25,6 +25,7 @@ public sealed class SimulationDeterminismTests
     {
         new(240, DefenseBattle.Spell.AttackBuff, new Vector3(8f, 0f, 9f), 0),
         new(600, DefenseBattle.Spell.Heal, new Vector3(8f, 0f, 10f), 0),
+        new(420, DefenseBattle.Spell.Taunt, default, 0, targetSpawnOrder: 2),
     };
 
     private static DefenseBattle NewBattle()
@@ -84,6 +85,9 @@ public sealed class SimulationDeterminismTests
             Mix(enemy.Health);
             Mix(enemy.AttacksPerformed);
             Mix(enemy.AttackBuffStacks);
+            Mix(enemy.MaxHealth);
+            Mix(BitConverter.SingleToInt32Bits(enemy.TauntRemaining));
+            Mix(enemy.ActiveTaunter?.SpawnOrder ?? -1);
             Mix(enemy.Target?.SpawnOrder ?? -1);
             Mix(enemy.RetaliationTarget?.SpawnOrder ?? -1);
             Mix(BitConverter.SingleToInt32Bits(enemy.RetaliationRemaining));

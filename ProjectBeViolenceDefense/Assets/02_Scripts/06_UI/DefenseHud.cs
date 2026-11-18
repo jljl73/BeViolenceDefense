@@ -26,6 +26,8 @@ internal sealed class DefenseHud
         public Sprite Lock;
         [Tooltip("선택. 비우면 방어력 버프 슬롯은 Wall 아이콘을 쓴다.")]
         public Sprite ArmorBuff;
+        [Tooltip("선택. 비우면 도발 슬롯은 Enemy 아이콘에 도발 색을 입혀 쓴다.")]
+        public Sprite Taunt;
         [Tooltip("선택. 넣으면 스킬 슬롯 뒤에 프레임을 깔고, 조준 중인 스킬은 선택 프레임으로 바꾼다.")]
         public Sprite SlotFrame;
         public Sprite SlotFrameSelected;
@@ -34,6 +36,9 @@ internal sealed class DefenseHud
     }
 
     private static readonly Vector2 SpellSlotSize = new(110, 124);
+    // 슬롯 5개를 행동 바(600px) 가운데에 놓는다. 프레임(128px)이 겹치지 않는 간격.
+    private const float SpellSlotSpacing = 124f;
+    private const float FirstSpellSlotX = -3f;
     private static readonly Vector2 ActionsSize = new(600, 184);
     private const float HealthBarThickness = 5f;
 
@@ -72,6 +77,7 @@ internal sealed class DefenseHud
     private readonly SpellSlot heal;
     private readonly SpellSlot moveSpeedBuff;
     private readonly SpellSlot armorBuff;
+    private readonly SpellSlot taunt;
     private readonly TextMeshProUGUI actionTip;
     private readonly HudButton help;
     private readonly TextMeshProUGUI helpTip;
@@ -159,6 +165,8 @@ internal sealed class DefenseHud
             DefenseBattle.Spell.MoveSpeedBuff, UIPalette.MoveSpeed, cast);
         armorBuff = CreateSpellSlot("Armor Buff", 3, "4", this.art.ArmorBuff != null ? this.art.ArmorBuff : this.art.Wall,
             DefenseBattle.Spell.ArmorBuff, UIPalette.Armor, cast);
+        taunt = CreateSpellSlot("Taunt", 4, "5", this.art.Taunt != null ? this.art.Taunt : this.art.Enemy,
+            DefenseBattle.Spell.Taunt, UIPalette.Taunt, cast, tintIcon: this.art.Taunt == null);
 
         manaGauge = Rect("Mana Gauge", spellBar, Vector2.up, Vector2.up,
             new Vector2(82, -138), new Vector2(436, 29));
@@ -293,7 +301,8 @@ internal sealed class DefenseHud
     }
 
     public void Refresh(DefenseBattle battle, DefenseGrid grid, DefenseBoardView view,
-        DefenseBattle.Spell? aimedSpell, Vector3? spellCenter, int rangeStep, int battleSpeed)
+        DefenseBattle.Spell? aimedSpell, Vector3? spellCenter, int rangeStep, int battleSpeed,
+        EnemyUnit tauntTarget = null)
     {
         bool inCombat = battle.CurrentPhase == DefenseBattle.Phase.Combat;
         // 승리도 패배처럼 판이 끝난 상태로 그린다.
@@ -328,7 +337,7 @@ internal sealed class DefenseHud
             notice.text = noticeText;
 
         bool blocked = ui.HasOpenPopup;
-        RefreshActions(battle, aimedSpell, spellCenter, rangeStep, inCombat, defeated, blocked);
+        RefreshActions(battle, aimedSpell, spellCenter, rangeStep, inCombat, defeated, blocked, tauntTarget);
         speedPanel.gameObject.SetActive(inCombat && !externalBattleInfo);
         RefreshSpeedButton(normalSpeed, battleSpeed == 1, blocked);
         RefreshSpeedButton(doubleSpeed, battleSpeed == 2, blocked);
@@ -337,7 +346,7 @@ internal sealed class DefenseHud
         help.Button.interactable = !blocked;
         StyleFlatButton(help, help.ShowTip ? UIPalette.TextPrimary : UIPalette.TextSecondary);
         SetTip(helpTip, !blocked && !defeated && (help.ShowTip || helpPinned)
-            ? (inCombat ? "1–4 aim · Left click casts · Esc cancels" : "Left click builds · Right click removes") +
+            ? (inCombat ? "1–5 aim · Left click casts · Esc cancels" : "Left click builds · Right click removes") +
               "\nWASD / RMB drag · " + (aimedSpell.HasValue ? "Wheel radius" : "Wheel zoom") + " · R restart"
             : null);
         StyleButton(restartButton, UIPalette.ButtonPrimary, UIPalette.TextOnAccent);
@@ -493,7 +502,7 @@ internal sealed class DefenseHud
     }
 
     private void RefreshActions(DefenseBattle battle, DefenseBattle.Spell? aimedSpell, Vector3? spellCenter,
-        int rangeStep, bool inCombat, bool defeated, bool blocked)
+        int rangeStep, bool inCombat, bool defeated, bool blocked, EnemyUnit tauntTarget)
     {
         actionBar.gameObject.SetActive(!defeated);
         preparePanel.gameObject.SetActive(!inCombat && !externalBattleInfo);
@@ -510,12 +519,26 @@ internal sealed class DefenseHud
         mana.text = $"{Mathf.FloorToInt(battle.Mana)} <size=80%>/ {DefenseBattle.MaxMana}</size>";
         SetBarFraction(manaFill, battle.Mana / DefenseBattle.MaxMana);
         bool spellHovered = attackBuff.Control.Hovered || heal.Control.Hovered ||
-            moveSpeedBuff.Control.Hovered || armorBuff.Control.Hovered;
+            moveSpeedBuff.Control.Hovered || armorBuff.Control.Hovered || taunt.Control.Hovered;
         string attackTip = RefreshSpell(attackBuff, battle, blocked, aimedSpell, rangeStep, spellHovered);
         string healTip = RefreshSpell(heal, battle, blocked, aimedSpell, rangeStep, spellHovered);
         string speedTip = RefreshSpell(moveSpeedBuff, battle, blocked, aimedSpell, rangeStep, spellHovered);
         string armorTip = RefreshSpell(armorBuff, battle, blocked, aimedSpell, rangeStep, spellHovered);
-        if (!blocked && aimedSpell is { } spell)
+        string tauntTip = RefreshSpell(taunt, battle, blocked, aimedSpell, rangeStep, spellHovered);
+        if (!blocked && aimedSpell == DefenseBattle.Spell.Taunt)
+        {
+            string tint = ColorUtility.ToHtmlStringRGB(taunt.Tint);
+            int pulled = 0;
+            if (tauntTarget != null)
+                foreach (EnemyUnit enemy in battle.Enemies)
+                    if (DefenseBattle.IsTauntable(tauntTarget, enemy))
+                        pulled++;
+            string reason = battle.SpellBlockReason(DefenseBattle.Spell.Taunt, 0);
+            string controls = reason ?? (tauntTarget != null ? "Click to cast · Esc" : "Point at a unit · Esc");
+            SetTip(actionTip, $"<color=#{tint}>◆ {taunt.Name}</color> · Radius {DefenseBattle.TauntRadius:0.0} · " +
+                $"{DefenseBattle.ManaCost(DefenseBattle.Spell.Taunt)} mana · Pulls {pulled}\n{controls}");
+        }
+        else if (!blocked && aimedSpell is { } spell)
         {
             SpellSlot slot = spell switch
             {
@@ -541,7 +564,7 @@ internal sealed class DefenseHud
         }
         else
         {
-            SetTip(actionTip, attackTip ?? healTip ?? speedTip ?? armorTip);
+            SetTip(actionTip, attackTip ?? healTip ?? speedTip ?? armorTip ?? tauntTip);
         }
     }
 
@@ -553,7 +576,7 @@ internal sealed class DefenseHud
         string reason = battle.SpellBlockReason(slot.Spell, rangeStep);
         bool ready = !blocked && reason == null;
         slot.Control.Button.interactable = ready;
-        Color ink = art.ColoredSkillIcons
+        Color ink = art.ColoredSkillIcons && !slot.TintIcon
             ? (ready ? Color.white : new Color(0.55f, 0.5f, 0.58f, 0.8f))
             : (ready ? slot.Tint : UIPalette.TextDisabled);
         StyleFlatButton(slot.Control, ink, aimed && !blocked, ready ? UIPalette.TextPrimary : UIPalette.TextDisabled);
@@ -564,8 +587,6 @@ internal sealed class DefenseHud
         }
         slot.Cost.color = ready ? UIPalette.Mana : UIPalette.TextSecondary;
         slot.Cost.SetText("{0}", DefenseBattle.ManaCost(slot.Spell, rangeStep));
-        slot.Charges.color = ready ? UIPalette.TextSecondary : UIPalette.TextDisabled;
-        slot.Charges.text = $"×{battle.CastsLeft(slot.Spell)}";
 
         if (blocked || !(spellHovered ? slot.Control.Hovered : slot.Control.Focused))
             return null;
@@ -576,13 +597,21 @@ internal sealed class DefenseHud
     }
 
     private SpellSlot CreateSpellSlot(string name, int index, string shortcut, Sprite sprite,
-        DefenseBattle.Spell spell, Color tint, Action<DefenseBattle.Spell> cast)
+        DefenseBattle.Spell spell, Color tint, Action<DefenseBattle.Spell> cast, bool tintIcon = false)
     {
-        HudButton control = ActionButton(name, spellBar, new Vector2(37 + index * 140, 0), SpellSlotSize,
-            () => cast(spell), sprite, shortcut, 82, flat: true);
+        bool coloredIcon = art.ColoredSkillIcons && !tintIcon;
+        int iconSize = coloredIcon ? 112 : 82;
+        HudButton control = ActionButton(name, spellBar, new Vector2(FirstSpellSlotX + index * SpellSlotSpacing, 0),
+            SpellSlotSize, () => cast(spell), sprite, shortcut, iconSize, flat: true);
         RectTransform rect = (RectTransform)control.Button.transform;
         AddFocusRing(control, new Vector2(-3, 6), 116);
-        control.Icon.preserveAspect = art.ColoredSkillIcons;
+        control.Icon.preserveAspect = coloredIcon;
+        if (coloredIcon)
+        {
+            float centerY = art.SlotFrame != null ? -52f : -48f;
+            control.Icon.rectTransform.anchoredPosition =
+                new Vector2((SpellSlotSize.x - iconSize) * 0.5f, centerY + iconSize * 0.5f);
+        }
         Image frame = null;
         if (art.SlotFrame != null)
         {
@@ -597,17 +626,19 @@ internal sealed class DefenseHud
         control.Caption.rectTransform.sizeDelta = new Vector2(18, 22);
         control.Caption.fontSize = 19;
         int costY = frame != null ? -118 : -105;
-        TextMeshProUGUI cost = Label("Cost", rect, 13, costY, 38, 24, 21, TextAlignmentOptions.Right);
+        // 사용 횟수 제한이 없으므로 마나 비용만 슬롯 아래 가운데에 보여 준다.
+        TextMeshProUGUI cost = Label("Cost", rect, 36, costY, 38, 24, 21, TextAlignmentOptions.Center);
         cost.text = DefenseBattle.ManaCost(spell).ToString();
-        TextMeshProUGUI charges = Label("Charges", rect, 60, costY, 40, 24, 21);
         string effect = spell switch
         {
+            DefenseBattle.Spell.Taunt => $"Taunt · Pick a unit · It grows with +{EnemyUnit.TauntHealthBonusPercent:P0} max HP " +
+                $"and pulls foes within {DefenseBattle.TauntRadius:0.0} tiles, even through walls, for {DefenseBattle.TauntDuration:0}s",
             DefenseBattle.Spell.AttackBuff => $"Attack buff · +{EnemyUnit.AttackBonus} damage for {DefenseBattle.BuffDuration:0}s · Stacks",
             DefenseBattle.Spell.Heal => $"Area heal · +{DefenseBattle.HealPercent:P0} max HP to injured enemies",
             DefenseBattle.Spell.MoveSpeedBuff => $"Move speed · +{EnemyUnit.MoveSpeedBonusPercent:P0} per stack for {DefenseBattle.BuffDuration:0}s",
             _ => $"Armor buff · +{EnemyUnit.ArmorBonus} armor for {DefenseBattle.BuffDuration:0}s · Stacks"
         };
-        return new SpellSlot(control, spell, tint, cost, charges, name, effect, frame);
+        return new SpellSlot(control, spell, tint, cost, name, effect, frame, tintIcon);
     }
 
     private HudButton ActionButton(string name, RectTransform parent, Vector2 position, Vector2 size,
@@ -729,22 +760,23 @@ internal sealed class DefenseHud
         public readonly DefenseBattle.Spell Spell;
         public readonly Color Tint;
         public readonly TextMeshProUGUI Cost;
-        public readonly TextMeshProUGUI Charges;
         public readonly string Name;
         public readonly string Effect;
         public readonly Image Frame;
+        // 채색 아이콘 세트에 전용 그림이 없어 흰 아이콘에 의미 색을 입혀야 하는 슬롯.
+        public readonly bool TintIcon;
 
         public SpellSlot(HudButton control, DefenseBattle.Spell spell, Color tint, TextMeshProUGUI cost,
-            TextMeshProUGUI charges, string name, string effect, Image frame = null)
+            string name, string effect, Image frame = null, bool tintIcon = false)
         {
             Frame = frame;
             Control = control;
             Spell = spell;
             Tint = tint;
             Cost = cost;
-            Charges = charges;
             Name = name;
             Effect = effect;
+            TintIcon = tintIcon;
         }
     }
 

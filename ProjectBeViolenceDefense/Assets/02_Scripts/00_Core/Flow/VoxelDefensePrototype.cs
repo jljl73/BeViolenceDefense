@@ -353,7 +353,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         Vector2 pointer = mouse.position.ReadValue();
         ReadRightButton(mouse, pointer);
         float scrollDelta = mouse.scroll.ReadValue().y;
-        if (aimedSpell.HasValue)
+        // 도발은 반경이 고정이라 조준 중에도 휠로 카메라를 확대·축소한다.
+        if (aimedSpell is { } aimed && DefenseBattle.IsAreaSpell(aimed))
             aimedRangeScroll = Mathf.Clamp(aimedRangeScroll + scrollDelta,
                 DefenseBattle.MinSpellRangeStep, DefenseBattle.MaxSpellRangeStep);
         else if (scrollDelta != 0f)
@@ -527,10 +528,52 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             UseSpell(DefenseBattle.Spell.ArmorBuff);
             return;
         }
+        if (keyboard?.digit5Key.wasPressedThisFrame == true)
+        {
+            UseSpell(DefenseBattle.Spell.Taunt);
+            return;
+        }
 
-        if (!trackingRightButton && aimedSpell is { } spell && mouse?.leftButton.wasPressedThisFrame == true &&
-            TryPickAreaSpellCenter(mouse, out Vector3 center))
+        if (trackingRightButton || aimedSpell is not { } spell || mouse?.leftButton.wasPressedThisFrame != true)
+            return;
+        if (spell == DefenseBattle.Spell.Taunt)
+        {
+            Vector2 pointer = mouse.position.ReadValue();
+            if (ui.BlocksBoardPointer(pointer))
+                return;
+            if (view.TryPickEnemy(pointer, battle.Enemies, out EnemyUnit target))
+                CastTaunt(target);
+            else
+                hud.Notify("Click a unit to taunt.");
+            return;
+        }
+        if (TryPickAreaSpellCenter(mouse, out Vector3 center))
             CastAimedSpell(spell, center);
+    }
+
+    private void CastTaunt(EnemyUnit target)
+    {
+        string blocked = battle.SpellBlockReason(DefenseBattle.Spell.Taunt, 0);
+        if (blocked != null)
+        {
+            hud.Notify(blocked);
+            return;
+        }
+
+        // 바로 적용하지 않고 다음 틱 시작에 적용한다. 결과는 OnSpellResolved 로 돌아온다.
+        battle.QueueTaunt(target);
+        SetAimedSpell(null);
+    }
+
+    private EnemyUnit HoveredTauntTarget()
+    {
+        Mouse mouse = Mouse.current;
+        if (aimedSpell != DefenseBattle.Spell.Taunt || mouse == null)
+            return null;
+        Vector2 pointer = mouse.position.ReadValue();
+        return !ui.BlocksBoardPointer(pointer) && view.TryPickEnemy(pointer, battle.Enemies, out EnemyUnit target)
+            ? target
+            : null;
     }
 
     private void CastAimedSpell(DefenseBattle.Spell spell, Vector3 center)
@@ -552,6 +595,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         IReadOnlyList<EnemyUnit> recipients)
     {
         hud.Notify(message);
+        // 도발의 첫 수신자는 도발 유닛이다. 시전 시점의 위치를 둘레로 반경을 보여준다.
+        if (command.Spell == DefenseBattle.Spell.Taunt)
+        {
+            if (recipients.Count > 0)
+                view.PlayAreaSpell(command.Spell, recipients[0].Position, DefenseBattle.TauntRadius, recipients);
+            return;
+        }
         view.PlayAreaSpell(command.Spell, command.Center, DefenseBattle.AreaSpellRadius(command.RangeStep), recipients);
     }
 
@@ -605,8 +655,9 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             ? center
             : null;
         int rangeStep = SpellRangeStep;
-        view.ShowAreaSpellPreview(aimedSpell, spellCenter, DefenseBattle.AreaSpellRadius(rangeStep));
-        hud.Refresh(battle, grid, view, aimedSpell, spellCenter, rangeStep, battleSpeed);
+        EnemyUnit tauntTarget = HoveredTauntTarget();
+        view.ShowAreaSpellPreview(aimedSpell, spellCenter, DefenseBattle.AreaSpellRadius(rangeStep), tauntTarget);
+        hud.Refresh(battle, grid, view, aimedSpell, spellCenter, rangeStep, battleSpeed, tauntTarget);
         if (leftCoreHud != null)
             leftCoreHud.Refresh(battle.CoreHealth, DefenseBattle.CoreMaxHealth);
         if (manaBarHud != null)
