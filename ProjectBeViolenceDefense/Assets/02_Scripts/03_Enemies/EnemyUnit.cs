@@ -1,65 +1,58 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
 internal sealed class EnemyFaction
 {
-    [SerializeField] private string displayName;
-    [SerializeField] private Color color;
-    [SerializeField, Min(0.1f)] private float attackRange;
-    [SerializeField, Min(0.1f)] private float awarenessRange = 2.2f;
+    public string DisplayName { get; }
+    public Color Color { get; }
+    public float AttackRange { get; }
+    public float AwarenessRange { get; }
+    public int MaxHealth { get; }
+    public int Damage { get; }
+    public float AttackInterval { get; }
+    public float DamagePerSecond => Damage / AttackInterval;
+    public int SpawnCount { get; }
+    public float MoveSpeed { get; }
+    public GameObject Model { get; }
+    public RuntimeAnimatorController Animations { get; }
+    public Material Skin { get; }
+    public float ModelScale { get; }
+    // 공격 1회마다 받는 피해를 고정으로 줄인다. 약한 공격일수록 덜 들어간다.
+    public int Armor { get; }
+    public string UnitId { get; }
 
-    [Header("Stats")]
-    [SerializeField, Min(1)] private int maxHealth = 50;
-    [SerializeField, Min(0)] private int damage = 10;
-    [SerializeField, Min(0.05f)] private float attackInterval = 0.65f;
-    [Tooltip("Units this faction spawns per round.")]
-    [SerializeField, Min(0)] private int spawnCount = 9;
-
-    [Header("Model (empty = default goblin)")]
-    [SerializeField] private GameObject model;
-    [SerializeField] private RuntimeAnimatorController animations;
-    [SerializeField] private Material skin;
-    [SerializeField, Min(0.01f)] private float modelScale = 1f;
-
-    public string DisplayName => displayName;
-    public Color Color => color;
-    public float AttackRange => attackRange;
-    public float AwarenessRange => Mathf.Max(attackRange, awarenessRange);
-    public int MaxHealth => maxHealth;
-    public int Damage => damage;
-    public float AttackInterval => attackInterval;
-    public float DamagePerSecond => damage / attackInterval;
-    public int SpawnCount => spawnCount;
-    public GameObject Model => model;
-    public RuntimeAnimatorController Animations => animations;
-    public Material Skin => skin;
-    public float ModelScale => modelScale;
-
-    public EnemyFaction(string displayName, Color color, float attackRange = 1.5f)
+    public EnemyFaction(string displayName, Color color, float attackRange = 1.5f, int maxHealth = 50,
+        int damage = 10, float attackInterval = 0.65f, int spawnCount = 9, float awarenessRange = 2.2f,
+        float moveSpeed = 1.7f, GameObject model = null, RuntimeAnimatorController animations = null,
+        Material skin = null, float modelScale = 1f, int armor = 0, string unitId = null)
     {
-        this.displayName = displayName;
-        this.color = color;
-        this.attackRange = attackRange;
-    }
-
-    public EnemyFaction(string displayName, Color color, float attackRange, int maxHealth, int damage,
-        float attackInterval, int spawnCount) : this(displayName, color, attackRange)
-    {
-        this.maxHealth = maxHealth;
-        this.damage = damage;
-        this.attackInterval = attackInterval;
-        this.spawnCount = spawnCount;
+        DisplayName = displayName;
+        Color = color;
+        AttackRange = attackRange;
+        AwarenessRange = Mathf.Max(attackRange, awarenessRange);
+        MaxHealth = maxHealth;
+        Damage = damage;
+        AttackInterval = attackInterval;
+        SpawnCount = spawnCount;
+        MoveSpeed = moveSpeed;
+        Model = model;
+        Animations = animations;
+        Skin = skin;
+        ModelScale = modelScale;
+        Armor = armor;
+        UnitId = unitId;
     }
 }
 
 internal sealed class EnemyUnit
 {
-    public const int AttackBonusPercent = 50;
-    public const int MoveSpeedBonusPercent = 30;
-    private const float MoveSpeed = 1.70f;
+    public const int AttackBonus = 10;
+    public const float MoveSpeedBonus = 0.5f;
 
     private readonly Vector3[] path;
+    private readonly List<float> attackBuffTimers = new();
+    private readonly List<float> moveSpeedBuffTimers = new();
     private int waypoint = 1;
     private int pendingDamage;
     private float cooldown;
@@ -75,8 +68,10 @@ internal sealed class EnemyUnit
     public Vector3 RouteWaypoint => path[waypoint];
     public int RemainingRouteWaypoints => path.Length - waypoint;
     public Vector3 Heading { get; private set; }
-    public float AttackBuffRemaining { get; private set; }
-    public float MoveSpeedBuffRemaining { get; private set; }
+    public int AttackBuffStacks => attackBuffTimers.Count;
+    public int MoveSpeedBuffStacks => moveSpeedBuffTimers.Count;
+    public float AttackBuffRemaining => NextBuffExpiry(attackBuffTimers);
+    public float MoveSpeedBuffRemaining => NextBuffExpiry(moveSpeedBuffTimers);
     public float HealFlash { get; private set; }
     public float AttackFlash => attackFlash;
     public int AttacksPerformed { get; private set; }
@@ -107,8 +102,31 @@ internal sealed class EnemyUnit
         cooldown = Mathf.Max(0, cooldown - deltaTime);
         attackFlash = Mathf.Max(0, attackFlash - deltaTime);
         HealFlash = Mathf.Max(0, HealFlash - deltaTime);
-        AttackBuffRemaining = Mathf.Max(0, AttackBuffRemaining - deltaTime);
-        MoveSpeedBuffRemaining = Mathf.Max(0, MoveSpeedBuffRemaining - deltaTime);
+        TickBuffs(attackBuffTimers, deltaTime);
+        TickBuffs(moveSpeedBuffTimers, deltaTime);
+    }
+
+    private static void TickBuffs(List<float> timers, float deltaTime)
+    {
+        for (int i = timers.Count - 1; i >= 0; i--)
+        {
+            float remaining = timers[i] - deltaTime;
+            if (remaining <= 0f)
+                timers.RemoveAt(i);
+            else
+                timers[i] = remaining;
+        }
+    }
+
+    private static float NextBuffExpiry(List<float> timers)
+    {
+        if (timers.Count == 0)
+            return 0f;
+
+        float remaining = timers[0];
+        for (int i = 1; i < timers.Count; i++)
+            remaining = Mathf.Min(remaining, timers[i]);
+        return remaining;
     }
 
     public void Face(Vector3 point)
@@ -124,14 +142,11 @@ internal sealed class EnemyUnit
         attackFlash = 0.14f;
         AttacksPerformed++;
         AttackHeading = Heading;
-        if (AttackBuffRemaining <= 0)
-            return Faction.Damage;
-
-        double damage = Faction.Damage * (1d + AttackBonusPercent / 100d);
-        return (int)Math.Min(int.MaxValue, Math.Round(damage, MidpointRounding.AwayFromZero));
+        return (int)Math.Min(int.MaxValue, Faction.Damage + (long)AttackBonus * AttackBuffStacks);
     }
 
-    public void QueueDamage(int damage) => pendingDamage += damage;
+    public void QueueDamage(int damage) =>
+        pendingDamage = (int)Math.Min(int.MaxValue, (long)pendingDamage + Math.Max(1, damage - Faction.Armor));
 
     public void ResolveDamage()
     {
@@ -141,9 +156,9 @@ internal sealed class EnemyUnit
 
     public void Die() => Health = 0;
 
-    public void ApplyAttackBuff(float duration) => AttackBuffRemaining = duration;
+    public void ApplyAttackBuff(float duration) => attackBuffTimers.Add(duration);
 
-    public void ApplyMoveSpeedBuff(float duration) => MoveSpeedBuffRemaining = duration;
+    public void ApplyMoveSpeedBuff(float duration) => moveSpeedBuffTimers.Add(duration);
 
     public void Heal(int amount)
     {
@@ -156,8 +171,8 @@ internal sealed class EnemyUnit
 
     public Vector3 StepToward(Vector3 destination, float deltaTime)
     {
-        float speedMultiplier = MoveSpeedBuffRemaining > 0 ? 1f + MoveSpeedBonusPercent / 100f : 1f;
-        return Vector3.MoveTowards(Position, destination, MoveSpeed * speedMultiplier * deltaTime);
+        float speed = Faction.MoveSpeed + MoveSpeedBonus * MoveSpeedBuffStacks;
+        return Vector3.MoveTowards(Position, destination, speed * deltaTime);
     }
 
     public void MoveOffRoute(Vector3 next) => Position = next;

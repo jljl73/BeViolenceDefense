@@ -118,7 +118,7 @@ internal sealed class CombatPositioning
     private bool CanAttackFromHere(EnemyUnit enemy, EnemyUnit target)
     {
         float range = enemy.Faction.AttackRange;
-        return target.IsAlive && target.Faction != enemy.Faction &&
+        return target.IsAlive && target.FactionIndex != enemy.FactionIndex &&
             (enemy.Position - target.Position).sqrMagnitude <= range * range &&
             grid.HasLineOfSight(enemy.Position, target.Position) &&
             ClearOfUnits(enemy, target, enemy.Position, target.Position, unitSpacing * 0.5f, attacking: true);
@@ -200,7 +200,7 @@ internal sealed class CombatPositioning
     private bool CanDetect(EnemyUnit enemy, EnemyUnit other)
     {
         float range = enemy.Faction.AwarenessRange;
-        return other.IsAlive && other.Faction != enemy.Faction &&
+        return other.IsAlive && other.FactionIndex != enemy.FactionIndex &&
             (other.Position - enemy.Position).sqrMagnitude <= range * range &&
             grid.HasLineOfSight(enemy.Position, other.Position);
     }

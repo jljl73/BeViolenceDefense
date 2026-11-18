@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -6,17 +7,56 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
 {
     private const float RightDragThreshold = 6f;
 
+    [System.Serializable]
+    private sealed class FactionSlot
+    {
+        [SerializeField, Tooltip("Enemy Catalog의 유닛 ID")]
+        private string unitId;
+        [SerializeField] private string displayName;
+        [SerializeField] private Color color;
+        [SerializeField, Min(0)] private int spawnCount;
+
+        public Color Color => color;
+
+        public EnemyFaction GetFaction(EnemyCatalog catalog) =>
+            catalog.GetFaction(unitId, displayName, color, spawnCount);
+    }
+
     [SerializeField] private Camera boardCamera;
     [SerializeField] private Shader voxelShader;
     [SerializeField] private UIManager ui;
     [SerializeField] private Texture2D encounterIcon;
     [SerializeField] private Sprite routeChevron;
-    [SerializeField] private GameObject goblinPrefab;
+    [SerializeField] private EnemyCatalog enemyCatalog;
     [SerializeField] private DefenseHud.Art hudArt = new();
     [SerializeField] private BoardTheme boardTheme = new();
-    // 1스테이지 임시 밸런스: 고블린 6 vs 좀비 4가 비슷한 전력으로 맞부딪치도록 맞춘 값 (docs/prototype.md 참고).
-    [SerializeField] private EnemyFaction coral = new("Coral", new Color32(255, 115, 87, 255), 1.5f, 50, 10, 0.65f, 6);
-    [SerializeField] private EnemyFaction teal = new("Teal", new Color32(69, 222, 206, 255), 1.5f, 90, 15, 1f, 4);
+    [SerializeField] private FactionSlot coral;
+    [SerializeField] private FactionSlot teal;
+    [SerializeField, Tooltip("라운드별 편성. 마지막 라운드 다음에는 처음부터 반복한다. 비어 있으면 Coral/Teal 슬롯과 기존 증원 규칙을 쓴다.")]
+    private RoundLineup[] rounds = System.Array.Empty<RoundLineup>();
+
+    [System.Serializable]
+    private sealed class SpawnGroup
+    {
+        [SerializeField, Tooltip("Enemy Catalog의 유닛 ID")]
+        private string unitId;
+        [SerializeField, Min(0)] private int count = 1;
+
+        public string UnitId => unitId;
+        public int Count => count;
+    }
+
+    [System.Serializable]
+    private sealed class RoundLineup
+    {
+        [SerializeField] private string note;
+        [SerializeField, Tooltip("왼쪽 스폰. 위에서부터 순서대로 나온다.")]
+        private SpawnGroup[] coral = System.Array.Empty<SpawnGroup>();
+        [SerializeField, Tooltip("오른쪽 스폰. 위에서부터 순서대로 나온다.")]
+        private SpawnGroup[] teal = System.Array.Empty<SpawnGroup>();
+
+        public SpawnGroup[] Side(int index) => (index == 0 ? coral : teal) ?? System.Array.Empty<SpawnGroup>();
+    }
 
     private DefenseGrid grid;
     private DefenseBoardView view;
@@ -24,22 +64,72 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private DefenseHud hud;
     private readonly BattleClock battleClock = new();
     private DefenseBattle.Spell? aimedSpell;
+    private float aimedRangeScroll;
     private int battleSpeed = 1;
     private bool trackingRightButton;
     private bool draggingCamera;
     private Vector2 previousDragPointer;
     private Vector2? rightClickPointer;
 
+    private int SpellRangeStep => Mathf.RoundToInt(aimedRangeScroll);
+
     private void Awake()
     {
+        if (enemyCatalog == null)
+        {
+            Debug.LogError("Assign an Enemy Catalog to VoxelDefensePrototype.", this);
+            enabled = false;
+            return;
+        }
+
+        EnemyFaction coralFaction = coral.GetFaction(enemyCatalog);
+        EnemyFaction tealFaction = teal.GetFaction(enemyCatalog);
+        if (coralFaction == null || tealFaction == null)
+        {
+            enabled = false;
+            return;
+        }
+
         grid = new DefenseGrid();
-        var factions = new[] { coral, teal };
-        view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme, goblinPrefab);
-        battle = new DefenseBattle(grid, factions);
+        var factions = new[] { coralFaction, tealFaction };
+        view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme);
+        battle = new DefenseBattle(grid, factions, BuildRoundLineup());
         battle.EnemySpawned += view.AddEnemy;
         battle.EnemyRemoved += view.RemoveEnemy;
         hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions);
         RefreshPlanningTiles();
+    }
+
+    // 라운드 편성을 진영(편)별 스폰 순서로 펼친다. 같은 유닛 종류는 한 객체를 공유한다.
+    private System.Func<int, IReadOnlyList<EnemyFaction>[]> BuildRoundLineup()
+    {
+        if (rounds == null || rounds.Length == 0)
+            return null;
+
+        var sideColors = new[] { coral.Color, teal.Color };
+        var units = new Dictionary<(string, int), EnemyFaction>();
+        var lineups = new IReadOnlyList<EnemyFaction>[rounds.Length][];
+        for (int r = 0; r < rounds.Length; r++)
+        {
+            lineups[r] = new IReadOnlyList<EnemyFaction>[2];
+            for (int side = 0; side < 2; side++)
+            {
+                var queue = new List<EnemyFaction>();
+                foreach (SpawnGroup group in rounds[r].Side(side))
+                {
+                    if (group == null || group.Count <= 0)
+                        continue;
+                    if (!units.TryGetValue((group.UnitId, side), out EnemyFaction unit))
+                        units[(group.UnitId, side)] = unit = enemyCatalog.GetUnit(group.UnitId, sideColors[side], $"Round {r + 1}");
+                    if (unit == null)
+                        continue;
+                    for (int i = 0; i < group.Count; i++)
+                        queue.Add(unit);
+                }
+                lineups[r][side] = queue;
+            }
+        }
+        return round => lineups[(round - 1) % lineups.Length];
     }
 
     private void Update()
@@ -140,7 +230,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         Vector2 pointer = mouse.position.ReadValue();
         ReadRightButton(mouse, pointer);
         float scrollDelta = mouse.scroll.ReadValue().y;
-        if (scrollDelta != 0f)
+        if (aimedSpell.HasValue)
+            aimedRangeScroll = Mathf.Clamp(aimedRangeScroll + scrollDelta,
+                DefenseBattle.MinSpellRangeStep, DefenseBattle.MaxSpellRangeStep);
+        else if (scrollDelta != 0f)
             view.QueueZoom(scrollDelta, pointer);
     }
 
@@ -260,10 +353,21 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
 
         if (!trackingRightButton && aimedSpell is { } spell && mouse?.leftButton.wasPressedThisFrame == true &&
             TryPickAreaSpellCenter(mouse, out Vector3 center))
+            CastAimedSpell(spell, center);
+    }
+
+    private void CastAimedSpell(DefenseBattle.Spell spell, Vector3 center)
+    {
+        int rangeStep = SpellRangeStep;
+        string blocked = battle.SpellBlockReason(spell, rangeStep);
+        if (blocked != null)
         {
-            hud.Notify(battle.CastAreaSpell(spell, center));
-            SetAimedSpell(null);
+            hud.Notify(blocked);
+            return;
         }
+
+        hud.Notify(battle.CastAreaSpell(spell, center, rangeStep));
+        SetAimedSpell(null);
     }
 
     private bool TryPickAreaSpellCenter(Mouse mouse, out Vector3 center)
@@ -281,13 +385,21 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Combat)
             return;
 
-        string blocked = battle.SpellBlockReason(spell);
+        if (aimedSpell == spell)
+            return;
+
+        int rangeStep = battle.InitialSpellRangeStep(spell);
+        string blocked = battle.SpellBlockReason(spell, rangeStep);
         if (blocked == null)
-            SetAimedSpell(spell);
+            SetAimedSpell(spell, rangeStep);
         hud.Notify(blocked ?? "");
     }
 
-    private void SetAimedSpell(DefenseBattle.Spell? spell) => aimedSpell = spell;
+    private void SetAimedSpell(DefenseBattle.Spell? spell, int rangeStep = 0)
+    {
+        aimedSpell = spell;
+        aimedRangeScroll = rangeStep;
+    }
 
     private void Restart() => SceneManager.LoadScene(gameObject.scene.buildIndex);
 
@@ -300,8 +412,9 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         Vector3? spellCenter = aimedSpell.HasValue && TryPickAreaSpellCenter(Mouse.current, out Vector3 center)
             ? center
             : null;
-        view.ShowAreaSpellPreview(aimedSpell, spellCenter);
-        hud.Refresh(battle, grid, view, aimedSpell, spellCenter, battleSpeed);
+        int rangeStep = SpellRangeStep;
+        view.ShowAreaSpellPreview(aimedSpell, spellCenter, DefenseBattle.AreaSpellRadius(rangeStep));
+        hud.Refresh(battle, grid, view, aimedSpell, spellCenter, rangeStep, battleSpeed);
     }
 
     private void OnApplicationFocus(bool focused)

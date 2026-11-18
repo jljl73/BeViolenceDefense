@@ -20,6 +20,11 @@ public sealed class BoardTheme
     public Color fixedWallTint = new Color32(130, 130, 140, 255);
     public Color trim = new Color32(178, 198, 199, 255);
 
+    [Header("코어 표현")]
+    [Tooltip("코어 받침대 위에 표시할 캐릭터 프리팹")]
+    public GameObject coreCharacterPrefab;
+    [Min(0.01f)] public float coreCharacterScale = 1.6f;
+
     [Header("타일 형태")]
     [Tooltip("타일 사이 간격 (칸 크기 1 기준)")]
     [Range(0f, 0.2f)] public float tileGap = 0.06f;

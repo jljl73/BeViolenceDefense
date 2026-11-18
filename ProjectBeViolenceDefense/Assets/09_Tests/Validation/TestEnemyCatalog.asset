@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8501cfafe5e2490fa10e4e5250df83f8, type: 3}
+  m_Name: TestEnemyCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCatalog
+  entries:
+  - id: coral-block
+    displayName: "\uCF54\uB784 \uD14C\uC2A4\uD2B8 \uBE14\uB85D"
+    model: {fileID: 0}
+    animations: {fileID: 0}
+    skin: {fileID: 0}
+    modelScale: 1
+    maxHealth: 50
+    damage: 10
+    attackInterval: 0.65
+    attackRange: 0.9
+    awarenessRange: 2.2
+    moveSpeed: 1.7
+  - id: teal-block
+    displayName: "\uD2F8 \uD14C\uC2A4\uD2B8 \uBE14\uB85D"
+    model: {fileID: 0}
+    animations: {fileID: 0}
+    skin: {fileID: 0}
+    modelScale: 1
+    maxHealth: 90
+    damage: 15
+    attackInterval: 1
+    attackRange: 0.9
+    awarenessRange: 2.2
+    moveSpeed: 1.7

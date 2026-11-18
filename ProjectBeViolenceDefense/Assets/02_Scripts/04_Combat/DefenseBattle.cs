@@ -6,11 +6,15 @@ internal sealed class DefenseBattle
 {
     public const int CoreMaxHealth = 120;
     public const int HealAmount = 10;
-    public const float BuffDuration = 4f;
-    public const float AreaSpellRadius = 1.4f;
+    public const float BuffDuration = 6f;
+    public const float DefaultAreaSpellRadius = DefaultSpellRadiusTenths / 10f;
+    public const int MinSpellRangeStep = -4;
+    public const int MaxSpellRangeStep = 5;
     public const int MaxMana = 70;
 
     private const int CastsPerSpell = 3;
+    private const int DefaultSpellRadiusTenths = 14;
+    private const int MaxSpellManaAdjustment = 2;
     private const float StartingMana = MaxMana * 0.5f;
     private const float ManaPerSecond = 7f;
     // 스폰 지점마다 이 간격으로 한 마리씩 줄지어 나온다.
@@ -31,6 +35,9 @@ internal sealed class DefenseBattle
     private readonly CombatPositioning combat;
     private readonly int[] spawnedPerFaction;
     private readonly int[] roundSpawnCounts;
+    // 라운드 번호 -> 진영(편)별 스폰 순서. null 이면 진영 하나를 기존 증원 규칙대로 반복한다.
+    private readonly Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup;
+    private IReadOnlyList<EnemyFaction>[] roundQueues;
     private float untilSpawn;
     private float untilCombatPlan;
 
@@ -48,10 +55,12 @@ internal sealed class DefenseBattle
     public int HealsLeft { get; private set; }
     public float Mana { get; private set; }
 
-    public DefenseBattle(DefenseGrid grid, EnemyFaction[] factions)
+    public DefenseBattle(DefenseGrid grid, EnemyFaction[] factions,
+        Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup = null)
     {
         this.grid = grid;
         this.factions = factions;
+        this.roundLineup = roundLineup;
         combat = new CombatPositioning(grid, enemies, UnitSpacing);
         spawnedPerFaction = new int[factions.Length];
         roundSpawnCounts = new int[factions.Length];
@@ -62,6 +71,19 @@ internal sealed class DefenseBattle
     {
         int roundsCleared = Round - 1;
         EnemiesPerRound = 0;
+        if (roundLineup != null)
+        {
+            roundQueues = roundLineup(Round);
+            for (int i = 0; i < factions.Length; i++)
+            {
+                roundSpawnCounts[i] = roundQueues != null && i < roundQueues.Length && roundQueues[i] != null
+                    ? roundQueues[i].Count
+                    : 0;
+                EnemiesPerRound += roundSpawnCounts[i];
+            }
+            return;
+        }
+
         for (int i = 0; i < factions.Length; i++)
         {
             int baseCount = factions[i].SpawnCount;
@@ -95,7 +117,14 @@ internal sealed class DefenseBattle
             Mana = Mathf.Min(MaxMana, Mana + ManaPerSecond * deltaTime);
     }
 
-    public static int ManaCost(Spell spell) => spell == Spell.Heal ? 32 : 24;
+    public static float AreaSpellRadius(int rangeStep) =>
+        (DefaultSpellRadiusTenths + Mathf.Clamp(rangeStep, MinSpellRangeStep, MaxSpellRangeStep) * 2) / 10f;
+
+    public static int ManaCost(Spell spell, int rangeStep = 0) =>
+        (spell == Spell.Heal ? 32 : 24) + Mathf.Clamp(rangeStep, -MaxSpellManaAdjustment, MaxSpellManaAdjustment);
+
+    public int InitialSpellRangeStep(Spell spell) =>
+        Mathf.Clamp(Mathf.FloorToInt(Mana) - ManaCost(spell), -MaxSpellManaAdjustment, 0);
 
     public int CastsLeft(Spell spell) => spell switch
     {
@@ -104,41 +133,41 @@ internal sealed class DefenseBattle
         _ => HealsLeft
     };
 
-    public string SpellBlockReason(Spell spell)
+    public string SpellBlockReason(Spell spell, int rangeStep)
     {
         if (CurrentPhase != Phase.Combat)
             return "Battle only";
         if (CastsLeft(spell) == 0)
             return "No casts left";
-        if (Mana < ManaCost(spell))
+        if (Mana < ManaCost(spell, rangeStep))
             return "Not enough mana";
         return null;
     }
 
-    public static bool IsInAreaSpellRange(EnemyUnit enemy, Vector3 center)
+    public static bool IsInAreaSpellRange(EnemyUnit enemy, Vector3 center, float radius)
     {
         Vector3 offset = enemy.Position - center;
-        return enemy.IsAlive && offset.x * offset.x + offset.z * offset.z <= AreaSpellRadius * AreaSpellRadius;
+        return enemy.IsAlive && offset.x * offset.x + offset.z * offset.z <= radius * radius;
     }
 
     public static bool CanReceiveAreaSpell(EnemyUnit enemy, Spell spell) => spell switch
     {
-        Spell.AttackBuff => enemy.AttackBuffRemaining <= 0,
-        Spell.MoveSpeedBuff => enemy.MoveSpeedBuffRemaining <= 0,
+        Spell.AttackBuff or Spell.MoveSpeedBuff => enemy.IsAlive,
         Spell.Heal => enemy.Health < enemy.MaxHealth,
         _ => false
     };
 
-    public string CastAreaSpell(Spell spell, Vector3 center)
+    public string CastAreaSpell(Spell spell, Vector3 center, int rangeStep)
     {
-        string blocked = SpellBlockReason(spell);
+        string blocked = SpellBlockReason(spell, rangeStep);
         if (blocked != null)
             return blocked;
 
+        float radius = AreaSpellRadius(rangeStep);
         int affected = 0;
         foreach (EnemyUnit enemy in enemies)
         {
-            if (!IsInAreaSpellRange(enemy, center) || !CanReceiveAreaSpell(enemy, spell))
+            if (!IsInAreaSpellRange(enemy, center, radius) || !CanReceiveAreaSpell(enemy, spell))
                 continue;
 
             switch (spell)
@@ -159,7 +188,7 @@ internal sealed class DefenseBattle
         if (affected == 0)
             return spell == Spell.Heal ? "No injured enemies in range." : "No eligible enemies in range.";
 
-        Mana -= ManaCost(spell);
+        Mana -= ManaCost(spell, rangeStep);
         switch (spell)
         {
             case Spell.AttackBuff:
@@ -178,12 +207,12 @@ internal sealed class DefenseBattle
 
     public IReadOnlyCollection<Vector2Int> ForecastEncounterCells()
     {
-        if (factions[0].SpawnCount == 0 || factions[1].SpawnCount == 0 || factions[0] == factions[1])
+        if (roundSpawnCounts[0] == 0 || roundSpawnCounts[1] == 0)
             return Array.Empty<Vector2Int>();
 
         Vector3[] firstRoute = grid.Routes[0];
         Vector3[] secondRoute = grid.Routes[1];
-        float range = Mathf.Max(factions[0].AttackRange, factions[1].AttackRange);
+        float range = Mathf.Max(RoundUnit(0, 0).AttackRange, RoundUnit(1, 0).AttackRange);
         // Compare the leaders after each tile step. The last point is a core contact, not a tile.
         int tileCount = Mathf.Min(firstRoute.Length, secondRoute.Length) - 1;
         for (int step = 0; step < tileCount; step++)
@@ -289,6 +318,12 @@ internal sealed class DefenseBattle
         }
     }
 
+    // 이번 라운드에 진영(편) side 에서 index 번째로 나오는 유닛 종류.
+    public EnemyFaction RoundUnit(int side, int index) =>
+        roundQueues != null ? roundQueues[side][index] : factions[side];
+
+    public int RoundSpawnCount(int side) => roundSpawnCounts[side];
+
     private void SpawnNext()
     {
         for (int factionIndex = 0; factionIndex < grid.Routes.Count; factionIndex++)
@@ -298,7 +333,8 @@ internal sealed class DefenseBattle
 
             spawnedPerFaction[factionIndex]++;
             var path = (Vector3[])grid.Routes[factionIndex].Clone();
-            var enemy = new EnemyUnit(factions[factionIndex], factionIndex, path, SpawnCount);
+            var enemy = new EnemyUnit(RoundUnit(factionIndex, spawnedPerFaction[factionIndex] - 1), factionIndex, path,
+                SpawnCount);
             SpawnCount++;
             enemies.Add(enemy);
             EnemySpawned?.Invoke(enemy);
