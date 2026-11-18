@@ -280,3 +280,79 @@
 - Unity 기본 안개(Linear)를 켜면 직교 카메라에서 화면 전체가 청록색으로 덮이는 문제를 확인해 사용하지 않음. 대신 생성 시 거리 기반으로 안개 색을 섞음(카메라 이동·줌에 따라 바뀌지 않음).
 - 줌 최대 축소(145%)·카메라 이동 시 배경 끝이 보이는지, 전투 중 유닛과 잎 파티클의 가독성, 상단 HUD 글자가 나무 위에서 읽히는지는 직접 확인하지 않음.
 - Netmarble Medium SDF.asset 1줄 변경은 에디터가 만든 것으로 보이며 이번 작업 범위가 아님.
+
+### [20261118-amethyst-ranges] 원본 산을 이용한 2칸·3칸 산맥 제작
+- 시각: 2026-11-18 20:13:20 +09:00
+- 작업자: ppzepi
+- 사용 도구: OpenAI Codex / Blender MCP / Blender 5.3.0 / PowerShell
+- 목적 및 적용 위치: 제공된 Meshy 산과 유사한 2×1·3×1 그리드용 산맥, Art3D/AmethystRanges.
+- 사용 방식: 원본 FBX·PNG 및 프로젝트의 URP/Input System/uGUI/DefenseGrid를 확인하고, 원본 UV·텍스처를 보존한 봉우리 변형과 Boolean Union으로 단일 연결 메시 생성. 피벗·바닥 크기를 맞추어 FBX/GLB와 편집용 blend 저장.
+- 결과 및 확인 방법: 성공(모델 제작 범위). 2칸 1.92×0.92, 높이 0.938, 276삼각형 / 3칸 2.92×0.92, 높이 1.006, 474삼각형. 각 메시 연결 성분 1, 경계·비매니폴드 에지 0. 최종 FBX 재임포트로 치수·원점·UV·2048px 텍스처 확인. GLB별 메시 1·내장 이미지 1 확인. 비교 렌더 육안 검토.
+- 사람의 개입: 원본 폴더 및 Blender MCP 사용을 사용자가 지정. 최종 외형 검토·게임 채택은 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art3D/AmethystRanges/README.md | Codex | 생성 | 전체 결과물 매니페스트·치수·배치·검증·적용 제한. 로컬 검토용 |
+| Art3D/AmethystRanges/Amethyst_Range_2x1.fbx, Amethyst_Range_3x1.fbx 및 동명 GLB | Blender MCP | 생성 | 원본 파생 산맥 2종, 텍스처 내장. 게임 미적용 |
+| Art3D/AmethystRanges/Amethyst_Ranges.blend, Amethyst_BaseColor.png | Blender MCP | 생성·복사 | 새 작업 씬 및 제공 PNG 복사. 기존 Blender 씬 보존, 원본 PNG 변경 없음 |
+| Art3D/AmethystRanges/build_ranges.py, 비교 PNG 2개, 검증 JSON 2개 및 FBM 폴더 | Codex / Blender MCP | 생성 | 제작 과정·시각 확인·재임포트 증거, 상세 목록은 매니페스트 참조 |
+| ai-use/ppzepi.md | Codex | 추가 | 본 작업 기록 |
+
+#### 증거
+- Art3D/AmethystRanges/Amethyst_Ranges_Comparison.png
+- Art3D/AmethystRanges/validation.json, Art3D/AmethystRanges/export_validation.json
+- Art3D는 기존 Git 제외 경로이므로 위 증거는 현재 로컬에만 존재.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex의 파일 도구·PowerShell과 Blender MCP, Art3D/AmethystRanges.
+- 사용 방식: 프로젝트 및 원본 검사 → Blender Python 생성 → 메시 검사 → 렌더 검토 → FBX/GLB 재검증 → 저장. 초기 GLB가 다른 씬의 선택 객체를 포함한 문제를 발견하여 활성 씬 한정 내보내기로 수정하고 최종 산맥 메시만 포함됨을 확인.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: `C:\Users\Choij\Downloads\Meshy_AI_Amethyst_Peaks_20261118_texture_fbx 해당 폴더 속 3d 오브젝트를 그리드의 한칸을 차지한다고 가정한 후, 이것과 유사한 2칸, 3칸 차지에 어울리는 산맥 오브젝트도 제작해봐 blender mcp있어`
+- 결과 및 실제 활용 방식: 제공 모델을 기준으로 2×1·3×1 산맥 파일 제작.
+- 선정 이유: 원본 스타일, 점유 크기와 제작 도구를 지정한 핵심 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Unity 씬·Assets·코드를 변경하지 않은 에셋 제작 작업으로 Unity CLI/컴파일/Play Mode는 실행하지 않음. Unity 임포트·URP 재질·다중 셀 점유 및 충돌 연결, 최종 외형 채택은 미확인.
+
+### [20261118-amethyst-import] 산맥 3종 한 칸 크기 임포트
+- 시각: 2026-11-18 20:19:28 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / Blender MCP 5.3.0 / Unity MCP 6000.3.28f1 / PowerShell
+- 목적 및 적용 위치: 원본·2봉·3봉 산을 모두 한 칸용 에셋으로 임포트.
+- 사용 방식: FBX 복사, ModelImporter 균일 축소, URP 공용 재질 연결, 바닥 중앙 프리팹과 0.92×0.92 BoxCollider 저장.
+- 결과 및 확인 방법: 성공. Unity 프리팹 재로드 검사에서 크기·바닥 정렬·URP 재질 확인. 크기 X/Y/Z: 원본 0.92/0.78/0.89, 2봉 0.92/0.45/0.44, 3봉 0.92/0.32/0.29.
+- 사람의 개입: 사용자가 3종 임포트와 각각 한 칸 크기 조정 요청. 외형 최종 검토 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Environment/Amethyst/ | Blender MCP / Unity MCP | 생성 | FBX 3개 및 meta, 한 칸 크기 임포트 설정과 재질 매핑 적용 |
+| ProjectBeViolenceDefense/Assets/05_Art/06_Textures/Amethyst/ | Codex / Unity MCP | 생성 | BaseColor PNG 복사 및 meta |
+| ProjectBeViolenceDefense/Assets/05_Art/02_Materials/Amethyst/ | Unity MCP | 생성 | Amethyst URP/Lit 재질 및 meta |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/04_World/Amethyst/ | Unity MCP | 생성 | OneCell 프리팹 3개 및 meta, 배치용 저장 완료 |
+| Art3D/AmethystRanges/Amethyst_Peak_1x1.fbx | Blender MCP | 생성 | 정규화한 원본 내보내기, 로컬 제작 파일 |
+
+#### 증거
+- 위 FBX.meta의 globalScale 및 재질 매핑, OneCell.prefab의 참조·충돌 설정.
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: unity --help 실행 시도.
+- 활용 방식: CLI 가용성 확인 후 Unity MCP로 전환.
+- 잘된 점: MCP로 실제 프로젝트·버전 확인 및 에셋 저장·검증.
+- 잘 안된 점 및 개선 필요: unity 실행 파일을 PATH에서 찾지 못함. 큰 eval 요청 시간 초과 후 작은 작업 단위로 나누어 완료.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex 파일 작업 및 MCP 제어.
+- 사용 방식: 기존 아트 폴더 확인, 원본 내보내기, 3종 임포트와 프리팹 검증.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: 해당 3개를 현재 프로젝트의 적절한 폴더 위치에 import 하고 그리드 한칸을 차지하도록 조율해.
+- 결과 및 실제 활용 방식: 각 모델을 균일 축소하여 한 칸 프리팹으로 저장.
+- 선정 이유: 이전 2·3칸 용도를 각 한 칸으로 변경한 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 게임 씬 배치 및 길찾기 점유 연결은 요청 범위 밖으로 수행하지 않음. Play Mode 미실행. UI 확인은 Computer Use의 Unity 접근 미승인으로 실패했으며 최종 검증은 정상 복구된 MCP로 수행.
