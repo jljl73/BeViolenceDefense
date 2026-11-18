@@ -91,6 +91,7 @@ public sealed class DefenseGrid
             return result;
 
         placed.Add(cell);
+        NavigationVersion++;
         routes = updated;
         return BuildResult.Placed;
     }
@@ -108,14 +109,8 @@ public sealed class DefenseGrid
         if (placed.Count >= WallLimit)
             return BuildResult.LimitReached;
 
-        Vector3[][] updated = FindRoutes(cell);
-        if (updated == null)
-            return BuildResult.BlocksRoute;
-
-        placed.Add(cell);
-        NavigationVersion++;
-        routes = updated;
-        return BuildResult.Placed;
+        updated = FindRoutes(cell);
+        return updated == null ? BuildResult.BlocksRoute : BuildResult.Placed;
     }
 
     public bool TryRemove(Vector2Int cell)
