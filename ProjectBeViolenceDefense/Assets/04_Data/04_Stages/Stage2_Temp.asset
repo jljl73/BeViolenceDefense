@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2073990d430741046825d63736970c68, type: 3}
   m_Name: Stage2_Temp
   m_EditorClassIdentifier: Assembly-CSharp::StageData
+  displayNameKey: stage.2
   width: 19
   depth: 18
   core:
