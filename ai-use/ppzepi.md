@@ -822,3 +822,39 @@
 
 #### 미확인 및 후속 확인
 - Play Mode 확인 안 함: 같은 팩션 스폰이 여러 개인 Stage2~4는 어떤 씬도 참조하지 않고 웨이브 SO도 연결되지 않음. 해당 스테이지를 씬에 연결하면 준비 단계마다 경로 표시가 한 스폰으로 바뀌는지 확인 필요.
+
+### [20261119-0721-merge-main-conflicts] main → feature/first-stage 머지 충돌 해결
+- 시각: 2026-11-19 07:21:17 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (Claude Opus 5.5), Unity CLI 1.0.0 + 열린 Unity 6000.3.28f1 Editor
+- 목적 및 적용 위치: `Merge branch 'main' into feature/first-stage` 진행 중 충돌 5건 해결. 스크립트 3개(VoxelDefensePrototype, DefenseBattle, DefenseBoardView)와 Stage2.asset/.meta.
+- 사용 방식: 충돌 구간과 양쪽 커밋(HEAD 506dec2 진영별 스폰 무작위 선택, main 5f95d74 웨이브 예고 연출)을 비교해 AI가 해결안 작성·적용. 두 기능을 모두 유지하고, main의 새 경로 표시 코드가 `grid.Routes` 대신 `battle.RoundRoutes()`(쓰지 않는 스폰은 null)를 받도록 맞춤.
+  - DefenseBattle: main의 이동속도 반영 교전 예고(`EncounterForecast`)를 유지하고 스폰 순회만 `RoundSpawns`로 교체.
+  - VoxelDefensePrototype: main의 `PlayWaveStartForecast`·경로 변화 강조·스폰 예고를 유지하고 경로 입력을 `RoundRoutes()`로 교체. 준비 단계의 스폰 예고에서 이번 라운드에 쓰지 않는 스폰을 숨김(다음 웨이브 미리보기는 스폰을 아직 고르지 않아 전체 표시).
+  - DefenseBoardView: `DrawRoutes`, 스폰 구조물 방향, `PlayRouteTracers`에서 null 경로를 건너뛰고 `ShowSpawnForecast`에 선택 인자 `routes` 추가.
+  - Stage2.asset: 양쪽이 서로 다른 GUID로 각각 새로 만든 파일. main 판(GUID 0490…)은 `Stage_GoldenMaple.prefab`이 참조하므로 경로·GUID 유지. HEAD 판(GUID 23b6…, 참조 없음)은 내용·GUID를 그대로 `Stage2_Temp.asset`으로 옮겨 보존(m_Name만 변경).
+- 결과 및 확인 방법: 성공(머지 커밋은 아직 안 함). 충돌 마커 0건, unmerged 경로 0건 확인. Editor 재컴파일 오류 0건. EditMode 테스트 93개 중 92개 통과(`StageWavesTests.FactionWithSeveralSpawnsUsesOnlyThePickedOne` 포함). 실패 1건 `StageContentTests.SharedSceneHasOneSelectorWithFourDistinctStageChoices`(기대 4, 실제 5)는 테스트와 GameScene이 main과 동일해 main에도 있는 기존 문제로 판단.
+- 사람의 개입: 확인 필요(해결 방향 검토 및 머지 커밋 여부 결정 대기).
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs | Claude Code | 수정 | 교전 예고 충돌 해결. stage됨 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 충돌 2건 해결, 경로 입력을 RoundRoutes로 교체. stage됨 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Claude Code | 수정 | 충돌 해결, null 경로 처리. stage됨 |
+| ProjectBeViolenceDefense/Assets/04_Data/04_Stages/Stage2.asset(.meta) | Claude Code | 수정 | main 판 채택. stage됨 |
+| ProjectBeViolenceDefense/Assets/04_Data/04_Stages/Stage2_Temp.asset(.meta) | Claude Code | 생성 | HEAD 판 Stage2 보존. stage됨, 사용 여부 확인 필요 |
+
+#### 증거
+- 없음
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 머지 후 컴파일 확인, EditMode 테스트 실행.
+- 활용 방식: `unity status`로 열린 Editor 확인 → `unity recompile` → `unity command console status` → `unity command test run --mode editor`.
+- 잘된 점: 열린 Editor에서 컴파일 결과와 테스트별 결과를 JSON으로 바로 확인.
+- 잘 안된 점 및 개선 필요: 머지 직후 에셋 import·컴파일 중이라 첫 `recompile`이 시간 초과되어 `status --until-ready`로 기다린 뒤 다시 실행.
+
+#### 미확인 및 후속 확인
+- Play Mode 미확인: 스폰이 여러 개인 스테이지에서 웨이브 예고 선분·교전 예고·스폰 예고가 선택된 스폰에만 표시되는지 직접 확인 필요.
+- Stage2_Temp를 유지할지, 별도 이름으로 바꿀지, 삭제할지 결정 필요.
+- StageContentTests의 스테이지 개수 기대값(4 → 5) 갱신은 main 쪽 후속 작업.

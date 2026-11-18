@@ -54,6 +54,7 @@ internal sealed class SpellEffects
         DefenseBattle.Spell.AttackBuff => UIPalette.Attack,
         DefenseBattle.Spell.MoveSpeedBuff => UIPalette.MoveSpeed,
         DefenseBattle.Spell.ArmorBuff => UIPalette.Armor,
+        DefenseBattle.Spell.Taunt => UIPalette.Taunt,
         _ => UIPalette.Heal
     };
 

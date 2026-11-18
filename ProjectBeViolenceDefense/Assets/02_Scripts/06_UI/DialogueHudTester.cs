@@ -8,17 +8,20 @@ using UnityEngine.InputSystem;
 public sealed class DialogueHudTester : MonoBehaviour
 {
     [SerializeField] private DialogueHud dialogue;
-    [SerializeField] private DialogueHud.Line[] lines =
+    private static readonly DialogueHud.Line[] Intro =
     {
-        new() { speaker = "Mage", expression = DialogueHud.Expression.Neutral, text = "Two armies are marching on the core..." },
-        new() { speaker = "Mage", expression = DialogueHud.Expression.Troubled, text = "I can't fight either of them.\nNot even a little." },
-        new() { speaker = "Mage", expression = DialogueHud.Expression.Surprised, text = "Wait. They hate each other more than they hate me?" },
-        new() { speaker = "Mage", expression = DialogueHud.Expression.Happy, text = "If I can make them meet, they will wear each other down!" },
+        new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Neutral, textKey = "dialogue.intro.1" },
+        new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Troubled, textKey = "dialogue.intro.2" },
+        new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Surprised, textKey = "dialogue.intro.3" },
+        new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Happy, textKey = "dialogue.intro.4" },
+        new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Teary, textKey = "dialogue.intro.5" },
+        new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Shock, textKey = "dialogue.intro.6" },
+        new() { speakerKey = "speaker.wizard", expression = DialogueHud.Expression.Breakdown, textKey = "dialogue.intro.7" },
     };
 
     private void Update()
     {
         if (dialogue != null && !dialogue.IsOpen && Keyboard.current?.tKey.wasPressedThisFrame == true)
-            dialogue.Play(lines);
+            dialogue.Play(Intro);
     }
 }

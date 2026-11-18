@@ -8,6 +8,7 @@ public sealed class DefenseGrid
     public const int WallLimit = 8;
     public const float WallWidth = 0.92f;
     public const float WallHeight = 0.8f;
+    private const float SightInset = (1f - WallWidth) * 0.5f;
 
     private static readonly Vector2Int[] Directions =
     {
@@ -123,19 +124,23 @@ public sealed class DefenseGrid
         return true;
     }
 
+    // 코어도 벽처럼 시야와 공격을 막는다. 벽과 같은 여유(칸 가장자리에서 SightInset)를 두어
+    // 모서리를 스치는 시선은 통과시킨다.
     public bool HasLineOfSight(Vector3 from, Vector3 to)
-        => IsWallFree(from, to, 0f);
+        => !CrossesCore(from, to, SightInset) && IsWallFree(from, to, 0f);
 
     public bool CanPursue(Vector3 from, Vector3 to)
+        => !CrossesCore(from, to, 0f) && IsWallFree(from, to, 0.24f);
+
+    private bool CrossesCore(Vector3 from, Vector3 to, float inset)
     {
         Vector3 step = to - from;
         float length = step.magnitude;
         if (length == 0f)
-            return true;
+            return false;
 
-        var coreBounds = new Bounds(CorePosition, new Vector3(CoreSize.x, 1f, CoreSize.y));
-        return (!coreBounds.IntersectRay(new Ray(from, step / length), out float distance) || distance > length) &&
-            IsWallFree(from, to, 0.24f);
+        var coreBounds = new Bounds(CorePosition, new Vector3(CoreSize.x - inset * 2f, 1f, CoreSize.y - inset * 2f));
+        return coreBounds.IntersectRay(new Ray(from, step / length), out float distance) && distance <= length;
     }
 
     private bool IsWallFree(Vector3 from, Vector3 to, float wallExpansion)

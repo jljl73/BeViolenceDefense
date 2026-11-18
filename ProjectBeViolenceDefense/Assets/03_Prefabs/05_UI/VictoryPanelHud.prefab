@@ -608,7 +608,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: STAGE CLEAR
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
@@ -1701,8 +1701,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -430, y: -40}
-  m_SizeDelta: {x: 589.6817, y: 940}
+  m_AnchoredPosition: {x: -430, y: -160.92464}
+  m_SizeDelta: {x: 787.2697, y: 1180.9045}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1262375890646924116
 CanvasRenderer:
@@ -1732,13 +1732,13 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: a137e956e90d42c41953cace4bcb5655, type: 3}
+  m_Texture: {fileID: 2800000, guid: 2d04f6c526567d84596ad7cdf5f67654, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
-    y: 0
-    width: 1
-    height: 1
+    y: 0.75
+    width: 0.14285715
+    height: 0.25
 --- !u!225 &8146175334212013664
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2084,7 +2084,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Retry
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
@@ -3308,9 +3308,20 @@ MonoBehaviour:
   - {fileID: 4311268608376423768}
   - {fileID: 3210462339103540505}
   - {fileID: 5625436782668584356}
+  characterSheet: {fileID: 2800000, guid: 2d04f6c526567d84596ad7cdf5f67654, type: 3}
+  sheetColumns: 7
+  sheetRows: 4
+  sheetFrames: 28
+  sheetFps: 9.96
   panel: {fileID: 616649222553467596}
   panelGroup: {fileID: 8104800512012381019}
   stageText: {fileID: 2765602583174650822}
+  titleText: {fileID: 6861424277298682833}
+  retryCaption: {fileID: 8812215029044522752}
+  coreCaption: {fileID: 7531902440253613722}
+  nextCaption: {fileID: 1240510883495035759}
+  leakedCaption: {fileID: 6389375730415939762}
+  fallenCaption: {fileID: 3801703879939789373}
   coreText: {fileID: 1412778879782193499}
   leakedText: {fileID: 2456920187896858274}
   fallenText: {fileID: 9149069026190229430}
@@ -3320,6 +3331,7 @@ MonoBehaviour:
   panelOffset: 260
   bobHeight: 10
   testKey: 1
+  testKeyCode: 36
 --- !u!1 &4303143461731688228
 GameObject:
   m_ObjectHideFlags: 0
@@ -3954,7 +3966,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Core health left
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
@@ -4444,7 +4456,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Next stage
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
@@ -4617,7 +4629,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: STAGE 1
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
@@ -5009,9 +5021,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Enemies that
-
-    reached the core'
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
@@ -6086,9 +6096,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Enemies that
-
-    fell fighting each other'
+  m_text: ""
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}
   m_sharedMaterial: {fileID: 6927683306136641325, guid: 533d20e11dec844e9bdc15eca1fa0c0a, type: 2}

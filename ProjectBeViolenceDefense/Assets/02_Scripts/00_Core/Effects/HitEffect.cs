@@ -7,7 +7,9 @@ using UnityEngine.Rendering;
 /// </summary>
 internal sealed class HitEffect : MonoBehaviour
 {
-    private const float Duration = 0.26f;
+    private const float Duration = 0.22f;
+    private const float FlashDuration = 0.065f;
+    private const float RingDuration = 0.15f;
     private const float FlashSize = 0.62f;
     private const float RingSize = 0.85f;
     private const int SparkCount = 5;
@@ -90,11 +92,13 @@ internal sealed class HitEffect : MonoBehaviour
         float burst = 1f - (1f - t) * (1f - t);
         float fade = 1f - t;
 
-        flash.transform.localScale = Vector3.one * (FlashSize * Mathf.Lerp(0.55f, 1f, burst));
-        flash.color = WithAlpha(Color.Lerp(Color.white, tint, Mathf.Lerp(t * 0.7f, 1f, colorEmphasis)), fade * fade);
+        float flashFade = Mathf.Clamp01(1f - age / FlashDuration);
+        flash.transform.localScale = Vector3.one * (FlashSize * Mathf.Lerp(0.4f, 1f, flashFade));
+        flash.color = WithAlpha(Color.Lerp(Color.white, tint, colorEmphasis), flashFade * flashFade);
 
         ring.transform.localScale = Vector3.one * (RingSize * Mathf.Lerp(0.3f, 1f, burst));
-        ring.color = WithAlpha(tint, fade * 0.85f);
+        float ringFade = Mathf.Clamp01(1f - age / RingDuration);
+        ring.color = WithAlpha(tint, ringFade * 0.65f);
 
         float drag = Mathf.Exp(-SparkDrag * deltaTime);
         float sparkSize = Mathf.Lerp(0.16f, 0.04f, t);

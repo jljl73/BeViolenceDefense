@@ -39,12 +39,22 @@ public static class UIPalette
     public static readonly Color ButtonDisabled = Hex("#3E3138");  // 사용 불가, 미선택
     public static readonly Color ButtonDanger = Hex("#E5484D");    // 삭제, 포기 같은 되돌릴 수 없는 행동
 
+    // ── 밝은 화면 (스테이지 선택처럼 배경이 비치는 화면) ──
+    public static readonly Color LightSurface = Hex("#FFF8EEE6");     // 크림색 반투명 카드·상단 바
+    public static readonly Color LightSurfaceLine = Hex("#E6CCA4");   // 카드의 얇은 테두리
+    public static readonly Color LightVeil = Hex("#FFF4E659");        // 배경 위에 덮는 옅은 크림 막
+    public static readonly Color TextOnLight = Hex("#3B2D3D");        // 크림 면 위 글자
+    public static readonly Color TextOnLightMuted = Hex("#9C8A86");   // 크림 면 위 보조·잠김 글자
+    public static readonly Color ChipOnLight = Hex("#FFE3A3");        // 크림 면 위 상태 꼬리표
+    public static readonly Color Shadow = Hex("#2A203059");           // 떠 있는 카드의 그림자
+
     // ── 게임 의미 색 ────────────────────────────
     public static readonly Color Mana = Hex("#4BDEFB");
     public static readonly Color Attack = Hex("#FFA588");
     public static readonly Color Heal = Hex("#99F5A0");
     public static readonly Color MoveSpeed = Hex("#66DAFF");
     public static readonly Color Armor = Hex("#C5A7FF");
+    public static readonly Color Taunt = Hex("#FF7FD1");
 
     private static Color Hex(string hex) => ColorUtility.TryParseHtmlString(hex, out var color) ? color : Color.magenta;
 }

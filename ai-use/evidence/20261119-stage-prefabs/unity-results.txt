@@ -1,0 +1,17 @@
+STAGE_EXPORTED Default board=25x25 camera=True environmentChildren=3
+STAGE_EXPORTED GoldenMaple board=17x17 camera=True environmentChildren=4
+STAGE_EXPORTED Snowfield board=17x17 camera=True environmentChildren=4
+STAGE_EXPORTED Graveyard board=17x17 camera=True environmentChildren=4
+STAGE_MIGRATION_PASS four content prefabs, three explicit default-board assets, one popup prefab and shared GameScene saved
+STAGE_REBIND_PASS four persistent prefab references saved
+STAGE_PLAY_PASS index=0 stage=Stage_Default width=25 ticks=75 units=4
+STAGE_RETRY_PASS index=0
+STAGE_PLAY_PASS index=1 stage=Stage_GoldenMaple width=17 ticks=75 units=4
+STAGE_RETRY_PASS index=1
+STAGE_PLAY_PASS index=2 stage=Stage_Snowfield width=17 ticks=75 units=4
+STAGE_RETRY_PASS index=2
+STAGE_PLAY_PASS index=3 stage=Stage_Graveyard width=17 ticks=75 units=4
+STAGE_RETRY_PASS index=3
+STAGE_SELECTION_PLAY_PASS 4 buttons, modal gating, per-stage spawn, retry, singleton UI/audio, double-click guard
+EditMode: StageContentTests 3/3 passed.
+Observed: UnityEditor.Search.SearchDatabase startup indexing exception; no stage runtime exceptions observed.

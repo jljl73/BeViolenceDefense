@@ -233,7 +233,7 @@ internal sealed class StagePreview
         SerializedProperty property = settings?.FindProperty(slot);
         if (property == null)
             return new EnemyFaction(fallbackName, fallbackColor);
-        string name = property.FindPropertyRelative("displayName").stringValue;
+        string name = GameText.Get(property.FindPropertyRelative("displayNameKey").stringValue);
         return new EnemyFaction(string.IsNullOrEmpty(name) ? fallbackName : name,
             property.FindPropertyRelative("color").colorValue);
     }

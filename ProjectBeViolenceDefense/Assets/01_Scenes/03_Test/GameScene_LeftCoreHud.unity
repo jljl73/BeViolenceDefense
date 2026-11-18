@@ -1033,21 +1033,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueHudTester
   dialogue: {fileID: 764363402}
-  lines:
-  - speaker: Mage
-    expression: 0
-    text: Two armies are marching on the core...
-  - speaker: Mage
-    expression: 3
-    text: 'I can''t fight either of them.
-
-      Not even a little.'
-  - speaker: Mage
-    expression: 2
-    text: Wait. They hate each other more than they hate me?
-  - speaker: Mage
-    expression: 1
-    text: If I can make them meet, they will wear each other down!
 --- !u!4 &1220946919
 Transform:
   m_ObjectHideFlags: 0
@@ -1645,19 +1630,20 @@ MonoBehaviour:
     Button: {fileID: 21300000, guid: 63e057d7b44c4882803a83059acff73f, type: 3}
     Start: {fileID: 21300000, guid: b0a1395bd58d4e92a469fc915ca08b26, type: 3}
     Restart: {fileID: 21300000, guid: dd4ddc7adebd4bf08200481b94c22e4c, type: 3}
-    AttackBuff: {fileID: 21300000, guid: 81eb4a9c7ac708b4ca366a157ecd4bc8, type: 3}
-    Heal: {fileID: 21300000, guid: d5b7491c161215b40a84a7d2e990e329, type: 3}
-    MoveSpeedBuff: {fileID: 21300000, guid: e7e60efa855f3364abfa60bbc0211f9e, type: 3}
+    AttackBuff: {fileID: 21300000, guid: 4f28b946680c49f899684194118e8b57, type: 3}
+    Heal: {fileID: 21300000, guid: 07ec35ca2b6141a1b65e747cfab799e3, type: 3}
+    MoveSpeedBuff: {fileID: 21300000, guid: 4f61db33701c41bc8f0bd0feabeaef7d, type: 3}
     Round: {fileID: 21300000, guid: 1b5a880028064ef6bc63aa8e1679a4e9, type: 3}
     Core: {fileID: 21300000, guid: d121ca5bb13042158f429b8b9c1c45a4, type: 3}
     Wall: {fileID: 21300000, guid: 098bcefc4feb4e308313833fc500a470, type: 3}
     Enemy: {fileID: 21300000, guid: 9dce938c5e2c4b3c91272d1e3834d2f7, type: 3}
     Mana: {fileID: 21300000, guid: bddccabed31f41598fd449b1dc6bf524, type: 3}
     Lock: {fileID: 21300000, guid: 4ff7c9dc22374be0a4bfb9b29de52b0d, type: 3}
-    ArmorBuff: {fileID: 21300000, guid: c54785e1a4699e2498244615da98b1d4, type: 3}
+    ArmorBuff: {fileID: 21300000, guid: d02d4a57e1b44ca383921414a16cb43e, type: 3}
     SlotFrame: {fileID: 21300000, guid: 38ceb414ff0bb13488736c79148cdee9, type: 3}
     SlotFrameSelected: {fileID: 21300000, guid: 411c54d21f7c1f442b5fbf2d7f6f10b9, type: 3}
     ColoredSkillIcons: 1
+    Taunt: {fileID: 21300000, guid: 750f82dc02b04321bb09b8f168386388, type: 3}
   leftCoreHud: {fileID: 1100666558}
   manaBarHud: {fileID: 1607539364}
   battleInfoHud: {fileID: 1863337268}
@@ -1687,12 +1673,12 @@ MonoBehaviour:
     border: {r: 0.15686275, g: 0.21176471, b: 0.27058825, a: 1}
   coral:
     unitId: goblin-grunt-1500
-    displayName: Goblin
+    displayNameKey: faction.goblin
     color: {r: 1, g: 0.4509804, b: 0.34117648, a: 1}
     spawnCount: 6
   teal:
     unitId: zombie
-    displayName: Undead
+    displayNameKey: faction.undead
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
     spawnCount: 4
   rounds:

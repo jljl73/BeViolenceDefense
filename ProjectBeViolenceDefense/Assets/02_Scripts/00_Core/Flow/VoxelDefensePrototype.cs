@@ -13,22 +13,26 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     {
         [SerializeField, Tooltip("Enemy Catalog의 유닛 ID. 비우면 이 종족은 라운드 편성으로만 나온다.")]
         private string unitId;
-        [SerializeField] private string displayName;
+        [SerializeField] private string displayNameKey;
         [SerializeField] private Color color;
         [SerializeField, Min(0)] private int spawnCount;
 
         public FactionSlot() { }
-        public FactionSlot(string displayName, Color color)
+        public FactionSlot(string displayNameKey, Color color)
         {
-            this.displayName = displayName;
+            this.displayNameKey = displayNameKey;
             this.color = color;
         }
 
         public Color Color => color;
 
-        public EnemyFaction GetFaction(EnemyCatalog catalog) => string.IsNullOrWhiteSpace(unitId)
-            ? new EnemyFaction(displayName, color, spawnCount: 0)
-            : catalog.GetFaction(unitId, displayName, color, spawnCount);
+        public EnemyFaction GetFaction(EnemyCatalog catalog)
+        {
+            string displayName = GameText.Get(displayNameKey);
+            return string.IsNullOrWhiteSpace(unitId)
+                ? new EnemyFaction(displayName, color, spawnCount: 0)
+                : catalog.GetFaction(unitId, displayName, color, spawnCount);
+        }
     }
 
     [SerializeField] private Camera boardCamera;
@@ -50,14 +54,16 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private StageAmbience stageAmbience;
     [Tooltip("선택. 연결하면 벽은 건설 모드(왼쪽 토글 버튼, B)에서만 놓고 철거한다.")]
     [SerializeField] private BuildModeHud buildModeHud;
+    [Tooltip("선택. 연결하면 패배했을 때 기본 팝업 대신 주인공 그림이 있는 패배 패널을 띄운다.")]
+    [SerializeField] private VictoryPanelHud defeatPanel;
     [SerializeField] private BoardTheme boardTheme = new();
     // 진영 = 종족. 순서는 EnemyFactionGroup 과 같다.
     [SerializeField, FormerlySerializedAs("coral")]
-    private FactionSlot greenHorde = new("Goblin", StageData.FactionColors[0]);
+    private FactionSlot greenHorde = new("faction.goblin", StageData.FactionColors[0]);
     [SerializeField, FormerlySerializedAs("teal")]
-    private FactionSlot undead = new("Undead", StageData.FactionColors[1]);
-    [SerializeField] private FactionSlot beasts = new("Beasts", StageData.FactionColors[2]);
-    [SerializeField] private FactionSlot dragonAndDemon = new("Dragon", StageData.FactionColors[3]);
+    private FactionSlot undead = new("faction.undead", StageData.FactionColors[1]);
+    [SerializeField] private FactionSlot beasts = new("faction.beast", StageData.FactionColors[2]);
+    [SerializeField] private FactionSlot dragonAndDemon = new("faction.dragon_demon", StageData.FactionColors[3]);
     [SerializeField, Tooltip("보드 크기·코어·스폰·고정 장애물·웨이브 편성. Tools/Stage Editor에서 편집한다. 비우면 기본 지형을 쓴다.")]
     private StageData stage;
     [Tooltip("선택. 연결하면 마지막 웨이브를 클리어했을 때 승리 패널을 띄운다.")]
@@ -83,7 +89,35 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
 
     private int SpellRangeStep => Mathf.RoundToInt(aimedRangeScroll);
 
+    [SerializeField] private bool waitForStageSelection;
+    private System.Action restartStage;
+
     private void Awake()
+    {
+        if (waitForStageSelection)
+        {
+            if (victoryPanelHud != null)
+                victoryPanelHud.Bind(next: null, retry: Restart);
+            enabled = false;
+            return;
+        }
+        InitializeBattle();
+    }
+
+    public void InitializeStage(StageContent content, System.Action retry)
+    {
+        if (view != null)
+            throw new System.InvalidOperationException("A stage has already been initialized.");
+        stage = content.Data;
+        boardTheme = content.Theme;
+        boardCamera = content.BoardCamera;
+        stageAmbience = content.Ambience;
+        restartStage = retry;
+        enabled = true;
+        InitializeBattle();
+    }
+
+    private void InitializeBattle()
     {
         if (enemyCatalog == null)
         {
@@ -132,12 +166,14 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             hud.UseExternalBuildPanel();
             buildModeHud.Bind(ToggleBuildMode, tool => buildTool = tool, hud.ActionBar);
         }
+        if (defeatPanel != null)
+            defeatPanel.Bind(next: Restart, retry: null);     // 패배 패널의 주 버튼이 다시 하기다
         if (stageAmbience != null)
             battle.EnemyRemoved += enemy => stageAmbience.Burst(transform.TransformPoint(enemy.Position));
         if (battleInfoHud != null)
         {
             hud.UseExternalBattleInfo();
-            battleInfoHud.Bind(StartBattle, SetBattleSpeed, () => hud.Notify("Settings are not available yet."));
+            battleInfoHud.Bind(StartBattle, SetBattleSpeed, () => hud.Notify(GameText.Get("notice.settings_pending")));
         }
         RefreshPlanningTiles();
     }
@@ -282,16 +318,31 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 if (battleClock.DeltaTime > 0f)
                     foreach (EnemyUnit enemy in battle.Enemies)
                         view.SyncEnemy(enemy, battleClock.DeltaTime, battleClock.PlaybackSpeed, battleClock.Interpolation);
+                if (encounterHintRemaining > 0f && battle.CurrentPhase == DefenseBattle.Phase.Combat)
+                {
+                    encounterHintRemaining -= battleClock.DeltaTime;
+                    if (encounterHintRemaining <= 0f)
+                        view.ShowBattleRoutes(battle.RoundRoutes());   // 교전 예고 칸을 지우고 평소의 전투 경로 표시로
+                }
                 if (battle.CurrentPhase == DefenseBattle.Phase.Preparation)
                 {
                     RefreshPlanningTiles();
-                    hud.Notify("Round cleared. Adjust walls before the next battle.");
+                    hud.Notify(GameText.Get("notice.wave_cleared"));
                     if (leftCoreHud != null)
                         leftCoreHud.Cheer();
                 }
                 else if (battle.CurrentPhase == DefenseBattle.Phase.Defeat)
                 {
-                    hud.ShowDefeat();
+                    if (defeatPanel != null)
+                    {
+                        int coreMax = DefenseBattle.CoreMaxHealth;
+                        defeatPanel.Show(usedStage != null ? GameText.Get(usedStage.displayNameKey) : null, battle.CoreHealth,
+                            coreMax, coreMax - battle.CoreHealth, fallenEnemies);
+                    }
+                    else
+                    {
+                        hud.ShowDefeat();
+                    }
                 }
                 else if (battle.CurrentPhase == DefenseBattle.Phase.Victory)
                 {
@@ -307,11 +358,11 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             leftCoreHud.Cheer();
         if (victoryPanelHud == null)
         {
-            hud.Notify("Victory! Press R to restart.");
+            hud.Notify(GameText.Get("notice.victory_restart"));
             return;
         }
         int coreMax = DefenseBattle.CoreMaxHealth;
-        victoryPanelHud.Show(usedStage != null ? usedStage.name : "", battle.CoreHealth, coreMax,
+        victoryPanelHud.Show(usedStage != null ? GameText.Get(usedStage.displayNameKey) : null, battle.CoreHealth, coreMax,
             coreMax - battle.CoreHealth, fallenEnemies);
     }
 
@@ -329,7 +380,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         buildMode = false;
         battle.StartRound();
         battleClock.Reset();
-        view.ShowBattleRoutes(battle.RoundRoutes());
+        PlayWaveStartForecast();
         hud.Notify("");
     }
 
@@ -355,7 +406,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         Vector2 pointer = mouse.position.ReadValue();
         ReadRightButton(mouse, pointer);
         float scrollDelta = mouse.scroll.ReadValue().y;
-        if (aimedSpell.HasValue)
+        // 도발은 반경이 고정이라 조준 중에도 휠로 카메라를 확대·축소한다.
+        if (aimedSpell is { } aimed && DefenseBattle.IsAreaSpell(aimed))
             aimedRangeScroll = Mathf.Clamp(aimedRangeScroll + scrollDelta,
                 DefenseBattle.MinSpellRangeStep, DefenseBattle.MaxSpellRangeStep);
         else if (scrollDelta != 0f)
@@ -471,7 +523,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             if (grid.TryRemove(cell))
             {
                 view.RemoveWall(cell);
-                RefreshPlanningTiles();
+                RefreshPlanningTiles(highlightChanges: true);
                 hud.Notify("");
             }
             return;
@@ -481,22 +533,83 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         {
             case DefenseGrid.BuildResult.Placed:
                 view.PlaceWall(cell);
-                RefreshPlanningTiles();
+                RefreshPlanningTiles(highlightChanges: true);
                 hud.Notify("");
                 break;
             case DefenseGrid.BuildResult.Occupied:
-                hud.Notify("That tile is occupied.");
+                hud.Notify(GameText.Get("notice.cell_occupied"));
                 break;
             case DefenseGrid.BuildResult.LimitReached:
-                hud.Notify("Wall limit reached. Remove a wall to free a slot.");
+                hud.Notify(GameText.Get("notice.no_walls"));
                 break;
             case DefenseGrid.BuildResult.BlocksRoute:
-                hud.Notify("Each spawn needs an open path to the core.");
+                hud.Notify(GameText.Get("notice.keep_routes"));
                 break;
         }
     }
 
-    private void RefreshPlanningTiles() => view.ShowPlanningTiles(battle.RoundRoutes(), battle.ForecastEncounterCells());
+    // 지금 길로 표시된 칸들. 벽을 놓거나 치운 뒤 새로 길이 된 칸만 골라 강조하는 데 쓴다.
+    private readonly HashSet<Vector2Int> shownRouteCells = new();
+    private readonly List<Vector2Int> changedRouteCells = new();
+    private readonly HashSet<Vector2Int> routeCellScratch = new();
+
+    private void RefreshPlanningTiles(bool highlightChanges = false)
+    {
+        // 이번 라운드에 쓰지 않는 스폰의 경로는 null 이다.
+        Vector3[][] routes = battle.RoundRoutes();
+        view.ShowPlanningTiles(routes, battle.ForecastEncounterCells());
+
+        changedRouteCells.Clear();
+        routeCellScratch.Clear();
+        foreach (Vector3[] path in routes)
+            if (path != null)
+                for (int i = 0; i < path.Length - 1; i++)   // 마지막 점은 코어 접점이라 칸이 아니다
+                {
+                    Vector2Int cell = DefenseGrid.PositionToCell(path[i]);
+                    if (routeCellScratch.Add(cell) && !shownRouteCells.Contains(cell))
+                        changedRouteCells.Add(cell);
+                }
+        shownRouteCells.Clear();
+        shownRouteCells.UnionWith(routeCellScratch);
+        if (highlightChanges && changedRouteCells.Count > 0)
+            view.FlashRouteCells(changedRouteCells);
+    }
+
+    // 웨이브 시작 연출: 선두의 예상 경로를 선분이 먼저 달리고, 이동속도를 반영한 예상 교전 칸을 잠깐 남긴다.
+    private const float EncounterHintSeconds = 5f;
+    private readonly int[] forecastCounts = new int[StageData.FactionCount];
+    private float encounterHintRemaining;
+
+    private void PlayWaveStartForecast()
+    {
+        for (int side = 0; side < forecastCounts.Length; side++)
+            forecastCounts[side] = side < battle.FactionCount ? battle.RoundSpawnCount(side) : 0;
+        IReadOnlyCollection<Vector2Int> encounters = battle.ForecastEncounterCells();
+        Vector3[][] routes = battle.RoundRoutes();
+        view.ShowBattleRoutes(routes, encounters);
+        view.PlayRouteTracers(routes, forecastCounts);
+        view.PlayEncounterBeacons(encounters, 0.7f);
+        encounterHintRemaining = encounters.Count > 0 ? EncounterHintSeconds : 0f;
+    }
+
+    private void UpdateSpawnForecast()
+    {
+        // 준비 단계: 이번 웨이브. 전투 중: 웨이브 호출 버튼에 마우스를 올렸을 때만 다음 웨이브.
+        bool preparing = battle.CurrentPhase == DefenseBattle.Phase.Preparation;
+        bool peekNext = battle.CurrentPhase == DefenseBattle.Phase.Combat && battleInfoHud != null &&
+            battleInfoHud.WaveButtonHovered;
+        if (!preparing && !peekNext)
+        {
+            view.ShowSpawnForecast(null, false, grid.SpawnCells);
+            return;
+        }
+
+        for (int side = 0; side < forecastCounts.Length; side++)
+            forecastCounts[side] = side >= battle.FactionCount ? 0
+                : preparing ? battle.RoundSpawnCount(side) : battle.NextRoundSpawnCount(side);
+        // 다음 웨이브의 스폰은 아직 고르지 않았으므로 준비 단계에서만 쓰지 않는 스폰을 숨긴다.
+        view.ShowSpawnForecast(forecastCounts, peekNext, grid.SpawnCells, preparing ? battle.RoundRoutes() : null);
+    }
 
     private void ReadCombatInput(Keyboard keyboard)
     {
@@ -529,10 +642,52 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             UseSpell(DefenseBattle.Spell.ArmorBuff);
             return;
         }
+        if (keyboard?.digit5Key.wasPressedThisFrame == true)
+        {
+            UseSpell(DefenseBattle.Spell.Taunt);
+            return;
+        }
 
-        if (!trackingRightButton && aimedSpell is { } spell && mouse?.leftButton.wasPressedThisFrame == true &&
-            TryPickAreaSpellCenter(mouse, out Vector3 center))
+        if (trackingRightButton || aimedSpell is not { } spell || mouse?.leftButton.wasPressedThisFrame != true)
+            return;
+        if (spell == DefenseBattle.Spell.Taunt)
+        {
+            Vector2 pointer = mouse.position.ReadValue();
+            if (ui.BlocksBoardPointer(pointer))
+                return;
+            if (view.TryPickEnemy(pointer, battle.Enemies, out EnemyUnit target))
+                CastTaunt(target);
+            else
+                hud.Notify(GameText.Get("notice.pick_taunt_target"));
+            return;
+        }
+        if (TryPickAreaSpellCenter(mouse, out Vector3 center))
             CastAimedSpell(spell, center);
+    }
+
+    private void CastTaunt(EnemyUnit target)
+    {
+        string blocked = battle.SpellBlockReason(DefenseBattle.Spell.Taunt, 0);
+        if (blocked != null)
+        {
+            hud.Notify(blocked);
+            return;
+        }
+
+        // 바로 적용하지 않고 다음 틱 시작에 적용한다. 결과는 OnSpellResolved 로 돌아온다.
+        battle.QueueTaunt(target);
+        SetAimedSpell(null);
+    }
+
+    private EnemyUnit HoveredTauntTarget()
+    {
+        Mouse mouse = Mouse.current;
+        if (aimedSpell != DefenseBattle.Spell.Taunt || mouse == null)
+            return null;
+        Vector2 pointer = mouse.position.ReadValue();
+        return !ui.BlocksBoardPointer(pointer) && view.TryPickEnemy(pointer, battle.Enemies, out EnemyUnit target)
+            ? target
+            : null;
     }
 
     private void CastAimedSpell(DefenseBattle.Spell spell, Vector3 center)
@@ -554,6 +709,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         IReadOnlyList<EnemyUnit> recipients)
     {
         hud.Notify(message);
+        // 도발의 첫 수신자는 도발 유닛이다. 시전 시점의 위치를 둘레로 반경을 보여준다.
+        if (command.Spell == DefenseBattle.Spell.Taunt)
+        {
+            if (recipients.Count > 0)
+                view.PlayAreaSpell(command.Spell, recipients[0].Position, DefenseBattle.TauntRadius, recipients);
+            return;
+        }
         view.PlayAreaSpell(command.Spell, command.Center, DefenseBattle.AreaSpellRadius(command.RangeStep), recipients);
     }
 
@@ -588,7 +750,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         aimedRangeScroll = rangeStep;
     }
 
-    private void Restart() => SceneManager.LoadScene(gameObject.scene.buildIndex);
+    private void Restart()
+    {
+        if (restartStage != null)
+            restartStage();
+        else
+            SceneManager.LoadScene(gameObject.scene.buildIndex);
+    }
 
     private void LateUpdate()
     {
@@ -602,13 +770,15 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             _ => 0f
         });
         view.AdvanceEffects(battleClock.DeltaTime);
+        UpdateSpawnForecast();
         view.AdvanceCoreAnimation(battleClock.DeltaTime, battleClock.PlaybackSpeed);
         Vector3? spellCenter = aimedSpell.HasValue && TryPickAreaSpellCenter(Mouse.current, out Vector3 center)
             ? center
             : null;
         int rangeStep = SpellRangeStep;
-        view.ShowAreaSpellPreview(aimedSpell, spellCenter, DefenseBattle.AreaSpellRadius(rangeStep));
-        hud.Refresh(battle, grid, view, aimedSpell, spellCenter, rangeStep, battleSpeed);
+        EnemyUnit tauntTarget = HoveredTauntTarget();
+        view.ShowAreaSpellPreview(aimedSpell, spellCenter, DefenseBattle.AreaSpellRadius(rangeStep), tauntTarget);
+        hud.Refresh(battle, grid, view, aimedSpell, spellCenter, rangeStep, battleSpeed, tauntTarget);
         if (leftCoreHud != null)
             leftCoreHud.Refresh(battle.CoreHealth, DefenseBattle.CoreMaxHealth);
         if (manaBarHud != null)

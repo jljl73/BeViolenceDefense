@@ -58,7 +58,9 @@ internal sealed class EnemyCatalogEditor : Editor
             if (entry.FindPropertyRelative("factionGroup").enumValueIndex != index)
                 continue;
 
-            string displayName = entry.FindPropertyRelative("displayName").stringValue;
+            string displayName = GameText.Get(entry.FindPropertyRelative("displayNameKey").stringValue);
+            if (string.IsNullOrEmpty(displayName))
+                displayName = entry.FindPropertyRelative("id").stringValue;
             using (new EditorGUILayout.HorizontalScope())
             {
                 entry.isExpanded = EditorGUILayout.Foldout(entry.isExpanded,
@@ -83,7 +85,7 @@ internal sealed class EnemyCatalogEditor : Editor
             entry.isExpanded = true;
             entry.FindPropertyRelative("factionGroup").enumValueIndex = index;
             entry.FindPropertyRelative("id").stringValue = "";
-            entry.FindPropertyRelative("displayName").stringValue = "";
+            entry.FindPropertyRelative("displayNameKey").stringValue = "";
             entry.FindPropertyRelative("model").objectReferenceValue = null;
             entry.FindPropertyRelative("animations").objectReferenceValue = null;
             entry.FindPropertyRelative("skin").objectReferenceValue = null;
@@ -106,7 +108,7 @@ internal sealed class EnemyCatalogEditor : Editor
         {
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("factionGroup"), new GUIContent("소속 팩션"));
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("id"), new GUIContent("유닛 ID"));
-            EditorGUILayout.PropertyField(entry.FindPropertyRelative("displayName"), new GUIContent("이름"));
+            EditorGUILayout.PropertyField(entry.FindPropertyRelative("displayNameKey"), new GUIContent("표시 이름 텍스트 키"));
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("model"), new GUIContent("모델"));
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("animations"),
                 new GUIContent("컨트롤러 오버라이드", "비어 있으면 모델에 연결된 애니메이터 컨트롤러를 사용합니다."));

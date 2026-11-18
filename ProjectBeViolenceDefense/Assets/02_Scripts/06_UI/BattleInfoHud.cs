@@ -37,6 +37,9 @@ public sealed class BattleInfoHud : MonoBehaviour
     [SerializeField] private TextMeshProUGUI waveCaption;
 
     private bool waveHovered;
+
+    /// <summary>마우스가 웨이브 호출 버튼 위에 있는지. 전투 중 다음 웨이브의 스폰 위치 예고에 쓴다.</summary>
+    public bool WaveButtonHovered => waveHovered;
     private bool wasInCombat;
     private float combatSeconds;
     private int shownSeconds = -1;
@@ -47,6 +50,7 @@ public sealed class BattleInfoHud : MonoBehaviour
     /// <summary>버튼 동작을 연결한다. 씬을 여는 쪽(VoxelDefensePrototype)이 한 번 호출한다.</summary>
     public void Bind(UnityAction callWave, Action<int> setSpeed, UnityAction openSettings)
     {
+        waveCaption.text = GameText.Format("hud.next_wave", GameText.Get("key.space"));
         waveButton.onClick.AddListener(callWave);
         speed1xButton.onClick.AddListener(() => setSpeed(1));
         speed2xButton.onClick.AddListener(() => setSpeed(2));
@@ -62,7 +66,7 @@ public sealed class BattleInfoHud : MonoBehaviour
     {
         if (stage != shownStage)
         {
-            stageText.text = $"STAGE {stage}";
+            stageText.text = GameText.Format("hud.wave", stage);
             shownStage = stage;
         }
 

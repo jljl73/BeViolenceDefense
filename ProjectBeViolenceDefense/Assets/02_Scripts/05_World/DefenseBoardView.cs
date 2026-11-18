@@ -19,10 +19,10 @@ internal sealed class DefenseBoardView
     private const float TileHeight = 0.28f;
     private const float RouteLaneSpacing = 0.49f;
     private const float RouteMarkerHeight = 0.02f;
-    private const float RouteMarkerTravel = 0.36f;
-    private const float RouteMarkerCyclesPerSecond = 0.5f;
+    private const float RouteMarkerSpacing = 0.8f;
+    private const float RouteMarkerSpeed = 0.55f;
+    private const float RouteEndpointTaper = 0.24f;
     private const float SingleLaneRouteMargin = 0.04f;
-    private const float RouteMarkerFadePortion = 0.18f;
     private const float BattleRouteTileTint = 0.3f;
     private const float BattleRouteMarkerTint = 0.6f;
     private const float SpawnPadHeight = 0.09f;
@@ -45,6 +45,11 @@ internal sealed class DefenseBoardView
     private const float HitHeight = 0.5f;
     private const float HitForwardOffset = 0.2f;
     private const int MaxHitEffects = 24;
+    private const float HitReactionDuration = 0.16f;
+    private const float HitReactionCooldown = 0.2f;
+    private const float DeathHoldDuration = 0.12f;
+    private const float DeathFadeDuration = 0.3f;
+    private const int MaxDeathViews = 40;
     private const float CoreStrikeWindup = 0.24f;
     private const float CoreStrikeFadeDuration = 0.25f;
     private const float CoreStrikeFlashScale = 1.50f;
@@ -54,6 +59,11 @@ internal sealed class DefenseBoardView
     private const float SpellBodyFlashDuration = 0.26f;
     private const float SpellBodyFlashBrightness = 1.8f;
     private const float BuffMarkSpacing = 0.20f;
+    // 도발 중인 유닛의 화면 크기 배율과 커지고 줄어드는 속도(초당 배율 변화). 충돌 크기는 바꾸지 않는다.
+    private const float TauntGiantScale = 2f;
+    private const float TauntGrowSpeed = 4f;
+    // 도발 조준 중 마우스에서 이 거리(칸) 안의 가장 가까운 유닛을 고른다.
+    private const float TauntPickRadius = 0.7f;
     private const float BuffMarkOffset = 0.32f;
     private const float BuffMarkDarkeningPerStack = 0.14f;
     private const float BuffMarkMinimumBrightness = 0.58f;
@@ -65,6 +75,7 @@ internal sealed class DefenseBoardView
     private static readonly int CoreHitState = Animator.StringToHash("Base Layer.Hit");
     private static readonly int RunState = Animator.StringToHash("Base Layer.Run");
     private static readonly int AttackState = Animator.StringToHash("Base Layer.Attack");
+    private static readonly int DeathState = Animator.StringToHash("Base Layer.Death");
 
     public static readonly Color32 CoreColor = new(255, 209, 112, 255);
     private static readonly Color CoreDamageColor = new Color32(255, 58, 66, 255);
@@ -73,6 +84,12 @@ internal sealed class DefenseBoardView
     private sealed class EnemyView
     {
         public Transform Root;
+        public Transform Body;
+        public Vector3 BodyScale;
+        public Vector3 HitDirection;
+        public float HitRemaining;
+        public float HitCooldown;
+        public float HitStrength;
         public Transform Head;
         public Renderer[] Renderers;
         public Renderer FactionRing;
@@ -93,25 +110,33 @@ internal sealed class DefenseBoardView
         public (Renderer Renderer, Material[] Original, Material[] Preview, int Order)[] PreviewSurfaces;
         public Color SpellFlashColor;
         public float SpellFlashRemaining;
+        public Vector3 BaseScale;
+        public float GiantScale = 1f;
     }
 
     private readonly struct RouteMarkerMotion
     {
-        public readonly Vector3 Center;
-        public readonly Vector3 Direction;
-        public readonly Color ArrowColor;
-        public readonly Color FloorColor;
-        public readonly float WidthScale;
+        public readonly RouteFlowPath Path;
+        public readonly float Distance;
+        public readonly Color Color;
 
-        public RouteMarkerMotion(Vector3 center, Vector3 direction, Color arrowColor, Color floorColor,
-            float widthScale)
+        public RouteMarkerMotion(RouteFlowPath path, float distance, Color color)
         {
-            Center = center;
-            Direction = direction;
-            ArrowColor = arrowColor;
-            FloorColor = floorColor;
-            WidthScale = widthScale;
+            Path = path;
+            Distance = distance;
+            Color = color;
         }
+    }
+
+    private sealed class DeathView
+    {
+        public EnemyView View;
+        public Vector3 Position;
+        public Vector3 Scale;
+        public float Duration;
+        public float Age;
+        public bool Animated;
+        public bool Fading;
     }
 
     private sealed class CoreStrike
@@ -143,7 +168,8 @@ internal sealed class DefenseBoardView
     private readonly int boardDepth;
     private readonly List<MeshRenderer> routeMarkers = new();
     private readonly List<RouteMarkerMotion> routeMarkerMotions = new();
-    private float routeMarkerPhase = 0.5f;
+    private float routeMarkerPhase = RouteMarkerSpacing * 0.5f;
+    private int activeRouteMarkerCount;
     private readonly Mesh routeMarkerMesh;
     private readonly Material routeMarkerMaterial;
     private readonly float singleLaneRouteWidth;
@@ -156,6 +182,7 @@ internal sealed class DefenseBoardView
     private readonly Dictionary<EnemyUnit, EnemyView> enemyViews = new();
     private readonly List<HitEffect> hitEffects = new();
     private readonly List<CoreStrike> coreStrikes = new();
+    private readonly List<DeathView> deathViews = new();
     private readonly Dictionary<Material, Material> fadeMaterials = new();
     private readonly SpellEffects spellEffects;
     private readonly MaterialPropertyBlock tintBlock = new();
@@ -173,11 +200,12 @@ internal sealed class DefenseBoardView
     private readonly Material moveSpeedBuffPreviewMaterial;
     private readonly Material healPreviewMaterial;
     private readonly Material armorBuffPreviewMaterial;
+    private readonly Material tauntPreviewMaterial;
     private readonly Material attackBuffMarkMaterial;
     private readonly Material moveSpeedBuffMarkMaterial;
     private readonly Material armorBuffMarkMaterial;
     private readonly Quaternion buffMarkRotation;
-    private readonly Dictionary<DefenseBattle.Spell, Material> targetSilhouettes = new();
+    private readonly Dictionary<(DefenseBattle.Spell Spell, int Faction), Material> targetSilhouettes = new();
     private readonly Dictionary<(Material Preview, Material Source), Material> texturedSilhouettes = new();
     private readonly MeshRenderer areaSpellPreview;
     private readonly Mesh areaSpellPreviewMesh;
@@ -277,6 +305,17 @@ internal sealed class DefenseBoardView
             Box($"{faction.DisplayName} spawn pad", root, position + Vector3.up * 0.035f,
                 padScale, FactionMaterial(faction), padMesh);
             Box("Spawn pad center", root, position + Vector3.up * 0.075f, new Vector3(0.55f, 0.03f, 0.55f), foundation);
+
+            // 종족별 스폰 지점 구조물(막사·납골당·굴·둥지). 유닛은 그 안에서 걸어 나온다.
+            GameObject structure = catalog != null ? catalog.SpawnStructure(spawnFactions[i]) : null;
+            if (structure != null)
+            {
+                Transform model = Object.Instantiate(structure, root, false).transform;
+                model.name = $"{faction.DisplayName} spawn structure";
+                model.localPosition = position + Vector3.up * SpawnPadHeight;
+                model.localScale *= SpawnStructureScale;
+                spawnStructures.Add((i, model));
+            }
         }
 
         CreateCore(grid, theme, foundation, fixedWall, core);
@@ -290,18 +329,22 @@ internal sealed class DefenseBoardView
         moveSpeedBuffPreviewMaterial = Palette(MoveSpeedBuffColor);
         healPreviewMaterial = Palette(UIPalette.Heal);
         armorBuffPreviewMaterial = Palette(UIPalette.Armor);
+        tauntPreviewMaterial = Palette(UIPalette.Taunt);
         attackBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.Attack, 0.72f));
         moveSpeedBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.MoveSpeed, 0.72f));
         armorBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.Armor, 0.72f));
         Shader silhouetteShader = Resources.Load<Shader>("SpellTargetSilhouette");
         foreach (DefenseBattle.Spell spell in System.Enum.GetValues(typeof(DefenseBattle.Spell)))
         {
-            var silhouette = new Material(silhouetteShader) { name = $"{spell} Target Silhouette" };
-            Color color = SpellEffects.SpellColor(spell);
-            silhouette.SetColor("_SilhouetteColor", color);
-            silhouette.SetColor("_OutlineColor", UIPalette.Background);
-            targetSilhouettes.Add(spell, silhouette);
-            materials.Add(silhouette);
+            // 빗금은 마법 종류가 아니라 대상의 진영 색으로 나눈다. 마법 종류는 범위 원의 색이 알려 준다.
+            for (int faction = 0; faction < factions.Count; faction++)
+            {
+                var silhouette = new Material(silhouetteShader) { name = $"{spell} Target Silhouette {faction}" };
+                silhouette.SetColor("_SilhouetteColor", factions[faction].Color);
+                silhouette.SetColor("_OutlineColor", UIPalette.Background);
+                targetSilhouettes.Add((spell, faction), silhouette);
+                materials.Add(silhouette);
+            }
         }
         areaSpellPreview.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         areaSpellPreview.receiveShadows = false;
@@ -618,19 +661,31 @@ internal sealed class DefenseBoardView
         IReadOnlyCollection<Vector2Int> encounters = null)
         => ShowRoutes(routes, encounters, false);
 
-    public void ShowBattleRoutes(IReadOnlyList<Vector3[]> routes)
-        => ShowRoutes(routes, null, true);
+    /// <summary>전투 중 경로 표시. <paramref name="encounters"/>를 주면 웨이브 시작 직후의 교전 예고 칸도 함께 남긴다.</summary>
+    public void ShowBattleRoutes(IReadOnlyList<Vector3[]> routes, IReadOnlyCollection<Vector2Int> encounters = null)
+        => ShowRoutes(routes, encounters, true);
 
     private void ShowRoutes(IReadOnlyList<Vector3[]> routes,
         IReadOnlyCollection<Vector2Int> encounters, bool subdued)
     {
         PlannedEncounters = encounters ?? System.Array.Empty<Vector2Int>();
+        // 스폰 구조물의 입구(-Z)를 경로의 첫 걸음 쪽으로 돌린다.
+        if (routes != null)
+            foreach (var (spawn, model) in spawnStructures)
+            {
+                Vector3[] path = routes[spawn];
+                if (path == null || path.Length < 2)
+                    continue;
+                Vector3 heading = Vector3.ProjectOnPlane(path[1] - path[0], Vector3.up);
+                if (heading.sqrMagnitude > 0.0001f)
+                    model.localRotation = Quaternion.LookRotation(-heading.normalized, Vector3.up);
+            }
         for (int x = 0; x < boardWidth; x++)
             for (int z = 0; z < boardDepth; z++)
                 floor[x, z].sharedMaterial = tiles[(x + z) % tiles.Length];
 
-        int markerCount = routes == null ? 0 : DrawRoutes(routes, subdued);
-        for (int i = markerCount; i < routeMarkers.Count; i++)
+        activeRouteMarkerCount = routes == null ? 0 : DrawRoutes(routes, subdued);
+        for (int i = activeRouteMarkerCount; i < routeMarkers.Count; i++)
             routeMarkers[i].enabled = false;
 
         foreach (Vector2Int cell in PlannedEncounters)
@@ -640,32 +695,34 @@ internal sealed class DefenseBoardView
 
     public void AdvanceRouteMarkers(float deltaTime)
     {
-        routeMarkerPhase = Mathf.Repeat(routeMarkerPhase + deltaTime * RouteMarkerCyclesPerSecond, 1f);
-        for (int i = 0; i < routeMarkers.Count; i++)
+        routeMarkerPhase = Mathf.Repeat(routeMarkerPhase + Mathf.Max(0f, deltaTime) * RouteMarkerSpeed,
+            RouteMarkerSpacing);
+        for (int i = 0; i < activeRouteMarkerCount; i++)
         {
             MeshRenderer marker = routeMarkers[i];
+            RouteMarkerMotion motion = routeMarkerMotions[i];
+            float distance = motion.Distance + routeMarkerPhase;
+            // Only enter/leave at the spawn pad and core. The rest of the stream never fades or restarts.
+            float taper = Mathf.SmoothStep(0f, 1f, Mathf.Min(distance - 0.48f,
+                motion.Path.Length - distance) / RouteEndpointTaper);
+            marker.enabled = taper > 0f;
             if (!marker.enabled)
                 continue;
 
-            RouteMarkerMotion motion = routeMarkerMotions[i];
-            float phase = routeMarkerPhase;
-            float travel = Mathf.SmoothStep(0f, 1f, phase);
-            marker.transform.localPosition = motion.Center + motion.Direction * ((travel - 0.5f) * RouteMarkerTravel);
-            float fade = Mathf.SmoothStep(0f, 1f,
-                Mathf.Min(phase, 1f - phase) / RouteMarkerFadePortion);
-            marker.transform.localScale = new Vector3(motion.WidthScale * fade, fade, fade);
-            tintBlock.SetColor(BaseColor, Color.Lerp(motion.FloorColor, motion.ArrowColor, fade));
+            motion.Path.Sample(distance, out Vector3 position, out Vector3 direction, out float width);
+            marker.transform.SetLocalPositionAndRotation(position, Quaternion.LookRotation(direction, Vector3.up));
+            marker.transform.localScale = new Vector3(width * taper, taper, taper);
+            tintBlock.SetColor(BaseColor, motion.Color);
             marker.SetPropertyBlock(tintBlock);
         }
     }
 
     private int DrawRoutes(IReadOnlyList<Vector3[]> routes, bool subdued)
     {
-        var stepsByCell = new Dictionary<Vector2Int, List<(int FactionIndex, Vector3 Direction)>>();
-        // factionIndex는 여기서 스폰(경로) 인덱스이고, 색은 spawnFactions로 찾는다.
-        for (int factionIndex = 0; factionIndex < routes.Count; factionIndex++)
+        var stepsByCell = new Dictionary<Vector2Int, List<(int Route, Vector3 Direction)>>();
+        for (int route = 0; route < routes.Count; route++)
         {
-            Vector3[] path = routes[factionIndex];
+            Vector3[] path = routes[route];
             // 이번 라운드에 쓰지 않는 스폰.
             if (path == null)
                 continue;
@@ -678,42 +735,57 @@ internal sealed class DefenseBoardView
                     steps = new List<(int, Vector3)>(factions.Count);
                     stepsByCell.Add(cell, steps);
                 }
-                steps.Add((factionIndex, (path[i + 1] - path[i]).normalized));
+                Vector3 incoming = i > 0 ? (path[i] - path[i - 1]).normalized : Vector3.zero;
+                Vector3 outgoing = (path[i + 1] - path[i]).normalized;
+                steps.Add((route, (incoming + outgoing).normalized));
             }
         }
 
-        int markerCount = 0;
-        foreach (var (cell, steps) in stepsByCell)
-        {
+        foreach (var cell in stepsByCell.Keys)
             floor[cell.x, cell.y].sharedMaterial = subdued
                 ? battleRouteTiles[(cell.x + cell.y) % battleRouteTiles.Length]
                 : routeTile;
-            if (routeChevron == null)
-                continue;
+        if (routeChevron == null)
+            return 0;
 
-            // Both arrows use one lateral axis so opposite headings stay in separate lanes.
-            Vector3 side = Vector3.Cross(Vector3.up, steps[0].Direction);
-            float height = RouteMarkerHeight + (spawnCells.Contains(cell) ? SpawnPadHeight : 0f);
-            Vector3 center = DefenseGrid.CellPosition(cell) + Vector3.up * height;
-            Color floorColor = floor[cell.x, cell.y].sharedMaterial.color;
-            for (int i = 0; i < steps.Count; i++)
+        int markerCount = 0;
+        for (int route = 0; route < routes.Count; route++)
+        {
+            Vector3[] path = routes[route];
+            if (path == null || path.Length < 2)
+                continue;
+            var points = new Vector3[path.Length];
+            var widths = new float[path.Length];
+            for (int i = 0; i < path.Length - 1; i++)
             {
-                var (factionIndex, direction) = steps[i];
-                float offset = (i - (steps.Count - 1) * 0.5f) * RouteLaneSpacing;
-                int markerIndex = markerCount++;
-                MeshRenderer marker = RouteMarker(markerIndex);
-                Vector3 markerCenter = center + side * offset;
-                marker.transform.localPosition = markerCenter;
-                marker.transform.localRotation = Quaternion.LookRotation(direction, Vector3.up);
-                Color color = factions[spawnFactions[factionIndex]].Color;
-                if (subdued)
-                    color = Color.Lerp(floorColor, color, BattleRouteMarkerTint);
-                marker.enabled = true;
-                routeMarkerMotions[markerIndex] = new RouteMarkerMotion(markerCenter, direction, color, floorColor,
-                    steps.Count == 1 ? singleLaneRouteWidth : 1f);
+                Vector2Int cell = DefenseGrid.PositionToCell(path[i]);
+                var steps = stepsByCell[cell];
+                int lane = steps.FindIndex(step => step.Route == route);
+                // Shared cells use the same lateral axis even for opposite headings.
+                Vector3 side = Vector3.Cross(Vector3.up, steps[0].Direction);
+                float spacing = Mathf.Min(RouteLaneSpacing,
+                    singleLaneRouteWidth * routeMarkerMesh.bounds.size.x / steps.Count);
+                float offset = (lane - (steps.Count - 1) * 0.5f) * spacing;
+                points[i] = path[i] + side * offset + Vector3.up * RouteMarkerHeight;
+                widths[i] = steps.Count == 1 ? singleLaneRouteWidth
+                    : Mathf.Min(1f, spacing * 0.9f / routeMarkerMesh.bounds.size.x);
+            }
+            points[^1] = path[^1] + Vector3.up * RouteMarkerHeight;
+            widths[^1] = widths[^2];
+            var flowPath = new RouteFlowPath(points, widths);
+            if (flowPath.Length <= 0f)
+                continue;
+            Color color = factions[spawnFactions[route]].Color;
+            if (subdued)
+                color = Color.Lerp(battleRouteTiles[0].color, color, BattleRouteMarkerTint);
+            int count = Mathf.CeilToInt(flowPath.Length / RouteMarkerSpacing);
+            for (int i = 0; i < count; i++)
+            {
+                RouteMarker(markerCount);
+                routeMarkerMotions[markerCount++] = new RouteMarkerMotion(flowPath,
+                    i * RouteMarkerSpacing, color);
             }
         }
-
         return markerCount;
     }
 
@@ -739,8 +811,8 @@ internal sealed class DefenseBoardView
         // The old route icon was a hollow chevron. Extrude its two narrow arms instead of filling the middle.
         Vector2[] outline =
         {
-            new(-0.23f, -0.12f), new(-0.10f, -0.12f), new(0f, 0.025f),
-            new(0.10f, -0.12f), new(0.23f, -0.12f), new(0f, 0.15f)
+            new(-0.23f, -0.18f), new(-0.10f, -0.18f), new(0f, 0.0375f),
+            new(0.10f, -0.18f), new(0.23f, -0.18f), new(0f, 0.225f)
         };
         var vertices = new List<Vector3>();
         foreach (Vector2 point in outline)
@@ -795,6 +867,264 @@ internal sealed class DefenseBoardView
     private const float WallRemoveTime = 0.16f;
     private static readonly Color WallFlash = new(1f, 0.82f, 0.42f);
     private Transform buildGhost;
+    private const float SpawnStructureScale = 1.1f;
+    private readonly List<(int Spawn, Transform Model)> spawnStructures = new();
+    private readonly List<SpawnBeacon> spawnBeacons = new();
+    private Mesh spawnBeaconRing;
+
+    private sealed class SpawnBeacon
+    {
+        public Transform Root;
+        public MeshRenderer[] Rings;
+        public MeshRenderer Arrow;
+        public TMPro.TextMeshPro Label;
+        public int ShownCount = -1;
+        public bool ShownNext;
+    }
+
+    // ── 길 갱신 강조 ──
+    /// <summary>벽을 놓거나 치워서 새로 길이 된 칸을 경로 순서대로 한 번 번쩍인다.</summary>
+    public void FlashRouteCells(IReadOnlyList<Vector2Int> cells)
+    {
+        for (int i = 0; i < cells.Count; i++)
+        {
+            Vector2Int cell = cells[i];
+            Color settled = floor[cell.x, cell.y].sharedMaterial.color;
+            Transform flash = Box("Route flash", root, DefenseGrid.CellPosition(cell) + Vector3.up * 0.02f,
+                new Vector3(0.9f, 0.04f, 0.9f), routeMarkerMaterial);
+            var renderer = flash.GetComponent<MeshRenderer>();
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            var block = new MaterialPropertyBlock();
+            block.SetColor(BaseColor, settled);
+            renderer.SetPropertyBlock(block);
+            GameObject flashObject = flash.gameObject;
+            LMotion.Create(0f, 1f, 0.55f)
+                .WithDelay(i * 0.035f)
+                .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                .WithOnComplete(() => Object.Destroy(flashObject))
+                .Bind(t =>
+                {
+                    // 금색으로 솟았다가 바닥색으로 가라앉는다.
+                    float pulse = Mathf.Sin(t * Mathf.PI);
+                    block.SetColor(BaseColor, Color.Lerp(settled, WallFlash * 1.5f, pulse));
+                    renderer.SetPropertyBlock(block);
+                    flash.localScale = new Vector3(0.9f, 0.04f + 0.12f * pulse, 0.9f);
+                })
+                .AddTo(flashObject);
+        }
+    }
+
+    // ── 스폰 위치 예고 ──
+    /// <summary>
+    /// 스폰 지점마다 등장 예고를 띄운다. <paramref name="countsPerFaction"/>이 null이면 숨긴다.
+    /// 매 프레임 부르며, 고리가 퍼지고 화살표가 들썩이는 움직임은 실시간으로 진행한다.
+    /// </summary>
+    // routes를 주면 경로가 null인 스폰(이번 라운드에 쓰지 않음)은 숨긴다.
+    public void ShowSpawnForecast(IReadOnlyList<int> countsPerFaction, bool nextWave, IReadOnlyList<Vector2Int> cells,
+        IReadOnlyList<Vector3[]> routes = null)
+    {
+        float clock = Time.unscaledTime;
+        for (int i = 0; i < cells.Count; i++)
+        {
+            int count = countsPerFaction != null && (routes == null || routes[i] != null)
+                ? countsPerFaction[spawnFactions[i]] : 0;
+            if (count <= 0)
+            {
+                if (i < spawnBeacons.Count)
+                    spawnBeacons[i].Root.gameObject.SetActive(false);
+                continue;
+            }
+
+            while (spawnBeacons.Count <= i)
+                spawnBeacons.Add(CreateSpawnBeacon(cells[spawnBeacons.Count], spawnFactions[spawnBeacons.Count]));
+            SpawnBeacon beacon = spawnBeacons[i];
+            beacon.Root.gameObject.SetActive(true);
+            Color color = factions[spawnFactions[i]].Color;
+            Color padColor = Color.Lerp(color, Color.black, 0.55f);
+            for (int ring = 0; ring < beacon.Rings.Length; ring++)
+            {
+                float phase = Mathf.Repeat(clock * 0.8f + ring / (float)beacon.Rings.Length, 1f);
+                float scale = Mathf.Lerp(1.0f, 2.5f, phase);
+                beacon.Rings[ring].transform.localScale = new Vector3(scale, 1f, scale);
+                tintBlock.SetColor(BaseColor, Color.Lerp(color * 1.3f, padColor, phase));
+                beacon.Rings[ring].SetPropertyBlock(tintBlock);
+            }
+            beacon.Arrow.transform.localPosition = Vector3.up * (1.75f + Mathf.Sin(clock * 4f) * 0.12f);
+            tintBlock.SetColor(BaseColor, color * 1.2f);
+            beacon.Arrow.SetPropertyBlock(tintBlock);
+            beacon.Label.transform.rotation = camera.transform.rotation;
+            if (beacon.ShownCount != count || beacon.ShownNext != nextWave)
+            {
+                beacon.ShownCount = count;
+                beacon.ShownNext = nextWave;
+                beacon.Label.text = nextWave ? $"<size=60%>NEXT</size>\n×{count}" : $"×{count}";
+                beacon.Label.color = Color.Lerp(color, Color.white, 0.55f);
+            }
+        }
+    }
+
+    private SpawnBeacon CreateSpawnBeacon(Vector2Int cell, int faction)
+    {
+        if (spawnBeaconRing == null)
+        {
+            spawnBeaconRing = CreateRingMesh("Spawn Beacon Ring", 0.5f, 0.07f, 32);
+            meshes.Add(spawnBeaconRing);
+        }
+
+        var beaconRoot = new GameObject("Spawn forecast").transform;
+        beaconRoot.SetParent(root, false);
+        beaconRoot.gameObject.SetActive(false);
+        beaconRoot.localPosition = DefenseGrid.CellPosition(cell);
+        var rings = new MeshRenderer[2];
+        for (int i = 0; i < rings.Length; i++)
+        {
+            var ring = new GameObject("Ring", typeof(MeshFilter), typeof(MeshRenderer));
+            ring.transform.SetParent(beaconRoot, false);
+            ring.transform.localPosition = Vector3.up * (SpawnPadHeight + 0.03f + i * 0.004f);
+            ring.GetComponent<MeshFilter>().sharedMesh = spawnBeaconRing;
+            rings[i] = ring.GetComponent<MeshRenderer>();
+            rings[i].sharedMaterial = routeMarkerMaterial;
+            rings[i].shadowCastingMode = ShadowCastingMode.Off;
+            rings[i].receiveShadows = false;
+        }
+
+        // 아래를 가리키는 화살표: 경로 화살표 메시를 세워서 쓴다.
+        var arrow = new GameObject("Arrow", typeof(MeshFilter), typeof(MeshRenderer));
+        arrow.transform.SetParent(beaconRoot, false);
+        arrow.transform.localRotation = Quaternion.LookRotation(Vector3.down, buffMarkRotation * Vector3.forward);
+        arrow.transform.localScale = Vector3.one * 3.4f;
+        arrow.GetComponent<MeshFilter>().sharedMesh = routeMarkerMesh;
+        var arrowRenderer = arrow.GetComponent<MeshRenderer>();
+        arrowRenderer.sharedMaterial = routeMarkerMaterial;
+        arrowRenderer.shadowCastingMode = ShadowCastingMode.Off;
+        arrowRenderer.receiveShadows = false;
+
+        var labelObject = new GameObject("Count", typeof(TMPro.TextMeshPro));
+        labelObject.transform.SetParent(beaconRoot, false);
+        labelObject.transform.localPosition = Vector3.up * 2.75f;
+        var label = labelObject.GetComponent<TMPro.TextMeshPro>();
+        label.font = TMPro.TMP_Settings.defaultFontAsset;
+        label.fontSize = 8.5f;
+        label.fontStyle = TMPro.FontStyles.Bold;
+        label.alignment = TMPro.TextAlignmentOptions.Center;
+        label.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
+        label.outlineWidth = 0.28f;
+        label.outlineColor = UIPalette.Background;
+        label.rectTransform.sizeDelta = new Vector2(6f, 2.6f);
+        label.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.Off;
+        return new SpawnBeacon { Root = beaconRoot, Rings = rings, Arrow = arrowRenderer, Label = label };
+    }
+
+    // ── 웨이브 시작 연출 ──
+    /// <summary>웨이브가 시작되면 각 스폰의 선두가 갈 길을 짧은 선분들이 먼저 달려 보여 준다.</summary>
+    public void PlayRouteTracers(IReadOnlyList<Vector3[]> routes, IReadOnlyList<int> countsPerFaction)
+    {
+        const int dashes = 5;
+        const float speed = 10f;      // 칸/초. 유닛보다 훨씬 빨라서 길을 먼저 훑는다.
+        const float spacing = 0.085f; // 선분 사이의 출발 간격(초)
+        for (int spawn = 0; spawn < routes.Count; spawn++)
+        {
+            Vector3[] path = routes[spawn];
+            if (path == null || countsPerFaction[spawnFactions[spawn]] <= 0)
+                continue;
+
+            float length = 0f;
+            for (int i = 1; i < path.Length; i++)
+                length += Vector3.Distance(path[i - 1], path[i]);
+            if (length <= 0.01f)
+                continue;
+
+            Color color = factions[spawnFactions[spawn]].Color * 1.45f;
+            float duration = length / speed;
+            for (int dash = 0; dash < dashes; dash++)
+            {
+                Transform segment = Box("Route tracer", root, path[0], new Vector3(0.24f, 0.07f, 0.75f), routeMarkerMaterial);
+                var renderer = segment.GetComponent<MeshRenderer>();
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+                var block = new MaterialPropertyBlock();
+                block.SetColor(BaseColor, color);
+                renderer.SetPropertyBlock(block);
+                segment.localScale = Vector3.zero;
+                GameObject segmentObject = segment.gameObject;
+                float tail = 1f - dash / (float)dashes * 0.55f;   // 뒤따르는 선분일수록 짧다
+                LMotion.Create(0f, length, duration)
+                    .WithDelay(dash * spacing)
+                    .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                    .WithOnComplete(() => Object.Destroy(segmentObject))
+                    .Bind(distance =>
+                    {
+                        Vector3 point = PointAlongRoute(path, distance, out Vector3 heading);
+                        float fade = Mathf.Clamp01(Mathf.Min(distance, length - distance) / 0.8f);
+                        segment.localPosition = point + Vector3.up * (RouteMarkerHeight + 0.09f);
+                        segment.localRotation = Quaternion.LookRotation(heading, Vector3.up);
+                        segment.localScale = new Vector3(0.24f * fade, 0.07f, 0.75f * tail * fade);
+                    })
+                    .AddTo(segmentObject);
+            }
+        }
+    }
+
+    /// <summary>예상 교전 칸에 고리가 퍼지는 표지를 잠깐 띄운다. <paramref name="delay"/>는 선두가 닿을 길을 선분이 훑는 시간만큼 준다.</summary>
+    public void PlayEncounterBeacons(IReadOnlyCollection<Vector2Int> cells, float delay)
+    {
+        if (spawnBeaconRing == null)
+        {
+            spawnBeaconRing = CreateRingMesh("Spawn Beacon Ring", 0.5f, 0.07f, 32);
+            meshes.Add(spawnBeaconRing);
+        }
+
+        Color hot = encounterTile.color * 1.5f;
+        foreach (Vector2Int cell in cells)
+        {
+            Color settled = encounterTile.color;
+            for (int i = 0; i < 3; i++)
+            {
+                var ring = new GameObject("Encounter beacon", typeof(MeshFilter), typeof(MeshRenderer));
+                ring.transform.SetParent(root, false);
+                ring.transform.localPosition = DefenseGrid.CellPosition(cell) + Vector3.up * (0.05f + i * 0.004f);
+                ring.transform.localScale = Vector3.zero;
+                ring.GetComponent<MeshFilter>().sharedMesh = spawnBeaconRing;
+                var renderer = ring.GetComponent<MeshRenderer>();
+                renderer.sharedMaterial = routeMarkerMaterial;
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+                var block = new MaterialPropertyBlock();
+                Transform ringTransform = ring.transform;
+                LMotion.Create(0f, 1f, 0.9f)
+                    .WithEase(Ease.OutCubic)
+                    .WithDelay(delay + i * 0.32f)
+                    .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                    .WithOnComplete(() => Object.Destroy(ring))
+                    .Bind(t =>
+                    {
+                        float scale = Mathf.Lerp(0.5f, 3.2f, t);
+                        ringTransform.localScale = new Vector3(scale, 1f, scale);
+                        block.SetColor(BaseColor, Color.Lerp(hot, settled, t));
+                        renderer.SetPropertyBlock(block);
+                    })
+                    .AddTo(ring);
+            }
+        }
+    }
+
+    private static Vector3 PointAlongRoute(Vector3[] path, float distance, out Vector3 heading)
+    {
+        heading = Vector3.forward;
+        for (int i = 1; i < path.Length; i++)
+        {
+            Vector3 step = path[i] - path[i - 1];
+            float segment = step.magnitude;
+            if (segment <= 0.0001f)
+                continue;
+            heading = step / segment;
+            if (distance <= segment)
+                return path[i - 1] + heading * distance;
+            distance -= segment;
+        }
+        return path[^1];
+    }
     private MaterialPropertyBlock ghostBlock;
     private Renderer[] ghostRenderers;
 
@@ -930,14 +1260,47 @@ internal sealed class DefenseBoardView
             point.z >= -0.5f && point.z < boardDepth - 0.5f;
     }
 
-    public void ShowAreaSpellPreview(DefenseBattle.Spell? spell, Vector3? center, float radius)
+    // 도발 조준용: 마우스 아래 가장 가까운 살아 있는 유닛.
+    public bool TryPickEnemy(Vector2 pointer, IReadOnlyList<EnemyUnit> enemies, out EnemyUnit picked)
     {
+        picked = null;
+        if (!TryPickBoardPoint(pointer, out Vector3 point))
+            return false;
+
+        float nearest = TauntPickRadius * TauntPickRadius;
+        foreach (EnemyUnit enemy in enemies)
+        {
+            if (!enemy.IsAlive || !enemyViews.TryGetValue(enemy, out EnemyView view))
+                continue;
+            // 화면에 그려진(보간된) 위치로 고른다.
+            Vector3 offset = view.Root.localPosition - point;
+            float distance = offset.x * offset.x + offset.z * offset.z;
+            if (distance > nearest)
+                continue;
+            nearest = distance;
+            picked = enemy;
+        }
+        return picked != null;
+    }
+
+    // 도발은 center 대신 tauntTarget 을 둘레로 반경을 그리고, 끌려올 유닛과 대상만 강조한다.
+    public void ShowAreaSpellPreview(DefenseBattle.Spell? spell, Vector3? center, float radius,
+        EnemyUnit tauntTarget = null)
+    {
+        if (spell == DefenseBattle.Spell.Taunt)
+        {
+            center = tauntTarget != null && enemyViews.TryGetValue(tauntTarget, out EnemyView targetView)
+                ? targetView.Root.localPosition
+                : null;
+            radius = DefenseBattle.TauntRadius;
+        }
         Material material = center.HasValue ? spell switch
         {
             DefenseBattle.Spell.MoveSpeedBuff => moveSpeedBuffPreviewMaterial,
             DefenseBattle.Spell.Heal => healPreviewMaterial,
             DefenseBattle.Spell.AttackBuff => attackBuffPreviewMaterial,
             DefenseBattle.Spell.ArmorBuff => armorBuffPreviewMaterial,
+            DefenseBattle.Spell.Taunt => tauntPreviewMaterial,
             _ => null
         } : null;
 
@@ -955,12 +1318,15 @@ internal sealed class DefenseBoardView
             UpdateAreaSpellRing(point, radius);
         }
 
-        Material silhouette = material != null ? targetSilhouettes[spell.Value] : null;
         foreach (var entry in enemyViews)
         {
-            bool eligible = silhouette != null && DefenseBattle.IsInAreaSpellRange(entry.Key, point, radius) &&
-                DefenseBattle.CanReceiveAreaSpell(entry.Key, spell.Value);
-            SetEnemyPreviewMaterial(entry.Value, eligible ? silhouette : null);
+            bool eligible = material != null && (spell == DefenseBattle.Spell.Taunt
+                ? entry.Key == tauntTarget || DefenseBattle.IsTauntable(tauntTarget, entry.Key)
+                : DefenseBattle.IsInAreaSpellRange(entry.Key, point, radius) &&
+                    DefenseBattle.CanReceiveAreaSpell(entry.Key, spell.Value));
+            // 빗금은 대상의 진영 색으로 칠한다.
+            SetEnemyPreviewMaterial(entry.Value,
+                eligible ? targetSilhouettes[(spell.Value, entry.Key.FactionIndex)] : null);
         }
     }
 
@@ -1130,13 +1496,16 @@ internal sealed class DefenseBoardView
         Color flashTint = view.SpellFlashColor * SpellBodyFlashBrightness;
         foreach (var (renderer, slot, baseColor) in view.TintSlots)
         {
-            if (flashStrength == 0f)
+            float hitStrength = Mathf.Clamp01(view.HitRemaining / HitReactionDuration);
+            hitStrength *= hitStrength;
+            if (flashStrength == 0f && hitStrength == 0f)
             {
                 renderer.SetPropertyBlock(null, slot);
                 continue;
             }
 
             Color tint = Color.Lerp(baseColor, flashTint, flashStrength);
+            tint = Color.Lerp(tint, Color.white * 1.65f, hitStrength * 0.8f);
             tint.a = baseColor.a;
             tintBlock.SetColor(BaseColor, tint);
             renderer.SetPropertyBlock(tintBlock, slot);
@@ -1235,12 +1604,14 @@ internal sealed class DefenseBoardView
         Transform model = new GameObject($"{enemy.Faction.DisplayName} enemy").transform;
         model.SetParent(root, false);
         model.localPosition = enemy.Position;
+        Transform body = new GameObject("Body Reaction").transform;
+        body.SetParent(model, false);
         EnemyView view;
         EnemyCatalog.UnitVisual look = default;
         GameObject prefab = catalog != null && catalog.TryGetVisual(enemy.Faction.UnitId, out look) ? look.Model : null;
         if (prefab != null)
         {
-            GameObject visual = Object.Instantiate(prefab, model);
+            GameObject visual = Object.Instantiate(prefab, body);
             ApplyUnitVisual(visual, look);
 
             view = new EnemyView
@@ -1267,9 +1638,13 @@ internal sealed class DefenseBoardView
         }
         else
         {
-            view = CreateBlockEnemy(model, material, enemy.FactionIndex);
+            view = CreateBlockEnemy(body, material, enemy.FactionIndex);
         }
+        view.Root = model;
+        view.Body = body;
+        view.BodyScale = body.localScale;
         view.TintSlots = CollectTintSlots(view.Renderers);
+        view.BaseScale = model.localScale;
         enemyViews.Add(enemy, view);
         SyncEnemy(enemy);
     }
@@ -1368,13 +1743,87 @@ internal sealed class DefenseBoardView
             BeginCoreStrike(enemy, view, coreDamage);
             return;
         }
-        Object.Destroy(view.Root.gameObject);
+        BeginDeath(view);
+    }
+
+    private void BeginDeath(EnemyView view)
+    {
+        SetEnemyPreviewMaterial(view, null);
+        view.SpellFlashRemaining = 0f;
+        view.HitRemaining = 0f;
+        ApplyEnemyTint(view);
+        ResetBodyReaction(view);
+        if (view.FactionRing != null)
+            view.FactionRing.enabled = false;
+
+        bool animated = view.Animator != null && view.Animator.HasState(0, DeathState);
+        float duration = 0.48f;
+        if (view.Animator != null)
+        {
+            view.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            view.Animator.speed = 0f;
+            if (animated)
+            {
+                view.Animator.Play(DeathState, 0, 0f);
+                view.Animator.Update(0f);
+                duration = Mathf.Clamp(view.Animator.GetCurrentAnimatorStateInfo(0).length, 0.6f, 1.25f);
+            }
+        }
+        // Only presentation survives removal; it no longer occupies a combat slot or receives input.
+        if (deathViews.Count >= MaxDeathViews)
+        {
+            Object.Destroy(deathViews[0].View.Root.gameObject);
+            deathViews.RemoveAt(0);
+        }
+        deathViews.Add(new DeathView
+        {
+            View = view, Position = view.Root.localPosition,
+            Scale = view.Root.localScale, Duration = duration, Animated = animated
+        });
+    }
+
+    private void AdvanceDeaths(float deltaTime)
+    {
+        for (int i = deathViews.Count - 1; i >= 0; i--)
+        {
+            DeathView death = deathViews[i];
+            death.Age += deltaTime;
+            float pose = Mathf.Clamp01(death.Age / death.Duration);
+            if (death.Animated)
+            {
+                // Explicit sampling prevents Animator time from bypassing BattleClock pause/slow motion.
+                death.View.Animator.Play(DeathState, 0, Mathf.Min(pose, 0.999f));
+                death.View.Animator.Update(0f);
+            }
+            else
+            {
+                death.View.Body.localRotation = Quaternion.Euler(-82f * Mathf.SmoothStep(0f, 1f, pose), 0f, 10f * pose);
+            }
+            float fade = Mathf.Clamp01((death.Age - death.Duration - DeathHoldDuration) / DeathFadeDuration);
+            if (fade <= 0f)
+                continue;
+            if (!death.Fading)
+            {
+                PrepareEnemyFade(death.View);
+                death.Fading = true;
+            }
+            SetEnemyOpacity(death.View, 1f - fade);
+            death.View.Root.localPosition = death.Position + Vector3.down * (0.18f * fade);
+            // Also retire models whose shader does not support transparency.
+            death.View.Root.localScale = death.Scale * (1f - fade * fade);
+            if (fade < 1f)
+                continue;
+            Object.Destroy(death.View.Root.gameObject);
+            deathViews.RemoveAt(i);
+        }
     }
 
     private void BeginCoreStrike(EnemyUnit enemy, EnemyView view, int coreDamage)
     {
         SetEnemyPreviewMaterial(view, null);
         view.SpellFlashRemaining = 0f;
+        view.HitRemaining = 0f;
+        ResetBodyReaction(view);
         ApplyEnemyTint(view);
 
         Vector3 heading = enemy.Heading.normalized;
@@ -1425,14 +1874,14 @@ internal sealed class DefenseBoardView
                 coreImpacted = true;
                 NextHitEffect().Play(root.TransformPoint(strike.Impact), CoreDamageColor, CoreStrikeFlashScale,
                     colorEmphasis: 0.85f);
-                PrepareCoreStrikeFade(strike.View);
+                PrepareEnemyFade(strike.View);
             }
             if (!strike.HasHit)
                 continue;
 
             if (fadeProgress < 1f)
             {
-                SetCoreStrikeOpacity(strike.View, 1f - Mathf.SmoothStep(0f, 1f, fadeProgress));
+                SetEnemyOpacity(strike.View, 1f - Mathf.SmoothStep(0f, 1f, fadeProgress));
                 continue;
             }
 
@@ -1468,7 +1917,7 @@ internal sealed class DefenseBoardView
         }
     }
 
-    private void PrepareCoreStrikeFade(EnemyView view)
+    private void PrepareEnemyFade(EnemyView view)
     {
         if (view.FactionRing != null)
             view.FactionRing.enabled = false;
@@ -1503,7 +1952,7 @@ internal sealed class DefenseBoardView
         }
     }
 
-    private void SetCoreStrikeOpacity(EnemyView view, float opacity)
+    private void SetEnemyOpacity(EnemyView view, float opacity)
     {
         foreach (var (renderer, slot, baseColor) in view.TintSlots)
         {
@@ -1529,14 +1978,47 @@ internal sealed class DefenseBoardView
             ApplyCoreFlash();
         }
         AdvanceCoreStrikes(deltaTime);
+        AdvanceDeaths(deltaTime);
         foreach (EnemyView view in enemyViews.Values)
         {
-            if (view.SpellFlashRemaining <= 0f)
+            view.HitCooldown = Mathf.Max(0f, view.HitCooldown - deltaTime);
+            if (view.SpellFlashRemaining <= 0f && view.HitRemaining <= 0f)
                 continue;
-
             view.SpellFlashRemaining = Mathf.Max(0f, view.SpellFlashRemaining - deltaTime);
+            view.HitRemaining = Mathf.Max(0f, view.HitRemaining - deltaTime);
             ApplyEnemyTint(view);
+            ApplyBodyReaction(view);
         }
+    }
+
+    private void ReactToHit(EnemyUnit target, Vector3 direction, bool boosted, bool armored)
+    {
+        if (!enemyViews.TryGetValue(target, out EnemyView view) || view.HitCooldown > 0f)
+            return;
+        view.HitDirection = direction.sqrMagnitude > 0.0001f ? direction.normalized : -target.Heading;
+        view.HitStrength = armored ? 0.55f : boosted ? 1.2f : 1f;
+        view.HitRemaining = HitReactionDuration;
+        view.HitCooldown = HitReactionCooldown;
+        ApplyEnemyTint(view);
+        ApplyBodyReaction(view);
+    }
+
+    private static void ResetBodyReaction(EnemyView view)
+    {
+        view.Body.localPosition = Vector3.zero;
+        view.Body.localRotation = Quaternion.identity;
+        view.Body.localScale = view.BodyScale;
+    }
+
+    private static void ApplyBodyReaction(EnemyView view)
+    {
+        float recoil = Mathf.Clamp01(view.HitRemaining / HitReactionDuration);
+        recoil = recoil * recoil * view.HitStrength;
+        Vector3 localDirection = Quaternion.Inverse(view.Root.localRotation) * view.HitDirection;
+        view.Body.localPosition = localDirection * (0.065f * recoil);
+        view.Body.localRotation = Quaternion.AngleAxis(9f * recoil, Vector3.Cross(Vector3.up, localDirection));
+        view.Body.localScale = Vector3.Scale(view.BodyScale,
+            new Vector3(1f + 0.045f * recoil, 1f - 0.07f * recoil, 1f + 0.045f * recoil));
     }
 
     // interpolation: 직전 틱(0)과 현재 틱(1) 사이 어디를 그릴지. deltaTime 은 화면용 전투 시간이다.
@@ -1558,8 +2040,19 @@ internal sealed class DefenseBoardView
         }
         SyncHit(view, enemy);
         SyncBuffMarks(view, enemy);
+        SyncGiantScale(view, enemy, deltaTime);
         bool movingWithBuff = enemy.MoveSpeedBuffStacks > 0 && IsMoving(step, deltaTime, playbackSpeed);
         spellEffects.SyncMoveTrail(view.Root, step, movingWithBuff, ref view.MoveSpeedTrails);
+    }
+
+    // 도발 중이면 서서히 커지고, 끝나면 원래 크기로 돌아간다.
+    private static void SyncGiantScale(EnemyView view, EnemyUnit enemy, float deltaTime)
+    {
+        float target = enemy.IsTaunting ? TauntGiantScale : 1f;
+        if (view.GiantScale == target)
+            return;
+        view.GiantScale = Mathf.MoveTowards(view.GiantScale, target, TauntGrowSpeed * deltaTime);
+        view.Root.localScale = view.BaseScale * view.GiantScale;
     }
 
     private void SyncBuffMarks(EnemyView view, EnemyUnit enemy)
@@ -1664,7 +2157,8 @@ internal sealed class DefenseBoardView
         Vector3 toAttacker = attacker.Position - target.Position;
         toAttacker.y = 0f;
         Vector3 point = target.Position + Vector3.up * HitHeight + Vector3.ClampMagnitude(toAttacker, HitForwardOffset);
-        NextHitEffect().Play(root.TransformPoint(point), attacker.Faction.Color);
+        NextHitEffect().Play(root.TransformPoint(point), attacker.Faction.Color, boosted ? 1.12f : 0.85f);
+        ReactToHit(target, -toAttacker, boosted, targetArmored);
         playHitSound?.Invoke();
         if (boosted)
             spellEffects.PlayAttack(attacker.Position, target.Position);

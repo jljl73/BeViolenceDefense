@@ -10,12 +10,14 @@ internal sealed class DefenseBattle
     public const float TickDuration = 1f / TicksPerSecond;
     public const float HealPercent = 0.25f;
     public const float BuffDuration = 6f;
+    // 도발: 고른 유닛이 이 시간 동안 거대해지고, 반경 안의 다른 진영 유닛을 벽 너머까지 끌어당긴다. 첫 테스트용 임시 값.
+    public const float TauntDuration = 5f;
+    public const float TauntRadius = 3.5f;
     public const float DefaultAreaSpellRadius = DefaultSpellRadiusTenths / 10f;
     public const int MinSpellRangeStep = -4;
     public const int MaxSpellRangeStep = 5;
     public const int MaxMana = 70;
 
-    private const int CastsPerSpell = 3;
     private const int DefaultSpellRadiusTenths = 14;
     private const int MaxSpellManaAdjustment = 2;
     private const float StartingMana = MaxMana * 0.5f;
@@ -29,7 +31,7 @@ internal sealed class DefenseBattle
     private const int ExtraReinforcements = 3;
 
     public enum Phase { Preparation, Combat, Defeat, Victory }
-    public enum Spell { AttackBuff, Heal, MoveSpeedBuff, ArmorBuff }
+    public enum Spell { AttackBuff, Heal, MoveSpeedBuff, ArmorBuff, Taunt }
 
     private readonly DefenseGrid grid;
     private readonly EnemyFaction[] factions;
@@ -58,18 +60,21 @@ internal sealed class DefenseBattle
     // 결과를 바꾸는 플레이어 입력. 틱 번호가 같으면 프레임 속도와 관계없이 같은 결과가 난다.
     public readonly struct SpellCommand
     {
-        public SpellCommand(int tick, Spell spell, Vector3 center, int rangeStep)
+        public SpellCommand(int tick, Spell spell, Vector3 center, int rangeStep, int targetSpawnOrder = -1)
         {
             Tick = tick;
             Spell = spell;
             Center = center;
             RangeStep = rangeStep;
+            TargetSpawnOrder = targetSpawnOrder;
         }
 
         public int Tick { get; }
         public Spell Spell { get; }
         public Vector3 Center { get; }
         public int RangeStep { get; }
+        // 유닛 하나를 고르는 마법(도발)의 대상. 범위 마법은 -1.
+        public int TargetSpawnOrder { get; }
     }
 
     private readonly List<SpellCommand> pendingSpells = new();
@@ -89,10 +94,6 @@ internal sealed class DefenseBattle
     public int CoreHealth { get; private set; } = CoreMaxHealth;
     public int SpawnCount { get; private set; }
     public int EnemiesPerRound { get; private set; }
-    public int AttackBuffsLeft { get; private set; }
-    public int MoveSpeedBuffsLeft { get; private set; }
-    public int ArmorBuffsLeft { get; private set; }
-    public int HealsLeft { get; private set; }
     public float Mana { get; private set; }
 
     public DefenseBattle(DefenseGrid grid, EnemyFaction[] factions,
@@ -146,13 +147,30 @@ internal sealed class DefenseBattle
 
         for (int i = 0; i < factions.Length; i++)
         {
-            int baseCount = factionSpawns[i].Length > 0 ? factions[i].SpawnCount : 0;
-            // Faction 1 (Undead) receives the first larger reinforcement, then it alternates with the others.
-            int largerReinforcements = roundsCleared / 2 + (i == 1 ? roundsCleared % 2 : 0);
-            int reinforcements = roundsCleared * ReinforcementsPerFaction + largerReinforcements * ExtraReinforcements;
-            roundSpawnCounts[i] = baseCount > 0 ? baseCount + reinforcements : 0;
+            roundSpawnCounts[i] = ReinforcedSpawnCount(i, roundsCleared);
             EnemiesPerRound += roundSpawnCounts[i];
         }
+    }
+
+    private int ReinforcedSpawnCount(int side, int roundsCleared)
+    {
+        int baseCount = factionSpawns[side].Length > 0 ? factions[side].SpawnCount : 0;
+        // Faction 1 (Undead) receives the first larger reinforcement, then it alternates with the others.
+        int largerReinforcements = roundsCleared / 2 + (side == 1 ? roundsCleared % 2 : 0);
+        int reinforcements = roundsCleared * ReinforcementsPerFaction + largerReinforcements * ExtraReinforcements;
+        return baseCount > 0 ? baseCount + reinforcements : 0;
+    }
+
+    /// <summary>다음 라운드에 진영(편) side 가 내보낼 유닛 수. 지금 라운드의 상태는 바꾸지 않는다.</summary>
+    public int NextRoundSpawnCount(int side)
+    {
+        if (factionSpawns[side].Length == 0)
+            return 0;
+        if (roundLineup == null)
+            return ReinforcedSpawnCount(side, Round);
+
+        IReadOnlyList<EnemyFaction>[] next = roundLineup(Round + 1);
+        return next != null && side < next.Length && next[side] != null ? next[side].Count : 0;
     }
 
     public void StartRound()
@@ -168,10 +186,6 @@ internal sealed class DefenseBattle
         Array.Clear(spawnedPerFaction, 0, spawnedPerFaction.Length);
         untilSpawn = 0.35f;
         untilCombatPlan = 0f;
-        AttackBuffsLeft = CastsPerSpell;
-        MoveSpeedBuffsLeft = CastsPerSpell;
-        ArmorBuffsLeft = CastsPerSpell;
-        HealsLeft = CastsPerSpell;
         Mana = StartingMana;
     }
 
@@ -184,6 +198,9 @@ internal sealed class DefenseBattle
     // 마법은 바로 적용하지 않고 다음 틱이 시작될 때 적용한다.
     public void QueueSpell(Spell spell, Vector3 center, int rangeStep) =>
         ScheduleSpell(new SpellCommand(TickIndex, spell, center, rangeStep));
+
+    public void QueueTaunt(EnemyUnit target) =>
+        ScheduleSpell(new SpellCommand(TickIndex, Spell.Taunt, target.Position, 0, target.SpawnOrder));
 
     // 리플레이용: 지정한 틱에 마법을 건다. 이미 지난 틱이면 다음 틱에 적용한다.
     public void ScheduleSpell(SpellCommand command)
@@ -202,8 +219,11 @@ internal sealed class DefenseBattle
         {
             SpellCommand command = pendingSpells[0];
             pendingSpells.RemoveAt(0);
-            string message = CastAreaSpell(command.Spell, command.Center, command.RangeStep, resolvedRecipients);
-            commandHistory.Add(new SpellCommand(TickIndex, command.Spell, command.Center, command.RangeStep));
+            string message = command.Spell == Spell.Taunt
+                ? CastTaunt(command.TargetSpawnOrder, resolvedRecipients)
+                : CastAreaSpell(command.Spell, command.Center, command.RangeStep, resolvedRecipients);
+            commandHistory.Add(new SpellCommand(TickIndex, command.Spell, command.Center, command.RangeStep,
+                command.TargetSpawnOrder));
             SpellResolved?.Invoke(command, message, resolvedRecipients);
         }
     }
@@ -211,28 +231,26 @@ internal sealed class DefenseBattle
     public static float AreaSpellRadius(int rangeStep) =>
         (DefaultSpellRadiusTenths + Mathf.Clamp(rangeStep, MinSpellRangeStep, MaxSpellRangeStep) * 2) / 10f;
 
-    public static int ManaCost(Spell spell, int rangeStep = 0) =>
-        (spell == Spell.Heal ? 32 : 24) + Mathf.Clamp(rangeStep, -MaxSpellManaAdjustment, MaxSpellManaAdjustment);
-
-    public int InitialSpellRangeStep(Spell spell) =>
-        Mathf.Clamp(Mathf.FloorToInt(Mana) - ManaCost(spell), -MaxSpellManaAdjustment, 0);
-
-    public int CastsLeft(Spell spell) => spell switch
+    // 도발은 반경을 조절하지 않으므로 rangeStep 을 무시한다.
+    public static int ManaCost(Spell spell, int rangeStep = 0) => spell switch
     {
-        Spell.AttackBuff => AttackBuffsLeft,
-        Spell.MoveSpeedBuff => MoveSpeedBuffsLeft,
-        Spell.ArmorBuff => ArmorBuffsLeft,
-        _ => HealsLeft
+        Spell.Taunt => 32,
+        Spell.Heal => 32 + Mathf.Clamp(rangeStep, -MaxSpellManaAdjustment, MaxSpellManaAdjustment),
+        _ => 24 + Mathf.Clamp(rangeStep, -MaxSpellManaAdjustment, MaxSpellManaAdjustment)
     };
+
+    public static bool IsAreaSpell(Spell spell) => spell != Spell.Taunt;
+
+    public int InitialSpellRangeStep(Spell spell) => IsAreaSpell(spell)
+        ? Mathf.Clamp(Mathf.FloorToInt(Mana) - ManaCost(spell), -MaxSpellManaAdjustment, 0)
+        : 0;
 
     public string SpellBlockReason(Spell spell, int rangeStep)
     {
         if (CurrentPhase != Phase.Combat)
-            return "Battle only";
-        if (CastsLeft(spell) == 0)
-            return "No casts left";
+            return GameText.Get("cast.combat_only");
         if (Mana < ManaCost(spell, rangeStep))
-            return "Not enough mana";
+            return GameText.Get("cast.not_enough_mana");
         return null;
     }
 
@@ -252,6 +270,8 @@ internal sealed class DefenseBattle
     public string CastAreaSpell(Spell spell, Vector3 center, int rangeStep, List<EnemyUnit> recipients = null)
     {
         recipients?.Clear();
+        if (!IsAreaSpell(spell))
+            return GameText.Get("cast.pick_target");
         string blocked = SpellBlockReason(spell, rangeStep);
         if (blocked != null)
             return blocked;
@@ -283,62 +303,140 @@ internal sealed class DefenseBattle
         }
 
         if (affected == 0)
-            return spell == Spell.Heal ? "No injured enemies in range." : "No eligible enemies in range.";
+            return spell == Spell.Heal ? GameText.Get("cast.no_injured_units") : GameText.Get("cast.no_eligible_units");
 
         Mana -= ManaCost(spell, rangeStep);
-        switch (spell)
+        return spell == Spell.Heal ? GameText.Format("cast.healed", affected) : GameText.Format("cast.buffed", affected);
+    }
+
+    // 도발에 끌려올 유닛: 살아 있는 다른 진영 유닛 중 도발 유닛 둘레 반경 안. 벽은 막지 않는다.
+    // 이미 교전 중인 유닛도 포함한다.
+    public static bool IsTauntable(EnemyUnit taunter, EnemyUnit other) =>
+        other != taunter && other.IsAlive && other.FactionIndex != taunter.FactionIndex &&
+        IsInAreaSpellRange(other, taunter.Position, TauntRadius);
+
+    // recipients 의 첫 항목은 도발 유닛, 나머지는 끌려온 유닛이다.
+    public string CastTaunt(int targetSpawnOrder, List<EnemyUnit> recipients = null)
+    {
+        recipients?.Clear();
+        string blocked = SpellBlockReason(Spell.Taunt, 0);
+        if (blocked != null)
+            return blocked;
+
+        EnemyUnit taunter = null;
+        foreach (EnemyUnit enemy in enemies)
+            if (enemy.SpawnOrder == targetSpawnOrder && enemy.IsAlive)
+                taunter = enemy;
+        if (taunter == null)
+            return GameText.Get("cast.target_gone");
+
+        taunter.ApplyTaunt(TauntDuration);
+        recipients?.Add(taunter);
+        int pulled = 0;
+        foreach (EnemyUnit enemy in enemies)
         {
-            case Spell.AttackBuff:
-                AttackBuffsLeft--;
-                break;
-            case Spell.MoveSpeedBuff:
-                MoveSpeedBuffsLeft--;
-                break;
-            case Spell.ArmorBuff:
-                ArmorBuffsLeft--;
-                break;
-            case Spell.Heal:
-                HealsLeft--;
-                break;
+            if (!IsTauntable(taunter, enemy))
+                continue;
+            enemy.ApplyTauntedBy(taunter, TauntDuration);
+            recipients?.Add(enemy);
+            pulled++;
         }
-        string action = spell == Spell.Heal ? "Healed" : "Buffed";
-        return affected == 1 ? $"{action} 1 enemy." : $"{action} {affected} enemies.";
+
+        Mana -= ManaCost(Spell.Taunt);
+        // 끌려온 유닛이 다음 계획까지 기다리지 않고 바로 방향을 바꾼다.
+        untilCombatPlan = 0f;
+        return GameText.Format("cast.taunted", pulled);
+    }
+
+    /// <summary>두 진영의 선두가 처음 만날 것으로 보이는 지점.</summary>
+    public readonly struct EncounterForecast
+    {
+        public EncounterForecast(Vector2Int cell, int sideA, int sideB, float seconds)
+        {
+            Cell = cell;
+            SideA = sideA;
+            SideB = sideB;
+            Seconds = seconds;
+        }
+
+        public Vector2Int Cell { get; }
+        public int SideA { get; }
+        public int SideB { get; }
+        public float Seconds { get; }
     }
 
     public IReadOnlyCollection<Vector2Int> ForecastEncounterCells()
     {
-        // 임시 가정: 모든 스폰의 선두가 동시에 출발한다. 서로 다른 진영의 스폰 쌍마다 교전 칸 하나.
         var cells = new HashSet<Vector2Int>();
+        foreach (EncounterForecast forecast in ForecastEncounters())
+            cells.Add(forecast.Cell);
+        return cells;
+    }
+
+    public IReadOnlyList<EncounterForecast> ForecastEncounters()
+    {
+        // 임시 가정: 모든 스폰의 선두가 동시에 출발해 각자의 이동속도로 경로를 따라 걷는다.
+        // 서로 다른 진영의 스폰 쌍마다 교전 칸 하나.
+        var forecasts = new List<EncounterForecast>();
         for (int a = 0; a < factions.Length; a++)
         for (int b = a + 1; b < factions.Length; b++)
         {
             if (roundSpawnCounts[a] == 0 || roundSpawnCounts[b] == 0)
                 continue;
-            float range = Mathf.Max(RoundUnit(a, 0).AttackRange, RoundUnit(b, 0).AttackRange);
+            EnemyFaction leaderA = RoundUnit(a, 0);
+            EnemyFaction leaderB = RoundUnit(b, 0);
+            float range = Mathf.Max(leaderA.AttackRange, leaderB.AttackRange);
             foreach (int first in RoundSpawns(a))
                 foreach (int second in RoundSpawns(b))
-                    if (ForecastEncounter(grid.Routes[first], grid.Routes[second], range) is { } cell)
-                        cells.Add(cell);
+                    if (ForecastEncounter(grid.Routes[first], grid.Routes[second], leaderA.MoveSpeed,
+                            leaderB.MoveSpeed, range) is { } hit)
+                        forecasts.Add(new EncounterForecast(hit.Cell, a, b, hit.Seconds));
         }
-        return cells;
+        return forecasts;
     }
 
-    private Vector2Int? ForecastEncounter(Vector3[] firstRoute, Vector3[] secondRoute, float range)
+    private (Vector2Int Cell, float Seconds)? ForecastEncounter(Vector3[] firstRoute, Vector3[] secondRoute,
+        float firstSpeed, float secondSpeed, float range)
     {
-        // Compare the leaders after each tile step. The last point is a core contact, not a tile.
-        int tileCount = Mathf.Min(firstRoute.Length, secondRoute.Length) - 1;
-        for (int step = 0; step < tileCount; step++)
+        // Walk both leaders along their routes in small steps. A leader that reaches the core is gone.
+        const float step = 0.1f;
+        float firstLength = RouteLength(firstRoute);
+        float secondLength = RouteLength(secondRoute);
+        for (float seconds = 0f; ; seconds += step)
         {
-            Vector3 first = firstRoute[step];
-            Vector3 second = secondRoute[step];
+            float firstDistance = firstSpeed * seconds;
+            float secondDistance = secondSpeed * seconds;
+            if (firstDistance >= firstLength || secondDistance >= secondLength)
+                return null;
+
+            Vector3 first = PointAlong(firstRoute, firstDistance);
+            Vector3 second = PointAlong(secondRoute, secondDistance);
             if ((first - second).sqrMagnitude > range * range || !grid.HasLineOfSight(first, second))
                 continue;
 
             Vector2Int center = DefenseGrid.PositionToCell((first + second) * 0.5f);
-            return grid.IsWalkable(center) ? center : DefenseGrid.PositionToCell(first);
+            return (grid.IsWalkable(center) ? center : DefenseGrid.PositionToCell(first), seconds);
         }
+    }
 
-        return null;
+    private static float RouteLength(Vector3[] route)
+    {
+        float length = 0f;
+        for (int i = 1; i < route.Length; i++)
+            length += Vector3.Distance(route[i - 1], route[i]);
+        return length;
+    }
+
+    private static Vector3 PointAlong(Vector3[] route, float distance)
+    {
+        for (int i = 1; i < route.Length; i++)
+        {
+            float segment = Vector3.Distance(route[i - 1], route[i]);
+            if (distance <= segment)
+                return Vector3.Lerp(route[i - 1], route[i], segment > 0f ? distance / segment : 0f);
+            distance -= segment;
+        }
+        return route[^1];
     }
 
     // 게임에서는 항상 TickDuration 으로 부른다. 다른 값은 시험용이다.

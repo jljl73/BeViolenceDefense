@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 보드 바닥·벽·배경 색. 기본값은 GameScene의 기존 색이며, 씬마다 인스펙터에서 바꿔 쓴다.
+/// 보드 바닥·벽·배경 색. 기본값은 GameScene의 기존 색이며, StageContent 프리팹의 Theme에서 바꿔 쓴다. 기존 테스트 씬에서도 설정할 수 있다.
 /// </summary>
 [System.Serializable]
 public sealed class BoardTheme

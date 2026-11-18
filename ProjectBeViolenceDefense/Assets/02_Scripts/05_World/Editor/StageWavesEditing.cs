@@ -37,7 +37,7 @@ internal static class StageWavesEditing
         {
             SerializedProperty entry = entries.GetArrayElementAtIndex(i);
             string id = entry.FindPropertyRelative("id").stringValue;
-            string name = entry.FindPropertyRelative("displayName").stringValue;
+            string name = GameText.Get(entry.FindPropertyRelative("displayNameKey").stringValue);
             result.Add(new Unit
             {
                 Id = id,

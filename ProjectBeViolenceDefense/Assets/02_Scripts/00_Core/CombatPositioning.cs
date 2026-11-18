@@ -250,6 +250,10 @@ internal sealed class CombatPositioning
         slot = -1;
         waypoint = default;
         length = float.PositiveInfinity;
+        // A taunted unit does not walk off to another opponent. It waits for room at the
+        // taunter and meanwhile strikes only what is already in reach (FindImmediateTarget).
+        if (current != null && enemy.ActiveTaunter == current)
+            return false;
         foreach (EnemyUnit other in enemies)
         {
             if (other == current || !CanDetect(enemy, other) ||
@@ -392,6 +396,14 @@ internal sealed class CombatPositioning
 
     private EnemyUnit FindTarget(EnemyUnit enemy)
     {
+        // Taunt overrides awareness, walls, retaliation and a fight already under way.
+        // Only a taunter proven unreachable from here falls back to the usual choice.
+        if (enemy.ActiveTaunter is { } taunter && !IsKnownUnreachable(enemy, taunter))
+        {
+            enemy.ConsumeRetaliationRequest();
+            return taunter;
+        }
+
         EnemyUnit target = enemy.Target ?? enemy.CombatQueue?.Target ?? enemy.PursuitTarget;
         EnemyUnit aggressor = enemy.ConsumeRetaliationRequest();
         if (aggressor != null && CanDetect(enemy, aggressor) &&
@@ -425,7 +437,8 @@ internal sealed class CombatPositioning
             if (target != null) enemy.LastKnownTargetPosition = target.Position;
         }
         enemy.PursuitTarget = target;
-        if (target != null && grid.HasLineOfSight(enemy.Position, target.Position))
+        // A taunted unit always knows where its taunter is, even behind walls.
+        if (target != null && (grid.HasLineOfSight(enemy.Position, target.Position) || enemy.ActiveTaunter == target))
         {
             enemy.LastKnownTargetPosition = target.Position;
             enemy.LostTargetSearchTime = 0f;
@@ -434,6 +447,9 @@ internal sealed class CombatPositioning
 
     private EnemyUnit FindImmediateTarget(EnemyUnit enemy, EnemyUnit preferred)
     {
+        // While the taunter has room, a taunted unit leaves whatever it was fighting.
+        if (enemy.ActiveTaunter is { } taunter && preferred == taunter && !IsTargetFull(taunter))
+            return CanAttackFromHere(enemy, taunter) ? taunter : null;
         if (!IsTargetFull(preferred) && CanAttackFromHere(enemy, preferred))
             return preferred;
 

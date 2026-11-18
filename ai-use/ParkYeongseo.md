@@ -1913,3 +1913,472 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: GraveFence는 창살이 판처럼 뭉친 메쉬로 나옴. Meshy 크레딧 300 사용
+
+### [20261119-wave-ux] 웨이브 UX 연출 6종, 새 유닛 4종·스폰 구조물 4종 게임 연결
+- 시각: 2026-11-19 07:30:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Unity CLI
+- 목적 및 적용 위치: 벽으로 길이 바뀐 것, 이번·다음 웨이브의 등장 위치, 웨이브 시작 시 선두의 경로와 예상 교전 지점을 화면에서 바로 읽히게 함. 앞서 만든 유닛·스폰 구조물을 공용 적 카탈로그에 연결
+- 사용 방식: `DefenseBoardView`에 LitMotion 기반 연출 추가(길 갱신 강조, 스폰 예고 표지, 경로 선분, 교전 표지), 마법 대상 빗금을 진영별 색으로 변경, `DefenseBattle`의 교전 예측을 선두 이동속도 기준으로 교체하고 다음 라운드 편성 조회 추가, `EnemyCatalog`에 종족별 스폰 구조물 항목 추가. 카탈로그 에셋에는 Unity 스크립트로 유닛 4종(임시 수치)과 구조물 4종 등록
+- 결과 및 확인 방법: 성공 / EditMode 테스트 42건 통과. Play Mode에서 리플렉션으로 벽 설치·웨이브 시작·마법 조준을 재현해 수치와 캡처 확인(강조 칸 12, 선분 10, 교전 표지 3, 예고 종료 후 잔여 오브젝트 0, 준비 단계 ×4/×6 표지, 전투 중 버튼 호버 시 NEXT ×6/×3). 새 유닛 4종은 씬을 저장하지 않은 임시 편성으로 실제 전투 루프에서 스폰·교전 확인. 콘솔 오류 0. 실제 마우스 호버·조준 입력은 미확인
+- 사람의 개입: 연출 항목과 진영별 빗금 색 예시(고블린 초록, 언데드 보라, 용족 빨강, 야수 노랑) 제시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Claude Code | 수정 | 길 갱신 강조, 스폰 예고, 경로 선분, 교전 표지, 진영별 빗금 색, 스폰 구조물 배치 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs | Claude Code | 수정 | 이동속도 반영 교전 예측, `NextRoundSpawnCount` / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 연출 호출, 교전 예고 유지 시간(5초) / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyCatalog.cs, 06_UI/BattleInfoHud.cs, 06_UI/DefenseHud.cs | Claude Code | 수정 | 스폰 구조물 항목, 버튼 호버 노출, 전투 중 교전 아이콘 허용 / 사용 |
+| ProjectBeViolenceDefense/Assets/04_Data/03_Balance/EnemyCatalog.asset | Unity CLI | 수정 | goblin-charger, goblin-chief, boar, dire-wolf 추가(임시 수치), 스폰 구조물 4종 연결 / 사용 |
+
+#### 증거
+- Tools/_out/waveux/prep.jpg, wave_frames.jpg, wave_frames2.jpg, units_game.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 카탈로그 등록, EditMode 테스트, Play Mode 연출 검증과 캡처, 새 유닛 임시 편성 전투
+- 활용 방식: 리플렉션으로 격자·보드 뷰·전투 객체를 호출, 씬은 저장하지 않고 디스크에서 다시 열어 원복
+- 잘된 점: 연출 오브젝트 개수와 정리 여부를 수치로 확인
+- 잘 안된 점 및 개선 필요: CLI 호출 지연 때문에 1초 남짓한 경로 선분은 별도로 다시 재생해 캡처함
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 교전 예측이 "같은 걸음 수"에서 "선두 이동속도" 기준으로 바뀌어 준비 단계의 예상 교전 칸 위치가 달라질 수 있음. 새 유닛 4종 수치는 기존 카탈로그 규모에 맞춘 임시 값이며 밸런스 표와 다름. 스폰 구조물은 공용 카탈로그에 연결되어 GameScene에도 나타남
+
+### [20261119-faction-colors] 진영 색을 빗금 색과 통일 (초록·보라·노랑·빨강)
+- 시각: 2026-11-19 08:00:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Unity CLI
+- 목적 및 적용 위치: 경로·스폰 표지·체력바에 쓰이는 진영 색과 마법 대상 빗금 색이 달라 헷갈리던 것을 한 팔레트로 통일
+- 사용 방식: `StageData.FactionColors`를 고블린 초록, 언데드 보라, 짐승 노랑, 드래곤 빨강으로 바꾸고 빗금도 같은 값을 쓰게 함. 테스트 씬 4종에 저장된 슬롯 색 갱신. 상단 HUD의 고블린·해골 아이콘은 색상만 Python으로 바꿈(명암 유지)
+- 결과 및 확인 방법: 부분 성공 / 단풍 테스트 씬 Play Mode 캡처에서 경로·스폰 표지·HUD 아이콘·빗금이 같은 색으로 나오는 것 확인, 콘솔 오류 0. GameScene에 저장된 슬롯 색(산호·청록)은 팀원 씬이라 바꾸지 않음
+- 사람의 개입: 진영 색과 빗금 색을 통일하도록 결정. 수치는 본인 담당이 아니라고 명시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/StageData.cs, DefenseBoardView.cs | Claude Code | 수정 | 진영 색 정의 변경, 빗금이 진영 색을 쓰도록 단일화 / 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/01_Icons/Hud/BattleInfo/Icon_Goblin_r0c0.png, Icon_Skull_r0c0.png | Python (색상 변환) | 수정 | 산호→초록, 청록→보라 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/ (GameScene_LeftCoreHud, Stage_* 3종) | Unity CLI | 수정 | 고블린·언데드 슬롯 색 갱신 / 사용 |
+
+#### 증거
+- Tools/_out/waveux/colors_unified.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 테스트 씬 슬롯 색 갱신, Play Mode 캡처
+- 활용 방식: `SerializedObject`로 색 값만 수정 후 저장
+- 잘된 점: 색 값 외의 씬 내용은 건드리지 않음
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: GameScene의 `Voxel Defense Prototype` 진영 슬롯 색 4개를 새 진영 색으로 바꿔야 실제 게임 씬도 통일됨. 문서(balance.md 등)의 Coral/Teal 표기는 그대로 둠
+
+### [20261119-result-panels-coast-highland-skillbar] 승리·패배 패널 idle, Stage1 해안가·Stage4 고원 테마, 스킬 바 재작업(검토 대기)
+- 시각: 2026-11-19 10:30:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / NovelAI Diffusion V5 / OpenAI Images API (gpt-image-2.6-sunburst) / Meshy API / spriteLab MCP / Blender(헤드리스 변환) / Unity CLI
+- 목적 및 적용 위치: 결과 화면 주인공 그림 애니메이션화와 패배 패널 신설, 팀원이 만든 Stage1·Stage4 지형에 테마 입히기, "밤티난다"는 의견이 있던 스킬 슬롯 프레임·아이콘 재작업
+- 사용 방식: (결과 패널) NAI로 패배 포즈 생성 → spriteLab idle → 28프레임 시트로 재포장, `VictoryPanelHud`를 승리·패배 공용 `ResultPanelHud`로 바꾸고 테스트 씬에서 패배 판정과 연결. (스테이지) GPT 방향 시안 → NAI 소품·바닥·전경 원화 → Meshy 메쉬 10종 → 스테이지 데이터의 보드 크기를 읽는 새 빌더로 테마 씬 생성. (스킬 바) GPT로 장식 없는 프레임+글자 칸 3상태, NAI로 아이콘 4종 후보
+- 결과 및 확인 방법: 부분 성공 / 승리·패배 패널은 Play Mode에서 띄워 프레임 진행과 캡처 확인, 패배는 코어 체력을 0으로 만들어 실제 판정 경로로 확인. 두 스테이지 씬은 Play Mode 캡처 확인(콘솔 오류 0). 스킬 바는 미리보기 이미지만 만들었고 게임에는 아직 넣지 않음
+- 사람의 개입: 패배 포즈 선택(눈이 뱅글뱅글 도는 2안), 승리·패배 애니메이션을 과한 동작에서 포즈 유지 idle로 바꾸도록 지시, 스테이지 컨셉 지정(Stage1 해안가, Stage4 고원), 스킬 아이콘은 NAI로·프레임은 장식 없이 글자 칸만 두도록 지시(GPT 목업은 반려)
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/ResultPanelHud.cs (구 VictoryPanelHud.cs) | Claude Code | 수정 | 승리·패배 공용화, 캐릭터 시트 재생, 버튼 동작 연결 / 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/DefeatPanelHud.prefab, VictoryPanelHud.prefab | Claude Code + Unity CLI | 생성·수정 | 패배 패널 신설, 두 패널에 idle 시트 연결 / 테스트 씬 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/CasterVictory/Sheet_Victory.png, CasterDefeat/ (Caster_Defeat.png, Sheet_Defeat.png) | NAI(02:1-I seed 432816350) + spriteLab + Python 재포장 | 생성 | 28프레임 7×4 시트 / 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/01_Icons/Hud/VictoryPanel/RibbonDefeat_*.png | Python (색 변환) | 생성 | 승리 리본을 보라색으로 변환 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 선택 항목 `defeatPanel` 추가(연결한 씬에서만 기본 팝업 대체) |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Environment/ (PalmTree, SeaRock, Driftwood, WreckedBoat, ShellCoral, WindPine, HighlandRock, HeatherBush, StandingStone, GrassTussock) + Env_*.prefab | NAI + Meshy | 생성 | 수정 없음(WindPine은 머티리얼 색조만 조정) / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/06_Textures/Stage/Ground_Sand.png, Ground_HighlandGrass.png, 00_Sprites/Stage/Branch_Palm*.png, Branch_Highland*.png | NAI + Python | 생성 | 타일화, 외곽선 제거 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/ShoreFoam.cs | Claude Code | 생성 | 해안 거품 띠 왕복 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/Stage1_Coast.unity, Stage4_Highland.unity, Assets/Settings/Stage/ 해당 머티리얼·볼륨 | Unity CLI | 생성 | 테마 테스트 씬 / 사용 |
+| Art Prompts/[Characters] 02_Party.txt, [Environment] 05_StageProps.txt, [UI] 04_SkillIcons.txt | Claude Code | 수정 | 1-H·1-I, 11-A~12-G, 2-A~3-C 추가 (1-H·2-A~2-C는 미채택) |
+| Tools/_out/g12/ (Frame_*.png, skillbar_preview.jpg) | GPT + NAI + Python | 생성 | 스킬 바 미리보기 / 검토 대기 (git 제외) |
+
+#### 증거
+- Tools/_out/victory/result_idle.jpg, defeat_panel.jpg, Tools/_out/stage/coast_v2.jpg, highland_v3.jpg, dir_coast.png, dir_highland.png, Tools/_out/g12/skillbar_preview.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 패널 프리팹 조립·시트 연결, 테마 씬 생성, Play Mode 캡처, 저장 없이 스테이지를 바꿔 보는 확인
+- 활용 방식: 테마별 빌더를 Python에서 생성해 `script eval --file`로 실행
+- 잘된 점: 캡처로 스테이지 참조가 저장되지 않은 문제를 바로 발견(씬을 연 뒤 에셋을 다시 불러오도록 수정)
+- 잘 안된 점 및 개선 필요: spriteLab 재추출 호출이 매번 응답 대기 중 시간 초과됨(서버에서는 완료되어 결과 조회로 받음)
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 패배 패널의 "코어에 닿은 적"은 잃은 코어 체력, "서로 싸우다 쓰러진 적"은 나머지 제거 수로 계산함. Stage4는 보드가 커서 기본 시점에서 유닛·표지가 작게 보임. Meshy 크레딧 300, Anlas(패배 포즈 8장) 사용
+
+### [20261119-coast-shore-highland-hills] 해안가 곡선 해안선, 고원 구릉 지형으로 재작업
+- 시각: 2026-11-19 11:30:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Unity CLI
+- 목적 및 적용 위치: `Stage1_Coast`, `Stage4_Highland` 테스트 씬을 사용자 피드백(스케치)에 맞게 수정
+- 사용 방식: 해안은 보드의 왼쪽 윤곽을 따라가는 해안선 함수를 만들어 바다를 왼쪽에 두고 무대 주위로 육지가 튀어나오게 함. 물은 해안선 거리 기반의 자체 셰이더(얕은→깊은 색, 밀려오는 거품 줄, 젖은 모래)로 그림. 고원은 절벽·구름바다를 없애고 보드 주변은 평평하고 바깥으로 완만히 솟는 구릉 메쉬로 교체, 나무를 8그루 안팎으로 줄임
+- 결과 및 확인 방법: 성공 / 두 씬 Play Mode 캡처 육안 확인, 콘솔 오류 0. 물 움직임과 구릉의 입체감은 정지 캡처로만 확인
+- 사람의 개입: 해안 배치 스케치 제공(바다는 왼쪽, 무대에 따라 해안이 튀어나옴), 고원은 구릉 테마에 나무 듬성듬성으로 지시. 스킬 바 재작업은 보류 지시(후보 반려)
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/02_Materials/ShoreWater.shader | Claude Code | 생성 | 해안 물 셰이더 / 사용 |
+| ProjectBeViolenceDefense/Assets/Settings/Stage/Stage1_Coast_Water.mat, _WaterMesh.asset, Stage4_Highland_Hills.asset | Unity CLI | 생성 | 해안 물 메쉬·머티리얼, 구릉 지형 메쉬 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/Stage1_Coast.unity, Stage4_Highland.unity | Unity CLI | 수정 | 재생성 / 사용 |
+
+#### 증거
+- Tools/_out/stage/coast_v4.jpg, highland_v5.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 셰이더 컴파일 확인, 테마 씬 재생성, Play Mode 캡처
+- 활용 방식: 테마 빌더를 생성해 `script eval --file`로 실행
+- 잘된 점: 해안선·지형을 스테이지 크기에서 계산하므로 다른 스테이지에도 재사용 가능
+- 잘 안된 점 및 개선 필요: 첫 구릉은 화면 아래쪽에서 카메라에 잘려 앞쪽 높이를 낮춤
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 이전 빌드에서 만든 `ShoreFoam.cs`와 Stage1_Coast_Sea/Foam/WetSand, Stage4_Highland_Cliff/Clouds 머티리얼은 더 이상 쓰이지 않음(정리 대상)
+
+### [20261119-capital-theme] Stage 4 테마를 왕도 시가지로 교체 (테스트 씬 Stage4_Capital)
+- 시각: 2026-11-19 13:00:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5, 도중 Fable 5.2에서 전환) / OpenAI Images API (gpt-image-2.6-sunburst) / NovelAI Diffusion V5 / Meshy API / Blender(헤드리스 변환) / Unity CLI
+- 목적 및 적용 위치: 고원 테마가 어울리지 않아 사용자 결정으로 왕도 시가지 전투 테마로 교체
+- 사용 방식: GPT 방향 시안 → NAI 원화(집 2종, 노점, 분수, 가로등, 상자 더미, 자갈 바닥, 축제 깃발 줄) → Meshy 메쉬 6종 → 테마 빌더에 왕도 테마 추가. 집은 보드 축에 맞춘 격자에 스냅하고 일정 간격의 격자선을 비워 거리와 블록이 생기게 함. 깃발 줄 원화는 투명 배경 처리가 실패해 색 기준으로 직접 오려 한 장만 사용
+- 결과 및 확인 방법: 부분 성공 / Play Mode 캡처 4회로 배치·밀도 조정, 콘솔 오류 0(Unity 서비스 403 로그는 무관). 작업 중 PC 블루스크린이 있었으나 생성 파일·씬은 모두 남아 있었음
+- 사람의 개입: 바다 위 돌 제거 후 커밋 지시, 고원을 왕도 시가지로 바꾸기로 결정, 깃발 포함 제작 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Environment/ (TownHouseRed, TownHouseBlue, MarketStall, Fountain, StreetLamp, CratePile) + Env_*.prefab | NAI + Meshy | 생성 | 수정 없음 / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/06_Textures/Stage/Ground_Cobble.png, 00_Sprites/Stage/Branch_Bunting*.png | NAI + Python | 생성 | 타일화, 깃발 배경 제거(한 장을 좌우 반전해 3장으로) / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/Stage4_Capital.unity, Assets/Settings/Stage/Stage4_Capital_* | Unity CLI | 생성 | 왕도 테마 테스트 씬 / 사용 |
+| Art Prompts/[Environment] 05_StageProps.txt | Claude Code | 수정 | 13-A~13-H 추가 |
+
+#### 증거
+- Tools/_out/stage/dir_capital.png, capital_v4.jpg, Tools/_out/capital/all_views.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 테마 씬 생성 4회, Play Mode 캡처
+- 활용 방식: 테마 빌더를 생성해 `script eval --file`로 실행
+- 잘된 점: 격자 스냅과 빈 격자선만으로 거리 구조를 만들어 다른 시가지 스테이지에도 재사용 가능
+- 잘 안된 점 및 개선 필요: 블루스크린 뒤 Unity 재시작 직후 첫 호출이 연결 오류를 냄(재시도 없이 다음 호출부터 정상)
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 고원 씬 `Stage4_Highland`와 고원 소품은 더 이상 쓰지 않음(정리 대상). Meshy 크레딧 180 사용
+
+### [20261119-suno-stage-prompts] 해변·묘지·왕도 전투 BGM 프롬프트 작성
+- 시각: 2026-11-19 04:44:37 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex
+- 목적 및 적용 위치: Suno용 스테이지0(해변 튜토리얼),3(묘지),4(왕도 최종전) 전투 음악 프롬프트.
+- 사용 방식: 사용자가 제공한1/2스테이지의 영문 프롬프트 구조와 고정8마디·기악·일정 강도·인트로/아웃트로 없는 루프 조건을 유지하고 악기·분위기·BPM·조성을 제안.
+- 결과 및 확인 방법: 성공. 영문 프롬프트3종 작성 및 사용자에게 제공. 음악 생성·청취·실제 루프 검증은 수행하지 않음.
+- 사람의 개입: 사용자가0/3/4 테마와1/2 프롬프트 예시 제공. 제안값 최종 채택 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[BGM] Stage_0_3_4_Suno.md | Codex | 생성 | 해변116BPM/G major,묘지128BPM/G minor,왕도140BPM/D minor 프롬프트와 기획 의도. Suno 생성 미실행 |
+
+#### 증거
+- Art Prompts/[BGM] Stage_0_3_4_Suno.md
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex로 음악 생성용 텍스트 프롬프트 초안 작성.
+- 사용 방식: 사용자 제공 음악 테마/제약을 기반으로3개 영문 프롬프트 작성. 음악·이미지 생성 API 호출 없음.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 실제 Suno 출력의 악기·무보컬·곡 전개·반복 연결 여부. BPM/조성/악기 구성은 제안값이며 확정 사양이 아님.
+
+### [20261119-capital-dusk] 왕도 시가지 황혼 조명, 가로등 불빛, 원경 왕성
+- 시각: 2026-11-19 14:00:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2 → Opus 5.5) / NovelAI Diffusion V5 / Meshy API / Blender(헤드리스 변환) / Unity CLI
+- 목적 및 적용 위치: 마지막 스테이지인 `Stage4_Capital`을 저녁·황혼 분위기로 바꾸고 앞서 지적한 약점(검게 보이는 푸른 지붕, 모래색 바닥, 왕성 부재, 작은 깃발·가로등) 보완
+- 사용 방식: 테마 빌더에 가로등 포인트 라이트(보드 근처 14개)와 원경 랜드마크 옵션 추가, 낮은 주황 태양·보라 환경광·따뜻한 블룸으로 조정. 푸른 지붕 텍스처는 파란 계열 픽셀만 밝게, 자갈 텍스처는 채도를 낮춰 회색으로(원본은 Tools/_out/capital/orig에 보관). 왕성은 NAI 원화 → Meshy 메쉬
+- 결과 및 확인 방법: 성공 / Play Mode 캡처 2회로 색 보정 조정, 콘솔 오류 0
+- 사람의 개입: 조명을 저녁·황혼으로 지시, 나머지 개선은 AI 판단에 맡김
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Environment/RoyalCastle.* + Env_RoyalCastle.prefab | NAI(05:13-I seed 727991014) + Meshy | 생성 | 수정 없음 / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Environment/TownHouseBlue_Color.png | Python | 수정 | 남색 지붕 밝기 0.30→0.59 / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/06_Textures/Stage/Ground_Cobble.png | Python | 수정 | 채도 낮춤 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/Stage4_Capital.unity, Assets/Settings/Stage/Stage4_Capital_Volume.asset | Unity CLI | 수정 | 황혼 조명·가로등 불빛·왕성 / 사용 |
+
+#### 증거
+- Tools/_out/stage/capital_v6.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 테마 씬 재생성, Play Mode 캡처
+- 활용 방식: 테마 빌더 `script eval --file`
+- 잘된 점: 가로등 불빛을 보드에 가까운 순으로만 켜 라이트 수를 제한
+- 잘 안된 점 및 개선 필요: 첫 황혼 설정은 지붕 빨강이 포화돼 채도·노출을 다시 조정함
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 포인트 라이트 14개 추가로 인한 성능 영향 미측정. 왕성은 화면 상단 HUD 뒤에 일부만 보임
+
+### [20261119-caster-faces] 주인공 초상 표정 2종 추가 (눈물 찔끔, 개그 붕괴)
+- 시각: 2026-11-19 14:40:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / OpenAI Images API (gpt-image-2.6-sunburst) / Unity CLI
+- 목적 및 적용 위치: 대화창 주인공 표정 바리에이션 추가
+- 사용 방식: 사용자가 그린 원본 초상(`Caster_Portrait_neutral/troubled.png`)을 회색 배경에 놓고 GPT 이미지 편집으로 얼굴만 바꾼 후보를 표정마다 2장 생성 → 원본 실루엣에 정렬(IoU 0.99)하고 회색을 걷어내 투명 PNG로 복원, 원본 밖에 새로 그려진 땀방울·당황 선은 알파로 살림. `DialogueHud.Expression`에 Teary, Breakdown 추가, 프리팹 초상 배열과 테스트 대사에 연결
+- 결과 및 확인 방법: 성공 / Play Mode에서 대사를 해당 줄까지 넘겨 텍스처 이름과 캡처로 표시 확인, 콘솔 오류 0. 두 표정은 정지 그림(움직이는 시트 없음)
+- 사람의 개입: 참고 이미지 2장으로 표정 방향 제시(코믹하게 눈물 찔끔, 표정이 망가지는 개그 얼굴). 후보 선택은 AI가 수행
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art2D/Portraits/Caster/Caster_Portrait_teary.png, Caster_Portrait_breakdown.png | GPT 이미지 편집 + Python 복원 | 생성 | 원본 초상 기반 얼굴 변경 / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/CasterDialogue/Caster_Portrait_teary.png, _breakdown.png | 위와 동일 | 생성 | 대화창용 사본 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DialogueHud.cs, DialogueHudTester.cs, 03_Prefabs/05_UI/DialogueHud.prefab | Claude Code + Unity CLI | 수정 | 표정 2종 추가, 테스트 대사 2줄 추가 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/ (테스터가 있는 7개 씬) | Unity CLI | 수정 | 테스트 대사 목록 갱신 |
+
+#### 증거
+- Tools/_out/faces/faces_sheet.jpg, final_check.jpg, dlg_check.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 프리팹·씬 갱신, Play Mode 캡처
+- 활용 방식: `script eval --file`, 리플렉션으로 대사 진행
+- 잘된 점: 원본 그림의 정렬을 수치로 확인해 다른 표정과 같은 자리에 맞춤
+- 잘 안된 점 및 개선 필요: 연속 캡처의 저장 시점이 호출 순서와 어긋나 두 장 중 한 장은 텍스처 이름으로 확인
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 좌상단 HUD 초상에는 넣지 않음(대화창 전용)
+
+### [20261119-caster-faces-v2] 표정 2종을 동공 없는 단순 개그 눈으로 교체
+- 시각: 2026-11-19 15:00:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / OpenAI Images API (gpt-image-2.6-sunburst) / Unity CLI
+- 목적 및 적용 위치: 앞서 만든 눈물·붕괴 표정이 사용자가 원한 것보다 복잡해 단순하게 다시 만듦
+- 사용 방식: 같은 방식(원본 초상의 얼굴만 GPT 편집 → 정렬 IoU 0.99 → 투명 복원)으로 각 2장 생성, 동공·홍채·하이라이트 없는 흰 타원 눈 지정. 같은 파일 이름에 덮어써 대화창 연결은 그대로 유지
+- 결과 및 확인 방법: 성공 / 결과 이미지 육안 확인, Unity 에셋 새로고침. 대화창 재생 확인은 이전 작업에서 같은 파일로 완료
+- 사람의 개입: 참고 이미지로 "눈물도 단순하게", "동공 없어지는 눈" 지시. 후보 선택은 AI가 수행
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art2D/Portraits/Caster/Caster_Portrait_teary.png, _breakdown.png 및 CasterDialogue 사본 | GPT 이미지 편집 + Python 복원 | 수정 | 흰 타원 눈 + 눈물 한 방울 / 흰 원 눈 + 벌린 입 / 사용 (v1은 Tools/_out/faces/v1_*.png에 보관) |
+
+#### 증거
+- Tools/_out/faces/faces_sheet2.jpg, final_check2.jpg (git 제외 폴더)
+
+### [20261119-pull-stageselect-capital-faces] pull 병합, 왕도 스테이지를 스테이지 선택에 추가, 표정 idle 시트 2종
+- 시각: 2026-11-19 15:40:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / spriteLab MCP / Unity CLI
+- 목적 및 적용 위치: 팀원의 스테이지 통합(한 씬에서 스테이지 프리팹을 불러오는 구조)을 받아 왕도 스테이지를 연결하고, 새 표정을 움직이는 초상으로 만듦
+- 사용 방식: `git pull --rebase` 충돌 해결 — 팀원이 승리 판정에 연결한 `VictoryPanelHud`(번역 키, Bind(next, retry))를 기준으로 하고 내 공용화 기능(캐릭터 시트 재생, 테스트 키 지정, 선택 부품 null 허용)을 합쳐 클래스 이름을 VictoryPanelHud로 되돌림(GUID 유지). `StageData` 번역 이름과 진영 색, 도발 마법 조준과 진영별 빗금을 함께 살림. 테스트 씬 4개는 팀원 쪽을 받음. 대화 테스트 대사는 팀원의 번역 키 방식으로 맞추고 새 대사 3줄과 키를 `GameText.ko.json`에 추가. 왕도는 팀원의 이관 방식대로 `Stage_Capital.prefab`(StageContent)으로 내보내 GameScene 스테이지 선택 5번째에 등록, 선택 팝업에 다섯 번째 카드 추가. 표정은 `Shock`(동공 없는 흰 눈, v2 2안)과 `Breakdown`(v1 질끈 감은 울음)을 spriteLab idle → 28프레임 시트로 대화창에 연결
+- 결과 및 확인 방법: 부분 성공 / 컴파일 통과, GameScene Play Mode에서 스테이지 5(왕도) 선택 후 진입 캡처 확인. 첫 실행에서 버튼 이름이 번역 키 그대로 보였고 텍스트 에셋 재임포트 후 해결됨을 확인. GameScene에는 우리가 만든 HUD(좌상단 코어·마나 바·전투 정보·건설 모드·패배 패널·대화창)가 연결돼 있지 않고 진영 색도 이전 값임을 확인(미적용)
+- 사람의 개입: 표정 선택(v2 2안, 당황은 v1), pull 및 왕도 반영 지시, UI 점검 요청
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/VictoryPanelHud.cs | Claude Code | 수정(병합) | 팀원 버전 + 시트 재생·패배 패널 호환 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs, 05_World/DefenseBoardView.cs, 05_World/StageData.cs, 06_UI/DialogueHud.cs, 06_UI/DialogueHudTester.cs | Claude Code | 수정(병합) | 충돌 해결, Shock 표정 추가 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_Stages/Stage_Capital.prefab, StageSelectionPopup.prefab | Unity CLI | 생성·수정 | 왕도 스테이지 프리팹, 선택 카드 5번 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity | Unity CLI | 수정 | 스테이지 선택 목록에 왕도 추가(사용자 지시) |
+| ProjectBeViolenceDefense/Assets/04_Data/04_Stages/Stage4.asset, Resources/GameText.ko.json | Unity CLI / Claude Code | 수정 | 표시 이름 키 `stage_select.capital`, 대사 키 3개 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/CasterDialogue/Sheet_shock.png, Sheet_breakdown.png, Caster_Portrait_shock.png | spriteLab + Python | 생성 | 표정 idle 시트 / 사용 |
+
+#### 증거
+- Tools/_out/stageselect/select.jpg, capital.jpg, Tools/_out/faces/sheets_check.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 병합 후 컴파일, 스테이지 프리팹 내보내기와 GameScene 등록, GameScene Play Mode 선택·진입 확인, HUD 연결 상태 조회
+- 활용 방식: `script eval --file`, Play Mode에서 `StageSelectionController.SelectStage(4)` 호출
+- 잘된 점: 프리팹 저장 전에 씬 외부 참조를 검사해 끊긴 참조 없이 내보냄
+- 잘 안된 점 및 개선 필요: 콘솔에 병합 중 남은 이전 컴파일 오류가 계속 집계돼 실제 상태와 구분이 필요했음
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: GameScene의 HUD를 새 HUD로 바꿀지(현재 기본 HUD), 진영 슬롯 색. 왕도 테스트 씬의 `victoryPanelHud` 연결은 비어 있음
+
+### [20261119-gamescene-hud-port-stageselect-mockup] GameScene에 HUD 이식, 스테이지 선택 화면 목업
+- 시각: 2026-11-19 16:10:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / OpenAI Images API (gpt-image-2.6-sunburst) / Unity CLI
+- 목적 및 적용 위치: 스테이지 선택이 들어간 공용 `GameScene`에 우리 HUD를 최종본으로 옮기고, 스테이지 선택 화면 개편 방향을 목업으로 제시
+- 사용 방식: Unity 스크립트로 GameScene의 HUD 레이어에 LeftCoreHud·ManaBarHud·BattleInfoHud·BuildModeHud, 팝업 레이어에 DialogueHud·DefeatPanelHud를 배치하고 `VoxelDefensePrototype`에 연결, 새 슬롯 프레임과 진영 색(초록·보라·노랑·빨강) 적용, 대화 테스트(T 키) 추가. 스테이지 선택은 참고 이미지 구성(좌측 캐릭터+대사, 우측 스테이지 목록)으로 GPT 목업 2장
+- 결과 및 확인 방법: 성공 / GameScene Play Mode에서 스테이지 5(왕도) 진입 후 새 HUD가 모두 뜨는 것 캡처 확인, 콘솔 오류 0. 목업은 검토 대기
+- 사람의 개입: "다 옮겨. 우리가 최종본"으로 GameScene 수정 승인, 스테이지 선택 구성과 기본 대사("히이잉... 왜 견습인 저만 남겨둔 거예요오...") 제시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity | Unity CLI | 수정 | HUD 프리팹 6종 배치·연결, 슬롯 프레임, 진영 색, 대화 테스트 / 사용 |
+| ArtDirection/Mockups/G13_StageSelect_20261119/ | OpenAI Images API | 생성 | REQUEST.md, 목업 A·B (git 제외) / 검토 대기 |
+
+#### 증거
+- Tools/_out/stageselect/capital2.jpg, ArtDirection/Mockups/G13_StageSelect_20261119/StageSelect_Mockup_A.png (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: GameScene HUD 이식, Play Mode 확인
+- 활용 방식: `script eval --file`로 프리팹 배치·직렬화 필드 연결
+- 잘된 점: 재실행해도 이전 사본을 지우고 다시 놓도록 작성
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+### [20261119-stageselect-mockup-clean] 스테이지 선택 화면 목업 C/D (깔끔한 방향)
+- 시각: 2026-11-19 06:00:05 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / OpenAI 이미지 편집 API (gpt-image-2.6-sunburst)
+- 목적 및 적용 위치: 목업 A/B가 무겁고 복잡하다는 피드백을 받아, 밝고 여백 많은 방향의 스테이지 선택 화면 목업 2종 생성. `ArtDirection/Mockups/G13_StageSelect_20261119/` (git 제외 폴더)
+- 사용 방식: 이전 목업 B, 울먹 표정 주인공, 스테이지 캡처(단풍 평원·왕도)를 참조로 넣고 PROMPTS_v2.txt(흐린 밝은 배경, 테두리 없는 반투명 크림 카드, 사선 버튼, 꿀색 강조 1색, 하단 대사 띠) 로 2장 생성
+- 결과 및 확인 방법: 성공 / 두 PNG를 직접 열어 확인. A/B보다 정돈된 화면. 탭 "도전/기록"은 기획에 없는 자리 채움 요소
+- 사람의 개입: 방향 피드백("블아처럼 깔끔하지가 않지"). 채택 여부 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/G13_StageSelect_20261119/StageSelect_Mockup_C.png | GPT 이미지 | 생성 | 단풍 평원 배경안. 검토 중 |
+| ArtDirection/Mockups/G13_StageSelect_20261119/StageSelect_Mockup_D.png | GPT 이미지 | 생성 | 왕도 배경안. 검토 중 |
+| ArtDirection/Mockups/G13_StageSelect_20261119/PROMPTS_v2.txt | Claude Code | 생성 | 생성 프롬프트 |
+
+#### 증거
+- 없음 (목업 폴더는 git 제외)
+
+### [20261119-stageselect-implement] 스테이지 선택 화면 구현(목업 C), 해안가 스테이지 편입, 울먹 표정 시트
+- 시각: 2026-11-19 06:13:27 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / Unity CLI (Unity 6000.3.28f1) / spriteLab (울먹 idle 영상·시트)
+- 목적 및 적용 위치: GameScene의 스테이지 선택 팝업을 목업 C 방향의 전체 화면으로 교체. Stage1_Coast 테스트 씬을 Stage_Coast 프리팹으로 내보내 1번 스테이지(기존 기본 전장 자리)에 연결. "도전/기록" 탭은 사용자 지시로 제외
+- 사용 방식: 단색 UI 조각(카드·테두리·그림자·사선 버튼·원형 마스크·체크·자물쇠)은 Python으로 흰색 생성 후 코드에서 UIPalette 색을 입힘. 썸네일·배경은 각 스테이지 프리팹 카메라로 에디터에서 렌더한 캡처를 잘라 씀. 프리팹은 에디터 스크립트로 재조립(GUID 유지). 울먹 표정은 spriteLab idle(48프레임) → 28프레임 7x4 시트로 묶어 선택 화면과 대화 HUD 둘 다에 연결
+- 결과 및 확인 방법: 성공 / Play Mode에서 진행도 5·1 상태 캡처, 해안가 입장 캡처 확인. 콘솔 오류 0
+- 사람의 개입: 목업 C 선택, 탭 제거, 해안가 편입 지시. 진행도 대사 5종과 단풍 이름 "황금 단풍 평원"은 AI 임시 문안 — 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/StageSelectionPopup.cs | Claude Code | 수정(재작성) | 카드 5장 상태, 진행도별 대사·시트, 등장 연출, 호버. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/UIPalette.cs | Claude Code | 수정 | 밝은 화면 토큰 7개 추가. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_Stages/StageSelectionPopup.prefab | Claude Code + Unity CLI | 수정(재조립) | 전체 화면 레이아웃. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_Stages/Stage_Coast.prefab | Unity CLI | 생성 | Stage1_Coast 씬 내보내기. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity | Unity CLI | 수정 | stages[0]=Stage_Coast, 선택 화면 전체 화면 스트레치. 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/03_StageSelect/ (SS_*.png 15장) | Python | 생성 | UI 조각, 썸네일 5, 배경. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/CasterDialogue/Sheet_teary.png | spriteLab + Python | 생성 | 울먹 idle 시트. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/DialogueHud.prefab | Unity CLI | 수정 | Teary 표정에 시트 연결. 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Claude Code | 수정 | 해안가·상태·입장·화자·진행도 대사 키, 단풍 이름 변경. 사용 |
+| docs/ui-flow.md | Claude Code | 수정 | 선택 화면 설명, 밝은 화면 색 토큰. 사용 |
+
+#### 증거
+- 캡처: Tools/_out/stageselect/ss_p5.jpg, ss_p2.jpg(진행도 1), ss_coast.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 해안가 프리팹 내보내기·등록, 스테이지 카메라 렌더 캡처, 선택 화면 프리팹 재조립, Play Mode 캡처·콘솔 확인
+- 활용 방식: script eval --file 로 에디터 스크립트 실행, playmode start/stop + ScreenCapture
+- 잘된 점: 프리팹 GUID와 씬 참조를 유지한 채 재조립·재실행 가능
+- 잘 안된 점 및 개선 필요: 씬 전환 뒤 프리팹 참조가 해제돼 경로로 다시 불러와야 했음. 콘솔에 이전 컴파일 오류가 남아 보여 혼동
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 진행도 저장 연동(SetProgress), 진행도 대사 문안, Stage1.asset 웨이브가 1번 스테이지로 적절한지, 기존 Stage_Default 프리팹 정리 여부
+
+### [20261119-stageselect-float] 스테이지 선택 주인공을 정지 그림 + 위아래 플로팅으로 변경
+- 시각: 2026-11-19 06:16:11 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 선택 화면의 spriteLab 시트가 누끼 품질·프레임 수가 부족하다는 피드백. StageSelectionPopup.cs, StageSelectionPopup.prefab
+- 사용 방식: 진행도별 표정을 원본 초상 PNG(Caster_Portrait_*)로 바꾸고, LitMotion으로 위아래 14px·3.2초 주기 플로팅. 시트 재생 코드 제거
+- 결과 및 확인 방법: 성공 / Play Mode 캡처(Tools/_out/stageselect/ss_p2.jpg), 콘솔 오류 0
+- 사람의 개입: 사용자 지시("적당히 위아래로 플로팅하는 정도로만")
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/StageSelectionPopup.cs | Claude Code | 수정 | Mood를 정지 초상으로, 플로팅 추가. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_Stages/StageSelectionPopup.prefab | Unity CLI | 수정 | 주인공 크기·위치를 초상 비율에 맞춤. 사용 |
+| docs/ui-flow.md | Claude Code | 수정 | 설명 문구. 사용 |
+
+#### 증거
+- Tools/_out/stageselect/ss_p2.jpg (git 제외)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 프리팹 재조립, Play Mode 캡처
+- 활용 방식: script eval --file, playmode start/stop + ScreenCapture
+- 잘된 점: 조립 스크립트 재실행만으로 반영
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+### [20261119-dialogue-teary-revert] 대화 HUD 울먹 표정 시트 되돌림
+- 시각: 2026-11-19 06:18:17 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: spriteLab 울먹 시트의 누끼·프레임 품질 문제로 대화 HUD 울먹 표정을 정지 그림으로 되돌림. DialogueHud.prefab portraitSheets[5] 비움, Sheet_teary.png 삭제(미사용)
+- 사용 방식: 에디터 스크립트로 프리팹 값 수정, AssetDatabase.DeleteAsset
+- 결과 및 확인 방법: 성공 / 프리팹에서 시트 참조 제거 확인
+- 사람의 개입: 사용자 지시("되돌리셈")
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/DialogueHud.prefab | Unity CLI | 수정 | 울먹 시트 연결 해제 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/CasterDialogue/Sheet_teary.png | Unity CLI | 삭제 | 미사용 |
+
+#### 증거
+- 없음
+
+### [20261119-stage-transition] 스테이지 입장 트랜지션(사선 막 + 리본 타이틀)
+- 시각: 2026-11-19 06:27:27 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / OpenAI 이미지 편집 API (gpt-image-2.6-sunburst, 투명 배경) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 선택 화면에서 스테이지로 바로 넘어가며 멈칫하던 것을 가리는 입장 연출. StageTransition.cs(신규), StageSelectionController.cs(트랜지션 연결), GameScene UI Canvas
+- 사용 방식: 리본 배너(글자 없음)를 GPT로 2안 생성 → A안 채택(사용자 위임) 후 잘라 씀. 막·금색 테두리는 단색 Image, 연출은 LitMotion(덮기 0.32초 → 리본 등장 → 덮인 동안 스테이지 생성, 최소 0.55초 유지 → 0.42초 걷기). 다시 하기 진입은 덮인 상태에서 시작
+- 결과 및 확인 방법: 성공 / Play Mode에서 진행 순서 로그(덮기→유지→걷기)와 막 위치 고정 캡처 확인, 콘솔 오류 0. 에디터 백그라운드 실행이라 실제 시간 흐름(부드러움)은 미확인
+- 사람의 개입: 연출 방향 승인, 리본 아이디어 제시. 리본 A/B 선택은 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/StageTransition.cs | Claude Code | 생성 | 입장 연출. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/StageSelectionController.cs | Claude Code | 수정 | 트랜지션이 덮은 뒤 생성(Enter 분리), 다시 하기 덮인 시작. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/StageTransition.prefab | Unity CLI | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/03_StageSelect/ST_Ribbon.png | GPT 이미지 + Python | 생성 | 1200x215 리본. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity | Unity CLI | 수정 | 트랜지션 배치·연결. 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Claude Code | 수정 | stage_transition.number 추가. 사용 |
+| ArtDirection/Mockups/G14_StageTransition_20261119/ (Ribbon_A/B, PROMPTS.txt) | GPT 이미지 | 생성 | 원본 2안 (git 제외) |
+| docs/ui-flow.md | Claude Code | 수정 | 입장 연출 설명. 사용 |
+
+#### 증거
+- Tools/_out/stageselect/transition_pose.jpg (git 제외)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 프리팹 조립·씬 배치, Play Mode 순서 로그·캡처
+- 활용 방식: script eval --file, playmode start/stop
+- 잘된 점: 막 위치를 고정해 원하는 장면을 정확히 캡처
+- 잘 안된 점 및 개선 필요: 백그라운드 에디터는 프레임 간격이 수 초라 시간 기반 연출을 실시간으로 검증할 수 없음
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: 이미지 편집 API, 리본 배너
+- 사용 방식: 선택 화면 캡처를 팔레트 참조로 넣고 글자 없는 투명 배경 리본 요청, 2장 생성 후 1장 채택
+
+### [20261119-stage-transition-v2] 스테이지 입장 트랜지션을 타이틀 카드 모션그래픽으로 재제작
+- 시각: 2026-11-19 06:42:00 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Unity CLI (Unity 6000.3.28f1) / Python(Pillow·numpy) / GPT 이미지(앞 기록의 리본 재사용)
+- 목적 및 적용 위치: 단색 막 + 리본뿐이던 1차 연출이 빈약하다는 피드백. StageTransition.cs 재작성, StageTransition.prefab 재조립, GameScene 인스턴스 교체
+- 사용 방식: LitMotion으로 3중 사선 띠(금·크림·자주) 시차 와이프, 왼쪽 사선 창의 스테이지 키아트(마스크, 천천히 줌아웃)와 뒤따르는 가장자리 선 2줄, 오른쪽 타이틀(자간이 좁혀지는 STAGE, 창 아래에서 솟는 번호, 선 긋기, 리본 펼침, 링 퍼짐, 반짝이 6개 깜빡임, 구석 빗금 7개), 흐르는 줄무늬·망점·큰 유령 숫자 배경. 타이틀이 자리 잡은 뒤 스테이지 생성 → 자주 띠가 타이틀을 실은 채 퇴장. 키아트는 Play Mode에서 각 스테이지를 보드 카메라로 렌더(UI 제외). 줄무늬·망점·반짝이·링은 Python으로 흰색 생성. 리본 꼬리는 자주색 배경에서 묻혀 꿀색으로 보정
+- 결과 및 확인 방법: 성공 / 연출을 스케일 시간으로 돌리는 캡처 모드 + Time.captureFramerate=30 으로 0.1초 간격 전 구간 캡처(해안가·왕도·설원), 콘솔 오류 0. 실시간 재생 체감(에디터 포커스 상태)은 미확인
+- 사람의 개입: 방향 피드백("비주얼 그래픽처럼 제대로"). 길이·구성 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/StageTransition.cs | Claude Code | 수정(재작성) | 타이틀 카드 연출, 캡처용 스케일 시간 옵션. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/StageTransition.prefab | Unity CLI | 수정(재조립) | 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/03_StageSelect/ST_Art_1~5.jpg | Unity CLI 렌더 + Python | 생성 | 스테이지 키아트 1280x720. 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/03_StageSelect/ST_Stripes·ST_Halftone·ST_Sparkle·ST_Ring.png | Python | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/03_StageSelect/ST_Ribbon.png | GPT 이미지 + Python | 수정 | 꼬리 색 보정. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity | Unity CLI | 수정 | 트랜지션 인스턴스 교체. 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Claude Code | 수정 | stage_transition.label 로 교체. 사용 |
+| docs/ui-flow.md | Claude Code | 수정 | 연출 설명. 사용 |
+
+#### 증거
+- Tools/_out/stageselect/transition_key.jpg, transition_hold.jpg, transition_seq_a/b.jpg (git 제외)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 스테이지별 키아트 렌더, 프리팹 재조립, 고정 프레임 캡처 검증
+- 활용 방식: script eval --file, playmode start/stop, Time.captureFramerate + ScreenCapture
+- 잘된 점: 백그라운드 에디터에서도 프레임 단위로 연출을 검증
+- 잘 안된 점 및 개선 필요: captureFramerate 는 unscaled 시간에 적용되지 않아 연출에 스케일 시간 전환 옵션을 추가해야 했음. 첫 재생 프레임에 에디터 셰이더 컴파일로 청록색 사각형이 1프레임 보임(에디터 한정으로 추정, 빌드 미확인)
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 빌드에서 첫 재생 시 셰이더 깜빡임 여부, 연출 길이(약 2.7초)가 반복 플레이에 부담되는지

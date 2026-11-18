@@ -1,0 +1,72 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using Object=UnityEngine.Object;
+[InitializeOnLoad]
+public static class CombatImpactBattleValidation
+{
+    const string Key="CombatImpactBattleValidation.Running";
+    static VoxelDefensePrototype flow;
+    static DefenseBattle battle;
+    static DefenseBoardView view;
+    static Camera camera;
+    static double started;
+    static int deaths,recoilFrames,peakCorpses,captures;
+    static float lastCapture;
+    static Vector3 focus;
+    static CombatImpactBattleValidation(){EditorApplication.update+=Update;}
+    public static void Run(){EditorSceneManager.OpenScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");SessionState.SetBool(Key,true);EditorApplication.EnterPlaymode();}
+    static object Field(object obj,string name)=>obj.GetType().GetField(name,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).GetValue(obj);
+    static void Update()
+    {
+        if(!SessionState.GetBool(Key,false)||!EditorApplication.isPlaying||EditorApplication.isCompiling)return;
+        try
+        {
+            if(started==0)started=EditorApplication.timeSinceStartup;
+            if(EditorApplication.timeSinceStartup-started>150)throw new Exception("Actual battle validation timeout");
+            if(battle==null)
+            {
+                var selection=Object.FindFirstObjectByType<StageSelectionController>();if(selection==null)return;
+                if(selection.CurrentStage==null){var ui=Object.FindFirstObjectByType<UIManager>();if(ui!=null&&ui.HasOpenPopup)selection.SelectStage(1);return;}
+                flow=Object.FindFirstObjectByType<VoxelDefensePrototype>();battle=(DefenseBattle)Field(flow,"battle");if(battle==null)return;
+                view=(DefenseBoardView)Field(flow,"view");camera=(Camera)Field(flow,"boardCamera");
+                typeof(VoxelDefensePrototype).GetField("battleSpeed",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(flow,2);
+                var grid=(DefenseGrid)Field(flow,"grid");
+                foreach(var cell in new[]{new Vector2Int(0,4),new Vector2Int(1,4),new Vector2Int(15,4),new Vector2Int(16,4)})
+                {
+                    if(grid.TryPlace(cell)!=DefenseGrid.BuildResult.Placed)throw new Exception("Cannot place validation wall "+cell);
+                    view.PlaceWall(cell);
+                }
+                battle.EnemyRemoved+=unit=>{if(!unit.ReachedCore)deaths++;};
+                typeof(VoxelDefensePrototype).GetMethod("StartBattle",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(flow,null);
+                if(battle.CurrentPhase!=DefenseBattle.Phase.Combat)throw new Exception("Battle did not start after the stage popup closed");
+                Directory.CreateDirectory("/tmp/combat-impact-battle-captures");
+                return;
+            }
+            var corpses=(IList)Field(view,"deathViews");peakCorpses=Math.Max(peakCorpses,corpses.Count);
+            foreach(DictionaryEntry pair in (IDictionary)Field(view,"enemyViews"))
+                if((float)Field(pair.Value,"HitRemaining")>0){recoilFrames++;break;}
+            if(captures==0&&corpses.Count>0)focus=(Vector3)Field(corpses[0],"Position");
+            if((corpses.Count>0||captures>0)&&captures<28&&Time.unscaledTime-lastCapture>=1f/15f)
+            {
+                Capture();lastCapture=Time.unscaledTime;
+            }
+            if(battle.CurrentPhase==DefenseBattle.Phase.Combat)return;
+            if(deaths<1||peakCorpses<1||recoilFrames<1)throw new Exception($"Missing combat feedback deaths={deaths} corpses={peakCorpses} recoil={recoilFrames}");
+            Debug.Log($"COMBAT_IMPACT_BATTLE_PASS phase={battle.CurrentPhase} ticks={battle.TickIndex} deaths={deaths} peakCorpses={peakCorpses} recoilFrames={recoilFrames} captures={captures}");
+            SessionState.SetBool(Key,false);EditorApplication.Exit(0);
+        }
+        catch(Exception e){Debug.LogException(e);SessionState.SetBool(Key,false);EditorApplication.Exit(1);}
+    }
+    static void Capture()
+    {
+        var pos=camera.transform.position;float size=camera.orthographicSize;camera.transform.position=focus-camera.transform.forward*20;camera.orthographicSize=2.6f;
+        var rt=new RenderTexture(960,640,24);var old=camera.targetTexture;var active=RenderTexture.active;camera.targetTexture=rt;camera.Render();RenderTexture.active=rt;
+        var image=new Texture2D(960,640,TextureFormat.RGB24,false);image.ReadPixels(new Rect(0,0,960,640),0,0);image.Apply();File.WriteAllBytes($"/tmp/combat-impact-battle-captures/frame-{captures++:D2}.png",image.EncodeToPNG());
+        camera.targetTexture=old;RenderTexture.active=active;camera.transform.position=pos;camera.orthographicSize=size;Object.Destroy(image);rt.Release();Object.Destroy(rt);
+    }
+}

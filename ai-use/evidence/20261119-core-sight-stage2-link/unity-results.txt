@@ -1,0 +1,7 @@
+Unity 6000.3.28f1, 프로젝트 복사본
+EditMode (-batchmode -nographics -runTests -testPlatform EditMode):
+testcasecount="92" result="Passed" total="92" passed="92" failed="0" skipped="0" 
+Play Mode (-batchmode -executeMethod Stage2PlayValidation.Run):
+STAGE2_BUTTON_LABEL 단풍
+STAGE2_PLAY_PASS stage=Stage_GoldenMaple walls=71 ticks=600 units=10
+로그의 ArgumentOutOfRangeException 1건은 UnityEditor.Search.SearchDatabase 시작 색인에서 난 것으로 게임 코드와 무관.

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="3" result="Passed" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-18 20:24:27Z" end-time="2026-11-18 20:24:28Z" duration="0.1914032">
+  <test-suite type="TestSuite" id="1000" name="ProjectBeViolenceDefense" fullname="ProjectBeViolenceDefense" runstate="Runnable" testcasecount="88" result="Passed" start-time="2026-11-18 20:24:27Z" end-time="2026-11-18 20:24:28Z" duration="0.191403" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1110" name="Assembly-CSharp-Editor.dll" fullname="/private/tmp/be-stage-prefab-validation/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="88" result="Passed" start-time="2026-11-18 20:24:28Z" end-time="2026-11-18 20:24:28Z" duration="0.180471" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="10132" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1086" name="StageContentTests" fullname="StageContentTests" classname="StageContentTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-18 20:24:28Z" end-time="2026-11-18 20:24:28Z" duration="0.174371" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1087" name="EveryStageIsSelfContainedWithoutDuplicatingSharedGameplayOrUi" fullname="StageContentTests.EveryStageIsSelfContainedWithoutDuplicatingSharedGameplayOrUi" methodname="EveryStageIsSelfContainedWithoutDuplicatingSharedGameplayOrUi" classname="StageContentTests" runstate="Runnable" seed="1592490985" result="Passed" start-time="2026-11-18 20:24:28Z" end-time="2026-11-18 20:24:28Z" duration="0.050427" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1089" name="SharedSceneHasOneSelectorWithFourDistinctStageChoices" fullname="StageContentTests.SharedSceneHasOneSelectorWithFourDistinctStageChoices" methodname="SharedSceneHasOneSelectorWithFourDistinctStageChoices" classname="StageContentTests" runstate="Runnable" seed="2056087004" result="Passed" start-time="2026-11-18 20:24:28Z" end-time="2026-11-18 20:24:28Z" duration="0.084617" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1088" name="ThemedStagesPreserveTheirPreviousDefaultTerrain" fullname="StageContentTests.ThemedStagesPreserveTheirPreviousDefaultTerrain" methodname="ThemedStagesPreserveTheirPreviousDefaultTerrain" classname="StageContentTests" runstate="Runnable" seed="549090193" result="Passed" start-time="2026-11-18 20:24:28Z" end-time="2026-11-18 20:24:28Z" duration="0.005200" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: /Users/mignon/Library/Application Support/DefaultCompany/ProjectBeViolenceDefense/TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

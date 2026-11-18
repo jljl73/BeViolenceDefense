@@ -47,8 +47,8 @@ internal static class VerifyEnemyGroupsOnce
         EnemyUnit wounded = battle.Enemies[0];
         wounded.QueueDamage(30);
         wounded.ResolveDamage();
-        Require(battle.CastAreaSpell(DefenseBattle.Spell.Heal, wounded.Position, 0).StartsWith("Healed") &&
-            wounded.Health == 33, "Area heal must restore a rounded-up share of maximum health.");
+        battle.CastAreaSpell(DefenseBattle.Spell.Heal, wounded.Position, 0);
+        Require(wounded.Health == 33, "Area heal must restore a rounded-up share of maximum health.");
         for (int i = 0; i < 40; i++) battle.Tick(1f / 60f, false);
         Require(battle.Enemies.Count == 4 && battle.Enemies.GroupBy(e => e.Faction).All(g => g.Count() == 2),
             "Each spawn point must release the next enemy after the interval.");

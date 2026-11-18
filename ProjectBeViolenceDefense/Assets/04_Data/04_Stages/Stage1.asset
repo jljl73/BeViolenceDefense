@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2073990d430741046825d63736970c68, type: 3}
   m_Name: Stage1
   m_EditorClassIdentifier: Assembly-CSharp::StageData
+  displayNameKey: stage_select.coast
   width: 17
   depth: 17
   core:
@@ -245,3 +246,4 @@ MonoBehaviour:
     cell: {x: 8, y: 0}
     size: {x: 1, y: 1}
     rotation: 0
+  waves: {fileID: 0}
