@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "frame": 2345,
+  "playing": true,
+  "firstCell": true,
+  "secondCell": true,
+  "adjacentCellsClear": true,
+  "rotatedFootprint": true,
+  "dimensions": "(1.92, 0.81, 0.92)",
+  "materials": [
+    "CartoonLog_Bark",
+    "CartoonLog_EndGrain"
+  ],
+  "scope": "Prefab render/material/collider validation. DefenseGrid placement rules unchanged."
+}

@@ -356,3 +356,46 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 게임 씬 배치 및 길찾기 점유 연결은 요청 범위 밖으로 수행하지 않음. Play Mode 미실행. UI 확인은 Computer Use의 Unity 접근 미승인으로 실패했으며 최종 검증은 정상 복구된 MCP로 수행.
+
+### [20261118-cartoon-log] 통나무 단면 수정 및 2칸 크기 Unity 임포트
+- 시각: 2026-11-18 21:53:00 +09:00
+- 작업자: ppzepi (`git config user.name` 확인)
+- 사용 도구: Codex / GPT-6, Blender MCP / Blender 5.3.0, Unity CLI 1.0.0 / Unity Editor 6000.3.28f1
+- 목적 및 적용 위치: 제공된 Meshy 통나무의 부풀어 있는 한쪽 단면을 개선하고 현재 프로젝트에 2×1칸 크기 프리팹으로 임포트.
+- 사용 방식: 원본 FBX·PNG 확인, Blender 양면 렌더 비교, 문제 단면 재구성·나이테 텍스처 생성, 기존 껍질 끝 조정, Unity Editor API로 재질·콜라이더·프리팹 생성 및 검증.
+- 결과 및 확인 방법: 성공 / Unity 실측 메시 1.92×0.806442×0.880844, Collider 1.92×0.806442×0.92, 352삼각형, URP 재질 2개. Blender 경계·비매니폴드·퇴화 면 0. Play Mode 프레임 진행, 두 셀 적중·인접 셀 비적중·90도 회전 검사 통과. 검증 후 Console 오류·경고 0, compilationFailed=false.
+- 사람의 개입: 원본 ZIP 제공 및 단면 수정·2칸 크기 임포트 요청. 최종 외형 채택 검토는 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `docs/cartoon-log-asset.md` | Codex | 생성 | 전체 결과물 경로·도구·수정 내용·적용 상태 manifest 및 배치 방법 |
+| manifest의 `ProjectBeViolenceDefense/Assets/**/CartoonLog/`와 `.meta` | Blender MCP, Codex, Unity CLI | 생성 | 수정 FBX·원본 및 신규 텍스처·URP 재질·2칸 프리팹. 현재 프로젝트에 임포트, 씬 영구 배치는 없음 |
+| `Art3D/CartoonLog/` | Blender MCP, Codex, Unity CLI | 생성 | 원본 추출·작업 blend·스크립트·렌더·검증 자료. 로컬 제작 자료, 기존 gitignore 제외 |
+| `ai-use/evidence/20261118-cartoon-log/` | Codex, Blender, Unity CLI | 생성 | 최종 Unity 미리보기와 검증 JSON 공유용 복사 |
+
+#### 증거
+- `ai-use/evidence/20261118-cartoon-log/blender_validation.json`
+- `ai-use/evidence/20261118-cartoon-log/unity_import_validation.json`
+- `ai-use/evidence/20261118-cartoon-log/unity_playmode_validation.json`
+- `ai-use/evidence/20261118-cartoon-log/Unity_2x1_Preview.png`
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 에디터 연결·버전 확인, 에셋 임포트·재질 remap·프리팹 생성, 미리보기 렌더, Play Mode 검증, Console 확인.
+- 활용 방식: Codex가 작업 스크립트를 작성하고 Unity CLI의 `script eval --file`이 실행 중인 지정 프로젝트 Editor에서 AssetDatabase·PrefabUtility·Physics API를 호출. `editor.playmode`와 `job wait`로 플레이 프레임 진행 확인.
+- 잘된 점: 실제 Unity 좌표·치수·재질·콜라이더를 확인하고 기존에 열려 있던 미저장 TestScene을 파일에 저장하지 않고 유지했다. Play Mode 종료 및 백그라운드 실행 임시 설정 복원.
+- 잘 안된 점 및 개선 필요: 초기 sandbox에서는 설치된 CLI 실행 경로 접근이 실패했으나 승인된 실행으로 해결. 1.0.1 업데이트 알림을 안내했으며 업데이트는 하지 않음. Windows 빌드는 미실행.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex의 파일 편집·셸 실행·이미지 확인, Blender MCP 호출.
+- 사용 방식: 사용자 요청 해석, 실제 프로젝트 설정 확인, 모델 수정 스크립트 작성, 전후 렌더 검토·수정 반복, Unity 임포트·플레이 검증과 기록.
+- 특별히 활용한 점: 원본 단면이 별도의 닫힌 메시 구성 요소임을 확인하고 해당 부분만 재구성해 납작하게 겹치는 면을 방지.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: “이거 통나무의 한쪽면이 자연스럽지 않다. 블렌더를 통해서 수정하고, unity 현재 프로젝트에 import 해줘. 게임 내 그리드 칸으로 2칸을 차지하도록 해”
+- 결과 및 실제 활용 방식: 단면·껍질 끝 수정 후 2×1칸 크기 모델과 콜라이더를 가진 프리팹으로 임포트.
+- 선정 이유: 수정 대상·도구·적용 프로젝트·최종 크기를 결정한 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 최종 외형의 취향·게임 배치 위치. 프리팹 크기와 충돌 범위를 2칸에 맞춘 작업이며 DefenseGrid 점유 데이터·경로 차단에 자동 연결하지 않음. 실제 고정 장애물로 채택 시 두 셀 등록 필요. Windows 빌드 미실행.

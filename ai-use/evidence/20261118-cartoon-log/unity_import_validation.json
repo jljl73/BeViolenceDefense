@@ -1,0 +1,31 @@
+{
+  "prefab": "Assets/03_Prefabs/04_World/CartoonLog/CartoonLog_2x1.prefab",
+  "model": "Assets/05_Art/05_Meshes/Environment/CartoonLog/CartoonLog_2x1.fbx",
+  "dimensions": {
+    "x": 1.92,
+    "y": 0.806442261,
+    "z": 0.880844235
+  },
+  "collider": {
+    "x": 1.92,
+    "y": 0.806442261,
+    "z": 0.92
+  },
+  "bottomY": 0.0,
+  "scale": "(1.00, 1.00, 1.00)",
+  "materials": [
+    {
+      "name": "CartoonLog_Bark",
+      "shader": "Universal Render Pipeline/Lit",
+      "texture": "CartoonLog_BaseColor"
+    },
+    {
+      "name": "CartoonLog_EndGrain",
+      "shader": "Universal Render Pipeline/Lit",
+      "texture": "CartoonLog_EndGrain"
+    }
+  ],
+  "triangles": 352,
+  "gridFootprint": "2x1 (1 unit per cell)",
+  "pivot": "bottom center"
+}

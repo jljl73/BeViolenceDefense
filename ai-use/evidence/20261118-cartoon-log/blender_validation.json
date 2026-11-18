@@ -1,0 +1,23 @@
+{
+  "blender_version": "5.3.0",
+  "dimensions_unity_xyz": [
+    1.9199999570846558,
+    0.8064422607421875,
+    0.880844235420227
+  ],
+  "triangles": 352,
+  "vertices": 181,
+  "boundary_edges": 0,
+  "nonmanifold_edges": 0,
+  "degenerate_faces": 0,
+  "materials": [
+    "CartoonLog_Bark",
+    "CartoonLog_EndGrain.002"
+  ],
+  "grid_footprint": [
+    2,
+    1
+  ],
+  "pivot": "bottom center",
+  "length_axis": "Unity X"
+}
