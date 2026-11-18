@@ -11,27 +11,57 @@ internal static class Program
 {
     private const float Step = 1f / 60f;
 
-    // 지형: MAP 환경 변수(17줄 글자 맵 파일)가 있으면 그것을, 없으면 GameScene 의 boardLayout 을 쓴다. 둘 다 없으면 기본 지형.
-    private static readonly List<Vector2Int> Board = LoadBoard();
+    // 지형: STAGE 환경 변수(StageData .asset 경로)가 있으면 그것을, 없으면 1스테이지 에셋을 쓴다. 둘 다 없으면 기본 지형.
+    private const string DefaultStagePath = "../ProjectBeViolenceDefense/Assets/04_Data/04_Stages/Stage1.asset";
+    private static readonly Func<DefenseGrid> NewGrid = LoadStage();
 
-    private static List<Vector2Int> LoadBoard()
+    // Unity가 저장한 StageData YAML에서 크기·코어·스폰·장애물 칸만 읽는다.
+    private static Func<DefenseGrid> LoadStage()
     {
-        string text = null;
-        string mapPath = Environment.GetEnvironmentVariable("MAP");
-        if (mapPath != null)
-            text = System.IO.File.ReadAllText(mapPath);
-        else if (System.IO.File.Exists("../ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity"))
+        string path = Environment.GetEnvironmentVariable("STAGE") ?? DefaultStagePath;
+        if (!System.IO.File.Exists(path))
         {
-            var m = System.Text.RegularExpressions.Regex.Match(
-                System.IO.File.ReadAllText("../ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity"),
-                "\n  boardLayout: \"([^\"]*)\"");
-            if (m.Success) text = System.Text.RegularExpressions.Regex.Unescape(m.Groups[1].Value);
+            Console.WriteLine($"스테이지 파일이 없습니다: {path}. 기본 지형을 씁니다.");
+            return () => new DefenseGrid();
         }
-        if (string.IsNullOrWhiteSpace(text)) return null;
-        if (DefenseGrid.TryParseLayout(text, out List<Vector2Int> walls, out string error)) return walls;
-        Console.WriteLine($"지형 오류: {error}. 기본 지형을 씁니다.");
-        return null;
+
+        string text = System.IO.File.ReadAllText(path).Replace("\r", string.Empty);
+        int Int(string pattern) => int.Parse(System.Text.RegularExpressions.Regex.Match(text, pattern).Groups[1].Value);
+        int width = Int(@"\n  width: (\d+)");
+        int depth = Int(@"\n  depth: (\d+)");
+        var c = System.Text.RegularExpressions.Regex.Match(text,
+            @"\n  core:\n(?:    serializedVersion: \d+\n)?    x: (-?\d+)\n    y: (-?\d+)\n    width: (\d+)\n    height: (\d+)");
+        var core = new RectInt(int.Parse(c.Groups[1].Value), int.Parse(c.Groups[2].Value),
+            int.Parse(c.Groups[3].Value), int.Parse(c.Groups[4].Value));
+        int obstaclesAt = text.IndexOf("\n  obstacles:", StringComparison.Ordinal);
+        string spawnText = text.Substring(0, obstaclesAt), obstacleText = text.Substring(obstaclesAt);
+
+        var cells = new List<Vector2Int>();
+        var factions = new List<int>();
+        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(spawnText,
+            @"cell: \{x: (-?\d+), y: (-?\d+)\}\n    faction: (-?\d+)"))
+        {
+            cells.Add(new Vector2Int(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value)));
+            factions.Add(int.Parse(m.Groups[3].Value));
+        }
+        var walls = new List<Vector2Int>();
+        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(obstacleText,
+            @"cell: \{x: (-?\d+), y: (-?\d+)\}\n    size: \{x: (\d+), y: (\d+)\}"))
+        {
+            int x = int.Parse(m.Groups[1].Value), y = int.Parse(m.Groups[2].Value);
+            for (int dx = 0; dx < int.Parse(m.Groups[3].Value); dx++)
+                for (int dy = 0; dy < int.Parse(m.Groups[4].Value); dy++)
+                    walls.Add(new Vector2Int(x + dx, y + dy));
+        }
+
+        if (new DefenseGrid(width, depth, core, cells, factions, walls).Routes == null)
+        {
+            Console.WriteLine("스테이지에 코어까지 갈 수 없는 스폰이 있습니다. 기본 지형을 씁니다.");
+            return () => new DefenseGrid();
+        }
+        return () => new DefenseGrid(width, depth, core, cells, factions, walls);
     }
+
     private const int TickLimit = 240 * 60;
     private static readonly float Range = float.Parse(Environment.GetEnvironmentVariable("RANGE") ?? "1.5");
 
@@ -88,12 +118,12 @@ internal static class Program
         var rng = new System.Random(20261118);
         while (result.Count < count)
         {
-            var grid = new DefenseGrid(Board);
+            var grid = NewGrid();
             var placed = new List<Vector2Int>();
             int walls = rng.Next(1, DefenseGrid.WallLimit + 1);
             for (int attempt = 0; attempt < 200 && placed.Count < walls; attempt++)
             {
-                var cell = new Vector2Int(rng.Next(DefenseGrid.Width), rng.Next(DefenseGrid.Depth));
+                var cell = new Vector2Int(rng.Next(grid.Width), rng.Next(grid.Depth));
                 if (grid.TryPlace(cell) == DefenseGrid.BuildResult.Placed)
                     placed.Add(cell);
             }
@@ -107,7 +137,7 @@ internal static class Program
 
     private static Outcome Run(Stats g, Stats z, Vector2Int[] layout, int seed = 0)
     {
-        var grid = new DefenseGrid(Board);
+        var grid = NewGrid();
         foreach (Vector2Int cell in layout)
             grid.TryPlace(cell);
 
@@ -228,7 +258,7 @@ internal static class Program
         foreach (var layout in layouts)
         for (int seed = 0; seed < Seeds; seed++)
         {
-            var grid = new DefenseGrid(Board);
+            var grid = NewGrid();
             foreach (Vector2Int cell in layout) grid.TryPlace(cell);
             var gf = new EnemyFaction("Goblin", new Color(1, 0, 0), Range, g.Hp, g.Dmg, g.Interval, g.Count);
             var zf = new EnemyFaction("Zombie", new Color(0, 1, 1), Range, z.Hp, z.Dmg, z.Interval, z.Count);
@@ -472,7 +502,7 @@ internal static class Program
             foreach (var layout in layouts)
             for (int seed = 0; seed < Seeds; seed++)
             {
-                var grid = new DefenseGrid(Board);
+                var grid = NewGrid();
                 foreach (Vector2Int cell in layout) grid.TryPlace(cell);
                 var battle = new DefenseBattle(grid, sideReps, _ => queues);
                 var all = new List<EnemyUnit>();

@@ -2,19 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-internal sealed class DefenseGrid
+public sealed class DefenseGrid
 {
-    public const int Width = 17;
-    public const int Depth = Width;
-    public const int SpawnPointCount = 2;
+    public const int DefaultSize = 17;
     public const int WallLimit = 8;
     public const float WallWidth = 0.92f;
     public const float WallHeight = 0.8f;
 
-    private const int MainLaneColumn = Width / 2;
-    private const int GateRow = 7;
-    private static readonly RectInt CoreFootprint = new(MainLaneColumn, Depth - 2, 2, 2);
-    private static readonly Vector2Int[] Spawns = { new(2, 2), new(Width - 3, 2) };
     private static readonly Vector2Int[] Directions =
     {
         Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left
@@ -22,81 +16,78 @@ internal sealed class DefenseGrid
 
     public enum BuildResult { Placed, Outside, Occupied, LimitReached, BlocksRoute }
 
+    private readonly RectInt coreFootprint;
+    private readonly Vector2Int[] spawns;
+    private readonly int[] spawnFactions;
     private readonly HashSet<Vector2Int> fixedWalls = new();
     private readonly HashSet<Vector2Int> placed = new();
     private Vector3[][] routes;
 
-    public IReadOnlyList<Vector2Int> SpawnCells => Spawns;
+    public int Width { get; }
+    public int Depth { get; }
+    public IReadOnlyList<Vector2Int> SpawnCells => spawns;
+    // 스폰별 진영 인덱스. Routes[i]는 SpawnCells[i]에서 출발한다.
+    public IReadOnlyList<int> SpawnFactions => spawnFactions;
     public IReadOnlyCollection<Vector2Int> FixedWalls => fixedWalls;
+    // 코어까지 갈 수 없는 스폰이 있으면 null.
     public IReadOnlyList<Vector3[]> Routes => routes;
+    // 경로 계산이 실패한 첫 스폰 인덱스. 성공하면 -1.
+    public int UnreachableSpawn { get; private set; } = -1;
     public int WallCount => placed.Count;
-    public Vector3 CorePosition => new(CoreFootprint.center.x - 0.5f, 0f, CoreFootprint.center.y - 0.5f);
-    public Vector2Int CoreSize => CoreFootprint.size;
+    public Vector3 CorePosition => new(coreFootprint.center.x - 0.5f, 0f, coreFootprint.center.y - 0.5f);
+    public Vector2Int CoreSize => coreFootprint.size;
     public Vector3 Center => new((Width - 1) * 0.5f, 0, (Depth - 1) * 0.5f);
 
-    // fixedWallCells 가 없으면 기본 지형(가운데 한 칸만 열린 가로 벽)을 쓴다.
-    public DefenseGrid(IEnumerable<Vector2Int> fixedWallCells = null)
+    // 기본 지형: 17x17, 가운데 한 칸만 열린 가로 벽.
+    public DefenseGrid() : this(DefaultSize, DefaultSize, new RectInt(DefaultSize / 2, DefaultSize - 2, 2, 2),
+        new[] { new Vector2Int(2, 2), new Vector2Int(DefaultSize - 3, 2) }, new[] { 0, 1 }, DefaultWalls())
     {
-        if (fixedWallCells != null)
-        {
-            foreach (Vector2Int cell in fixedWallCells)
-                if (InBounds(cell) && !CoreFootprint.Contains(cell) && Array.IndexOf(Spawns, cell) < 0)
-                    fixedWalls.Add(cell);
-            routes = FindRoutes();
-            if (routes != null)
-                return;
+    }
 
-            Debug.LogError("The board layout leaves a spawn without a path to the core. Using the default terrain.");
-            fixedWalls.Clear();
+    // 범위 밖·코어·스폰 위에 놓인 벽 칸은 무시한다. 경로가 없으면 Routes가 null이다.
+    public DefenseGrid(int width, int depth, RectInt core, IReadOnlyList<Vector2Int> spawnCells,
+        IReadOnlyList<int> spawnFactionIndices, IEnumerable<Vector2Int> fixedWallCells)
+    {
+        Width = width;
+        Depth = depth;
+        coreFootprint = core;
+        spawns = new Vector2Int[spawnCells.Count];
+        spawnFactions = new int[spawnCells.Count];
+        for (int i = 0; i < spawns.Length; i++)
+        {
+            spawns[i] = spawnCells[i];
+            spawnFactions[i] = spawnFactionIndices[i];
         }
 
-        // The two entrances share one straight approach from the gate to the core.
-        for (int x = 0; x < Width; x++)
-            if (x != MainLaneColumn)
-                fixedWalls.Add(new Vector2Int(x, GateRow));
+        if (fixedWallCells != null)
+            foreach (Vector2Int cell in fixedWallCells)
+                if (InBounds(cell) && !coreFootprint.Contains(cell) && Array.IndexOf(spawns, cell) < 0)
+                    fixedWalls.Add(cell);
         routes = FindRoutes();
     }
 
-    // 글자 맵을 고정 벽 목록으로 바꾼다. 17줄 x 17칸, 첫 줄이 코어 쪽(y=16)이고 '#'이 벽이다.
-    // 나머지 글자(코어 C, 바닥 . 등)는 바닥으로 본다.
-    public static bool TryParseLayout(string text, out List<Vector2Int> walls, out string error)
+    private static IEnumerable<Vector2Int> DefaultWalls()
     {
-        walls = new List<Vector2Int>();
-        error = null;
-        string[] rows = (text ?? string.Empty).Replace("\r", string.Empty).Trim().Split('\n');
-        if (rows.Length != Depth)
-        {
-            error = $"needs {Depth} rows, found {rows.Length}";
-            return false;
-        }
-
-        for (int i = 0; i < Depth; i++)
-        {
-            string row = rows[i].Trim();
-            if (row.Length != Width)
-            {
-                error = $"row {i + 1} needs {Width} cells, found {row.Length}";
-                return false;
-            }
-            for (int x = 0; x < Width; x++)
-                if (row[x] == '#')
-                    walls.Add(new Vector2Int(x, Depth - 1 - i));
-        }
-        return true;
+        const int gateRow = 7;
+        for (int x = 0; x < DefaultSize; x++)
+            if (x != DefaultSize / 2)
+                yield return new Vector2Int(x, gateRow);
     }
 
-    public bool IsWalkable(Vector2Int cell) => InBounds(cell) && !CoreFootprint.Contains(cell) && !IsWall(cell);
+    public bool IsWalkable(Vector2Int cell) => InBounds(cell) && !coreFootprint.Contains(cell) && !IsWall(cell);
 
-    private static Vector3 ClosestCorePoint(Vector3 position) => new(
-        Mathf.Clamp(position.x, CoreFootprint.xMin - 0.5f, CoreFootprint.xMax - 0.5f),
+    public bool IsFixedWall(Vector2Int cell) => fixedWalls.Contains(cell);
+
+    private Vector3 ClosestCorePoint(Vector3 position) => new(
+        Mathf.Clamp(position.x, coreFootprint.xMin - 0.5f, coreFootprint.xMax - 0.5f),
         0f,
-        Mathf.Clamp(position.z, CoreFootprint.yMin - 0.5f, CoreFootprint.yMax - 0.5f));
+        Mathf.Clamp(position.z, coreFootprint.yMin - 0.5f, coreFootprint.yMax - 0.5f));
 
     public BuildResult TryPlace(Vector2Int cell)
     {
         if (!InBounds(cell))
             return BuildResult.Outside;
-        if (!IsWalkable(cell) || Array.IndexOf(Spawns, cell) >= 0)
+        if (!IsWalkable(cell) || Array.IndexOf(spawns, cell) >= 0)
             return BuildResult.Occupied;
         if (placed.Count >= WallLimit)
             return BuildResult.LimitReached;
@@ -177,7 +168,7 @@ internal sealed class DefenseGrid
         // Flood from all open tiles touching the core's sides.
         var distances = new int[Width, Depth];
         var queue = new Queue<Vector2Int>();
-        foreach (Vector2Int coreCell in CoreFootprint.allPositionsWithin)
+        foreach (Vector2Int coreCell in coreFootprint.allPositionsWithin)
         {
             foreach (Vector2Int direction in Directions)
             {
@@ -204,21 +195,26 @@ internal sealed class DefenseGrid
             }
         }
 
-        var result = new Vector3[SpawnPointCount][];
+        var result = new Vector3[spawns.Length][];
         for (int i = 0; i < result.Length; i++)
         {
-            Vector2Int cell = Spawns[i];
-            int distance = distances[cell.x, cell.y];
+            Vector2Int cell = spawns[i];
+            int distance = InBounds(cell) ? distances[cell.x, cell.y] : 0;
             if (distance == 0)
+            {
+                UnreachableSpawn = i;
                 return null;
+            }
+
+            // Mirror the tie-break for spawns right of center so equally short paths stay symmetric.
+            bool mirrored = cell.x * 2 > Width - 1;
 
             var path = new List<Vector3> { CellPosition(cell) };
             while (distance > 1)
             {
-                // Mirror the tie-break so equally short paths respect the default terrain's symmetry.
                 foreach (Vector2Int direction in Directions)
                 {
-                    Vector2Int step = i == 0 ? direction : new Vector2Int(-direction.x, direction.y);
+                    Vector2Int step = mirrored ? new Vector2Int(-direction.x, direction.y) : direction;
                     Vector2Int next = cell + step;
                     if (!InBounds(next) || distances[next.x, next.y] != distance - 1)
                         continue;
@@ -232,9 +228,10 @@ internal sealed class DefenseGrid
             path.Add(ClosestCorePoint(CellPosition(cell)));
             result[i] = path.ToArray();
         }
+        UnreachableSpawn = -1;
         return result;
     }
 
-    public static bool InBounds(Vector2Int cell) =>
+    public bool InBounds(Vector2Int cell) =>
         cell.x >= 0 && cell.x < Width && cell.y >= 0 && cell.y < Depth;
 }

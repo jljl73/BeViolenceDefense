@@ -103,6 +103,59 @@ internal static class VerifyEnemyGroupsOnce
         Debug.Log($"ENEMY_GROUPS_PASS: contacts={contacts}, kills={kills}, forecast={forecast}");
     }
 
+    [MenuItem("Tools/Verify Stage Data")]
+    private static void VerifyStageData()
+    {
+        var stage = ScriptableObject.CreateInstance<StageData>();
+        try
+        {
+            stage.spawns.Add(new StageData.Spawn { cell = new Vector2Int(2, 2), faction = 0 });
+            stage.spawns.Add(new StageData.Spawn { cell = new Vector2Int(14, 2), faction = 1 });
+            stage.spawns.Add(new StageData.Spawn { cell = new Vector2Int(11, 1), faction = 1 });
+            stage.obstacles.Add(new StageData.Obstacle { cell = new Vector2Int(0, 5), size = new Vector2Int(2, 1) });
+            stage.obstacles.Add(new StageData.Obstacle { cell = new Vector2Int(5, 0), size = new Vector2Int(1, 3), rotation = 1 });
+            DefenseGrid grid = stage.CreateGrid();
+            Require(stage.Validate(grid) == null, $"The test stage must be valid: {stage.Validate(grid)}");
+            Require(grid.IsFixedWall(new Vector2Int(0, 5)) && grid.IsFixedWall(new Vector2Int(1, 5)) &&
+                !grid.IsFixedWall(new Vector2Int(2, 5)), "A 2x1 obstacle must block exactly two cells.");
+            Require(new[] { 0, 1, 2 }.All(y => grid.IsFixedWall(new Vector2Int(5, y))) && !grid.IsFixedWall(new Vector2Int(5, 3)),
+                "A rotated 1x3 obstacle must block exactly three cells.");
+            Require(!grid.HasLineOfSight(new Vector3(4, 0, 1), new Vector3(6, 0, 1)), "Obstacle cells must block sight.");
+            Require(grid.Routes.Count == 3 && grid.SpawnFactions.SequenceEqual(new[] { 0, 1, 1 }),
+                "Each spawn must get its own route and faction.");
+
+            var factions = new[]
+            {
+                new EnemyFaction("Coral", Color.red, spawnCount: 4), new EnemyFaction("Teal", Color.cyan, spawnCount: 4)
+            };
+            var battle = new DefenseBattle(grid, factions);
+            var tealCells = new System.Collections.Generic.List<Vector2Int>();
+            battle.EnemySpawned += enemy =>
+            {
+                if (enemy.Faction == factions[1]) tealCells.Add(DefenseGrid.PositionToCell(enemy.Position));
+            };
+            battle.StartRound();
+            for (int i = 0; i < 600; i++) battle.Tick(1f / 60f, false);
+            Require(tealCells.SequenceEqual(new[]
+                {
+                    new Vector2Int(14, 2), new Vector2Int(11, 1), new Vector2Int(14, 2), new Vector2Int(11, 1)
+                }), $"A faction with two spawns must alternate between them: {string.Join(" ", tealCells)}");
+
+            foreach (Vector2Int cell in new[] { new(10, 1), new(12, 1), new(11, 0), new Vector2Int(11, 2) })
+                stage.obstacles.Add(new StageData.Obstacle { cell = cell, size = Vector2Int.one });
+            grid = stage.CreateGrid();
+            Require(grid.Routes == null && grid.UnreachableSpawn == 2 && stage.Validate(grid) != null,
+                "A walled-in spawn must be reported.");
+            stage.spawns.RemoveAll(spawn => spawn.faction == 1);
+            Require(stage.Validate(stage.CreateGrid()) != null, "A faction without spawns must be reported.");
+            Debug.Log($"STAGE_DATA_PASS: teal spawns {string.Join(" ", tealCells)}");
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(stage);
+        }
+    }
+
     private static void Require(bool pass, string message)
     {
         if (!pass) throw new InvalidOperationException(message);

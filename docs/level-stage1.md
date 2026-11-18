@@ -1,12 +1,12 @@
 # 1스테이지 레벨: 무너진 관문
 
-> 첫 레벨 디자인 시안이다. 지형은 `GameScene` → `Voxel Defense Prototype` → `Board Layout`, 웨이브는 같은 컴포넌트의 `Rounds`에서 바꾼다. 수치 검증은 `BalanceSim`으로 한다.
+> 첫 레벨 디자인 시안이다. 지형은 `Assets/04_Data/04_Stages/Stage1.asset`을 `Tools/Stage Editor`로, 웨이브는 `GameScene` → `Voxel Defense Prototype`의 `Rounds`에서 바꾼다. 수치 검증은 `BalanceSim`으로 한다.
 
 ![1스테이지 레벨 설계](images/stage1_level_design.png)
 
 ## 지형
 
-17줄 × 17칸이다. 첫 줄이 코어 쪽(y=16)이고 `#`이 고정 벽, `C`가 코어다. Coral 스폰은 (2, 2), Teal 스폰은 (14, 2)다.
+17줄 × 17칸이다. 아래 그림에서 첫 줄이 코어 쪽(y=16)이고 `#`이 고정 벽(기본 벽 1×1 장애물), `C`가 코어다. Coral 스폰은 (2, 2), Teal 스폰은 (14, 2)다. 실제 데이터는 `Stage1.asset`이며 이 글자 그림은 참고용이다.
 
 ```
 ........CC.......   16  코어

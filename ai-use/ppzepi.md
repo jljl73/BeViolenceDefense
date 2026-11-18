@@ -435,3 +435,46 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: BoardTheme.wallPrefab 선택 후 Play Mode에서 배치·철거 및 기존 벽과 시각 비교.
+
+### [20261118-stage-editor] 스테이지 그리드 에디터 툴과 StageData 이관
+- 시각: 2026-11-18 22:49:07 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code / Claude Opus 5.5 (claude-opus-5-5), Unity CLI 1.0.0 (Unity 6000.3.28f1 Editor 연결), .NET 11 SDK(BalanceSim 임시 빌드)
+- 목적 및 적용 위치: 보드 크기·고정 장애물 프리팹(여러 칸 포함)·진영별 여러 스폰·코어 위치를 편집하는 `Tools/Stage Editor` 창 제작. `DefenseGrid` 상수(17×17, 스폰 2개, 코어 위치)를 스테이지 데이터로 바꾸고 GameScene 1스테이지 글자 맵을 `Stage1.asset`으로 이관.
+- 사용 방식: 사용자가 저장 방식(StageData 에셋)·스폰 수(진영당 여러 개)·편집 UI(전용 창)를 선택하고, Amethyst 프리팹이 각각 1×1·2×1·3×1을 차지해야 한다고 지정. AI가 계획 작성 후 코드 수정, Unity CLI로 에셋 변환·컴파일·검증 실행.
+- 결과 및 확인 방법: 성공. Unity 컴파일 오류·경고 0. `Tools/Verify Enemy Groups Once` 통과(ENEMY_GROUPS_PASS). 신규 `Tools/Verify Stage Data` 통과(2×1·회전 1×3 장애물 칸 차단과 시야 차단, 스폰 3개 경로, Teal 두 스폰 교대 (14,2)→(11,1)→(14,2)→(11,1), 막힌 스폰·진영 누락 경고). BalanceSim `rounds`(벽 없음, 벽 (5,7);(8,7))와 기본 실행 출력이 변경 전후 바이트 단위로 동일. Play Mode에서 임시 스테이지(통나무 2×1, 자수정 3×1, 회전 자수정 2×1, Teal 스폰 추가)로 장애물 크기(2.92·1.92 길이)와 스폰 패드 3개, 전투 진행, 콘솔 에러·경고 0 확인. 에디터 창의 배치·겹침 거부·지우기·크기 변경·Undo를 리플렉션 호출로 확인.
+- 사람의 개입: 요구 사항과 설계 선택지 결정, Amethyst footprint 규칙 지정. 코드 리뷰·커밋은 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/StageData.cs | Claude Code | 생성 | 스테이지 ScriptableObject(크기·코어·스폰·장애물), 그리드 생성·검증. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/Editor/StageEditorWindow.cs | Claude Code | 생성 | Stage Editor 창(도구·팔레트·회전·경로 미리보기·검증·Undo)과 StageData 인스펙터 버튼. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseGrid.cs | Claude Code | 수정 | 크기·코어·스폰을 인스턴스 값으로, 스폰별 진영, 도달 불가 스폰 기록, 글자 맵 파서 삭제, public 전환. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs | Claude Code | 수정 | 진영당 여러 스폰 교대 스폰, 스폰 쌍별 예상 교전. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Claude Code | 수정 | 보드 크기 반영, 장애물 프리팹 1회 생성·footprint 길이 맞춤, 스폰 진영색. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs, 05_World/BoardEnvironment.cs | Claude Code | 수정 | `boardLayout` → `stage` 참조, 잘못된 스테이지면 기본 지형. 사용 |
+| ProjectBeViolenceDefense/Assets/04_Data/04_Stages/Stage1.asset | Unity CLI script eval | 생성 | 기존 17×17 글자 맵 → 기본 벽 1×1 장애물 55개, 스폰 2개, 코어 (8,15). 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity | Unity CLI script eval | 수정 | VoxelDefensePrototype.stage에 Stage1 연결 후 저장. 저장 시 Editor에 열려 있던 미저장 상태(Popup UI 오브젝트, 직렬화 버전 갱신)도 함께 기록됨 — 확인 필요 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Validation/VerifyEnemyGroupsOnce.cs | Claude Code | 수정 | `Tools/Verify Stage Data` 검증 추가. 사용 |
+| BalanceSim/Program.cs, BalanceSim/README.md | Claude Code | 수정 | `STAGE` 에셋 YAML에서 지형 읽기, `MAP` 글자 맵 삭제. 사용 |
+| docs/prototype.md, docs/level-stage1.md | Claude Code | 수정 | Stage 에셋·Stage Editor·여러 스폰 규칙 설명. 사용 |
+
+#### 증거
+- ai-use/evidence/stage-editor/stage_editor_window.png
+- ai-use/evidence/stage-editor/playmode_multicell_obstacles.png
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 글자 맵 → Stage1.asset 변환과 씬 연결, 반복 컴파일(`unity recompile`), 검증 메뉴 실행, 임시 스테이지로 Play Mode 진입·전투 시작·게임 뷰 캡처, 에디터 창 캡처와 리플렉션 동작 확인, 임시 에셋 삭제.
+- 활용 방식: 연결된 Editor에 `script eval`로 C# 실행, `console get`으로 결과·에러 확인, `capture game_view`/`capture editor_window`로 스크린샷 저장.
+- 잘된 점: 컴파일 오류를 파일·줄 단위로 바로 받아 수정했고, Play Mode 상태를 코드로 조회해 장애물 크기를 수치로 확인함.
+- 잘 안된 점 및 개선 필요: 첫 변환 스크립트에서 씬 참조가 저장되지 않아 재할당이 필요했음. 씬 저장이 Editor의 기존 미저장 변경까지 함께 기록함. 도메인 리로드 직후 명령이 한 번 연결 실패함.
+
+#### 주요 프롬프트
+- 사용 도구: Claude Code
+- 프롬프트 원문: `gameScene 과 같은 게임 내 스테이지 그리드를 제작하는 editor tool이 필요해. 최소한 그리드가 몇 곱하기 몇일지 결정하고, 통행 불가능하고 처음부터 배치되어있는 장애물 프리팹들을 미리 배치하고, 적의 스폰포인트를 미리 준비할 수 있어야 해. 그 외에도 필요한 기능들이 있으면 좋고.` / 계획 보완: `Assets\03_Prefabs\04_World 폴더 내 프리팹들을 사전배치 방해물로 배치할 수 있어야 한다. Amethyst들은 각각 그리드 1x1칸, 2x1칸, 3x1칸을 차지해야 하는 프리팹이다.`
+- 결과 및 실제 활용 방식: StageData 에셋과 Stage Editor 창, 그리드·전투·표시·BalanceSim의 스테이지 데이터화.
+- 선정 이유: 하드코딩된 17×17 보드를 데이터 기반 스테이지로 바꾼 핵심 기능 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: GameScene diff의 Popup 오브젝트가 의도한 변경인지. `Amethyst.mat`(_MainTex 자동 동기화)과 TMP `Netmarble Medium SDF.asset`(Play Mode 동적 아틀라스) 변경은 Editor 부수 효과로 이번 작업에 포함하지 않음. 실제 마우스로 Stage Editor를 칠하는 조작감, 17×17이 아닌 보드에서의 카메라·배경 배치는 미확인. Windows 빌드 미실행.

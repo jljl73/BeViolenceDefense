@@ -35,6 +35,8 @@ internal sealed class DefenseBattle
     private readonly CombatPositioning combat;
     private readonly int[] spawnedPerFaction;
     private readonly int[] roundSpawnCounts;
+    // 진영 -> 그 진영 스폰의 경로 인덱스. 진영 안에서는 스폰을 번갈아 쓴다.
+    private readonly int[][] factionSpawns;
     // 라운드 번호 -> 진영(편)별 스폰 순서. null 이면 진영 하나를 기존 증원 규칙대로 반복한다.
     private readonly Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup;
     private IReadOnlyList<EnemyFaction>[] roundQueues;
@@ -65,6 +67,15 @@ internal sealed class DefenseBattle
         combat = new CombatPositioning(grid, enemies, UnitSpacing);
         spawnedPerFaction = new int[factions.Length];
         roundSpawnCounts = new int[factions.Length];
+        factionSpawns = new int[factions.Length][];
+        for (int f = 0; f < factions.Length; f++)
+        {
+            var routes = new List<int>();
+            for (int i = 0; i < grid.SpawnFactions.Count; i++)
+                if (grid.SpawnFactions[i] == f)
+                    routes.Add(i);
+            factionSpawns[f] = routes.ToArray();
+        }
         PrepareRoundSpawns();
     }
 
@@ -221,9 +232,18 @@ internal sealed class DefenseBattle
         if (roundSpawnCounts[0] == 0 || roundSpawnCounts[1] == 0)
             return Array.Empty<Vector2Int>();
 
-        Vector3[] firstRoute = grid.Routes[0];
-        Vector3[] secondRoute = grid.Routes[1];
         float range = Mathf.Max(RoundUnit(0, 0).AttackRange, RoundUnit(1, 0).AttackRange);
+        // 임시 가정: 모든 스폰의 선두가 동시에 출발한다. Coral·Teal 스폰 쌍마다 교전 칸 하나.
+        var cells = new HashSet<Vector2Int>();
+        foreach (int first in factionSpawns[0])
+            foreach (int second in factionSpawns[1])
+                if (ForecastEncounter(grid.Routes[first], grid.Routes[second], range) is { } cell)
+                    cells.Add(cell);
+        return cells;
+    }
+
+    private Vector2Int? ForecastEncounter(Vector3[] firstRoute, Vector3[] secondRoute, float range)
+    {
         // Compare the leaders after each tile step. The last point is a core contact, not a tile.
         int tileCount = Mathf.Min(firstRoute.Length, secondRoute.Length) - 1;
         for (int step = 0; step < tileCount; step++)
@@ -234,10 +254,10 @@ internal sealed class DefenseBattle
                 continue;
 
             Vector2Int center = DefenseGrid.PositionToCell((first + second) * 0.5f);
-            return new[] { grid.IsWalkable(center) ? center : DefenseGrid.PositionToCell(first) };
+            return grid.IsWalkable(center) ? center : DefenseGrid.PositionToCell(first);
         }
 
-        return Array.Empty<Vector2Int>();
+        return null;
     }
 
     public void Tick(float deltaTime, bool pauseMovement)
@@ -337,13 +357,13 @@ internal sealed class DefenseBattle
 
     private void SpawnNext()
     {
-        for (int factionIndex = 0; factionIndex < grid.Routes.Count; factionIndex++)
+        for (int factionIndex = 0; factionIndex < factions.Length; factionIndex++)
         {
             if (spawnedPerFaction[factionIndex] >= roundSpawnCounts[factionIndex])
                 continue;
 
+            var path = (Vector3[])NextRoute(factionIndex).Clone();
             spawnedPerFaction[factionIndex]++;
-            var path = (Vector3[])grid.Routes[factionIndex].Clone();
             var enemy = new EnemyUnit(RoundUnit(factionIndex, spawnedPerFaction[factionIndex] - 1), factionIndex, path,
                 SpawnCount);
             SpawnCount++;
@@ -352,14 +372,21 @@ internal sealed class DefenseBattle
         }
     }
 
+    // 이 진영의 다음 유닛이 출발할 경로.
+    private Vector3[] NextRoute(int factionIndex)
+    {
+        int[] spawns = factionSpawns[factionIndex];
+        return grid.Routes[spawns[spawnedPerFaction[factionIndex] % spawns.Length]];
+    }
+
     private bool SpawnPointsClear()
     {
-        for (int factionIndex = 0; factionIndex < grid.Routes.Count; factionIndex++)
+        for (int factionIndex = 0; factionIndex < factions.Length; factionIndex++)
         {
             if (spawnedPerFaction[factionIndex] >= roundSpawnCounts[factionIndex])
                 continue;
 
-            Vector3 spawn = grid.Routes[factionIndex][0];
+            Vector3 spawn = NextRoute(factionIndex)[0];
             foreach (EnemyUnit enemy in enemies)
                 if ((enemy.Position - spawn).sqrMagnitude < UnitSpacing * UnitSpacing)
                     return false;

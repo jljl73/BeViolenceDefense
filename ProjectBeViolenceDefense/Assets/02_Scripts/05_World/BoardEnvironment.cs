@@ -11,6 +11,8 @@ public sealed class BoardEnvironment : MonoBehaviour
     [SerializeField] private Shader particleShader;
     [SerializeField] private Camera viewCamera;
     [SerializeField] private int seed = 11;
+    [SerializeField, Tooltip("보드 크기를 읽을 스테이지. 비우면 기본 17x17")]
+    private StageData stage;
 
     [Header("지면")]
     [SerializeField] private float groundHeight = -0.25f;
@@ -48,12 +50,16 @@ public sealed class BoardEnvironment : MonoBehaviour
 
     private readonly List<Object> created = new();
     private Vector3 center;
+    private float halfBoard;
     private Vector3 toFar;
 
     private void Awake()
     {
         var random = new System.Random(seed);
-        center = new((DefenseGrid.Width - 1) * 0.5f, 0f, (DefenseGrid.Depth - 1) * 0.5f);
+        int width = stage != null ? stage.width : DefenseGrid.DefaultSize;
+        int depth = stage != null ? stage.depth : DefenseGrid.DefaultSize;
+        center = new((width - 1) * 0.5f, 0f, (depth - 1) * 0.5f);
+        halfBoard = Mathf.Max(width, depth) * 0.5f + 0.5f;
         // 카메라 반대쪽(화면 위)과 카메라 쪽(화면 아래)을 구분한다.
         Camera cam = viewCamera != null ? viewCamera : Camera.main;
         toFar = cam != null
@@ -117,7 +123,6 @@ public sealed class BoardEnvironment : MonoBehaviour
         var trees = new GameObject("Trees").transform;
         trees.SetParent(transform, false);
         var placed = new List<Vector2>();
-        float halfBoard = DefenseGrid.Width * 0.5f + 0.5f;
         int attempts = Mathf.CeilToInt(scatterRange * scatterRange * 4f / (treeSpacing * treeSpacing)) * 3;
         for (int i = 0; i < attempts; i++)
         {

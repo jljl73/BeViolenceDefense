@@ -34,8 +34,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private FactionSlot teal;
     [SerializeField, Tooltip("라운드별 편성. 마지막 라운드 다음에는 처음부터 반복한다. 비어 있으면 Coral/Teal 슬롯과 기존 증원 규칙을 쓴다.")]
     private RoundLineup[] rounds = System.Array.Empty<RoundLineup>();
-    [SerializeField, TextArea(17, 17), Tooltip("17줄 x 17칸 글자 맵. 첫 줄이 코어 쪽이고 '#'이 고정 벽이다. 비우면 기본 지형을 쓴다.")]
-    private string boardLayout;
+    [SerializeField, Tooltip("보드 크기·코어·스폰·고정 장애물. Tools/Stage Editor에서 편집한다. 비우면 기본 지형을 쓴다.")]
+    private StageData stage;
 
     [System.Serializable]
     private sealed class SpawnGroup
@@ -93,9 +93,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             return;
         }
 
-        grid = new DefenseGrid(LoadBoardLayout());
+        grid = CreateGrid(out StageData usedStage);
         var factions = new[] { coralFaction, tealFaction };
-        view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme);
+        view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme,
+            usedStage);
         battle = new DefenseBattle(grid, factions, BuildRoundLineup());
         battle.EnemySpawned += view.AddEnemy;
         battle.EnemyRemoved += view.RemoveEnemy;
@@ -103,15 +104,22 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         RefreshPlanningTiles();
     }
 
-    private List<Vector2Int> LoadBoardLayout()
+    private DefenseGrid CreateGrid(out StageData usedStage)
     {
-        if (string.IsNullOrWhiteSpace(boardLayout))
-            return null;
-        if (DefenseGrid.TryParseLayout(boardLayout, out List<Vector2Int> walls, out string error))
-            return walls;
+        usedStage = null;
+        if (stage == null)
+            return new DefenseGrid();
 
-        Debug.LogError($"Board layout is invalid ({error}). Using the default terrain.", this);
-        return null;
+        DefenseGrid stageGrid = stage.CreateGrid();
+        string error = stage.Validate(stageGrid);
+        if (error == null)
+        {
+            usedStage = stage;
+            return stageGrid;
+        }
+
+        Debug.LogError($"Stage '{stage.name}' is invalid ({error}). Using the default terrain.", this);
+        return new DefenseGrid();
     }
 
     // 라운드 편성을 진영(편)별 스폰 순서로 펼친다. 같은 유닛 종류는 한 객체를 공유한다.

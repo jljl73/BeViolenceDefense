@@ -70,6 +70,9 @@ internal sealed class DefenseBoardView
     private readonly IReadOnlyList<EnemyFaction> factions;
     private readonly Sprite routeChevron;
     private readonly HashSet<Vector2Int> spawnCells;
+    private readonly IReadOnlyList<int> spawnFactions;
+    private readonly int boardWidth;
+    private readonly int boardDepth;
     private readonly List<SpriteRenderer> routeMarkers = new();
     private readonly List<Material> materials = new();
     private readonly Dictionary<Material, Material> aimOverlayMaterials = new();
@@ -83,7 +86,7 @@ internal sealed class DefenseBoardView
     private readonly SpellCastMarkers spellCastMarkers;
     private readonly MaterialPropertyBlock enemyTint = new();
     private readonly Dictionary<EnemyFaction, Material> factionMaterials = new();
-    private readonly MeshRenderer[,] floor = new MeshRenderer[DefenseGrid.Width, DefenseGrid.Depth];
+    private readonly MeshRenderer[,] floor;
     private readonly Material[] tiles;
     private readonly Material routeTile;
     private readonly Material encounterTile;
@@ -115,7 +118,7 @@ internal sealed class DefenseBoardView
     public IReadOnlyCollection<Vector2Int> PlannedEncounters { get; private set; } = System.Array.Empty<Vector2Int>();
 
     public DefenseBoardView(Transform root, Camera camera, Shader shader, DefenseGrid grid,
-        IReadOnlyList<EnemyFaction> factions, Sprite routeChevron, BoardTheme theme)
+        IReadOnlyList<EnemyFaction> factions, Sprite routeChevron, BoardTheme theme, StageData stage = null)
     {
         this.root = root;
         this.camera = camera;
@@ -123,6 +126,10 @@ internal sealed class DefenseBoardView
         this.factions = factions;
         this.routeChevron = routeChevron;
         spawnCells = new HashSet<Vector2Int>(grid.SpawnCells);
+        spawnFactions = grid.SpawnFactions;
+        boardWidth = grid.Width;
+        boardDepth = grid.Depth;
+        floor = new MeshRenderer[boardWidth, boardDepth];
         // Aim slightly toward the near corner to leave room for the battle controls.
         Vector3 boardForward = root.InverseTransformDirection(camera.transform.forward);
         cameraFocus = grid.Center - Vector3.ProjectOnPlane(boardForward, Vector3.up).normalized * CameraFocusOffset;
@@ -144,13 +151,13 @@ internal sealed class DefenseBoardView
         Material core = Palette(CoreColor);
 
         Box("Board base", root, grid.Center - Vector3.up * 0.55f,
-            new Vector3(DefenseGrid.Width, 0.6f, DefenseGrid.Depth), foundation);
+            new Vector3(boardWidth, 0.6f, boardDepth), foundation);
         float tileSize = 1f - theme.tileGap;
         var tileScale = new Vector3(tileSize, TileHeight, tileSize);
         Mesh tileMesh = theme.tileBevel > 0f ? Beveled("Board Tile", tileScale, theme.tileBevel) : null;
-        for (int x = 0; x < DefenseGrid.Width; x++)
+        for (int x = 0; x < boardWidth; x++)
         {
-            for (int z = 0; z < DefenseGrid.Depth; z++)
+            for (int z = 0; z < boardDepth; z++)
             {
                 floor[x, z] = Box($"Tile {x},{z}", root, new Vector3(x, -TileHeight * 0.5f, z),
                     tileScale, tiles[(x + z) % tiles.Length], tileMesh).GetComponent<MeshRenderer>();
@@ -160,12 +167,15 @@ internal sealed class DefenseBoardView
         if (theme.borderWidth > 0f)
             CreateBorder(grid, theme);
 
-        foreach (Vector2Int cell in grid.FixedWalls)
-            wallViews.Add(cell, CreateWall(cell, $"Fixed Wall {cell.x},{cell.y}", fixedWall));
+        if (stage != null)
+            CreateObstacles(grid, stage, fixedWall);
+        else
+            foreach (Vector2Int cell in grid.FixedWalls)
+                wallViews.Add(cell, CreateWall(cell, $"Fixed Wall {cell.x},{cell.y}", fixedWall));
 
         for (int i = 0; i < grid.SpawnCells.Count; i++)
         {
-            EnemyFaction faction = factions[i];
+            EnemyFaction faction = factions[spawnFactions[i]];
             Vector3 position = DefenseGrid.CellPosition(grid.SpawnCells[i]);
             var padScale = new Vector3(0.9f, 0.07f, 0.9f);
             Mesh padMesh = theme.tileBevel > 0f ? Beveled("Spawn Pad", padScale, Mathf.Min(theme.tileBevel, 0.03f)) : null;
@@ -202,6 +212,59 @@ internal sealed class DefenseBoardView
         aimDim = CreateAimDim();
     }
 
+    // 장애물 프리팹은 차지한 칸들의 중심에 한 번만 만들고, 각 칸을 같은 Transform으로 등록해 클릭 판정에 쓴다.
+    private void CreateObstacles(DefenseGrid grid, StageData stage, Material fixedWall)
+    {
+        foreach (StageData.Obstacle obstacle in stage.obstacles)
+        {
+            Transform view;
+            if (obstacle.prefab != null)
+            {
+                view = Object.Instantiate(obstacle.prefab, root, false).transform;
+                view.name = $"{obstacle.prefab.name} {obstacle.cell.x},{obstacle.cell.y}";
+                // 자수정 산맥처럼 한 칸 길이로 줄여 임포트한 프리팹도 차지한 칸 길이에 맞춰 균일하게 키운다.
+                int cells = obstacle.rotation % 2 == 0 ? obstacle.size.x : obstacle.size.y;
+                float length = LocalLengthX(view);
+                if (length > 0.01f)
+                    view.localScale *= (cells - (1f - DefenseGrid.WallWidth)) / length;
+                view.SetLocalPositionAndRotation(obstacle.Center, Quaternion.Euler(0f, obstacle.rotation * 90f, 0f));
+            }
+            else
+            {
+                view = null;
+            }
+
+            foreach (Vector2Int cell in obstacle.Footprint.allPositionsWithin)
+            {
+                // grid가 범위 밖·코어·스폰 칸을 버렸으면 표시도 하지 않는다.
+                if (!grid.IsFixedWall(cell) || wallViews.ContainsKey(cell))
+                    continue;
+                wallViews.Add(cell, view != null ? view : CreateWall(cell, $"Fixed Wall {cell.x},{cell.y}", fixedWall));
+            }
+        }
+    }
+
+    // 프리팹 루트 기준 메시 전체의 X 길이 (루트 자신의 스케일 제외).
+    private static float LocalLengthX(Transform model)
+    {
+        float min = float.PositiveInfinity, max = float.NegativeInfinity;
+        foreach (MeshFilter filter in model.GetComponentsInChildren<MeshFilter>())
+        {
+            if (filter.sharedMesh == null)
+                continue;
+            Bounds bounds = filter.sharedMesh.bounds;
+            for (int corner = 0; corner < 8; corner++)
+            {
+                var local = new Vector3(corner & 1, (corner >> 1) & 1, (corner >> 2) & 1);
+                Vector3 point = bounds.min + Vector3.Scale(bounds.size, local);
+                float x = model.InverseTransformPoint(filter.transform.TransformPoint(point)).x;
+                min = Mathf.Min(min, x);
+                max = Mathf.Max(max, x);
+            }
+        }
+        return max > min ? max - min : 0f;
+    }
+
     // 보드 바깥을 두르는 테두리. 칸 안쪽을 침범하지 않아 선택과 경로에 영향이 없다.
     private void CreateBorder(DefenseGrid grid, BoardTheme theme)
     {
@@ -213,11 +276,11 @@ internal sealed class DefenseBoardView
         float bevel = Mathf.Max(theme.tileBevel, 0.04f);
         float y = (top + bottom) * 0.5f;
         Vector3 center = grid.Center;
-        float halfX = DefenseGrid.Width * 0.5f + width * 0.5f;
-        float halfZ = DefenseGrid.Depth * 0.5f + width * 0.5f;
+        float halfX = boardWidth * 0.5f + width * 0.5f;
+        float halfZ = boardDepth * 0.5f + width * 0.5f;
 
-        var longSize = new Vector3(DefenseGrid.Width + width * 2f, height, width);
-        var shortSize = new Vector3(width, height, DefenseGrid.Depth);
+        var longSize = new Vector3(boardWidth + width * 2f, height, width);
+        var shortSize = new Vector3(width, height, boardDepth);
         Mesh longMesh = Beveled("Board Border Long", longSize, bevel);
         Mesh shortMesh = Beveled("Board Border Short", shortSize, bevel);
         Box("Border near", root, new Vector3(center.x, y, center.z - halfZ), longSize, material, longMesh);
@@ -279,14 +342,15 @@ internal sealed class DefenseBoardView
 
     public void FitCamera()
     {
-        float boardScale = Mathf.Max(DefenseGrid.Width, DefenseGrid.Depth) / 12f;
+        float boardScale = Mathf.Max(boardWidth, boardDepth) / 12f;
         camera.orthographicSize = Mathf.Max(9.4f, 9.5f / camera.aspect) * boardScale * viewScale;
     }
 
     public void QueueZoom(float scrollDelta, Vector2 pointer)
     {
         targetViewScale = Mathf.Clamp(targetViewScale * Mathf.Pow(ZoomStep, scrollDelta), MinViewScale, MaxViewScale);
-        zoomAnchorViewport = TryPickCell(pointer, out Vector2Int cell) && DefenseGrid.InBounds(cell)
+        zoomAnchorViewport = TryPickCell(pointer, out Vector2Int cell) &&
+            cell.x >= 0 && cell.x < boardWidth && cell.y >= 0 && cell.y < boardDepth
             ? (Vector2)camera.ScreenToViewportPoint(pointer)
             : null;
     }
@@ -336,8 +400,8 @@ internal sealed class DefenseBoardView
 
     private void MoveCamera(Vector3 offset)
     {
-        cameraFocus.x = ClampPanAxis(cameraFocus.x + offset.x, DefenseGrid.Width - 1f);
-        cameraFocus.z = ClampPanAxis(cameraFocus.z + offset.z, DefenseGrid.Depth - 1f);
+        cameraFocus.x = ClampPanAxis(cameraFocus.x + offset.x, boardWidth - 1f);
+        cameraFocus.z = ClampPanAxis(cameraFocus.z + offset.z, boardDepth - 1f);
         PositionCamera();
     }
 
@@ -354,8 +418,8 @@ internal sealed class DefenseBoardView
         IReadOnlyCollection<Vector2Int> encounters = null)
     {
         PlannedEncounters = encounters ?? System.Array.Empty<Vector2Int>();
-        for (int x = 0; x < DefenseGrid.Width; x++)
-            for (int z = 0; z < DefenseGrid.Depth; z++)
+        for (int x = 0; x < boardWidth; x++)
+            for (int z = 0; z < boardDepth; z++)
                 floor[x, z].sharedMaterial = tiles[(x + z) % tiles.Length];
 
         int markerCount = routes == null ? 0 : DrawRoutes(routes);
@@ -369,6 +433,7 @@ internal sealed class DefenseBoardView
     private int DrawRoutes(IReadOnlyList<Vector3[]> routes)
     {
         var stepsByCell = new Dictionary<Vector2Int, List<(int FactionIndex, Vector3 Direction)>>();
+        // factionIndex는 여기서 스폰(경로) 인덱스이고, 색은 spawnFactions로 찾는다.
         for (int factionIndex = 0; factionIndex < routes.Count; factionIndex++)
         {
             Vector3[] path = routes[factionIndex];
@@ -404,7 +469,7 @@ internal sealed class DefenseBoardView
                 marker.transform.localPosition = center + side * offset;
                 marker.transform.localRotation = Quaternion.LookRotation(Vector3.down,
                     Vector3.Cross(Vector3.down, direction));
-                marker.color = factions[factionIndex].Color;
+                marker.color = factions[spawnFactions[factionIndex]].Color;
                 marker.enabled = true;
             }
         }
@@ -447,8 +512,8 @@ internal sealed class DefenseBoardView
                 return false;
 
         point = ray.GetPoint(distance);
-        return point.x >= -0.5f && point.x < DefenseGrid.Width - 0.5f &&
-            point.z >= -0.5f && point.z < DefenseGrid.Depth - 0.5f;
+        return point.x >= -0.5f && point.x < boardWidth - 0.5f &&
+            point.z >= -0.5f && point.z < boardDepth - 0.5f;
     }
 
     public void ShowAreaSpellPreview(DefenseBattle.Spell? spell, Vector3? center, float radius)
