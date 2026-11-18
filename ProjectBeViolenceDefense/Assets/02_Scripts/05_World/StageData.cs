@@ -67,7 +67,7 @@ public sealed class StageData : ScriptableObject
                 yield return cell;
     }
 
-    public DefenseGrid CreateGrid()
+    public DefenseGrid CreateGrid(float cellSize = 1f)
     {
         var cells = new Vector2Int[spawns.Count];
         var factions = new int[spawns.Count];
@@ -76,7 +76,7 @@ public sealed class StageData : ScriptableObject
             cells[i] = spawns[i].cell;
             factions[i] = spawns[i].faction;
         }
-        return new DefenseGrid(width, depth, core, cells, factions, BlockedCells());
+        return new DefenseGrid(width, depth, core, cells, factions, BlockedCells(), cellSize);
     }
 
     // 게임을 시작할 수 없는 문제. 없으면 null.

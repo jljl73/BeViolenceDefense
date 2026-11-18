@@ -27,6 +27,8 @@ internal sealed class DefenseBattle
     private const float CombatPlanInterval = 0.12f;
     private const float RouteYieldDelay = 0.35f;
     private const int RouteRejoinWaypoints = 3;
+    // 교전 뒤 원래 경로 대신 지금 위치에서 새 경로를 잡으려면 줄어야 하는 최소 거리(칸). 첫 테스트용 임시 값.
+    private const float RerouteMinimumSaving = 2f;
     private const int ReinforcementsPerFaction = 1;
     private const int ExtraReinforcements = 3;
 
@@ -414,8 +416,8 @@ internal sealed class DefenseBattle
             if ((first - second).sqrMagnitude > range * range || !grid.HasLineOfSight(first, second))
                 continue;
 
-            Vector2Int center = DefenseGrid.PositionToCell((first + second) * 0.5f);
-            return (grid.IsWalkable(center) ? center : DefenseGrid.PositionToCell(first), seconds);
+            Vector2Int center = grid.WorldToCell((first + second) * 0.5f);
+            return (grid.IsWalkable(center) ? center : grid.WorldToCell(first), seconds);
         }
     }
 
@@ -703,13 +705,31 @@ internal sealed class DefenseBattle
             enemy.RouteYieldDestination = destination;
     }
 
-    // 교전이 끝나 경로를 벗어난 유닛은 원래 경로로 되돌아가지 않고, 지금 위치에서 코어로 가는
-    // 최단 경로를 새로 잡는다. 원래 경로가 멀리 돌아가는 쪽이면 뺑 돌아 복귀하는 것이 어색하다.
+    // 교전이 끝나 경로를 벗어난 유닛은 원래 경로로 돌아가는 길이 지금 위치에서 코어로 곧장 가는
+    // 최단 경로보다 RerouteMinimumSaving 이상 길면 새 경로를 잡는다. 모두가 새 경로를 잡으면
+    // 같은 진영이 여러 갈래로 갈라져 합류 지점에서 서로 막으므로, 크게 돌아갈 때만 바꾼다.
     private void RerouteFromHere(EnemyUnit enemy)
     {
-        if (enemy.Position.Equals(enemy.RoutePosition))
+        if (enemy.Position.Equals(enemy.RoutePosition) || grid.RouteFrom(enemy.Position) is not { } route)
             return;
-        if (grid.RouteFrom(enemy.Position) is { } route)
+
+        float direct = 0f;
+        for (int i = 1; i < route.Length; i++)
+            direct += Vector3.Distance(route[i - 1], route[i]);
+
+        // 보이는 원래 경로 점 중 가장 짧게 이어지는 곳. 하나도 안 보이면 우회 경로로 돌아가야 한다.
+        float rejoin = float.PositiveInfinity;
+        if (grid.CanPursue(enemy.Position, enemy.RoutePosition))
+            rejoin = Vector3.Distance(enemy.Position, enemy.RoutePosition) +
+                Vector3.Distance(enemy.RoutePosition, enemy.GetRouteWaypoint(0)) + enemy.RouteLengthFrom(0);
+        for (int offset = 0; offset < enemy.RemainingRouteWaypoints - 1; offset++)
+        {
+            Vector3 waypoint = enemy.GetRouteWaypoint(offset);
+            if (grid.CanPursue(enemy.Position, waypoint))
+                rejoin = Mathf.Min(rejoin, Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset));
+        }
+
+        if (rejoin - direct >= RerouteMinimumSaving * grid.CellSize)
             enemy.Reroute(route);
     }
 

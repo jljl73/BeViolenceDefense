@@ -189,3 +189,13 @@ Unity EditMode **58/58 통과**. U자 벽을 10칸 넘게 돌아 같은 적에 �
 | 공격 횟수 | 2,382 | 2,373 |
 
 테스트는 `CoreBlocksDetectionAndAttacksLikeAWall`, `ShootersOnOppositeFacesOfTheCoreWalkInInsteadOfWaitingOnEachOther`, `CrowdArrivingOnBothSidesOfTheCoreFinishes` 세 개를 추가했고, 고치기 전 코드에서는 셋 다 실패한다. 진영당 9~60명 밀집 전투 8개는 고친 뒤에도 모두 끝난다.
+
+## 교전 뒤 현재 위치에서 코어로 — 2026-11-19
+
+교전·추격·도발로 원래 경로에서 멀어진 유닛이 타깃을 잃으면, 원래 경로로 되돌아가느라 코어와 반대쪽으로 크게 돌아가는 경우가 있었다. 벽 틈 너머에서 싸우다 끝나면 틈을 다시 지나 원래 길로 돌아갔다.
+
+- 타깃을 잃은 첫 이동에서 지금 위치부터 코어까지의 최단 칸 경로(`DefenseGrid.RouteFrom`)와, 보이는 원래 경로 점으로 돌아가 그 경로를 따르는 길이를 비교한다. 새 경로가 `RerouteMinimumSaving = 2`칸 이상 짧으면 새 경로로 갈아탄다(`EnemyUnit.Reroute`). 보이는 원래 경로 점이 없으면 항상 갈아탄다.
+- 임시 가정이다. 2칸 기준은 첫 테스트용 값이다.
+- 모든 유닛이 새 경로를 잡게 하면, 같은 진영이 여러 갈래로 갈라져 문 앞 합류 지점에서 서로 막혀 진영당 20~40명 밀집 전투 3개가 끝나지 않았다. 그래서 크게 돌아갈 때만 바꾼다.
+
+테스트는 `RerouteAfterCombatTests` 두 개를 추가했다. Unity EditMode에서 이 둘과 밀집 전투 8개를 포함한 105개 중 104개가 통과했다. 실패한 1개 `StageContentTests.SharedSceneHasOneSelectorWithFourDistinctStageChoices`는 스테이지 선택지 수(4 기대, 5 존재) 검사로 이 변경과 관계없다. 실제 스테이지에서의 체감은 확인하지 않았다.

@@ -1,0 +1,3 @@
+grave 조합 366 {'ok': 294, 'rejected': 72}
+snow 조합 822 {'ok': 704, 'rejected': 118}
+snow 조합 1644 {'ok': 1408, 'rejected': 236}

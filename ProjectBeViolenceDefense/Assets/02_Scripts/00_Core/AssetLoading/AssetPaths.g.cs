@@ -8,21 +8,25 @@ public static class AssetPaths
 {
     public static readonly IReadOnlyList<string> All = new string[]
     {
+        "BuffLightning",
         "Fonts & Materials/Netmarble Medium SDF",
         "GameText.ko",
         "LineBreaking Following Characters",
         "LineBreaking Leading Characters",
         "Meshy_AppIcon_16",
         "Prefabs/WoodBlockWall",
+        "SpellAreaBurst",
         "SpellTargetSilhouette",
         "Style Sheets/Default Style Sheet",
         "TMP Settings",
     };
 
+    public const string BuffLightning = "BuffLightning";
     public const string GameText_ko = "GameText.ko";
     public const string LineBreaking_Following_Characters = "LineBreaking Following Characters";
     public const string LineBreaking_Leading_Characters = "LineBreaking Leading Characters";
     public const string Meshy_AppIcon_16 = "Meshy_AppIcon_16";
+    public const string SpellAreaBurst = "SpellAreaBurst";
     public const string SpellTargetSilhouette = "SpellTargetSilhouette";
     public const string TMP_Settings = "TMP Settings";
 

@@ -1,0 +1,10 @@
+scene=Assets/01_Scenes/03_Test/Stage_GoldenMaple.unity mapScale=2 cellSize=2 board=17x17
+captured 0-preparation
+first fight tick=914 spawn=1 pos=(18.21, 0.00, 12.13) rootLocal=(9.11, 0.00, 6.07) rootScale=0.500
+captured 1-battle
+captured 2-battle-zoom
+wave finished: phase=Preparation tick=2327 core=113 remaining=0 maxViewOffset=0.0000
+captured 3-after-wave
+errors:
+  Exception: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index

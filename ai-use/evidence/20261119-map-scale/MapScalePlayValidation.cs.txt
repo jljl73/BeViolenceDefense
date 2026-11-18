@@ -1,0 +1,184 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+// 검증 복사본 전용. 맵 2배(mapScale) 상태로 실제 씬을 열어 준비·전투 화면을 캡처하고,
+// 유닛 화면 위치·크기가 전투 좌표와 맞는지, 웨이브가 끝나는지 확인한다.
+// 실행: SCALE_SCENE=<씬> SCALE_OUT=<출력 폴더> Unity -batchmode -projectPath <복사본> -executeMethod MapScalePlayValidation.Run
+[InitializeOnLoad]
+internal static class MapScalePlayValidation
+{
+    const string RunningKey = "MapScalePlayValidation.Running";
+    const BindingFlags Any = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+    static VoxelDefensePrototype flow;
+    static DefenseBattle battle;
+    static DefenseBoardView view;
+    static DefenseGrid grid;
+    static Camera camera;
+    static UIManager ui;
+    static int stage, waitFrames;
+    static double started;
+    static float maxOffset;
+    static readonly List<string> errors = new();
+    static readonly List<string> report = new();
+
+    static string Scene => Environment.GetEnvironmentVariable("SCALE_SCENE") ?? "Assets/01_Scenes/02_Gameplay/GameScene.unity";
+    static string Out => Environment.GetEnvironmentVariable("SCALE_OUT") ?? "/tmp/map-scale-validation";
+
+    static MapScalePlayValidation() { EditorApplication.update += Update; }
+
+    public static void Run()
+    {
+        EditorSceneManager.OpenScene(Scene);
+        SessionState.SetBool(RunningKey, true);
+        EditorApplication.EnterPlaymode();
+    }
+
+    static object Field(object owner, string name) => owner.GetType().GetField(name, Any).GetValue(owner);
+    static void Call(string name, params object[] args) =>
+        typeof(VoxelDefensePrototype).GetMethod(name, Any).Invoke(flow, args);
+    static void Check(bool ok, string message) { if (!ok) throw new Exception(message); }
+    static void Log(string line) { report.Add(line); Debug.Log("SCALE_VALIDATION " + line); }
+
+    static void Update()
+    {
+        if (!SessionState.GetBool(RunningKey, false) || !EditorApplication.isPlaying || EditorApplication.isCompiling) return;
+        try
+        {
+            if (waitFrames > 0) { waitFrames--; return; }
+            switch (stage)
+            {
+                case 0: Setup(); break;
+                case 1: WaitForFight(); break;
+                case 2: FinishWave(); break;
+            }
+            if (stage > 0 && EditorApplication.timeSinceStartup - started > 420) throw new Exception($"Timed out at stage {stage}.");
+        }
+        catch (Exception e) { Debug.LogException(e); Finish(1, e.Message); }
+    }
+
+    static void Setup()
+    {
+        flow = UnityEngine.Object.FindFirstObjectByType<VoxelDefensePrototype>();
+        if (flow == null) return;
+        battle = (DefenseBattle)Field(flow, "battle");
+        if (battle == null) return;
+        view = (DefenseBoardView)Field(flow, "view");
+        grid = (DefenseGrid)Field(flow, "grid");
+        camera = (Camera)Field(flow, "boardCamera");
+        ui = (UIManager)Field(flow, "ui");
+        started = EditorApplication.timeSinceStartup;
+        Application.logMessageReceived += (message, stack, type) =>
+        {
+            if (type is LogType.Error or LogType.Exception or LogType.Assert && !message.StartsWith("SCALE_VALIDATION"))
+                errors.Add($"{type}: {message}");
+        };
+        Directory.CreateDirectory(Out);
+        Log($"scene={Scene} mapScale={Field(flow, "mapScale")} cellSize={grid.CellSize} board={grid.Width}x{grid.Depth}");
+        Check(grid.CellSize == 2f, "The grid does not use the doubled map.");
+        Capture("0-preparation", withHud: true);
+        Call("SetBattleSpeed", 3);
+        Call("StartBattle");
+        Check(battle.CurrentPhase == DefenseBattle.Phase.Combat, "The battle did not start.");
+        stage = 1;
+    }
+
+    static void CheckViews()
+    {
+        var views = (IDictionary)Field(view, "enemyViews");
+        foreach (EnemyUnit unit in battle.Enemies)
+        {
+            if (!views.Contains(unit)) continue;
+            var root = (Transform)Field(views[unit], "Root");
+            Vector3 board = view.ToBoard(unit.Position);
+            Vector3 previous = view.ToBoard(unit.PreviousPosition);
+            // 화면은 직전 틱과 현재 틱 사이를 보간하므로 그 선분까지의 거리로 본다.
+            Vector3 segment = board - previous;
+            float t = segment.sqrMagnitude > 0f ? Mathf.Clamp01(Vector3.Dot(root.localPosition - previous, segment) / segment.sqrMagnitude) : 0f;
+            maxOffset = Mathf.Max(maxOffset, Vector3.Distance(root.localPosition, previous + segment * t));
+        }
+    }
+
+    static void WaitForFight()
+    {
+        CheckViews();
+        if (battle.CurrentPhase != DefenseBattle.Phase.Combat) throw new Exception("The wave ended before any fight.");
+        EnemyUnit fighter = battle.Enemies.FirstOrDefault(unit => unit.AttacksPerformed > 0 && unit.Target != null);
+        if (fighter == null) return;
+        var views = (IDictionary)Field(view, "enemyViews");
+        var root = (Transform)Field(views[fighter], "Root");
+        Log($"first fight tick={battle.TickIndex} spawn={fighter.SpawnOrder} pos={fighter.Position:F2} rootLocal={root.localPosition:F2} rootScale={root.localScale.x:F3}");
+        Capture("1-battle", withHud: true);
+        Capture("2-battle-zoom", withHud: false, focus: root.localPosition);
+        stage = 2;
+    }
+
+    static void FinishWave()
+    {
+        CheckViews();
+        if (battle.CurrentPhase == DefenseBattle.Phase.Combat) return;
+        Log($"wave finished: phase={battle.CurrentPhase} tick={battle.TickIndex} core={battle.CoreHealth} remaining={battle.Enemies.Count} maxViewOffset={maxOffset:F4}");
+        Check(maxOffset < 0.05f, "A unit view drifted away from its battle position.");
+        Capture("3-after-wave", withHud: true);
+        Finish(0, null);
+    }
+
+    static void Capture(string name, bool withHud, Vector3? focus = null)
+    {
+        Vector3 oldPosition = camera.transform.position;
+        float oldSize = camera.orthographicSize;
+        if (focus is { } point)
+        {
+            camera.transform.position = flow.transform.TransformPoint(point) - camera.transform.forward * 20f;
+            camera.orthographicSize = 2.6f;
+        }
+        const int width = 1600, height = 900;
+        var rt = new RenderTexture(width, height, 24);
+        RenderTexture previous = camera.targetTexture, active = RenderTexture.active;
+        Canvas canvas = ui.GetComponent<Canvas>();
+        RenderMode mode = canvas.renderMode;
+        Camera canvasCamera = canvas.worldCamera;
+        float plane = canvas.planeDistance;
+        camera.targetTexture = rt;
+        if (withHud)
+        {
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.worldCamera = camera;
+            canvas.planeDistance = camera.nearClipPlane + 0.5f;
+            Canvas.ForceUpdateCanvases();
+        }
+        camera.Render();
+        RenderTexture.active = rt;
+        var texture = new Texture2D(width, height, TextureFormat.RGB24, false);
+        texture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        texture.Apply();
+        File.WriteAllBytes(Path.Combine(Out, name + ".png"), texture.EncodeToPNG());
+        canvas.renderMode = mode;
+        canvas.worldCamera = canvasCamera;
+        canvas.planeDistance = plane;
+        camera.targetTexture = previous;
+        RenderTexture.active = active;
+        camera.transform.position = oldPosition;
+        camera.orthographicSize = oldSize;
+        UnityEngine.Object.Destroy(texture);
+        rt.Release();
+        UnityEngine.Object.Destroy(rt);
+        Log("captured " + name);
+    }
+
+    static void Finish(int code, string failure)
+    {
+        if (failure != null) report.Add("FAIL: " + failure);
+        report.Add(errors.Count == 0 ? "errors: none" : "errors:\n  " + string.Join("\n  ", errors));
+        try { Directory.CreateDirectory(Out); File.WriteAllLines(Path.Combine(Out, "summary.txt"), report); } catch { }
+        SessionState.SetBool(RunningKey, false);
+        EditorApplication.Exit(code);
+    }
+}

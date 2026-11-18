@@ -1,0 +1,5 @@
+Unity 6000.3.28f1 CLI, /tmp/be-buff-lightning-validation, exit code 0.
+Runner: ../20261119-buff-lightning/BuffLightningValidation.cs.txt
+Changed height from max(1.8, 3.2 * scale) to max(18, 32 * scale).
+BUFF_LIGHTNING_PLAY_PASS actual queued cast, three recipients/five colors, taunt target only, pause, moving/removed target, expiry, 128-bolt pool, cleanup, shader compilation
+Startup UnityEditor.Search.SearchDatabase exception observed; runtime validation passed.

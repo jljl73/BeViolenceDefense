@@ -57,6 +57,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [Tooltip("선택. 연결하면 패배했을 때 기본 팝업 대신 주인공 그림이 있는 패배 패널을 띄운다.")]
     [SerializeField] private VictoryPanelHud defeatPanel;
     [SerializeField] private BoardTheme boardTheme = new();
+    [Tooltip("맵 크기 실험. 유닛(몸통·사거리·속도)은 그대로 두고 벽·길·코어 등 맵을 이 배율로 키운다. 1이 원래 크기.")]
+    [SerializeField, Min(0.5f)] private float mapScale = 2f;
     // 진영 = 종족. 순서는 EnemyFactionGroup 과 같다.
     [SerializeField, FormerlySerializedAs("coral")]
     private FactionSlot greenHorde = new("faction.goblin", StageData.FactionColors[0]);
@@ -169,7 +171,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (defeatPanel != null)
             defeatPanel.Bind(next: Restart, retry: null);     // 패배 패널의 주 버튼이 다시 하기다
         if (stageAmbience != null)
-            battle.EnemyRemoved += enemy => stageAmbience.Burst(transform.TransformPoint(enemy.Position));
+            battle.EnemyRemoved += enemy => stageAmbience.Burst(transform.TransformPoint(view.ToBoard(enemy.Position)));
         if (battleInfoHud != null)
         {
             hud.UseExternalBattleInfo();
@@ -190,9 +192,9 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     {
         usedStage = null;
         if (stage == null)
-            return new DefenseGrid();
+            return new DefenseGrid(mapScale);
 
-        DefenseGrid stageGrid = stage.CreateGrid();
+        DefenseGrid stageGrid = stage.CreateGrid(mapScale);
         string error = stage.Validate(stageGrid);
         if (error == null)
         {
@@ -201,7 +203,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         }
 
         Debug.LogError($"Stage '{stage.name}' is invalid ({error}). Using the default terrain.", this);
-        return new DefenseGrid();
+        return new DefenseGrid(mapScale);
     }
 
     // 스테이지의 웨이브 편성. 없거나 잘못되었으면 null(기존 증원 규칙으로 끝없이 진행).
@@ -565,7 +567,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             if (path != null)
                 for (int i = 0; i < path.Length - 1; i++)   // 마지막 점은 코어 접점이라 칸이 아니다
                 {
-                    Vector2Int cell = DefenseGrid.PositionToCell(path[i]);
+                    Vector2Int cell = grid.WorldToCell(path[i]);
                     if (routeCellScratch.Add(cell) && !shownRouteCells.Contains(cell))
                         changedRouteCells.Add(cell);
                 }

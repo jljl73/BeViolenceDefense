@@ -1,0 +1,21 @@
+Unity 6000.3.28f1, 프로젝트 복사본(세션 임시 폴더)에서 batchmode 실행. 실행 전 복사본의 Library/ilpp.pid 삭제.
+
+[EditMode] 작업 트리 = 커밋 efbd3e0 + 스테이징된 재경로 수정 + StageContentTests 수정
+  1차: 105개 중 104 통과, 실패 1 = StageContentTests.SharedSceneHasOneSelectorWithFourDistinctStageChoices (Expected: 4 But was: 5)
+  2차(선택지 수 검사를 5개로 고친 뒤): 105개 중 105 통과
+  StageContentTests.SnowfieldAndGraveyardLayoutsKeepTheSceneryFrameAndLengthenRoutesWhenTheirGatesAreWalled("Snowfield",45,18,"2,11 14,11",19,"0,7 1,7 15,7 16,7",25)  Passed
+  StageContentTests.SnowfieldAndGraveyardLayoutsKeepTheSceneryFrameAndLengthenRoutesWhenTheirGatesAreWalled("Graveyard",41,16,"4,12 5,12 11,12 12,12",17,"4,6 5,6 11,6 12,6",21)  Passed
+
+[EditMode] 그보다 앞선 작업 트리(재경로 변경 첫 판이 미커밋으로 있던 시점)
+  105개 중 100 통과, 실패 5 = CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration (20,True)/(40,False)/(40,True),
+  RerouteAfterCombatTests.RouteFromStartsHereAndStepsOnlyThroughOpenCells, StageContentTests.SharedSceneHasOneSelectorWithFourDistinctStageChoices
+  (앞의 4개는 다른 작업의 진행 중 변경에서 나온 실패이며 이후 판에서 통과)
+
+[Play Mode] GameScene, StagePlayValidation.cs.txt (-executeMethod, 화면 캡처 때문에 -nographics 없이)
+  STAGE_PLAY_SELECT 2 -> STAGE_PLAY_PASS stage=Stage_Snowfield walls=45 ticks=600 units=10   (경로 18/18, 준비 단계 확인 후 전투 시작)
+  STAGE_PLAY_SELECT 3 -> STAGE_PLAY_PASS stage=Stage_Graveyard walls=41 ticks=600 units=10   (경로 16/16)
+  선택은 StageSelectionController.SelectStage를 직접 불렀다. 선택 카드 클릭과 잠금 상태는 거치지 않았다.
+  로그의 ArgumentOutOfRangeException 1건은 UnityEditor.Search.SearchDatabase 시작 색인에서 난 것으로 게임 코드와 무관.
+  첫 시도는 실패: 실행 스크립트가 복사본에서 SpellAreaBurst.shader를 지워 SpellEffects 생성자에서 ArgumentNullException. 복사본을 다시 맞춘 뒤 통과.
+
+원본 Library/ilpp.pid의 PID 16176은 실행 전후 모두 살아 있지 않았다(다른 세션 기록에도 같은 관찰).

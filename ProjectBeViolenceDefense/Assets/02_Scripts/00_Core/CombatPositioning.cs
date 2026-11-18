@@ -608,7 +608,7 @@ internal sealed class CombatPositioning
     {
         if (slot < 0 || RequiredSpacing(enemy.Faction, target.Faction) > enemy.Faction.AttackRange) return false;
         Vector3 point = SlotPosition(enemy, target, slot);
-        if (!grid.IsWalkable(DefenseGrid.PositionToCell(point)) || !grid.HasLineOfSight(point, target.Position) ||
+        if (!grid.IsWalkable(grid.WorldToCell(point)) || !grid.HasLineOfSight(point, target.Position) ||
             !ClearOfUnits(enemy, target, point, target.Position, attacking: true)) return false;
         if (reservedSlots.TryGetValue(target, out var reservation) &&
             (reservation.Count >= MaxAttackersPerTarget || (reservation.Mask & (1 << slot)) != 0)) return false;
@@ -691,7 +691,7 @@ internal sealed class CombatPositioning
     }
 
     private bool CanTraversePath(EnemyUnit enemy, Vector3 from, Vector3 to) =>
-        grid.IsWalkable(DefenseGrid.PositionToCell(to)) && grid.CanPursue(from, to) &&
+        grid.IsWalkable(grid.WorldToCell(to)) && grid.CanPursue(from, to) &&
         ClearOfUnits(enemy, null, from, to, attacking: false);
 
     private void PursueLastKnownPosition(EnemyUnit enemy, EnemyUnit target)
@@ -719,7 +719,7 @@ internal sealed class CombatPositioning
         foreach (Vector3 direction in Directions)
         {
             Vector3 point = goal + direction * (enemy.Faction.AttackRange * 0.85f);
-            if (grid.IsWalkable(DefenseGrid.PositionToCell(point)) && grid.HasLineOfSight(point, goal))
+            if (grid.IsWalkable(grid.WorldToCell(point)) && grid.HasLineOfSight(point, goal))
                 pathGoals.Add(point);
         }
         if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _))
@@ -756,7 +756,7 @@ internal sealed class CombatPositioning
             for (int slot = 0; slot < SlotCount; slot++)
             {
                 Vector3 point = SlotPosition(enemy, target, slot);
-                if (grid.IsWalkable(DefenseGrid.PositionToCell(point)) && grid.HasLineOfSight(point, target.Position))
+                if (grid.IsWalkable(grid.WorldToCell(point)) && grid.HasLineOfSight(point, target.Position))
                     pathGoals.Add(point);
             }
         // A temporary crowd is not an unreachable target. Only reject if even a
@@ -908,8 +908,8 @@ internal sealed class CombatPositioning
             Mathf.Max(enemy.Faction.AttackRange * 0.85f, RequiredSpacing(enemy.Faction, target.Faction) + 0.02f));
 
     private bool CanMove(EnemyUnit enemy, EnemyUnit target, Vector3 from, Vector3 to) =>
-        grid.IsWalkable(DefenseGrid.PositionToCell(from)) &&
-        grid.IsWalkable(DefenseGrid.PositionToCell(to)) &&
+        grid.IsWalkable(grid.WorldToCell(from)) &&
+        grid.IsWalkable(grid.WorldToCell(to)) &&
         ClearOfUnits(enemy, target, from, to, attacking: false) &&
         grid.CanPursue(from, to) &&
         (target != null || HasRouteConnection(enemy, to));
@@ -964,6 +964,9 @@ internal sealed class CombatPositioning
         private int version = -1;
         private bool ignoreUnits;
 
+        // 칸 절반 간격. 칸 한 변이 바뀌어도 칸당 노드 수는 같다.
+        private float Spacing => owner.grid.CellSize * 0.5f;
+
         public PursuitPathfinder(CombatPositioning owner)
         {
             this.owner = owner;
@@ -973,7 +976,7 @@ internal sealed class CombatPositioning
             points = new Vector3[count]; edges = new byte[count]; costs = new float[count];
             parents = new int[count]; closed = new bool[count];
             for (int z = 0; z < depth; z++)
-                for (int x = 0; x < width; x++) points[z * width + x] = new Vector3(x * 0.5f, 0, z * 0.5f);
+                for (int x = 0; x < width; x++) points[z * width + x] = new Vector3(x, 0, z) * Spacing;
         }
 
         private void RefreshEdges()
@@ -983,13 +986,13 @@ internal sealed class CombatPositioning
             for (int i = 0; i < points.Length; i++)
             {
                 edges[i] = 0;
-                if (!owner.grid.IsWalkable(DefenseGrid.PositionToCell(points[i]))) continue;
+                if (!owner.grid.IsWalkable(owner.grid.WorldToCell(points[i]))) continue;
                 for (int d = 0; d < 8; d++)
                 {
                     int x = i % width + Dx[d], z = i / width + Dz[d];
                     if (x < 0 || z < 0 || x >= width || z >= depth) continue;
                     int next = z * width + x;
-                    if (owner.grid.IsWalkable(DefenseGrid.PositionToCell(points[next])) &&
+                    if (owner.grid.IsWalkable(owner.grid.WorldToCell(points[next])) &&
                         owner.grid.CanPursue(points[i], points[next])) edges[i] |= (byte)(1 << d);
                 }
             }
@@ -1005,7 +1008,7 @@ internal sealed class CombatPositioning
             RefreshEdges();
             open.Clear();
             for (int i = 0; i < costs.Length; i++) { costs[i] = float.PositiveInfinity; parents[i] = -1; closed[i] = false; }
-            int sx = Mathf.RoundToInt(enemy.Position.x * 2f), sz = Mathf.RoundToInt(enemy.Position.z * 2f);
+            int sx = Mathf.RoundToInt(enemy.Position.x / Spacing), sz = Mathf.RoundToInt(enemy.Position.z / Spacing);
             for (int z = Mathf.Max(0, sz - 1); z <= Mathf.Min(depth - 1, sz + 1); z++)
                 for (int x = Mathf.Max(0, sx - 1); x <= Mathf.Min(width - 1, sx + 1); x++)
                 {
@@ -1031,14 +1034,14 @@ internal sealed class CombatPositioning
                 for (int g = 0; strikeTarget == null && g < goals.Count; g++)
                 {
                     float distance = Vector3.Distance(points[i], goals[g]);
-                    if (distance > 1f || costs[i] + distance >= best || !Clear(enemy, points[i], goals[g])) continue;
+                    if (distance > Spacing * 2f || costs[i] + distance >= best || !Clear(enemy, points[i], goals[g])) continue;
                     best = costs[i] + distance; end = i; goalIndex = g;
                 }
                 for (int d = 0; d < 8; d++)
                 {
                     if ((edges[i] & (1 << d)) == 0) continue;
                     int next = i + Dz[d] * width + Dx[d];
-                    float cost = costs[i] + (d % 2 == 0 ? 0.5f : 0.70710678f);
+                    float cost = costs[i] + Spacing * (d % 2 == 0 ? 1f : 1.41421356f);
                     if (closed[next] || cost >= costs[next] ||
                         (!ignoreUnits && !owner.ClearOfUnits(enemy, null, points[i], points[next], attacking: false))) continue;
                     costs[next] = cost; parents[next] = i;
@@ -1054,7 +1057,7 @@ internal sealed class CombatPositioning
         }
 
         private bool Clear(EnemyUnit enemy, Vector3 from, Vector3 to) =>
-            owner.grid.IsWalkable(DefenseGrid.PositionToCell(to)) && owner.grid.CanPursue(from, to) &&
+            owner.grid.IsWalkable(owner.grid.WorldToCell(to)) && owner.grid.CanPursue(from, to) &&
             (ignoreUnits || owner.ClearOfUnits(enemy, null, from, to, attacking: false));
 
         private static float Heuristic(Vector3 point, IReadOnlyList<Vector3> goals)
