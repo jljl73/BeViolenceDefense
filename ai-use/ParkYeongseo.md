@@ -80,3 +80,58 @@
 
 #### 증거
 - 없음
+
+### [20261118-enemies-armor-zombie-werewolf] 리빙 아머·좀비·늑대인간 3D 유닛
+- 시각: 2026-11-18 17:50:00 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Opus 5.5) / NovelAI Diffusion V5 / OpenAI Images API (gpt-image-2.6-sunburst) / Meshy API / Unity CLI + Pipeline (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 적 3종 추가, `Assets/Art/Enemies/LivingArmor`, `Zombie`, `Werewolf`
+- 사용 방식: `unit-3d-pipeline` 스킬 절차대로 NAI 컨셉 3장씩 생성 → 사용자 선택(1·2·1번) → GPT 4면 시트 → Meshy 1.5k 메시·리깅·동작(공격 4, 피격 179, 쓰러짐 189) → Unity 임포트. Meshy 단계는 Claude 하위 에이전트(Haiku)가 실행·감시
+- 결과 및 확인 방법: 성공. headless Blender 6방향 렌더로 메시 확인(삼각형 1,546·1,506·1,557), Unity에서 X 55° 직교 카메라(AGENTS.md 테스트 카메라) 확인 씬을 Play Mode로 재생해 스크린샷 확인, 콘솔 오류 0
+- 사람의 개입: 컨셉 선택
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `ProjectBeViolenceDefense/Assets/Art/Enemies/{LivingArmor,Zombie,Werewolf}/` (Walk·Combat FBX, Color PNG, .mat, .controller) | Meshy, Claude Code+Unity CLI | 생성 | 사용 후보 |
+| `Art Prompts/[Enemies] 01_Enemies.txt` 1-D·1-E·1-F 섹션 | Claude Code | 수정 | 프롬프트 추가 |
+| `Assets/Scenes/Test_Enemies3.unity`, 각 `Preview/` 컨트롤러 | Claude Code+Unity CLI | 생성 | 확인용, .gitignore로 제외 |
+
+#### 증거
+- 없음
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 3종 임포트 설정·머티리얼·애니메이터 생성, 55° 직교 카메라 확인 씬 생성과 Play Mode 캡처
+- 활용 방식: 스킬의 `unity_setup_unit.cs`를 `script eval`로 실행, Play Mode 진입 후 `job wait`로 프레임 진행 확인
+- 잘된 점: 세 유닛이 같은 스크립트로 한 번에 설정됨
+- 잘 안된 점 및 개선 필요: 확인 씬 스크립트 수정 실수로 두 줄이 겹쳐 배치됨 → 위치 확인 후 수정
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 실제 게임 씬 카메라 크기에서의 가독성, 리빙 아머 왼쪽 옆모습은 GPT 4면에서 칼이 빠져 있었음(메시에는 칼 있음)
+
+### [20261118-armor-sword-zombie-bald] 리빙 아머 칼 분리·교체, 좀비 민머리 재작업
+- 시각: 2026-11-18 18:10:00 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Opus 5.5) / NovelAI Diffusion V5 / OpenAI Images API (gpt-image-2.6-sunburst) / Meshy API / Codex CLI 0.170.0 + Blender MCP / Unity CLI + Pipeline
+- 목적 및 적용 위치: 리빙 아머 칼을 별도 소품으로 바꾸고, 좀비를 위에서 좀비로 읽히게 민머리로 변경. `Assets/Art/Enemies/LivingArmor`, `Assets/Art/Enemies/Zombie`
+- 사용 방식: 칼은 NAI 원화 3장 → 1번 선택(Claude Code) → Meshy 500 메시 → Codex가 Blender에서 몸에 붙은 칼 면 61개 삭제·새 칼을 RightHand 뼈에 부착·동작별 손목 보정 → Claude Code가 Unity에서 칼의 비균일 스케일을 균일하게 수정해 프리팹 생성. 좀비는 확정된 GPT 4면 시트를 Images API로 "머리만 변경" 편집 → Meshy 메시·리깅·동작 → Unity 기존 파일 덮어쓰기(GUID 유지)
+- 결과 및 확인 방법: 성공. headless Blender 렌더, Codex 확인 캡처(옆·55° 직교, 바닥선), Unity 55° 직교 확인 씬 Play Mode 캡처, 콘솔 오류 0
+- 사람의 개입: 칼 재생성·좀비 머리 제거 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `ProjectBeViolenceDefense/Assets/Art/Enemies/LivingArmor/` (`LivingArmor_WithSword.fbx`, `LivingArmor_Sword_Color.png`, `LivingArmor_Sword.mat`, `LivingArmor.controller`, `LivingArmor.prefab`) | Meshy, Codex+Blender, Claude Code+Unity CLI | 생성·수정 | 칼 분리 버전. 프리팹이 최종 사용 후보(칼 스케일 균일화 포함) |
+| `ProjectBeViolenceDefense/Assets/Art/Enemies/Zombie/` (`Zombie_Walk.fbx`, `Zombie_Combat.fbx`, `Zombie_Color.png`) | OpenAI Images API, Meshy, Claude Code | 수정 | 모자·머리카락 제거한 민머리 좀비로 교체 |
+| `Art Prompts/[Props] 03_Weapons.txt` 2-A | Claude Code | 수정 | 브로드소드 프롬프트 |
+
+#### 증거
+- 없음
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex CLI(Blender 작업 1건), Images API(좀비 4면 시트 편집 1건)
+- 사용 방식: Claude Code가 요청서 작성·실행 후 캡처 검수
+- 특별히 활용한 점: 확정된 4면 시트에서 머리만 바꾸는 편집으로 나머지 디자인 유지
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Codex가 칼을 비균일 스케일로 붙여 Unity 프리팹에서 보정함(원본 FBX는 비균일 상태). 칼 손잡이 위치가 손바닥과 정확히 맞는지는 근접 확인 필요
