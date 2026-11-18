@@ -23,7 +23,6 @@ internal sealed class DefenseBoardView
     public static readonly Color32 CoreColor = new(255, 209, 112, 255);
     public static readonly Color32 MoveSpeedBuffColor = new(102, 218, 255, 255);
     public static readonly Color32 HealColor = new(153, 245, 160, 255);
-    private static readonly Color32 FixedWallTint = new(130, 130, 140, 255);
 
     private sealed class EnemyView
     {
@@ -48,6 +47,7 @@ internal sealed class DefenseBoardView
     private readonly Material encounterTile;
     private readonly Material buildWall;
     private readonly Material trim;
+    private readonly Color fixedWallTint;
     private readonly Material attackBuffPreviewMaterial;
     private readonly Material moveSpeedBuffPreviewMaterial;
     private readonly MeshRenderer areaBuffPreview;
@@ -60,7 +60,7 @@ internal sealed class DefenseBoardView
     public IReadOnlyCollection<Vector2Int> PlannedEncounters { get; private set; } = System.Array.Empty<Vector2Int>();
 
     public DefenseBoardView(Transform root, Camera camera, Shader shader, DefenseGrid grid,
-        IReadOnlyList<EnemyFaction> factions, Sprite routeChevron)
+        IReadOnlyList<EnemyFaction> factions, Sprite routeChevron, BoardTheme theme)
     {
         this.root = root;
         this.camera = camera;
@@ -74,20 +74,17 @@ internal sealed class DefenseBoardView
         PositionCamera();
         camera.orthographic = true;
         camera.clearFlags = CameraClearFlags.SolidColor;
-        camera.backgroundColor = UIPalette.Background;
+        camera.backgroundColor = theme.background;
         FitCamera();
 
-        Material foundation = Palette(new Color32(40, 54, 69, 255));
-        tiles = new[]
-        {
-            Palette(new Color32(72, 91, 101, 255)),
-            Palette(new Color32(81, 101, 107, 255))
-        };
-        routeTile = Palette(new Color32(104, 130, 130, 255));
-        encounterTile = Palette(new Color32(221, 151, 76, 255));
-        buildWall = Palette(new Color32(112, 143, 182, 255));
-        Material fixedWall = Palette(new Color32(97, 120, 136, 255));
-        trim = Palette(new Color32(178, 198, 199, 255));
+        Material foundation = Palette(theme.foundation);
+        tiles = new[] { Palette(theme.tileA), Palette(theme.tileB) };
+        routeTile = Palette(theme.routeTile);
+        encounterTile = Palette(theme.encounterTile);
+        buildWall = Palette(theme.buildWall);
+        Material fixedWall = Palette(theme.fixedWall);
+        trim = Palette(theme.trim);
+        fixedWallTint = theme.fixedWallTint;
         Material core = Palette(CoreColor);
 
         Box("Board base", root, grid.Center - Vector3.up * 0.55f,
@@ -447,7 +444,7 @@ internal sealed class DefenseBoardView
             if (material != buildWall)
             {
                 var block = new MaterialPropertyBlock();
-                block.SetColor("_BaseColor", FixedWallTint);
+                block.SetColor("_BaseColor", fixedWallTint);
                 foreach (Renderer renderer in woodWall.GetComponentsInChildren<Renderer>())
                     renderer.SetPropertyBlock(block);
             }

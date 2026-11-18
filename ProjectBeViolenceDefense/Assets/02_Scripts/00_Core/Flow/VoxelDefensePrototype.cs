@@ -10,6 +10,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private Texture2D encounterIcon;
     [SerializeField] private Sprite routeChevron;
     [SerializeField] private DefenseHud.Art hudArt = new();
+    [SerializeField] private BoardTheme boardTheme = new();
     [SerializeField] private EnemyFaction coral = new("Coral", new Color32(255, 115, 87, 255), 0.9f);
     [SerializeField] private EnemyFaction teal = new("Teal", new Color32(69, 222, 206, 255), 0.9f);
 
@@ -25,7 +26,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     {
         grid = new DefenseGrid();
         var factions = new[] { coral, teal };
-        view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron);
+        view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme);
         battle = new DefenseBattle(grid, factions);
         battle.EnemySpawned += view.AddEnemy;
         battle.EnemyRemoved += RemoveEnemy;
