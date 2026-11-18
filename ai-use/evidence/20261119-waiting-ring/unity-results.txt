@@ -1,0 +1,14 @@
+Unity 6000.3.28f1 EditMode, 프로젝트 복사본(세션 임시 폴더). 실행 전 복사본의 Library/ilpp.pid 삭제.
+
+[최종 코드] testcasecount="114" result="Passed" total="114" passed="114" failed="0"
+
+[이번 수정 전 전투 코드 + 새 테스트] testcasecount="114" result="Failed(Child)" total="114" passed="113" failed="1"
+  FAILED CombatPositioningTests.WaitingUnitWalksUpBehindTheFightInsteadOfStandingFarAway
+
+[대기선까지 다가가기만 넣은 중간판 + 새 테스트] testcasecount="114" result="Failed(Child)" total="114" passed="112" failed="2"
+  FAILED CombatPositioningTests.FirstWaveRearUnitsDoNotRepeatedlyReverseWhileWithoutTarget
+  FAILED CombatPositioningTests.UnitsWaitingOnOpponentsNobodyFightsGiveUpInsteadOfFreezing
+
+[처음 실행: 다가가기 + 싸움 없는 대기 포기, 복귀 수정 전] 112개 중 111 통과, 실패 = FirstWaveRearUnitsDoNotRepeatedlyReverseWhileWithoutTarget (Expected <= 2, was 3)
+
+스테이지 관련 실패 2개는 이 실행들에서 사라졌다. 다른 작업이 Stage_GoldenMaple.prefab의 지형 참조를 Stage2_Temp.asset으로 바꿨다.

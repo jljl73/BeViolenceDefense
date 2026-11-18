@@ -1,0 +1,575 @@
+diff --git a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
+index 8f93c3a..528d4c8 100644
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
+@@ -9,6 +9,10 @@ internal sealed class CombatPositioning
+     internal const float LostTargetSearchDuration = 4f;
+     // 보이지 않는 적을 쫓다가 이 시간 동안 조금도 가까워지지 못하면 추격을 그만두고 원래 경로로 돌아간다.
+     internal const float HiddenPursuitStallLimit = 2f;
++    // 적에게 가는 길이 직선 거리보다 이 칸 수 넘게 길면 돌아가지 않는다. 길은 있는데 유닛에 막힌
++    // 경우에는 뒤에서 기다리고, 지형 때문에 이만큼 돌아야 하는 적은 그 자리에서는 상대하지 않는다.
++    // 첫 테스트용 임시 값.
++    internal const float MaxPursuitDetour = 3f;
+     // 옆걸음 직후 이 시간 동안은 방금 온 쪽으로 되돌아가는 옆걸음을 고르지 않는다.
+     internal const float SidestepMemoryDuration = 2.5f;
+     // 스스로 다른 적으로 바꾼 뒤 이 시간 동안은 다시 바꾸지 않는다.
+@@ -16,6 +20,13 @@ internal sealed class CombatPositioning
+     // 경로 밖에서 막힌 유닛이 이 여유 안으로 붙어 있는 유닛에게서 한 걸음 비켜선다.
+     private const float StepAsideMargin = 0.15f;
+     private const float StepAsideDistance = 0.4f;
++    // 대기선보다 이만큼 넘게 멀 때만 다가간다. 대기선 근처에서 조금씩 움직이지 않게 한다.
++    private const float WaitingRingSlack = 0.3f;
++    // 뒤에서 기다리는 것은 싸움이 벌어지는 동안만이다. 기다리는 적이 이 시간 동안 누구와도 싸우지
++    // 않으면 대기를 그만두고, 그 뒤 DisengageDuration 동안은 지금 자리에서 때릴 수 있는 적만 상대한다.
++    // 서로 다른 적을 기다리는 유닛들이 원을 이뤄 영영 멈추는 것을 막는다. 첫 테스트용 임시 값.
++    internal const float IdleQueueLimit = 2f;
++    internal const float DisengageDuration = 2f;
+     private const float ApproachProgressThreshold = 0.05f;
+     private const int CurrentPositionSlot = -2;
+     // 여덟 공격 자리가 아닌, 사거리 안에서 때릴 수 있는 임의 지점으로 가는 중.
+@@ -44,6 +55,8 @@ internal sealed class CombatPositioning
+     private readonly List<(Vector3 Position, float Radius)> reservedPositions = new();
+     private readonly HashSet<EnemyUnit> alertedUnits = new();
+     private readonly List<EnemyUnit> activeFighters = new();
++    // 지난 계획 때 실제로 때리고 있던 유닛과 맞고 있던 유닛.
++    private readonly HashSet<EnemyUnit> foughtUnits = new();
+     private int nextQueueOrder;
+     private int plannedEnemyCount;
+     private readonly PursuitPathfinder pathfinder;
+@@ -199,6 +212,13 @@ internal sealed class CombatPositioning
+                 enemy.CombatQueue = null; RememberTarget(enemy, null);
+                 continue;
+             }
++            if (enemy.IdleQueueTime >= IdleQueueLimit)
++            {
++                enemy.CombatQueue = null; RememberTarget(enemy, null);
++                enemy.IdleQueueTime = 0f;
++                enemy.DisengageRemaining = DisengageDuration;
++                continue;
++            }
+             if (queueTarget != null)
+                 QueueBehindFight(enemy, queueTarget);
+             else
+@@ -210,6 +230,10 @@ internal sealed class CombatPositioning
+     // erase the time already spent stuck. Cooldown while in striking position is not a stall.
+     public void TrackApproachProgress(EnemyUnit enemy, float deltaTime)
+     {
++        if (enemy.Target == null && enemy.CombatQueue is { } waitingFor && !foughtUnits.Contains(waitingFor.Target))
++            enemy.IdleQueueTime += deltaTime;
++        else
++            enemy.IdleQueueTime = 0f;
+         if (enemy.PursuitTarget is { IsAlive: true } remembered &&
+             !grid.HasLineOfSight(enemy.Position, remembered.Position) &&
+             Vector3.Distance(enemy.Position, enemy.LastKnownTargetPosition) <= enemy.Faction.AttackRange &&
+@@ -364,6 +388,16 @@ internal sealed class CombatPositioning
+         if (enemy.CombatDestination is not { } destination)
+             return;
+ 
++        // 자리 없이 기다리는 유닛은 대기선까지 곧장 걷기만 한다. 막히면 그 자리에 서고, 옆걸음이나
++        // 우회로 비집고 들어가지 않는다.
++        if (enemy.Target == null)
++        {
++            Vector3 closer = enemy.StepToward(destination, deltaTime);
++            if (CanMove(enemy, target, enemy.Position, closer))
++                enemy.MoveOffRoute(closer);
++            return;
++        }
++
+         if (TryUsePath(enemy, target, out Vector3 pathWaypoint, out float pathLength))
+         {
+             destination = pathWaypoint;
+@@ -413,12 +447,15 @@ internal sealed class CombatPositioning
+             (grid.HasLineOfSight(enemy.Position, target.Position) || enemy.LostTargetSearchTime < LostTargetSearchDuration))
+             return target;
+ 
++        // 싸움 없는 대기를 막 그만둔 유닛은 잠시 지금 자리에서 때릴 수 있는 적만 상대한다.
++        bool reachOnly = enemy.DisengageRemaining > 0f;
+         EnemyUnit nearest = null;
+         float nearestDistance = float.PositiveInfinity;
+         foreach (EnemyUnit other in enemies)
+         {
+             float distance = (other.Position - enemy.Position).sqrMagnitude;
+-            if (!IsNearer(other, distance, nearest, nearestDistance) || !CanDetect(enemy, other))
++            if (!IsNearer(other, distance, nearest, nearestDistance) || !CanDetect(enemy, other) ||
++                (reachOnly && !CanAttackFromHere(enemy, other)))
+                 continue;
+ 
+             nearest = other;
+@@ -488,9 +525,14 @@ internal sealed class CombatPositioning
+         alertedUnits.Clear();
+         // Snapshot established fights before assigning this plan. Merely acquiring a
+         // distant target must not relay awareness indefinitely through the whole army.
++        foughtUnits.Clear();
+         foreach (EnemyUnit enemy in enemies)
+             if (enemy.IsAlive && enemy.Target is { IsAlive: true } target && CanAttackFromHere(enemy, target))
++            {
+                 activeFighters.Add(enemy);
++                foughtUnits.Add(enemy);
++                foughtUnits.Add(target);
++            }
+         foreach (EnemyUnit enemy in enemies)
+             foreach (EnemyUnit fighter in activeFighters)
+                 if ((enemy.Position - fighter.Position).sqrMagnitude <= CombatJoinRange * CombatJoinRange &&
+@@ -555,8 +597,14 @@ internal sealed class CombatPositioning
+         enemy.RouteBypassOffset = -1;
+         enemy.BlockedRouteTime = 0f;
+ 
+-        // Hold position while waiting. Backing away to make room and walking in again as
+-        // soon as a slot opened made waiting units pace back and forth behind the fight.
++        // 싸우는 줄 바로 뒤(공격 자리 반경 + 자기 몸통 간격)까지는 걸어가서 기다린다. 멀리서 적을
++        // 정한 채 그 자리에 서 있지 않는다. 다가가기만 하고 물러나지는 않는다: 자리를 내주려고
++        // 물러났다가 자리가 나면 다시 들어오면 싸움 뒤에서 왔다 갔다 하게 된다.
++        Vector3 offset = enemy.Position - target.Position;
++        float distance = offset.magnitude;
++        float ring = SlotRadius(enemy, target) + RequiredSpacing(enemy.Faction, enemy.Faction);
++        if (distance > ring + WaitingRingSlack && grid.HasLineOfSight(enemy.Position, target.Position))
++            enemy.CombatDestination = target.Position + offset / distance * ring;
+     }
+ 
+     private bool FindSlot(EnemyUnit enemy, EnemyUnit target, out int slot, out Vector3 waypoint,
+@@ -644,7 +692,7 @@ internal sealed class CombatPositioning
+         pathGoals.Clear(); pathSlots.Clear();
+         for (int i = 0; i < SlotCount; i++)
+             if (SlotAvailable(enemy, target, i)) { pathGoals.Add(SlotPosition(enemy, target, i)); pathSlots.Add(i); }
+-        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int goal))
++        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int goal, maxDetour: PursuitDetourLimit(enemy, target)))
+             slot = pathSlots[goal];
+         else
+         {
+@@ -653,7 +701,7 @@ internal sealed class CombatPositioning
+             // reachable spot with a clear strike.
+             pathGoals.Clear(); pathGoals.Add(target.Position);
+             if (!allowOpenPosition ||
+-                !pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, strikeTarget: target))
++                !pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, strikeTarget: target, maxDetour: PursuitDetourLimit(enemy, target)))
+             {
+                 enemy.PathRetryRemaining = StalledRetargetDelay;
+                 CheckStaticReachability(enemy, target, hidden: false);
+@@ -722,7 +770,7 @@ internal sealed class CombatPositioning
+             if (grid.IsWalkable(grid.WorldToCell(point)) && grid.HasLineOfSight(point, goal))
+                 pathGoals.Add(point);
+         }
+-        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _))
++        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, maxDetour: PursuitDetourLimit(enemy, target)))
+         {
+             enemy.CombatPathIndex = 0; enemy.CombatPathTarget = target; enemy.CombatPathAnchor = goal;
+             enemy.CombatPathSearch = true;
+@@ -759,9 +807,9 @@ internal sealed class CombatPositioning
+                 if (grid.IsWalkable(grid.WorldToCell(point)) && grid.HasLineOfSight(point, target.Position))
+                     pathGoals.Add(point);
+             }
+-        // A temporary crowd is not an unreachable target. Only reject if even a
+-        // route ignoring every unit fails, or no valid striking position exists.
+-        if (pathfinder.Find(enemy, pathGoals, staticPath, out _, ignoreUnits: true)) return;
++        // A temporary crowd is not an unreachable target. Only reject if even a route
++        // ignoring every unit fails or is a long way round, or no valid striking position exists.
++        if (pathfinder.Find(enemy, pathGoals, staticPath, out _, ignoreUnits: true, maxDetour: PursuitDetourLimit(enemy, target))) return;
+         enemy.UnreachableTarget = target;
+         enemy.UnreachableTargetPosition = enemy.LastKnownTargetPosition;
+         enemy.UnreachableFromPosition = enemy.Position;
+@@ -904,7 +952,10 @@ internal sealed class CombatPositioning
+     }
+ 
+     private static Vector3 SlotPosition(EnemyUnit enemy, EnemyUnit target, int slot) =>
+-        target.Position + Directions[slot] * Mathf.Min(enemy.Faction.AttackRange,
++        target.Position + Directions[slot] * SlotRadius(enemy, target);
++
++    private static float SlotRadius(EnemyUnit enemy, EnemyUnit target) =>
++        Mathf.Min(enemy.Faction.AttackRange,
+             Mathf.Max(enemy.Faction.AttackRange * 0.85f, RequiredSpacing(enemy.Faction, target.Faction) + 0.02f));
+ 
+     private bool CanMove(EnemyUnit enemy, EnemyUnit target, Vector3 from, Vector3 to) =>
+@@ -926,6 +977,10 @@ internal sealed class CombatPositioning
+         return false;
+     }
+ 
++    // 도발은 벽 너머의 유닛을 끌어오는 주문이라, 도발한 유닛에게 가는 길에는 한도를 두지 않는다.
++    private float PursuitDetourLimit(EnemyUnit enemy, EnemyUnit target) =>
++        enemy.ActiveTaunter == target ? float.PositiveInfinity : MaxPursuitDetour * grid.CellSize;
++
+     private bool ClearOfUnits(EnemyUnit enemy, EnemyUnit target, Vector3 from, Vector3 to, bool attacking)
+     {
+         Vector3 step = to - from;
+@@ -999,8 +1054,9 @@ internal sealed class CombatPositioning
+         }
+ 
+         // With strikeTarget, the search ends at the first node the unit can strike it from.
++        // maxDetour: 경로 길이가 그 목표까지의 직선 거리보다 이만큼 넘게 길면 찾지 못한 것으로 본다.
+         public bool Find(EnemyUnit enemy, IReadOnlyList<Vector3> goals, List<Vector3> result, out int goalIndex,
+-            bool ignoreUnits = false, EnemyUnit strikeTarget = null)
++            bool ignoreUnits = false, EnemyUnit strikeTarget = null, float maxDetour = float.PositiveInfinity)
+         {
+             this.ignoreUnits = ignoreUnits;
+             goalIndex = -1;
+@@ -1019,10 +1075,18 @@ internal sealed class CombatPositioning
+                 }
+             int end = -1;
+             float best = float.PositiveInfinity;
++            // 남은 직선 거리를 더한 값이 가장 먼 목표의 한도를 넘는 지점부터는 어떤 목표에도 한도 안에 닿지 못한다.
++            float limit = float.PositiveInfinity;
++            if (!float.IsPositiveInfinity(maxDetour))
++            {
++                limit = 0f;
++                foreach (Vector3 goal in goals)
++                    limit = Mathf.Max(limit, Vector3.Distance(enemy.Position, goal) + maxDetour);
++            }
+             while (open.Count > 0)
+             {
+                 var entry = Pop();
+-                if (entry.Score >= best) break;
++                if (entry.Score >= best || entry.Score > limit) break;
+                 int i = entry.Node;
+                 if (closed[i]) continue;
+                 closed[i] = true;
+@@ -1034,7 +1098,9 @@ internal sealed class CombatPositioning
+                 for (int g = 0; strikeTarget == null && g < goals.Count; g++)
+                 {
+                     float distance = Vector3.Distance(points[i], goals[g]);
+-                    if (distance > Spacing * 2f || costs[i] + distance >= best || !Clear(enemy, points[i], goals[g])) continue;
++                    if (distance > Spacing * 2f || costs[i] + distance >= best ||
++                        costs[i] + distance > Vector3.Distance(enemy.Position, goals[g]) + maxDetour ||
++                        !Clear(enemy, points[i], goals[g])) continue;
+                     best = costs[i] + distance; end = i; goalIndex = g;
+                 }
+                 for (int d = 0; d < 8; d++)
+diff --git a/ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs b/ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs
+index 0b0b0d3..9982bc4 100644
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs
+@@ -128,6 +128,10 @@ internal sealed class EnemyUnit
+     public Vector3? RouteYieldDestination { get; set; }
+     public int RouteBypassOffset { get; set; } = -1;
+     public float BlockedRouteTime { get; set; }
++    // 아무도 싸우지 않는 적을 기다린 시간. 한도를 넘으면 대기를 그만둔다.
++    public float IdleQueueTime { get; set; }
++    // 그런 대기를 그만둔 뒤, 지금 자리에서 때릴 수 있는 적만 상대하는 남은 시간.
++    public float DisengageRemaining { get; set; }
+     // 직전 이동 때 교전·추격·대기 중이었는지. 타깃을 잃은 첫 이동에서 코어 경로를 다시 잡는 데 쓴다.
+     public bool WasEngaged { get; set; }
+     public bool ReachedCore => Position.Equals(path[^1]);
+@@ -151,6 +155,7 @@ internal sealed class EnemyUnit
+         PathRetryRemaining = Mathf.Max(0, PathRetryRemaining - deltaTime);
+         RetargetLockRemaining = Mathf.Max(0, RetargetLockRemaining - deltaTime);
+         SidestepMemoryRemaining = Mathf.Max(0, SidestepMemoryRemaining - deltaTime);
++        DisengageRemaining = Mathf.Max(0, DisengageRemaining - deltaTime);
+         RetaliationRemaining = Mathf.Max(0, RetaliationRemaining - deltaTime);
+         if (RetaliationRemaining <= 0f || RetaliationTarget is not { IsAlive: true })
+         {
+diff --git a/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs b/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
+index 48c1ddb..aa4865b 100644
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
+@@ -8,7 +8,7 @@ internal sealed class DefenseBattle
+     // 전투 로직의 고정 틱. 공격 간격·지속시간이 이 단위로 딱 떨어지도록 60을 쓴다.
+     public const int TicksPerSecond = 60;
+     public const float TickDuration = 1f / TicksPerSecond;
+-    public const float HealPercent = 0.25f;
++    public const float HealPercent = 0.50f;
+     public const float BuffDuration = 6f;
+     // 도발: 고른 유닛이 이 시간 동안 거대해지고, 반경 안의 다른 진영 유닛을 벽 너머까지 끌어당긴다. 첫 테스트용 임시 값.
+     public const float TauntDuration = 5f;
+@@ -671,9 +671,12 @@ internal sealed class DefenseBattle
+         bool offRoute = !enemy.Position.Equals(enemy.RoutePosition);
+         if (offRoute && combat.IsReturningAlongPath(enemy) && combat.TryReturnAlongPath(enemy, deltaTime))
+             return;
+-        if (offRoute && TryRejoinRoute(enemy, deltaTime))
++        bool routeInSight = false;
++        if (offRoute && TryRejoinRoute(enemy, deltaTime, out routeInSight))
+             return;
+-        if (offRoute && combat.TryReturnAlongPath(enemy, deltaTime))
++        // 앞쪽 경로 점이 보이는데 다른 유닛에 가려 못 가는 것이면 길이 날 때까지 기다린다. 경로 탐색으로
++        // 닿을 수 있는 아무 점(뒤쪽일 수 있다)으로 돌아가면 뒤로 갔다 앞으로 오며 여러 번 돌아선다.
++        if (offRoute && !routeInSight && combat.TryReturnAlongPath(enemy, deltaTime))
+             return;
+ 
+         // Off-route units wait for their forward connection, rather than walking back
+@@ -694,7 +697,7 @@ internal sealed class DefenseBattle
+         if (enemy.BlockedRouteTime < RouteYieldDelay)
+             return;
+         enemy.BlockedRouteTime = 0f;
+-        if (TryRejoinRoute(enemy, deltaTime))
++        if (TryRejoinRoute(enemy, deltaTime, out _))
+             return;
+         if (combat.TryFindRouteYield(enemy, RouteRejoinWaypoints, out Vector3 destination, out int offset))
+         {
+@@ -733,14 +736,17 @@ internal sealed class DefenseBattle
+             enemy.Reroute(route);
+     }
+ 
+-    private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime)
++    // routeInSight: 벽에 가리지 않은 앞쪽 경로 점이 하나라도 있는지(유닛에 막혔는지와 무관).
++    private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime, out bool routeInSight)
+     {
++        routeInSight = false;
+         // The final point is on the core boundary, not a navigation waypoint. Return
+         // to its approach tile; the normal route step then handles core contact.
+         if (enemy.RemainingRouteWaypoints == 1)
+         {
+             Vector3 approach = enemy.RoutePosition;
+-            if (!grid.CanPursue(enemy.Position, approach) || !combat.CanFollowRoute(enemy, approach))
++            routeInSight = grid.CanPursue(enemy.Position, approach);
++            if (!routeInSight || !combat.CanFollowRoute(enemy, approach))
+                 return false;
+             Vector3 step = enemy.StepToward(approach, deltaTime);
+             enemy.Face(step);
+@@ -750,12 +756,26 @@ internal sealed class DefenseBattle
+             return true;
+         }
+ 
++        // 보이는 경로 점 가운데 코어까지 가장 짧게 이어지는 길. 그 점이 유닛에 막혀 있어도, 그보다
++        // 한 칸 넘게 손해인 점(지나온 쪽)으로 되돌아가지는 않는다.
++        int first = Mathf.Max(0, enemy.RouteBypassOffset);
++        float shortest = float.PositiveInfinity;
++        for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= first; offset--)
++        {
++            Vector3 waypoint = enemy.GetRouteWaypoint(offset);
++            if (grid.CanPursue(enemy.Position, waypoint))
++                shortest = Mathf.Min(shortest, Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset));
++        }
++        routeInSight = !float.IsPositiveInfinity(shortest);
++
+         // A fighter may have moved well beyond its old route index. Rejoin the furthest
+         // visible, unobstructed point ahead instead of walking backwards through the army.
+-        for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= Mathf.Max(0, enemy.RouteBypassOffset); offset--)
++        for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= first; offset--)
+         {
+             Vector3 waypoint = enemy.GetRouteWaypoint(offset);
+-            if (!grid.CanPursue(enemy.Position, waypoint) || !combat.CanFollowRoute(enemy, waypoint))
++            if (!grid.CanPursue(enemy.Position, waypoint) ||
++                Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset) > shortest + grid.CellSize ||
++                !combat.CanFollowRoute(enemy, waypoint))
+                 continue;
+ 
+             Vector3 next = enemy.StepToward(waypoint, deltaTime);
+diff --git a/ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseGrid.cs b/ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseGrid.cs
+index 4240d2f..66154a3 100644
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseGrid.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseGrid.cs
+@@ -8,8 +8,8 @@ public sealed class DefenseGrid
+     public const int WallLimit = 8;
+     public const float WallWidth = 0.92f;
+     public const float WallHeight = 0.8f;
+-    // 칸 한 변 대비 벽 가장자리 여유.
+-    private const float SightInset = (1f - WallWidth) * 0.5f;
++    // 이동·시야 판정에서 벽 상자를 넓히는 양(상자 전체 폭 기준).
++    private const float PursuitWallMargin = 0.24f;
+ 
+     private static readonly Vector2Int[] Directions =
+     {
+@@ -132,23 +132,21 @@ public sealed class DefenseGrid
+         return true;
+     }
+ 
+-    // 코어도 벽처럼 시야와 공격을 막는다. 벽과 같은 여유(칸 가장자리에서 SightInset)를 두어
+-    // 모서리를 스치는 시선은 통과시킨다.
+-    public bool HasLineOfSight(Vector3 from, Vector3 to)
+-        => !CrossesCore(from, to, SightInset * CellSize) && IsWallFree(from, to, 0f);
++    // 코어도 벽처럼 시야와 공격을 막는다. 시야는 이동과 같은 판정을 쓴다. 벽·코어 가장자리에서
++    // 같은 여유를 두므로 "보이지만 곧장 걸어갈 수 없는" 위치가 생기지 않는다.
++    public bool HasLineOfSight(Vector3 from, Vector3 to) => CanPursue(from, to);
+ 
+     public bool CanPursue(Vector3 from, Vector3 to)
+-        => !CrossesCore(from, to, 0f) && IsWallFree(from, to, 0.24f);
++        => !CrossesCore(from, to) && IsWallFree(from, to, PursuitWallMargin);
+ 
+-    private bool CrossesCore(Vector3 from, Vector3 to, float inset)
++    private bool CrossesCore(Vector3 from, Vector3 to)
+     {
+         Vector3 step = to - from;
+         float length = step.magnitude;
+         if (length == 0f)
+             return false;
+ 
+-        var coreBounds = new Bounds(CorePosition,
+-            new Vector3(CoreSize.x * CellSize - inset * 2f, 1f, CoreSize.y * CellSize - inset * 2f));
++        var coreBounds = new Bounds(CorePosition, new Vector3(CoreSize.x * CellSize, 1f, CoreSize.y * CellSize));
+         return coreBounds.IntersectRay(new Ray(from, step / length), out float distance) && distance <= length;
+     }
+ 
+diff --git a/ProjectBeViolenceDefense/Assets/09_Tests/Editor/CombatPositioningTests.cs b/ProjectBeViolenceDefense/Assets/09_Tests/Editor/CombatPositioningTests.cs
+index 7e10d82..fac3a25 100644
+--- a/ProjectBeViolenceDefense/Assets/09_Tests/Editor/CombatPositioningTests.cs
++++ b/ProjectBeViolenceDefense/Assets/09_Tests/Editor/CombatPositioningTests.cs
+@@ -649,32 +649,91 @@ public sealed class CombatPositioningTests
+     }
+ 
+     [Test]
+-    public void KnownTargetIsReachedAroundAUWallWithoutLosingItOrCuttingWalls()
++    public void SightAndMovementAgreeAlongWallEdges()
++    {
++        var grid = OpenGrid(new Vector2Int(6, 6));
++        // 벽 칸의 가장자리를 스치는 선. 이전에는 보이지만 곧장 걸어갈 수는 없었다.
++        var from = new Vector3(4, 0, 6.5f);
++        var to = new Vector3(8, 0, 6.5f);
++        Assert.That(grid.CanPursue(from, to), Is.False);
++        Assert.That(grid.HasLineOfSight(from, to), Is.False);
++        for (int step = 0; step <= 40; step++)
++        {
++            float z = 5f + step * 0.05f;
++            from = new Vector3(4, 0, z);
++            to = new Vector3(8, 0, 12f - z);
++            Assert.That(grid.HasLineOfSight(from, to), Is.EqualTo(grid.CanPursue(from, to)), $"z {z}");
++        }
++    }
++
++    [Test]
++    public void KnownTargetBehindALongWallIsLeftAloneInsteadOfWalkingAllTheWayRound()
+     {
+         var grid = UShapedWall();
+         var attacker = Unit(0, 0, 4, 6, radius: 0.3f);
+         var target = Unit(1, 1, 8, 6, radius: 0.3f);
+         // An already seen opponent is now occluded while the pursuer is inside the U.
++        // Leaving the U and coming back round is far beyond MaxPursuitDetour.
+         attacker.Target = target;
+         var combat = new CombatPositioning(grid, new[] { attacker, target });
+-        float travelled = 0f, leftmost = attacker.Position.x;
+-        bool usedPath = false;
+-        for (int tick = 0; tick < 1200 && !combat.CanAttack(attacker, target); tick++)
++        float travelled = 0f;
++        for (int tick = 0; tick < 600; tick++)
++        {
++            Vector3 before = attacker.Position;
++            StepApproach(combat, attacker, tick);
++            attacker.TickTimers(DefenseBattle.TickDuration);
++            Assert.That(grid.CanPursue(before, attacker.Position), Is.True);
++            travelled += Vector3.Distance(before, attacker.Position);
++        }
++        Assert.That(attacker.Target ?? attacker.CombatQueue?.Target, Is.Null);
++        Assert.That(attacker.CombatPath, Is.Empty);
++        Assert.That(travelled, Is.LessThan(1f));
++    }
++
++    [Test]
++    public void KnownTargetBehindAPillarIsReachedByAShortWayRound()
++    {
++        var grid = OpenGrid(new Vector2Int(6, 6));
++        var attacker = Unit(0, 0, 4, 6, radius: 0.3f);
++        var target = Unit(1, 1, 8, 6, radius: 0.3f);
++        Assert.That(grid.HasLineOfSight(attacker.Position, target.Position), Is.False, "The pillar must hide the opponent.");
++        attacker.Target = target;
++        var combat = new CombatPositioning(grid, new[] { attacker, target });
++        float travelled = 0f;
++        for (int tick = 0; tick < 600 && !combat.CanAttack(attacker, target); tick++)
+         {
+             Vector3 before = attacker.Position;
+             StepApproach(combat, attacker, tick);
+             attacker.TickTimers(DefenseBattle.TickDuration);
+             Assert.That(attacker.Target ?? attacker.CombatQueue?.Target, Is.SameAs(target));
+             Assert.That(grid.CanPursue(before, attacker.Position), Is.True);
+-            Assert.That(Vector3.Distance(attacker.Position, target.Position), Is.GreaterThanOrEqualTo(0.66f - 0.0001f));
+             travelled += Vector3.Distance(before, attacker.Position);
+-            leftmost = Mathf.Min(leftmost, attacker.Position.x);
+-            usedPath |= attacker.CombatPath.Count > 0;
+         }
+-        Assert.That(usedPath, Is.True);
+-        Assert.That(leftmost, Is.LessThan(2.5f), "The route must initially move away from the opponent to leave the U.");
+-        Assert.That(travelled, Is.GreaterThan(10f));
+         Assert.That(combat.CanAttack(attacker, target), Is.True);
++        Assert.That(travelled, Is.LessThan(4f + CombatPositioning.MaxPursuitDetour));
++    }
++
++    // 1칸 폭 복도에서 앞의 아군이 적과 맞붙어 길을 막았다. 반대편 자리로 가려면 복도를 나가 바깥으로
++    // 한참 돌아야 한다. 길 자체는 짧으므로 적을 버리지 않고, 돌아가지도 않고 뒤에서 기다린다.
++    [Test]
++    public void UnitBlockedByItsOwnFrontLineWaitsBehindInsteadOfWalkingAllTheWayRound()
++    {
++        var walls = new List<Vector2Int>();
++        for (int x = 2; x <= 9; x++) { walls.Add(new Vector2Int(x, 5)); walls.Add(new Vector2Int(x, 7)); }
++        var grid = OpenGrid(walls.ToArray());
++        var waiting = Unit(0, 0, 4, 6, radius: 0.3f);
++        var front = Unit(0, 1, 5, 6, radius: 0.3f);
++        var opponent = Unit(1, 2, 6.3f, 6, radius: 0.3f);
++        var combat = new CombatPositioning(grid, new[] { waiting, front, opponent });
++        Vector3 start = waiting.Position;
++        for (int tick = 0; tick < 600; tick++)
++        {
++            StepApproach(combat, waiting, tick);
++            waiting.TickTimers(DefenseBattle.TickDuration);
++            Assert.That(waiting.Target ?? waiting.CombatQueue?.Target, Is.SameAs(opponent), $"tick {tick}");
++            Assert.That(Vector3.Distance(waiting.Position, start), Is.LessThan(1f), $"tick {tick}");
++        }
++        Assert.That(combat.CanAttack(front, opponent), Is.True, "The fixture must keep the front unit fighting.");
+     }
+ 
+     [Test]
+@@ -714,7 +773,7 @@ public sealed class CombatPositioningTests
+     }
+ 
+     [Test]
+-    public void TargetDeathDuringLongDetourStillAllowsReturningToCoreRoute()
++    public void UnitLeftOffItsRouteBehindALongWallStillReturnsToTheCoreRoute()
+     {
+         var grid = UShapedWall();
+         var faction = new EnemyFaction("Pursuer", Color.white, spawnCount: 0, maxHealth: 1000);
+@@ -727,13 +786,8 @@ public sealed class CombatPositioningTests
+         attacker.Target = target;
+         battle.StartRound();
+         ((List<EnemyUnit>)battle.Enemies).AddRange(new[] { attacker, target });
+-        bool usedPath = false;
+         for (int tick = 0; tick < 180; tick++)
+-        {
+             battle.Tick(DefenseBattle.TickDuration, false);
+-            usedPath |= attacker.CombatPath.Count > 0;
+-        }
+-        Assert.That(usedPath, Is.True);
+         target.Die();
+         for (int tick = 0; tick < 3000 && battle.CurrentPhase == DefenseBattle.Phase.Combat; tick++)
+         {
+@@ -823,6 +877,57 @@ public sealed class CombatPositioningTests
+         Assert.That(waiting.CombatQueue?.Target, Is.SameAs(target));
+     }
+ 
++    [Test]
++    public void WaitingUnitWalksUpBehindTheFightInsteadOfStandingFarAway()
++    {
++        var target = Unit(1, 0, 6, 6, radius: 0.3f);
++        var fighters = new[] { Unit(0, 1, 4.9f, 6, radius: 0.3f), Unit(0, 2, 6, 4.9f, radius: 0.3f), Unit(0, 3, 6, 7.1f, radius: 0.3f) };
++        var waiting = Unit(0, 4, 2.6f, 7.2f, radius: 0.3f);
++        var units = new List<EnemyUnit>(fighters) { waiting, target };
++        var combat = new CombatPositioning(OpenGrid(), units);
++        float distance = Vector3.Distance(waiting.Position, target.Position);
++        for (int tick = 0; tick < 300; tick++)
++        {
++            StepApproach(combat, waiting, tick);
++            float now = Vector3.Distance(waiting.Position, target.Position);
++            Assert.That(now, Is.LessThanOrEqualTo(distance + 0.0001f), "A waiting unit closes in; it never backs away.");
++            distance = now;
++        }
++        Assert.That(fighters.All(f => combat.CanAttack(f, target)), Is.True);
++        Assert.That(waiting.CombatQueue?.Target, Is.SameAs(target));
++        // 공격 자리 반경(사거리의 85%) + 자기 몸통 간격 바로 뒤.
++        float ring = 1.5f * 0.85f + CombatPositioning.RequiredSpacing(waiting.Faction, waiting.Faction);
++        Assert.That(distance, Is.InRange(ring - 0.01f, ring + 0.35f));
++    }
++
++    // 2스테이지 시안(삭제됨)에 윗문 (3,12)을 막은 배치. 코어 아래에서 네 유닛이 서로 다른 적을 기다리며
++    // 원을 이뤄, 아무도 싸우지 않은 채 멈췄다. 싸움 없는 대기는 그만두어야 전투가 끝난다.
++    [Test]
++    public void UnitsWaitingOnOpponentsNobodyFightsGiveUpInsteadOfFreezing()
++    {
++        var grid = MapGrid(new[] { new Vector2Int(2, 2), new Vector2Int(14, 2) },
++            ".................", ".................", ".................",
++            ".....#.....#.....",
++            "########.####.###",
++            "....#.......#....",
++            "##.....###.....##",
++            "....#.......#....",
++            "..######.######..",
++            "....#.......#....",
++            "##.....###.....##",
++            "....#.......#....",
++            "..######.######..",
++            "....#.......#....",
++            "....#.......#....",
++            ".......###.......",
++            "....#.......#....");
++        var result = RunToEnd(grid, Lineup(
++            new[] { (Kind("grunt", 75, 10, 0.65f, 1.7f, 0.34f), 6) },
++            new[] { (Kind("skeleton", 70, 12, 0.8f, 1.6f, 0.22f * 1.3f), 6) }), 120 * DefenseBattle.TicksPerSecond);
++        Assert.That(result.Spawned, Is.EqualTo(12));
++        Assert.That(result.Finished, Is.True);
++    }
++
+     [Test]
+     public void HiddenOpponentBehindACrowdIsGivenUpInsteadOfBlockingTheLane()
+     {

@@ -76,6 +76,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private DefenseBattle battle;
     private BattleSoundPlayer soundPlayer;
     private DefenseHud hud;
+    private StageSpellUnlocks spellUnlocks;
     private readonly BattleClock battleClock = new();
     private DefenseBattle.Spell? aimedSpell;
     private float aimedRangeScroll;
@@ -92,6 +93,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private int SpellRangeStep => Mathf.RoundToInt(aimedRangeScroll);
 
     [SerializeField] private bool waitForStageSelection;
+    private int stageNumber;
     private System.Action restartStage;
 
     private void Awake()
@@ -106,7 +108,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         InitializeBattle();
     }
 
-    public void InitializeStage(StageContent content, System.Action retry)
+    public void InitializeStage(StageContent content, int stageNumber, System.Action retry)
     {
         if (view != null)
             throw new System.InvalidOperationException("A stage has already been initialized.");
@@ -114,6 +116,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         boardTheme = content.Theme;
         boardCamera = content.BoardCamera;
         stageAmbience = content.Ambience;
+        this.stageNumber = stageNumber;
         restartStage = retry;
         enabled = true;
         InitializeBattle();
@@ -146,7 +149,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             enemyCatalog, usedStage, soundPlayer.PlayHit);
         StageWaves waves = UsableWaves();
         // 같은 진영 스폰이 여럿이면 라운드마다 하나만 무작위로 쓴다. 전투 입력을 정할 때만 무작위를 쓴다.
-        battle = new DefenseBattle(grid, factions, BuildRoundLineup(waves), waves != null ? waves.waves.Count : 0,
+        int roundLimit = waves?.waves.Count ?? usedStage?.reinforcementWaveLimit ?? 0;
+        battle = new DefenseBattle(grid, factions, BuildRoundLineup(waves), roundLimit,
             pickSpawn: n => Random.Range(0, n));
         battle.EnemySpawned += view.AddEnemy;
         battle.EnemyRemoved += enemy => view.RemoveEnemy(enemy, battle.CoreHealth);
@@ -158,7 +162,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (victoryPanelHud != null)
             victoryPanelHud.Bind(next: null, retry: Restart);
         battle.SpellResolved += OnSpellResolved;
-        hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions);
+        spellUnlocks = new StageSpellUnlocks();
+        hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions, spellUnlocks);
         if (leftCoreHud != null)
             hud.UseExternalCorePanel(new Vector2(320, -236));
         if (manaBarHud != null)
@@ -206,7 +211,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         return new DefenseGrid(mapScale);
     }
 
-    // 스테이지의 웨이브 편성. 없거나 잘못되었으면 null(기존 증원 규칙으로 끝없이 진행).
+    // 편성이 없거나 잘못되었으면 기본 증원 규칙을 쓴다.
     private StageWaves UsableWaves()
     {
         StageWaves waves = usedStage != null ? usedStage.waves : null;
@@ -356,6 +361,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
 
     private void ShowVictory()
     {
+        spellUnlocks.RecordClear(stageNumber);
         if (leftCoreHud != null)
             leftCoreHud.Cheer();
         if (victoryPanelHud == null)
@@ -735,6 +741,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     {
         if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Combat)
             return;
+
+        int requiredStage = spellUnlocks.MissingStage(spell);
+        if (requiredStage != 0)
+        {
+            hud.Notify(GameText.Format("spell.locked", requiredStage));
+            return;
+        }
 
         if (aimedSpell == spell)
             return;

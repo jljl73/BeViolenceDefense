@@ -8,7 +8,7 @@ internal sealed class DefenseBattle
     // 전투 로직의 고정 틱. 공격 간격·지속시간이 이 단위로 딱 떨어지도록 60을 쓴다.
     public const int TicksPerSecond = 60;
     public const float TickDuration = 1f / TicksPerSecond;
-    public const float HealPercent = 0.25f;
+    public const float HealPercent = 0.50f;
     public const float BuffDuration = 6f;
     // 도발: 고른 유닛이 이 시간 동안 거대해지고, 반경 안의 다른 진영 유닛을 벽 너머까지 끌어당긴다. 첫 테스트용 임시 값.
     public const float TauntDuration = 5f;
@@ -671,9 +671,12 @@ internal sealed class DefenseBattle
         bool offRoute = !enemy.Position.Equals(enemy.RoutePosition);
         if (offRoute && combat.IsReturningAlongPath(enemy) && combat.TryReturnAlongPath(enemy, deltaTime))
             return;
-        if (offRoute && TryRejoinRoute(enemy, deltaTime))
+        bool routeInSight = false;
+        if (offRoute && TryRejoinRoute(enemy, deltaTime, out routeInSight))
             return;
-        if (offRoute && combat.TryReturnAlongPath(enemy, deltaTime))
+        // 앞쪽 경로 점이 보이는데 다른 유닛에 가려 못 가는 것이면 길이 날 때까지 기다린다. 경로 탐색으로
+        // 닿을 수 있는 아무 점(뒤쪽일 수 있다)으로 돌아가면 뒤로 갔다 앞으로 오며 여러 번 돌아선다.
+        if (offRoute && !routeInSight && combat.TryReturnAlongPath(enemy, deltaTime))
             return;
 
         // Off-route units wait for their forward connection, rather than walking back
@@ -694,7 +697,7 @@ internal sealed class DefenseBattle
         if (enemy.BlockedRouteTime < RouteYieldDelay)
             return;
         enemy.BlockedRouteTime = 0f;
-        if (TryRejoinRoute(enemy, deltaTime))
+        if (TryRejoinRoute(enemy, deltaTime, out _))
             return;
         if (combat.TryFindRouteYield(enemy, RouteRejoinWaypoints, out Vector3 destination, out int offset))
         {
@@ -733,14 +736,17 @@ internal sealed class DefenseBattle
             enemy.Reroute(route);
     }
 
-    private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime)
+    // routeInSight: 벽에 가리지 않은 앞쪽 경로 점이 하나라도 있는지(유닛에 막혔는지와 무관).
+    private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime, out bool routeInSight)
     {
+        routeInSight = false;
         // The final point is on the core boundary, not a navigation waypoint. Return
         // to its approach tile; the normal route step then handles core contact.
         if (enemy.RemainingRouteWaypoints == 1)
         {
             Vector3 approach = enemy.RoutePosition;
-            if (!grid.CanPursue(enemy.Position, approach) || !combat.CanFollowRoute(enemy, approach))
+            routeInSight = grid.CanPursue(enemy.Position, approach);
+            if (!routeInSight || !combat.CanFollowRoute(enemy, approach))
                 return false;
             Vector3 step = enemy.StepToward(approach, deltaTime);
             enemy.Face(step);
@@ -750,12 +756,26 @@ internal sealed class DefenseBattle
             return true;
         }
 
-        // A fighter may have moved well beyond its old route index. Rejoin the furthest
-        // visible, unobstructed point ahead instead of walking backwards through the army.
-        for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= Mathf.Max(0, enemy.RouteBypassOffset); offset--)
+        // 보이는 경로 점 가운데 코어까지 가장 짧게 이어지는 길. 그 점이 유닛에 막혀 있어도, 그보다
+        // 한 칸 넘게 손해인 점(지나온 쪽)으로 되돌아가지는 않는다.
+        int first = Mathf.Max(0, enemy.RouteBypassOffset);
+        float shortest = float.PositiveInfinity;
+        for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= first; offset--)
         {
             Vector3 waypoint = enemy.GetRouteWaypoint(offset);
-            if (!grid.CanPursue(enemy.Position, waypoint) || !combat.CanFollowRoute(enemy, waypoint))
+            if (grid.CanPursue(enemy.Position, waypoint))
+                shortest = Mathf.Min(shortest, Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset));
+        }
+        routeInSight = !float.IsPositiveInfinity(shortest);
+
+        // A fighter may have moved well beyond its old route index. Rejoin the furthest
+        // visible, unobstructed point ahead instead of walking backwards through the army.
+        for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= first; offset--)
+        {
+            Vector3 waypoint = enemy.GetRouteWaypoint(offset);
+            if (!grid.CanPursue(enemy.Position, waypoint) ||
+                Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset) > shortest + grid.CellSize ||
+                !combat.CanFollowRoute(enemy, waypoint))
                 continue;
 
             Vector3 next = enemy.StepToward(waypoint, deltaTime);

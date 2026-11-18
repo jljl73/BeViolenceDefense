@@ -57,8 +57,10 @@ public sealed class StageData : ScriptableObject
     public RectInt core = new(DefenseGrid.DefaultSize / 2 - 1, DefenseGrid.DefaultSize - 3, 3, 3);
     public List<Spawn> spawns = new();
     public List<Obstacle> obstacles = new();
-    [Tooltip("웨이브 편성. 비우면 기존 증원 규칙으로 끝없이 반복한다.")]
+    [Tooltip("웨이브 편성. 비우면 기본 증원 규칙을 쓴다.")]
     public StageWaves waves;
+    [Min(0), Tooltip("웨이브 편성이 없을 때 클리어에 필요한 웨이브 수. 0이면 무한 증원.")]
+    public int reinforcementWaveLimit;
 
     public IEnumerable<Vector2Int> BlockedCells()
     {

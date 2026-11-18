@@ -61,7 +61,7 @@ public sealed class StageSelectionController : MonoBehaviour
         SelectedStage = index;
         if (ui.HasOpenPopup)
             ui.CloseTopPopup();
-        game.InitializeStage(CurrentStage, Retry);
+        game.InitializeStage(CurrentStage, index + 1, Retry);
     }
 
     private void Retry()

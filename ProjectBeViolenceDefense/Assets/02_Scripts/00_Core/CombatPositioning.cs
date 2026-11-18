@@ -9,6 +9,10 @@ internal sealed class CombatPositioning
     internal const float LostTargetSearchDuration = 4f;
     // 보이지 않는 적을 쫓다가 이 시간 동안 조금도 가까워지지 못하면 추격을 그만두고 원래 경로로 돌아간다.
     internal const float HiddenPursuitStallLimit = 2f;
+    // 적에게 가는 길이 직선 거리보다 이 칸 수 넘게 길면 돌아가지 않는다. 길은 있는데 유닛에 막힌
+    // 경우에는 뒤에서 기다리고, 지형 때문에 이만큼 돌아야 하는 적은 그 자리에서는 상대하지 않는다.
+    // 첫 테스트용 임시 값.
+    internal const float MaxPursuitDetour = 3f;
     // 옆걸음 직후 이 시간 동안은 방금 온 쪽으로 되돌아가는 옆걸음을 고르지 않는다.
     internal const float SidestepMemoryDuration = 2.5f;
     // 스스로 다른 적으로 바꾼 뒤 이 시간 동안은 다시 바꾸지 않는다.
@@ -16,6 +20,13 @@ internal sealed class CombatPositioning
     // 경로 밖에서 막힌 유닛이 이 여유 안으로 붙어 있는 유닛에게서 한 걸음 비켜선다.
     private const float StepAsideMargin = 0.15f;
     private const float StepAsideDistance = 0.4f;
+    // 대기선보다 이만큼 넘게 멀 때만 다가간다. 대기선 근처에서 조금씩 움직이지 않게 한다.
+    private const float WaitingRingSlack = 0.3f;
+    // 뒤에서 기다리는 것은 싸움이 벌어지는 동안만이다. 기다리는 적이 이 시간 동안 누구와도 싸우지
+    // 않으면 대기를 그만두고, 그 뒤 DisengageDuration 동안은 지금 자리에서 때릴 수 있는 적만 상대한다.
+    // 서로 다른 적을 기다리는 유닛들이 원을 이뤄 영영 멈추는 것을 막는다. 첫 테스트용 임시 값.
+    internal const float IdleQueueLimit = 2f;
+    internal const float DisengageDuration = 2f;
     private const float ApproachProgressThreshold = 0.05f;
     private const int CurrentPositionSlot = -2;
     // 여덟 공격 자리가 아닌, 사거리 안에서 때릴 수 있는 임의 지점으로 가는 중.
@@ -44,6 +55,8 @@ internal sealed class CombatPositioning
     private readonly List<(Vector3 Position, float Radius)> reservedPositions = new();
     private readonly HashSet<EnemyUnit> alertedUnits = new();
     private readonly List<EnemyUnit> activeFighters = new();
+    // 지난 계획 때 실제로 때리고 있던 유닛과 맞고 있던 유닛.
+    private readonly HashSet<EnemyUnit> foughtUnits = new();
     private int nextQueueOrder;
     private int plannedEnemyCount;
     private readonly PursuitPathfinder pathfinder;
@@ -199,6 +212,13 @@ internal sealed class CombatPositioning
                 enemy.CombatQueue = null; RememberTarget(enemy, null);
                 continue;
             }
+            if (enemy.IdleQueueTime >= IdleQueueLimit)
+            {
+                enemy.CombatQueue = null; RememberTarget(enemy, null);
+                enemy.IdleQueueTime = 0f;
+                enemy.DisengageRemaining = DisengageDuration;
+                continue;
+            }
             if (queueTarget != null)
                 QueueBehindFight(enemy, queueTarget);
             else
@@ -210,6 +230,10 @@ internal sealed class CombatPositioning
     // erase the time already spent stuck. Cooldown while in striking position is not a stall.
     public void TrackApproachProgress(EnemyUnit enemy, float deltaTime)
     {
+        if (enemy.Target == null && enemy.CombatQueue is { } waitingFor && !foughtUnits.Contains(waitingFor.Target))
+            enemy.IdleQueueTime += deltaTime;
+        else
+            enemy.IdleQueueTime = 0f;
         if (enemy.PursuitTarget is { IsAlive: true } remembered &&
             !grid.HasLineOfSight(enemy.Position, remembered.Position) &&
             Vector3.Distance(enemy.Position, enemy.LastKnownTargetPosition) <= enemy.Faction.AttackRange &&
@@ -364,6 +388,16 @@ internal sealed class CombatPositioning
         if (enemy.CombatDestination is not { } destination)
             return;
 
+        // 자리 없이 기다리는 유닛은 대기선까지 곧장 걷기만 한다. 막히면 그 자리에 서고, 옆걸음이나
+        // 우회로 비집고 들어가지 않는다.
+        if (enemy.Target == null)
+        {
+            Vector3 closer = enemy.StepToward(destination, deltaTime);
+            if (CanMove(enemy, target, enemy.Position, closer))
+                enemy.MoveOffRoute(closer);
+            return;
+        }
+
         if (TryUsePath(enemy, target, out Vector3 pathWaypoint, out float pathLength))
         {
             destination = pathWaypoint;
@@ -413,12 +447,15 @@ internal sealed class CombatPositioning
             (grid.HasLineOfSight(enemy.Position, target.Position) || enemy.LostTargetSearchTime < LostTargetSearchDuration))
             return target;
 
+        // 싸움 없는 대기를 막 그만둔 유닛은 잠시 지금 자리에서 때릴 수 있는 적만 상대한다.
+        bool reachOnly = enemy.DisengageRemaining > 0f;
         EnemyUnit nearest = null;
         float nearestDistance = float.PositiveInfinity;
         foreach (EnemyUnit other in enemies)
         {
             float distance = (other.Position - enemy.Position).sqrMagnitude;
-            if (!IsNearer(other, distance, nearest, nearestDistance) || !CanDetect(enemy, other))
+            if (!IsNearer(other, distance, nearest, nearestDistance) || !CanDetect(enemy, other) ||
+                (reachOnly && !CanAttackFromHere(enemy, other)))
                 continue;
 
             nearest = other;
@@ -488,9 +525,14 @@ internal sealed class CombatPositioning
         alertedUnits.Clear();
         // Snapshot established fights before assigning this plan. Merely acquiring a
         // distant target must not relay awareness indefinitely through the whole army.
+        foughtUnits.Clear();
         foreach (EnemyUnit enemy in enemies)
             if (enemy.IsAlive && enemy.Target is { IsAlive: true } target && CanAttackFromHere(enemy, target))
+            {
                 activeFighters.Add(enemy);
+                foughtUnits.Add(enemy);
+                foughtUnits.Add(target);
+            }
         foreach (EnemyUnit enemy in enemies)
             foreach (EnemyUnit fighter in activeFighters)
                 if ((enemy.Position - fighter.Position).sqrMagnitude <= CombatJoinRange * CombatJoinRange &&
@@ -555,8 +597,14 @@ internal sealed class CombatPositioning
         enemy.RouteBypassOffset = -1;
         enemy.BlockedRouteTime = 0f;
 
-        // Hold position while waiting. Backing away to make room and walking in again as
-        // soon as a slot opened made waiting units pace back and forth behind the fight.
+        // 싸우는 줄 바로 뒤(공격 자리 반경 + 자기 몸통 간격)까지는 걸어가서 기다린다. 멀리서 적을
+        // 정한 채 그 자리에 서 있지 않는다. 다가가기만 하고 물러나지는 않는다: 자리를 내주려고
+        // 물러났다가 자리가 나면 다시 들어오면 싸움 뒤에서 왔다 갔다 하게 된다.
+        Vector3 offset = enemy.Position - target.Position;
+        float distance = offset.magnitude;
+        float ring = SlotRadius(enemy, target) + RequiredSpacing(enemy.Faction, enemy.Faction);
+        if (distance > ring + WaitingRingSlack && grid.HasLineOfSight(enemy.Position, target.Position))
+            enemy.CombatDestination = target.Position + offset / distance * ring;
     }
 
     private bool FindSlot(EnemyUnit enemy, EnemyUnit target, out int slot, out Vector3 waypoint,
@@ -644,7 +692,7 @@ internal sealed class CombatPositioning
         pathGoals.Clear(); pathSlots.Clear();
         for (int i = 0; i < SlotCount; i++)
             if (SlotAvailable(enemy, target, i)) { pathGoals.Add(SlotPosition(enemy, target, i)); pathSlots.Add(i); }
-        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int goal))
+        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int goal, maxDetour: PursuitDetourLimit(enemy, target)))
             slot = pathSlots[goal];
         else
         {
@@ -653,7 +701,7 @@ internal sealed class CombatPositioning
             // reachable spot with a clear strike.
             pathGoals.Clear(); pathGoals.Add(target.Position);
             if (!allowOpenPosition ||
-                !pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, strikeTarget: target))
+                !pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, strikeTarget: target, maxDetour: PursuitDetourLimit(enemy, target)))
             {
                 enemy.PathRetryRemaining = StalledRetargetDelay;
                 CheckStaticReachability(enemy, target, hidden: false);
@@ -722,7 +770,7 @@ internal sealed class CombatPositioning
             if (grid.IsWalkable(grid.WorldToCell(point)) && grid.HasLineOfSight(point, goal))
                 pathGoals.Add(point);
         }
-        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _))
+        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, maxDetour: PursuitDetourLimit(enemy, target)))
         {
             enemy.CombatPathIndex = 0; enemy.CombatPathTarget = target; enemy.CombatPathAnchor = goal;
             enemy.CombatPathSearch = true;
@@ -759,9 +807,9 @@ internal sealed class CombatPositioning
                 if (grid.IsWalkable(grid.WorldToCell(point)) && grid.HasLineOfSight(point, target.Position))
                     pathGoals.Add(point);
             }
-        // A temporary crowd is not an unreachable target. Only reject if even a
-        // route ignoring every unit fails, or no valid striking position exists.
-        if (pathfinder.Find(enemy, pathGoals, staticPath, out _, ignoreUnits: true)) return;
+        // A temporary crowd is not an unreachable target. Only reject if even a route
+        // ignoring every unit fails or is a long way round, or no valid striking position exists.
+        if (pathfinder.Find(enemy, pathGoals, staticPath, out _, ignoreUnits: true, maxDetour: PursuitDetourLimit(enemy, target))) return;
         enemy.UnreachableTarget = target;
         enemy.UnreachableTargetPosition = enemy.LastKnownTargetPosition;
         enemy.UnreachableFromPosition = enemy.Position;
@@ -904,7 +952,10 @@ internal sealed class CombatPositioning
     }
 
     private static Vector3 SlotPosition(EnemyUnit enemy, EnemyUnit target, int slot) =>
-        target.Position + Directions[slot] * Mathf.Min(enemy.Faction.AttackRange,
+        target.Position + Directions[slot] * SlotRadius(enemy, target);
+
+    private static float SlotRadius(EnemyUnit enemy, EnemyUnit target) =>
+        Mathf.Min(enemy.Faction.AttackRange,
             Mathf.Max(enemy.Faction.AttackRange * 0.85f, RequiredSpacing(enemy.Faction, target.Faction) + 0.02f));
 
     private bool CanMove(EnemyUnit enemy, EnemyUnit target, Vector3 from, Vector3 to) =>
@@ -925,6 +976,10 @@ internal sealed class CombatPositioning
                 return true;
         return false;
     }
+
+    // 도발은 벽 너머의 유닛을 끌어오는 주문이라, 도발한 유닛에게 가는 길에는 한도를 두지 않는다.
+    private float PursuitDetourLimit(EnemyUnit enemy, EnemyUnit target) =>
+        enemy.ActiveTaunter == target ? float.PositiveInfinity : MaxPursuitDetour * grid.CellSize;
 
     private bool ClearOfUnits(EnemyUnit enemy, EnemyUnit target, Vector3 from, Vector3 to, bool attacking)
     {
@@ -999,8 +1054,9 @@ internal sealed class CombatPositioning
         }
 
         // With strikeTarget, the search ends at the first node the unit can strike it from.
+        // maxDetour: 경로 길이가 그 목표까지의 직선 거리보다 이만큼 넘게 길면 찾지 못한 것으로 본다.
         public bool Find(EnemyUnit enemy, IReadOnlyList<Vector3> goals, List<Vector3> result, out int goalIndex,
-            bool ignoreUnits = false, EnemyUnit strikeTarget = null)
+            bool ignoreUnits = false, EnemyUnit strikeTarget = null, float maxDetour = float.PositiveInfinity)
         {
             this.ignoreUnits = ignoreUnits;
             goalIndex = -1;
@@ -1019,10 +1075,18 @@ internal sealed class CombatPositioning
                 }
             int end = -1;
             float best = float.PositiveInfinity;
+            // 남은 직선 거리를 더한 값이 가장 먼 목표의 한도를 넘는 지점부터는 어떤 목표에도 한도 안에 닿지 못한다.
+            float limit = float.PositiveInfinity;
+            if (!float.IsPositiveInfinity(maxDetour))
+            {
+                limit = 0f;
+                foreach (Vector3 goal in goals)
+                    limit = Mathf.Max(limit, Vector3.Distance(enemy.Position, goal) + maxDetour);
+            }
             while (open.Count > 0)
             {
                 var entry = Pop();
-                if (entry.Score >= best) break;
+                if (entry.Score >= best || entry.Score > limit) break;
                 int i = entry.Node;
                 if (closed[i]) continue;
                 closed[i] = true;
@@ -1034,7 +1098,9 @@ internal sealed class CombatPositioning
                 for (int g = 0; strikeTarget == null && g < goals.Count; g++)
                 {
                     float distance = Vector3.Distance(points[i], goals[g]);
-                    if (distance > Spacing * 2f || costs[i] + distance >= best || !Clear(enemy, points[i], goals[g])) continue;
+                    if (distance > Spacing * 2f || costs[i] + distance >= best ||
+                        costs[i] + distance > Vector3.Distance(enemy.Position, goals[g]) + maxDetour ||
+                        !Clear(enemy, points[i], goals[g])) continue;
                     best = costs[i] + distance; end = i; goalIndex = g;
                 }
                 for (int d = 0; d < 8; d++)

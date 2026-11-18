@@ -1,0 +1,67 @@
+--- src/00_Core/CombatPositioning.cs	2026-11-19 07:34:47
++++ src-p2/00_Core/CombatPositioning.cs	2026-11-19 07:53:51
+@@ -353,7 +353,44 @@
+         }
+         return best > 0f;
+     }
++
++    internal const float SeparationSpeed = 1f;
++    private readonly List<(EnemyUnit Unit, Vector3 Push)> separation = new();
+ 
++    public void SeparateRestingAllies(float deltaTime)
++    {
++        separation.Clear();
++        foreach (EnemyUnit unit in enemies)
++        {
++            if (unit.Target != null || !unit.Position.Equals(unit.PreviousPosition))
++                continue;
++            Vector3 push = Vector3.zero;
++            foreach (EnemyUnit other in enemies)
++            {
++                if (other == unit || other.FactionIndex != unit.FactionIndex || !other.Position.Equals(other.PreviousPosition))
++                    continue;
++                float spacing = RequiredSpacing(unit.Faction, other.Faction);
++                Vector3 offset = unit.Position - other.Position;
++                float distance = offset.magnitude;
++                if (distance >= spacing)
++                    continue;
++                Vector3 direction = distance > 0.0001f ? offset / distance
++                    : unit.SpawnOrder < other.SpawnOrder ? Vector3.right : Vector3.left;
++                push += direction * (spacing - distance);
++            }
++            if (push.sqrMagnitude > 0f)
++                separation.Add((unit, push));
++        }
++        foreach ((EnemyUnit unit, Vector3 push) in separation)
++        {
++            float step = Mathf.Min(push.magnitude, SeparationSpeed * deltaTime);
++            Vector3 next = unit.Position + push.normalized * step;
++            if (grid.IsWalkable(grid.WorldToCell(next)) && grid.CanPursue(unit.Position, next) &&
++                ClearOfUnits(unit, null, unit.Position, next, attacking: false))
++                unit.MoveOffRoute(next);
++        }
++    }
++
+     public void Move(EnemyUnit enemy, EnemyUnit target, float deltaTime)
+     {
+         if (CanAttack(enemy, target))
+@@ -934,6 +971,8 @@
+         {
+             if (other == enemy || (attacking && other == target))
+                 continue;
++            if (!attacking && lengthSquared > 0f && other.FactionIndex == enemy.FactionIndex)
++                continue; // 실험: 아군 통과
+ 
+             Vector3 offset = other.Position - from;
+             float along = Vector3.Dot(offset, step);
+--- src/04_Combat/DefenseBattle.cs	2026-11-19 07:34:47
++++ src-p2/04_Combat/DefenseBattle.cs	2026-11-19 07:53:51
+@@ -524,6 +524,8 @@
+                 }
+                 AdvanceUnit(enemy, deltaTime);
+             }
++
++            combat.SeparateRestingAllies(deltaTime);
+ 
+             for (int i = enemies.Count - 1; i >= 0; i--)
+             {

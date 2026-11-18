@@ -1,0 +1,24 @@
+# 테스트 장면(FirstWaveRearUnitsDoNotRepeatedlyReverseWhileWithoutTarget)의 타깃 없는 유닛 돌아섬, Unity 밖 빌드
+== w0 (이전)
+tick 559 #9 F1 pos (12.33,4.76) prevState - heading (0.0,-1.0)->(-0.3,1.0) onRoute False wp (12.0,6.0)
+tick 887 #7 F1 pos (7.97,5.76) prevState T#4 heading (-0.4,-0.9)->(0.0,1.0) onRoute False wp (11.0,6.0)
+tick 1042 #9 F1 pos (8.97,6.00) prevState - heading (0.9,0.3)->(-1.0,0.0) onRoute True wp (8.0,6.0)
+phase Preparation max 2 [0,0,0,0,0,0,0,1,0,2]
+== w2 (대기 수정만)
+tick 818 #7 F1 pos (8.75,3.69) prevState Q#4 heading (-0.7,0.7)->(0.9,0.4) onRoute False wp (11.0,6.0)
+tick 818 #8 F1 pos (8.76,5.02) prevState T#4 heading (-1.0,0.1)->(0.8,0.6) onRoute False wp (11.0,6.0)
+tick 818 #9 F1 pos (8.45,6.02) prevState T#4 heading (-0.8,-0.6)->(-0.1,1.0) onRoute False wp (11.0,6.0)
+tick 863 #8 F1 pos (8.41,5.77) prevState - heading (-0.9,0.5)->(0.9,0.4) onRoute False wp (11.0,6.0)
+tick 888 #8 F1 pos (8.97,6.00) prevState - heading (0.9,0.4)->(-1.0,0.0) onRoute True wp (8.0,6.0)
+tick 919 #7 F1 pos (9.97,6.00) prevState - heading (0.4,0.9)->(-1.0,0.0) onRoute True wp (9.0,6.0)
+phase Preparation max 3 [0,0,0,0,0,0,0,2,3,1]
+== w3 (최종)
+tick 818 #9 F1 pos (8.45,6.02) prevState T#4 heading (-0.8,-0.6)->(-0.1,1.0) onRoute False wp (11.0,6.0)
+tick 829 #8 F1 pos (8.75,5.03) prevState - heading (-1.0,0.1)->(0.3,1.0) onRoute False wp (11.0,6.0)
+tick 839 #7 F1 pos (8.76,3.68) prevState - heading (-0.7,0.7)->(1.0,0.0) onRoute False wp (11.0,6.0)
+phase Preparation max 1 [0,0,0,0,0,0,0,1,1,1]
+
+# 밀집 전투 20명 + 벽 4개, 칸 크기 1, 대기 수정만 넣은 판: 같은 진영 두 유닛이 문 아래에서 마주 보고 멈춤
+finished=False ticks=24000 units=2 spawned=40 lastAttackChangeTick=5150 core=108
+#5 F1 pos (8.50,6.00) moved False tgt - canAtk False queue - dest - slot -1 stall 0.00 idleQ 0.00 diseng 0.00 routeWp (8.0,6.0) onRoute True blocked 0.07 yield False hp 10
+#29 F1 pos (7.46,6.00) moved False tgt - canAtk False queue - dest - slot -1 stall 0.00 idleQ 0.00 diseng 0.00 routeWp (8.0,6.0) onRoute True blocked 0.08 yield False hp 90

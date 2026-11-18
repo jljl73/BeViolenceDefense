@@ -207,3 +207,4 @@ MonoBehaviour:
     size: {x: 1, y: 1}
     rotation: 0
   waves: {fileID: 0}
+  reinforcementWaveLimit: 3

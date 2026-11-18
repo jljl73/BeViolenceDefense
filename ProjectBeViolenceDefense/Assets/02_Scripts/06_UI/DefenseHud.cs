@@ -44,6 +44,7 @@ internal sealed class DefenseHud
 
     private readonly UIManager ui;
     private readonly Art art;
+    private readonly StageSpellUnlocks spellUnlocks;
     private readonly RectTransform markers;
     private readonly RectTransform defeatPopup;
     private readonly TextMeshProUGUI round;
@@ -90,11 +91,13 @@ internal sealed class DefenseHud
     private float noticeUntil;
 
     public DefenseHud(UIManager ui, UnityAction restart, UnityAction start, Action<DefenseBattle.Spell> cast,
-        Action<int> setBattleSpeed, Texture2D encounterIcon, Art art, IReadOnlyList<EnemyFaction> factions)
+        Action<int> setBattleSpeed, Texture2D encounterIcon, Art art, IReadOnlyList<EnemyFaction> factions,
+        StageSpellUnlocks spellUnlocks)
     {
         this.ui = ui;
         this.encounterIcon = encounterIcon;
         this.art = art ?? new Art();
+        this.spellUnlocks = spellUnlocks;
         markers = Rect("Board Markers", ui.HudLayer, Vector2.zero, Vector2.one * 0.5f, Vector2.zero, Vector2.zero);
         Stretch(markers);
 
@@ -561,9 +564,11 @@ internal sealed class DefenseHud
         DefenseBattle.Spell? aimedSpell, int aimedRangeStep, bool spellHovered)
     {
         bool aimed = aimedSpell == slot.Spell;
+        int requiredStage = spellUnlocks.MissingStage(slot.Spell);
+        bool locked = requiredStage != 0;
         int rangeStep = aimed ? aimedRangeStep : battle.InitialSpellRangeStep(slot.Spell);
         string reason = battle.SpellBlockReason(slot.Spell, rangeStep);
-        bool ready = !blocked && reason == null;
+        bool ready = !locked && !blocked && reason == null;
         slot.Control.Button.interactable = ready;
         Color ink = art.ColoredSkillIcons && !slot.TintIcon
             ? (ready ? Color.white : new Color(0.55f, 0.5f, 0.58f, 0.8f))
@@ -576,10 +581,14 @@ internal sealed class DefenseHud
         }
         slot.Cost.color = ready ? UIPalette.Mana : UIPalette.TextSecondary;
         slot.Cost.SetText("{0}", DefenseBattle.ManaCost(slot.Spell, rangeStep));
+        slot.Cost.enabled = !locked;
+        slot.Lock.enabled = locked && slot.Lock.sprite != null;
 
         if (blocked || !(spellHovered ? slot.Control.Hovered : slot.Control.Focused))
             return null;
 
+        if (locked)
+            return $"{slot.Name}\n{GameText.Format("spell.locked", requiredStage)}";
         if (reason != null)
             return $"{slot.Effect}\n{reason}";
         return slot.Effect;
@@ -618,6 +627,8 @@ internal sealed class DefenseHud
         // 사용 횟수 제한이 없으므로 마나 비용만 슬롯 아래 가운데에 보여 준다.
         TextMeshProUGUI cost = Label("Cost", rect, 36, costY, 38, 24, 21, TextAlignmentOptions.Center);
         cost.text = DefenseBattle.ManaCost(spell).ToString();
+        Image lockIcon = AddIcon("Lock", rect, art.Lock, new Vector2(45, costY), 20, UIPalette.TextSecondary);
+        lockIcon.enabled = false;
         var (displayName, description) = spell switch
         {
             DefenseBattle.Spell.AttackBuff => (GameText.Get("spell.attack.name"),
@@ -632,7 +643,7 @@ internal sealed class DefenseHud
                 GameText.Format("spell.taunt.description", DefenseBattle.TauntDuration,
                     EnemyUnit.TauntHealthBonusPercent * 100, DefenseBattle.TauntRadius))
         };
-        return new SpellSlot(control, spell, tint, cost, displayName, $"{displayName} · {description}", frame, tintIcon);
+        return new SpellSlot(control, spell, tint, cost, lockIcon, displayName, $"{displayName} · {description}", frame, tintIcon);
     }
 
     private HudButton ActionButton(string name, RectTransform parent, Vector2 position, Vector2 size,
@@ -754,13 +765,14 @@ internal sealed class DefenseHud
         public readonly DefenseBattle.Spell Spell;
         public readonly Color Tint;
         public readonly TextMeshProUGUI Cost;
+        public readonly Image Lock;
         public readonly string Name;
         public readonly string Effect;
         public readonly Image Frame;
         // 채색 아이콘 세트에 전용 그림이 없어 흰 아이콘에 의미 색을 입혀야 하는 슬롯.
         public readonly bool TintIcon;
 
-        public SpellSlot(HudButton control, DefenseBattle.Spell spell, Color tint, TextMeshProUGUI cost,
+        public SpellSlot(HudButton control, DefenseBattle.Spell spell, Color tint, TextMeshProUGUI cost, Image lockIcon,
             string name, string effect, Image frame = null, bool tintIcon = false)
         {
             Frame = frame;
@@ -768,6 +780,7 @@ internal sealed class DefenseHud
             Spell = spell;
             Tint = tint;
             Cost = cost;
+            Lock = lockIcon;
             Name = name;
             Effect = effect;
             TintIcon = tintIcon;

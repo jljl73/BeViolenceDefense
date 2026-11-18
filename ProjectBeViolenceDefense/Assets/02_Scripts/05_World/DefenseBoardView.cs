@@ -14,8 +14,8 @@ internal sealed class DefenseBoardView
     private const float ZoomResponse = 18f;
     private const float MaxZoomFrameTime = 0.05f;
     private const float ZoomSnapDistance = 0.0005f;
-    private const float MinViewScale = 0.35f;
-    private const float MaxViewScale = 1.2f;
+    private const float MinViewScale = 0.2f;
+    private const float MaxViewScale = 1.05f;
     private const float TileHeight = 0.28f;
     private const float RouteLaneSpacing = 0.49f;
     private const float RouteMarkerHeight = 0.02f;
@@ -1618,9 +1618,12 @@ internal sealed class DefenseBoardView
         var board = new Vector3[routes.Count][];
         for (int i = 0; i < board.Length; i++)
         {
-            board[i] = new Vector3[routes[i].Length];
+            Vector3[] route = routes[i];
+            if (route == null)
+                continue;
+            board[i] = new Vector3[route.Length];
             for (int j = 0; j < board[i].Length; j++)
-                board[i][j] = ToBoard(routes[i][j]);
+                board[i][j] = ToBoard(route[j]);
         }
         return board;
     }

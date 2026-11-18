@@ -649,32 +649,91 @@ public sealed class CombatPositioningTests
     }
 
     [Test]
-    public void KnownTargetIsReachedAroundAUWallWithoutLosingItOrCuttingWalls()
+    public void SightAndMovementAgreeAlongWallEdges()
+    {
+        var grid = OpenGrid(new Vector2Int(6, 6));
+        // 벽 칸의 가장자리를 스치는 선. 이전에는 보이지만 곧장 걸어갈 수는 없었다.
+        var from = new Vector3(4, 0, 6.5f);
+        var to = new Vector3(8, 0, 6.5f);
+        Assert.That(grid.CanPursue(from, to), Is.False);
+        Assert.That(grid.HasLineOfSight(from, to), Is.False);
+        for (int step = 0; step <= 40; step++)
+        {
+            float z = 5f + step * 0.05f;
+            from = new Vector3(4, 0, z);
+            to = new Vector3(8, 0, 12f - z);
+            Assert.That(grid.HasLineOfSight(from, to), Is.EqualTo(grid.CanPursue(from, to)), $"z {z}");
+        }
+    }
+
+    [Test]
+    public void KnownTargetBehindALongWallIsLeftAloneInsteadOfWalkingAllTheWayRound()
     {
         var grid = UShapedWall();
         var attacker = Unit(0, 0, 4, 6, radius: 0.3f);
         var target = Unit(1, 1, 8, 6, radius: 0.3f);
         // An already seen opponent is now occluded while the pursuer is inside the U.
+        // Leaving the U and coming back round is far beyond MaxPursuitDetour.
         attacker.Target = target;
         var combat = new CombatPositioning(grid, new[] { attacker, target });
-        float travelled = 0f, leftmost = attacker.Position.x;
-        bool usedPath = false;
-        for (int tick = 0; tick < 1200 && !combat.CanAttack(attacker, target); tick++)
+        float travelled = 0f;
+        for (int tick = 0; tick < 600; tick++)
+        {
+            Vector3 before = attacker.Position;
+            StepApproach(combat, attacker, tick);
+            attacker.TickTimers(DefenseBattle.TickDuration);
+            Assert.That(grid.CanPursue(before, attacker.Position), Is.True);
+            travelled += Vector3.Distance(before, attacker.Position);
+        }
+        Assert.That(attacker.Target ?? attacker.CombatQueue?.Target, Is.Null);
+        Assert.That(attacker.CombatPath, Is.Empty);
+        Assert.That(travelled, Is.LessThan(1f));
+    }
+
+    [Test]
+    public void KnownTargetBehindAPillarIsReachedByAShortWayRound()
+    {
+        var grid = OpenGrid(new Vector2Int(6, 6));
+        var attacker = Unit(0, 0, 4, 6, radius: 0.3f);
+        var target = Unit(1, 1, 8, 6, radius: 0.3f);
+        Assert.That(grid.HasLineOfSight(attacker.Position, target.Position), Is.False, "The pillar must hide the opponent.");
+        attacker.Target = target;
+        var combat = new CombatPositioning(grid, new[] { attacker, target });
+        float travelled = 0f;
+        for (int tick = 0; tick < 600 && !combat.CanAttack(attacker, target); tick++)
         {
             Vector3 before = attacker.Position;
             StepApproach(combat, attacker, tick);
             attacker.TickTimers(DefenseBattle.TickDuration);
             Assert.That(attacker.Target ?? attacker.CombatQueue?.Target, Is.SameAs(target));
             Assert.That(grid.CanPursue(before, attacker.Position), Is.True);
-            Assert.That(Vector3.Distance(attacker.Position, target.Position), Is.GreaterThanOrEqualTo(0.66f - 0.0001f));
             travelled += Vector3.Distance(before, attacker.Position);
-            leftmost = Mathf.Min(leftmost, attacker.Position.x);
-            usedPath |= attacker.CombatPath.Count > 0;
         }
-        Assert.That(usedPath, Is.True);
-        Assert.That(leftmost, Is.LessThan(2.5f), "The route must initially move away from the opponent to leave the U.");
-        Assert.That(travelled, Is.GreaterThan(10f));
         Assert.That(combat.CanAttack(attacker, target), Is.True);
+        Assert.That(travelled, Is.LessThan(4f + CombatPositioning.MaxPursuitDetour));
+    }
+
+    // 1칸 폭 복도에서 앞의 아군이 적과 맞붙어 길을 막았다. 반대편 자리로 가려면 복도를 나가 바깥으로
+    // 한참 돌아야 한다. 길 자체는 짧으므로 적을 버리지 않고, 돌아가지도 않고 뒤에서 기다린다.
+    [Test]
+    public void UnitBlockedByItsOwnFrontLineWaitsBehindInsteadOfWalkingAllTheWayRound()
+    {
+        var walls = new List<Vector2Int>();
+        for (int x = 2; x <= 9; x++) { walls.Add(new Vector2Int(x, 5)); walls.Add(new Vector2Int(x, 7)); }
+        var grid = OpenGrid(walls.ToArray());
+        var waiting = Unit(0, 0, 4, 6, radius: 0.3f);
+        var front = Unit(0, 1, 5, 6, radius: 0.3f);
+        var opponent = Unit(1, 2, 6.3f, 6, radius: 0.3f);
+        var combat = new CombatPositioning(grid, new[] { waiting, front, opponent });
+        Vector3 start = waiting.Position;
+        for (int tick = 0; tick < 600; tick++)
+        {
+            StepApproach(combat, waiting, tick);
+            waiting.TickTimers(DefenseBattle.TickDuration);
+            Assert.That(waiting.Target ?? waiting.CombatQueue?.Target, Is.SameAs(opponent), $"tick {tick}");
+            Assert.That(Vector3.Distance(waiting.Position, start), Is.LessThan(1f), $"tick {tick}");
+        }
+        Assert.That(combat.CanAttack(front, opponent), Is.True, "The fixture must keep the front unit fighting.");
     }
 
     [Test]
@@ -714,7 +773,7 @@ public sealed class CombatPositioningTests
     }
 
     [Test]
-    public void TargetDeathDuringLongDetourStillAllowsReturningToCoreRoute()
+    public void UnitLeftOffItsRouteBehindALongWallStillReturnsToTheCoreRoute()
     {
         var grid = UShapedWall();
         var faction = new EnemyFaction("Pursuer", Color.white, spawnCount: 0, maxHealth: 1000);
@@ -727,13 +786,8 @@ public sealed class CombatPositioningTests
         attacker.Target = target;
         battle.StartRound();
         ((List<EnemyUnit>)battle.Enemies).AddRange(new[] { attacker, target });
-        bool usedPath = false;
         for (int tick = 0; tick < 180; tick++)
-        {
             battle.Tick(DefenseBattle.TickDuration, false);
-            usedPath |= attacker.CombatPath.Count > 0;
-        }
-        Assert.That(usedPath, Is.True);
         target.Die();
         for (int tick = 0; tick < 3000 && battle.CurrentPhase == DefenseBattle.Phase.Combat; tick++)
         {
@@ -821,6 +875,57 @@ public sealed class CombatPositioningTests
         }
         Assert.That(fighters.All(f => combat.CanAttack(f, target)), Is.True);
         Assert.That(waiting.CombatQueue?.Target, Is.SameAs(target));
+    }
+
+    [Test]
+    public void WaitingUnitWalksUpBehindTheFightInsteadOfStandingFarAway()
+    {
+        var target = Unit(1, 0, 6, 6, radius: 0.3f);
+        var fighters = new[] { Unit(0, 1, 4.9f, 6, radius: 0.3f), Unit(0, 2, 6, 4.9f, radius: 0.3f), Unit(0, 3, 6, 7.1f, radius: 0.3f) };
+        var waiting = Unit(0, 4, 2.6f, 7.2f, radius: 0.3f);
+        var units = new List<EnemyUnit>(fighters) { waiting, target };
+        var combat = new CombatPositioning(OpenGrid(), units);
+        float distance = Vector3.Distance(waiting.Position, target.Position);
+        for (int tick = 0; tick < 300; tick++)
+        {
+            StepApproach(combat, waiting, tick);
+            float now = Vector3.Distance(waiting.Position, target.Position);
+            Assert.That(now, Is.LessThanOrEqualTo(distance + 0.0001f), "A waiting unit closes in; it never backs away.");
+            distance = now;
+        }
+        Assert.That(fighters.All(f => combat.CanAttack(f, target)), Is.True);
+        Assert.That(waiting.CombatQueue?.Target, Is.SameAs(target));
+        // 공격 자리 반경(사거리의 85%) + 자기 몸통 간격 바로 뒤.
+        float ring = 1.5f * 0.85f + CombatPositioning.RequiredSpacing(waiting.Faction, waiting.Faction);
+        Assert.That(distance, Is.InRange(ring - 0.01f, ring + 0.35f));
+    }
+
+    // 2스테이지 시안(삭제됨)에 윗문 (3,12)을 막은 배치. 코어 아래에서 네 유닛이 서로 다른 적을 기다리며
+    // 원을 이뤄, 아무도 싸우지 않은 채 멈췄다. 싸움 없는 대기는 그만두어야 전투가 끝난다.
+    [Test]
+    public void UnitsWaitingOnOpponentsNobodyFightsGiveUpInsteadOfFreezing()
+    {
+        var grid = MapGrid(new[] { new Vector2Int(2, 2), new Vector2Int(14, 2) },
+            ".................", ".................", ".................",
+            ".....#.....#.....",
+            "########.####.###",
+            "....#.......#....",
+            "##.....###.....##",
+            "....#.......#....",
+            "..######.######..",
+            "....#.......#....",
+            "##.....###.....##",
+            "....#.......#....",
+            "..######.######..",
+            "....#.......#....",
+            "....#.......#....",
+            ".......###.......",
+            "....#.......#....");
+        var result = RunToEnd(grid, Lineup(
+            new[] { (Kind("grunt", 75, 10, 0.65f, 1.7f, 0.34f), 6) },
+            new[] { (Kind("skeleton", 70, 12, 0.8f, 1.6f, 0.22f * 1.3f), 6) }), 120 * DefenseBattle.TicksPerSecond);
+        Assert.That(result.Spawned, Is.EqualTo(12));
+        Assert.That(result.Finished, Is.True);
     }
 
     [Test]

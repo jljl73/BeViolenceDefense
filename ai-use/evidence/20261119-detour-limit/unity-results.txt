@@ -1,0 +1,18 @@
+Unity 6000.3.28f1 EditMode, 프로젝트 복사본(세션 임시 폴더). 실행 전 복사본의 Library/ilpp.pid 삭제.
+
+[고친 뒤 최종] testcasecount="112" result="Failed(Child)" total="112" passed="110" failed="2"
+  FAILED StageContentTests.EveryStageIsSelfContainedWithoutDuplicatingSharedGameplayOrUi
+  FAILED StageContentTests.GoldenMapleLoadsTheStage2LayoutOnTheFrameItsSceneryWasBuiltFor
+  -> 두 실패 모두 Stage2.asset 삭제(커밋 c9b1876)로 Stage_GoldenMaple.prefab의 지형 참조가 끊긴 탓. 이 변경과 무관.
+
+[고치기 전 전투 코드(HEAD의 CombatPositioning.cs, DefenseGrid.cs) + 새 테스트] testcasecount="112" result="Failed(Child)" total="112" passed="107" failed="5"
+  FAILED CombatPositioningTests.KnownTargetBehindALongWallIsLeftAloneInsteadOfWalkingAllTheWayRound
+  FAILED CombatPositioningTests.SightAndMovementAgreeAlongWallEdges
+  FAILED CombatPositioningTests.UnitBlockedByItsOwnFrontLineWaitsBehindInsteadOfWalkingAllTheWayRound
+  FAILED StageContentTests.EveryStageIsSelfContainedWithoutDuplicatingSharedGameplayOrUi
+  FAILED StageContentTests.GoldenMapleLoadsTheStage2LayoutOnTheFrameItsSceneryWasBuiltFor
+  (고치기 전 코드에는 MaxPursuitDetour 상수가 없어 사본 테스트에서만 숫자 3으로 바꿔 컴파일했다)
+
+[중간 실행] 우회 한도·시야 통일만 넣고 테스트를 고치기 전: 109개 중 5개 실패
+  KnownTargetIsReachedAroundAUWallWithoutLosingItOrCuttingWalls, TargetDeathDuringLongDetourStillAllowsReturningToCoreRoute (큰 우회를 기대하던 테스트),
+  TauntTests.TauntReachesThroughAWallAndTheUnitWalksAroundIt (-> 도발은 한도에서 제외), StageContentTests 2개(위와 같음)

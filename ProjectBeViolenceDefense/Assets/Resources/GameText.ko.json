@@ -68,6 +68,7 @@
     {"key": "spell.attack.name", "text": "공격력 강화"},
     {"key": "spell.heal.description", "text": "범위 안 부상 유닛의 체력을 각각 최대 체력의 {0:0}%만큼 회복"},
     {"key": "spell.heal.name", "text": "범위 회복"},
+    {"key": "spell.locked", "text": "{0}스테이지 클리어 후 해금"},
     {"key": "spell.move_speed.description", "text": "{0:0}초간 중첩당 이동속도 +{1:0}%"},
     {"key": "spell.move_speed.name", "text": "이동속도 강화"},
     {"key": "spell.taunt.description", "text": "유닛 하나가 {0:0}초간 커지고 최대 체력이 {1:0}% 증가. 벽 너머까지 반경 {2:0.0}칸 안의 다른 진영 유닛을 유인"},

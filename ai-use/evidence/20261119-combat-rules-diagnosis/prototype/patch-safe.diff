@@ -1,0 +1,22 @@
+--- src/00_Core/CombatPositioning.cs	2026-11-19 07:34:47
++++ src-safe/00_Core/CombatPositioning.cs	2026-11-19 07:57:07
+@@ -589,7 +589,7 @@
+             shortest = length;
+         }
+         if (slot >= 0) return true;
+-        if (FindPathSlot(enemy, target, out slot, out waypoint, out shortest)) return true;
++        if (FindPathSlot(enemy, target, out slot, out waypoint, out shortest, allowOpenPosition: true)) return true;
+         if (!allowLocalSteer) return false;
+         for (int i = 0; i < SlotCount; i++)
+         {
+--- src/05_World/DefenseGrid.cs	2026-11-19 07:34:47
++++ src-safe/05_World/DefenseGrid.cs	2026-11-19 07:57:07
+@@ -135,7 +135,7 @@
+     // 코어도 벽처럼 시야와 공격을 막는다. 벽과 같은 여유(칸 가장자리에서 SightInset)를 두어
+     // 모서리를 스치는 시선은 통과시킨다.
+     public bool HasLineOfSight(Vector3 from, Vector3 to)
+-        => !CrossesCore(from, to, SightInset * CellSize) && IsWallFree(from, to, 0f);
++        => !CrossesCore(from, to, 0f) && IsWallFree(from, to, 0.24f); // 실험: 시야를 이동 판정과 같게
+ 
+     public bool CanPursue(Vector3 from, Vector3 to)
+         => !CrossesCore(from, to, 0f) && IsWallFree(from, to, 0.24f);

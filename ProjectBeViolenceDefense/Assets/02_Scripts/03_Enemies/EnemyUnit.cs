@@ -128,6 +128,10 @@ internal sealed class EnemyUnit
     public Vector3? RouteYieldDestination { get; set; }
     public int RouteBypassOffset { get; set; } = -1;
     public float BlockedRouteTime { get; set; }
+    // 아무도 싸우지 않는 적을 기다린 시간. 한도를 넘으면 대기를 그만둔다.
+    public float IdleQueueTime { get; set; }
+    // 그런 대기를 그만둔 뒤, 지금 자리에서 때릴 수 있는 적만 상대하는 남은 시간.
+    public float DisengageRemaining { get; set; }
     // 직전 이동 때 교전·추격·대기 중이었는지. 타깃을 잃은 첫 이동에서 코어 경로를 다시 잡는 데 쓴다.
     public bool WasEngaged { get; set; }
     public bool ReachedCore => Position.Equals(path[^1]);
@@ -151,6 +155,7 @@ internal sealed class EnemyUnit
         PathRetryRemaining = Mathf.Max(0, PathRetryRemaining - deltaTime);
         RetargetLockRemaining = Mathf.Max(0, RetargetLockRemaining - deltaTime);
         SidestepMemoryRemaining = Mathf.Max(0, SidestepMemoryRemaining - deltaTime);
+        DisengageRemaining = Mathf.Max(0, DisengageRemaining - deltaTime);
         RetaliationRemaining = Mathf.Max(0, RetaliationRemaining - deltaTime);
         if (RetaliationRemaining <= 0f || RetaliationTarget is not { IsAlive: true })
         {
