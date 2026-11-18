@@ -720,3 +720,50 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 테스트 씬(GameScene_LeftCoreHud, Stage_GoldenMaple, Stage_Graveyard, Stage_Snowfield)은 StageData가 없어 웨이브 편성이 빠지고 기존 증원 규칙으로 끝없이 진행됨(구 `rounds` 데이터는 씬 파일에 남아 있지만 읽히지 않음). 그룹이 2개 이상인 웨이브의 실제 무작위 선택은 단위 테스트(주입한 선택값)로만 확인. BalanceSim의 씬 편성 파서는 이전부터 현재 씬 형식과 맞지 않으며 수정하지 않음. 승리 패널의 스테이지 표시는 에셋 이름(예: "StageTEST")을 씀.
+
+### [20261119-stage-waves-editor] StageWaves 인간 편집용 Editor 도구
+- 시각: 2026-11-19 03:26:00 +09:00
+- 작업자: ppzepi
+- 사용 도구: OpenAI Codex / GPT-6, Unity CLI 1.0.0, Unity Editor 6000.3.28f1, 웹 검색, Computer Use
+- 목적 및 적용 위치: 중첩된 StageWaves 편성을 웨이브 목록·팩션 후보 카드·유닛 표로 쉽게 편집하도록 Editor 전용 도구 제공.
+- 사용 방식: 실제 SO·카탈로그·런타임 소비 코드·기존 IMGUI 도구 확인, 공개 Wave Timeline UX 문서 참고, 직렬화 편집과 검증 UI 구현, CLI 컴파일·EditMode·Play Mode 및 실제 창 검증.
+- 결과 및 확인 방법: 성공 / 최종 컴파일 오류·경고 0, 관련 EditMode 12/12 통과. 임시 복사본에서 후보 복제·50% 확률 표시·저장 후 재임포트 확인. GameScene 프레임 진행과 Play Mode 편집 잠금, 최종 새 콘솔 오류 0 확인. 원본 밸런스·씬·패키지 변경 없음.
+- 사람의 개입: 사용자가 편집 도구 제작 및 공개 에셋 UI/UX 참고를 요청. 직접 수정 및 최종 채택 여부는 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ai-use/evidence/20261119-stage-waves-editor/README.md | Codex | 생성 | 전체 소스·테스트·문서·meta·증거 목록 및 검증 범위. 작업 트리 적용, 사람 채택 확인 필요 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/Editor/ | Codex + Unity Editor(meta) | 생성·수정 | 편집 창·Inspector·직렬화 도우미 추가, 기존 Stage Editor 연결. 상세 파일은 위 목록 참고 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/StageWavesEditingTests.cs 및 .meta | Codex + Unity Editor(meta) | 생성 | 신규 편집 회귀 테스트 7개, 통과 |
+| docs/stage-waves-editor.md | Codex | 생성 | 사용법과 공개 참고 출처, 작업 트리 적용 |
+
+#### 증거
+- ai-use/evidence/20261119-stage-waves-editor/README.md
+- ai-use/evidence/20261119-stage-waves-editor/compile.json
+- ai-use/evidence/20261119-stage-waves-editor/tests.json
+- ai-use/evidence/20261119-stage-waves-editor/editor.png
+- ai-use/evidence/20261119-stage-waves-editor/play-readonly.png
+- ai-use/evidence/20261119-stage-waves-editor/play-frames.json
+- ai-use/evidence/20261119-stage-waves-editor/final-console.json
+- ai-use/evidence/20261119-stage-waves-editor/final-state.json
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 프로젝트 연결·버전·씬 상태 확인, 스크립트 컴파일, 관련 EditMode 테스트, 창 열기, 임시 에셋 생성·재임포트·정리, 화면 캡처, Play Mode 프레임·콘솔 확인.
+- 활용 방식: Codex가 구현·검증 절차를 작성하고 CLI가 실행 중인 해당 Unity Editor에서 recompile, test run/status, script eval, capture editor_window, editor.playmode, job wait, console get 수행.
+- 잘된 점: 12개 테스트 결과와 실제 Editor 화면·Play Mode 동작을 확인하고 증거 파일로 저장. 테스트용 임시 에셋만 사용해 원본 밸런스 유지.
+- 잘 안된 점 및 개선 필요: CLI 경로가 샌드박스에서 보이지 않아 승인된 외부 실행으로 연결. 컴파일 직후 도메인 재로드 구간에서 1회 연결 실패하여 status --until-ready로 복구. 초기 EditorGUI 비공개 API 사용 컴파일 오류를 제거하여 해결. 1.0.1 업데이트는 별도 승인 없이 수행하지 않음.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex의 파일 편집·셸 실행·웹 검색·Computer Use, 프로젝트 Editor 소스와 문서·검증 기록.
+- 사용 방식: 코드와 데이터 분석 → 공개 편집 UX 조사 → 구현 → 자동 테스트 → 실제 화면의 후보 복제·저장 검증 → 로그 추가.
+- 특별히 활용한 점: 기존 전투 데이터 형식을 유지하며 중첩 복제 독립성·Undo/Redo·무작위 후보 병력 집계를 검증.
+
+#### 주요 프롬프트
+- 사용 도구: OpenAI Codex
+- 프롬프트 원문: 현재 StageWavesSO가 인간 개발자가 편집하기에 수월한 상태가 아니다. 사람이 편집하기에 용이하도록 Editor tool로 만들어라. 가능하다면 비슷한 공개된 에셋의 편집기를 참고해서 UI와 UX를 고려해라.
+- 결과 및 실제 활용 방식: 전용 창·검색 선택기·후보 카드·검증 UI와 사용 문서 구현에 적용.
+- 선정 이유: 이번 도구의 작업 범위와 인간 편집 중심 UX 방향을 지정한 핵심 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 실제 밸런스 작업에서 이름/ID 검색 입력과 유닛 선택의 전체 UI 흐름, 다양한 화면 크기·Unity 밝은 테마 사용성. 자동 UI 입력은 팝업 포커스 제약으로 검색 입력 완료를 확인하지 못함. 전투 전체 플레이와 Player 빌드는 미실행.

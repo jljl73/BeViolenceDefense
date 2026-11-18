@@ -185,6 +185,21 @@ internal sealed class StageEditorWindow : EditorWindow
             return;
 
         EditorGUILayout.Space();
+        using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
+        {
+            EditorGUI.BeginChangeCheck();
+            var waves = (StageWaves)EditorGUILayout.ObjectField("웨이브", stage.waves, typeof(StageWaves), false);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(stage, "스테이지 웨이브 연결");
+                stage.waves = waves;
+                EditorUtility.SetDirty(stage);
+            }
+        }
+        if (GUILayout.Button(stage.waves != null ? "웨이브 편집기 열기" : "웨이브 만들기…"))
+            StageWavesEditorWindow.Open(stage.waves, stage);
+
+        EditorGUILayout.Space();
         EditorGUILayout.LabelField("보드 크기", EditorStyles.boldLabel);
         EditorGUI.BeginChangeCheck();
         int width = EditorGUILayout.IntSlider("가로", stage.width, StageData.MinSize, StageData.MaxSize);
