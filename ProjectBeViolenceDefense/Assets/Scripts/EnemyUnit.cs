@@ -7,10 +7,12 @@ internal sealed class EnemyFaction
     [SerializeField] private string displayName;
     [SerializeField] private Color color;
     [SerializeField, Min(0.1f)] private float attackRange;
+    [SerializeField, Min(0.1f)] private float awarenessRange = 2.2f;
 
     public string DisplayName => displayName;
     public Color Color => color;
     public float AttackRange => attackRange;
+    public float AwarenessRange => Mathf.Max(attackRange, awarenessRange);
 
     public EnemyFaction(string displayName, Color color, float attackRange)
     {
@@ -30,7 +32,7 @@ internal sealed class EnemyUnit
     private const float MoveSpeed = 2.25f;
 
     private readonly Vector3[] path;
-    private readonly float lastStepLength;
+    private readonly float[] remainingDistance;
     private int waypoint = 1;
     private int pendingDamage;
     private float cooldown;
@@ -38,8 +40,10 @@ internal sealed class EnemyUnit
 
     public EnemyFaction Faction { get; }
     public int SpawnOrder { get; }
+    public int FactionIndex { get; }
     public int Health { get; private set; } = MaxHealth;
     public Vector3 Position { get; private set; }
+    public Vector3 RoutePosition { get; private set; }
     public Vector3 Heading { get; private set; }
     public float AttackBuffRemaining { get; private set; }
     public float MoveSpeedBuffRemaining { get; private set; }
@@ -48,18 +52,21 @@ internal sealed class EnemyUnit
     public bool IsAlive => Health > 0;
     public bool CanAttack => cooldown <= 0;
     public EnemyUnit Target { get; set; }
-    public bool AttackingCore { get; set; }
+    public bool ReachedCore => Position.Equals(path[^1]);
 
-    public float DistanceToCore => Vector3.Distance(Position, path[waypoint]) +
-        (waypoint == path.Length - 1 ? 0f : path.Length - 2 - waypoint + lastStepLength);
+    public float DistanceToCore => Vector3.Distance(Position, RoutePosition) +
+        Vector3.Distance(RoutePosition, path[waypoint]) + remainingDistance[waypoint];
 
-    public EnemyUnit(EnemyFaction faction, Vector3[] path, int spawnOrder)
+    public EnemyUnit(EnemyFaction faction, int factionIndex, Vector3[] path, int spawnOrder)
     {
         Faction = faction;
+        FactionIndex = factionIndex;
         SpawnOrder = spawnOrder;
         this.path = path;
-        lastStepLength = Vector3.Distance(path[^2], path[^1]);
-        Position = path[0];
+        remainingDistance = new float[path.Length];
+        for (int i = path.Length - 2; i >= 0; i--)
+            remainingDistance[i] = remainingDistance[i + 1] + Vector3.Distance(path[i], path[i + 1]);
+        Position = RoutePosition = path[0];
         Heading = path[1] - Position;
     }
 
@@ -94,6 +101,8 @@ internal sealed class EnemyUnit
         pendingDamage = 0;
     }
 
+    public void Die() => Health = 0;
+
     public void ApplyAttackBuff(float duration) => AttackBuffRemaining = duration;
 
     public void ApplyMoveSpeedBuff(float duration) => MoveSpeedBuffRemaining = duration;
@@ -104,14 +113,21 @@ internal sealed class EnemyUnit
         HealFlash = 0.55f;
     }
 
-    public Vector3 NextPosition(float deltaTime)
+    public Vector3 NextRoutePosition(float deltaTime) =>
+        StepToward(Position.Equals(RoutePosition) ? path[waypoint] : RoutePosition, deltaTime);
+
+    public Vector3 StepToward(Vector3 destination, float deltaTime)
     {
         float speedMultiplier = MoveSpeedBuffRemaining > 0 ? 1f + MoveSpeedBonusPercent / 100f : 1f;
-        return Vector3.MoveTowards(Position, path[waypoint], MoveSpeed * speedMultiplier * deltaTime);
+        return Vector3.MoveTowards(Position, destination, MoveSpeed * speedMultiplier * deltaTime);
     }
 
-    public void MoveTo(Vector3 next)
+    public void MoveOffRoute(Vector3 next) => Position = next;
+
+    public void FollowRoute(Vector3 next)
     {
+        if (Position.Equals(RoutePosition))
+            RoutePosition = next;
         Position = next;
         if (next == path[waypoint] && waypoint < path.Length - 1)
             waypoint++;

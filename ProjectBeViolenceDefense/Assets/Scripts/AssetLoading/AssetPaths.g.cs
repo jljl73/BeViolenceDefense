@@ -8,5 +8,26 @@ public static class AssetPaths
 {
     public static readonly IReadOnlyList<string> All = new string[]
     {
+        "Fonts & Materials/Netmarble Medium SDF",
+        "LineBreaking Following Characters",
+        "LineBreaking Leading Characters",
+        "Style Sheets/Default Style Sheet",
+        "TMP Settings",
     };
+
+    public const string LineBreaking_Following_Characters = "LineBreaking Following Characters";
+    public const string LineBreaking_Leading_Characters = "LineBreaking Leading Characters";
+    public const string TMP_Settings = "TMP Settings";
+
+    public static class Fonts___Materials
+    {
+        public const string Folder = "Fonts & Materials";
+        public const string Netmarble_Medium_SDF = "Fonts & Materials/Netmarble Medium SDF";
+    }
+
+    public static class Style_Sheets
+    {
+        public const string Folder = "Style Sheets";
+        public const string Default_Style_Sheet = "Style Sheets/Default Style Sheet";
+    }
 }

@@ -13,6 +13,10 @@ internal sealed class DefenseBoardView
     private const float MinViewScale = 0.55f;
     private const float MaxViewScale = 1.45f;
     private const float TileSize = 0.94f;
+    private const float RouteMarkerSize = 0.68f;
+    private const float RouteLaneSpacing = 0.49f;
+    private const float RouteMarkerHeight = 0.02f;
+    private const float SpawnPadHeight = 0.09f;
 
     private static readonly Plane BoardGround = new(Vector3.up, Vector3.zero);
 
@@ -29,6 +33,10 @@ internal sealed class DefenseBoardView
     private readonly Transform root;
     private readonly Camera camera;
     private readonly Shader shader;
+    private readonly IReadOnlyList<EnemyFaction> factions;
+    private readonly Sprite routeChevron;
+    private readonly HashSet<Vector2Int> spawnCells;
+    private readonly List<SpriteRenderer> routeMarkers = new();
     private readonly List<Material> materials = new();
     private readonly Dictionary<Vector2Int, Transform> wallViews = new();
     private readonly Dictionary<EnemyUnit, EnemyView> enemyViews = new();
@@ -50,11 +58,15 @@ internal sealed class DefenseBoardView
 
     public IReadOnlyCollection<Vector2Int> PlannedEncounters { get; private set; } = System.Array.Empty<Vector2Int>();
 
-    public DefenseBoardView(Transform root, Camera camera, Shader shader, DefenseGrid grid)
+    public DefenseBoardView(Transform root, Camera camera, Shader shader, DefenseGrid grid,
+        IReadOnlyList<EnemyFaction> factions, Sprite routeChevron)
     {
         this.root = root;
         this.camera = camera;
         this.shader = shader;
+        this.factions = factions;
+        this.routeChevron = routeChevron;
+        spawnCells = new HashSet<Vector2Int>(grid.SpawnCells);
         // Aim slightly toward the near corner to leave room for the battle controls.
         Vector3 boardForward = root.InverseTransformDirection(camera.transform.forward);
         cameraFocus = grid.Center - Vector3.ProjectOnPlane(boardForward, Vector3.up).normalized * CameraFocusOffset;
@@ -91,10 +103,12 @@ internal sealed class DefenseBoardView
         foreach (Vector2Int cell in grid.FixedWalls)
             wallViews.Add(cell, CreateWall(cell, $"Fixed Wall {cell.x},{cell.y}", fixedWall));
 
-        foreach (Vector2Int cell in grid.SpawnCells)
+        for (int i = 0; i < grid.SpawnCells.Count; i++)
         {
-            Vector3 position = DefenseGrid.CellPosition(cell);
-            Box("Spawn pad", root, position + Vector3.up * 0.035f, new Vector3(0.9f, 0.07f, 0.9f), trim);
+            EnemyFaction faction = factions[i];
+            Vector3 position = DefenseGrid.CellPosition(grid.SpawnCells[i]);
+            Box($"{faction.DisplayName} spawn pad", root, position + Vector3.up * 0.035f,
+                new Vector3(0.9f, 0.07f, 0.9f), FactionMaterial(faction));
             Box("Spawn pad center", root, position + Vector3.up * 0.075f, new Vector3(0.55f, 0.03f, 0.55f), foundation);
         }
 
@@ -198,16 +212,71 @@ internal sealed class DefenseBoardView
             for (int z = 0; z < DefenseGrid.Depth; z++)
                 floor[x, z].sharedMaterial = tiles[(x + z) % tiles.Length];
 
-        if (routes != null)
-            foreach (Vector3[] path in routes)
-                foreach (Vector3 point in path)
-                {
-                    Vector2Int cell = DefenseGrid.PositionToCell(point);
-                    floor[cell.x, cell.y].sharedMaterial = routeTile;
-                }
+        int markerCount = routes == null ? 0 : DrawRoutes(routes);
+        for (int i = markerCount; i < routeMarkers.Count; i++)
+            routeMarkers[i].enabled = false;
 
         foreach (Vector2Int cell in PlannedEncounters)
             floor[cell.x, cell.y].sharedMaterial = encounterTile;
+    }
+
+    private int DrawRoutes(IReadOnlyList<Vector3[]> routes)
+    {
+        var stepsByCell = new Dictionary<Vector2Int, List<(int FactionIndex, Vector3 Direction)>>();
+        for (int factionIndex = 0; factionIndex < routes.Count; factionIndex++)
+        {
+            Vector3[] path = routes[factionIndex];
+            // The last waypoint is the contact point on the core, not a floor tile.
+            for (int i = 0; i < path.Length - 1; i++)
+            {
+                Vector2Int cell = DefenseGrid.PositionToCell(path[i]);
+                if (!stepsByCell.TryGetValue(cell, out var steps))
+                {
+                    steps = new List<(int, Vector3)>(factions.Count);
+                    stepsByCell.Add(cell, steps);
+                }
+                steps.Add((factionIndex, (path[i + 1] - path[i]).normalized));
+            }
+        }
+
+        int markerCount = 0;
+        foreach (var (cell, steps) in stepsByCell)
+        {
+            floor[cell.x, cell.y].sharedMaterial = routeTile;
+            if (routeChevron == null)
+                continue;
+
+            // Both arrows use one lateral axis so opposite headings stay in separate lanes.
+            Vector3 side = Vector3.Cross(Vector3.up, steps[0].Direction);
+            float height = RouteMarkerHeight + (spawnCells.Contains(cell) ? SpawnPadHeight : 0f);
+            Vector3 center = DefenseGrid.CellPosition(cell) + Vector3.up * height;
+            for (int i = 0; i < steps.Count; i++)
+            {
+                var (factionIndex, direction) = steps[i];
+                float offset = (i - (steps.Count - 1) * 0.5f) * RouteLaneSpacing;
+                SpriteRenderer marker = RouteMarker(markerCount++);
+                marker.transform.localPosition = center + side * offset;
+                marker.transform.localRotation = Quaternion.LookRotation(Vector3.down,
+                    Vector3.Cross(Vector3.down, direction));
+                marker.color = factions[factionIndex].Color;
+                marker.enabled = true;
+            }
+        }
+
+        return markerCount;
+    }
+
+    private SpriteRenderer RouteMarker(int index)
+    {
+        if (index < routeMarkers.Count)
+            return routeMarkers[index];
+
+        var marker = new GameObject("Route Chevron").AddComponent<SpriteRenderer>();
+        marker.transform.SetParent(root, false);
+        marker.transform.localScale = Vector3.one * RouteMarkerSize;
+        marker.sprite = routeChevron;
+        routeMarkers.Add(marker);
+        return marker;
     }
 
     public void PlaceWall(Vector2Int cell) => wallViews.Add(cell, CreateWall(cell, $"Wall {cell.x},{cell.y}", buildWall));
@@ -312,19 +381,25 @@ internal sealed class DefenseBoardView
     public Vector3 ScreenPoint(Vector3 boardPosition) =>
         camera.WorldToScreenPoint(root.TransformPoint(boardPosition));
 
+    private Material FactionMaterial(EnemyFaction faction)
+    {
+        if (!factionMaterials.TryGetValue(faction, out Material material))
+        {
+            material = Palette(faction.Color);
+            factionMaterials.Add(faction, material);
+        }
+        return material;
+    }
+
     public void AddEnemy(EnemyUnit enemy)
     {
-        if (!factionMaterials.TryGetValue(enemy.Faction, out Material material))
-        {
-            material = Palette(enemy.Faction.Color);
-            factionMaterials.Add(enemy.Faction, material);
-        }
-
+        Material material = FactionMaterial(enemy.Faction);
         Transform model = new GameObject($"{enemy.Faction.DisplayName} enemy").transform;
         model.SetParent(root, false);
+        model.localScale = Vector3.one * 0.75f;
         Box("Body", model, new Vector3(0, 0.29f, 0), new Vector3(0.42f, 0.43f, 0.38f), material);
         Transform head = Box("Head", model, new Vector3(0, 0.62f, 0), new Vector3(0.31f, 0.27f, 0.31f), material);
-        if (enemy.SpawnOrder % 2 == 0)
+        if (enemy.FactionIndex == 0)
         {
             Box("Crest", head, new Vector3(0, 0.65f, 0), new Vector3(0.28f, 0.34f, 0.7f), trim);
         }

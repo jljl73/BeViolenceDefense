@@ -471,6 +471,7 @@ MonoBehaviour:
   voxelShader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   ui: {fileID: 1670040552}
   encounterIcon: {fileID: 2800000, guid: c37be215002b4edea1fa17f08c0cee92, type: 3}
+  routeChevron: {fileID: 21300000, guid: 46ebbe5b08e24fc9841b086637f821aa, type: 3}
   hudArt:
     Panel: {fileID: 21300000, guid: 71d454b5c2b146bb850d3f0c894ac591, type: 3}
     Button: {fileID: 21300000, guid: 63e057d7b44c4882803a83059acff73f, type: 3}
@@ -484,14 +485,17 @@ MonoBehaviour:
     Wall: {fileID: 21300000, guid: 098bcefc4feb4e308313833fc500a470, type: 3}
     Enemy: {fileID: 21300000, guid: 9dce938c5e2c4b3c91272d1e3834d2f7, type: 3}
     Mana: {fileID: 21300000, guid: bddccabed31f41598fd449b1dc6bf524, type: 3}
+    Lock: {fileID: 21300000, guid: 4ff7c9dc22374be0a4bfb9b29de52b0d, type: 3}
   coral:
     displayName: Coral
     color: {r: 1, g: 0.4509804, b: 0.34117648, a: 1}
     attackRange: 0.9
+    awarenessRange: 2.2
   teal:
     displayName: Teal
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
     attackRange: 0.9
+    awarenessRange: 2.2
 --- !u!1 &310873186
 GameObject:
   m_ObjectHideFlags: 0
