@@ -1,0 +1,15 @@
+{
+    "asset": "30b9903a01cd248c7972532602972e69",
+    "fileName": "01a1efc9-164e-778f-8008-78b127354f3c.wav",
+    "prompt": "For a colorful low-poly fantasy game. Dry isolated one-shot, warm rounded playful tone, short tail. No voices, music bed, ambience, gore or harsh distortion. A single friendly action unavailable cue: two closely spaced muted wooden notes descending, a soft hollow tok-tok. Clearly different from confirmation, never an alarm or harsh buzzer, 0.3 seconds then silence.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

@@ -1,0 +1,15 @@
+{
+    "asset": "cfe39fd7cd806483fb2e3279d81cd302",
+    "fileName": "01a1efc6-a3a3-7158-bb54-7909e32955ea.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. One chunky small stone wall set on a tile: tight low stone clunk, tiny gravel settling. Friendly tactile board game piece placement, 0.35 seconds then silence.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

@@ -1,0 +1,144 @@
+2026-11-18T17:41:47.1943820Z START
+2026-11-18T17:41:47.2160040Z ERROR System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation. ---> System.ArgumentException: Model ID 'elevenlabs-sound-effects-v2' does not exist in Model List.
+  at Unity.AI.Generators.Tools.AssetGenerators.ValidateModelId (Unity.AI.Generators.Redux.IStoreApi store, System.Collections.Generic.IEnumerable`1[T] modalities, System.String modelId) [0x00033] in ./Library/PackageCache/com.unity.ai.assistant@b2c71963ca57/Modules/Unity.AI.Generators.Tools/AssetGeneratorQuote.cs:314 
+  at Unity.AI.Generators.Tools.AssetGenerators.GenerateSoundAsync[TSettings] (Unity.AI.Generators.Tools.GenerationParameters`1[TSettings] parameters, Unity.AI.Generators.Tools.SoundSettings soundSettings, System.Threading.CancellationToken cancellationToken) [0x0001c] in ./Library/PackageCache/com.unity.ai.assistant@b2c71963ca57/Modules/Unity.AI.Generators.Tools/AssetGenerators.cs:576 
+  at Unity.AI.Generators.Tools.AssetGenerators.GenerateAsync[TSettings] (Unity.AI.Generators.Tools.GenerationParameters`1[TSettings] parameters, System.Threading.CancellationToken cancellationToken) [0x000ec] in ./Library/PackageCache/com.unity.ai.assistant@b2c71963ca57/Modules/Unity.AI.Generators.Tools/AssetGenerators.cs:118 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <63da8c8c2a89417b88fd57669622fa05>:0 
+   --- End of inner exception stack trace ---
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00083] in <63da8c8c2a89417b88fd57669622fa05>:0 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in <63da8c8c2a89417b88fd57669622fa05>:0 
+  at UnityAiSfxBatch.Run () [0x003d3] in /private/tmp/be-sound-validation/Assets/Editor/UnityAiSfxBatch.cs:44 
+2026-11-18T17:42:17.5986820Z START
+2026-11-18T17:42:25.7313260Z MODEL elevenlabs-multilingual-v2 ElevenLabs Multilingual V2, ElevenLabs Multilingual V2 is a generative model for creating high-quality multilingual text to speech audio., Modalities: Sound, SupportsTextPrompt, AvailableVoices: Adam | Alice | Bella | Bill | Brian | Callum | Charlie | Chris | Daniel | Eric | George | Harry | Jessica | Laura | Liam | Lily | Matilda | River | Roger | Sarah | Will.
+2026-11-18T17:42:25.7323600Z MODEL elevenlabs-sound-effects-v2 ElevenLabs Sound Effects V2, ElevenLabs Sound Effects V2 is a generative model for creating high-quality sound effects., Modalities: Sound, SupportsTextPrompt, SupportsAudioLooping.
+2026-11-18T17:42:25.7330220Z MODEL google-lyria-3-clip Google Lyria 3 Clip, Google Lyria 3 Clip generates expressive 30-second music clips in MP3 format from text prompts. Purpose-built for short-form and loopable game audio., Modalities: Sound, SupportsTextPrompt.
+2026-11-18T17:42:25.7336260Z MODEL google-lyria-3-pro Google Lyria 3 Pro, Google Lyria 3 Pro generates complete, structured songs of up to ~2 minutes from text prompts. Supports genre, instruments, tempo, key, mood, and arrangement structure tags., Modalities: Sound, SupportsTextPrompt.
+2026-11-18T17:42:25.7342750Z MODEL meta-musicgen Meta MusicGen, Meta MusicGen generates music from text and can be guided by a reference melody., Modalities: Sound, SupportsTextPrompt, SupportsImageReference, SupportsEditWithPrompt.
+2026-11-18T17:42:25.7348970Z MODEL video-seedance-2-5 Seedance 2.5, ByteDance's Seedance 2.5 generates video from a text prompt, a first and optional last frame, or up to 10 reference images, at up to 1080p and 4 to 30 seconds, with an optional generated soundtrack., Modalities: Video, SupportsTextPrompt, SupportsSpritesheets, SupportsAnimatedSprites, SupportsImageReference, SupportsEditWithPrompt.
+2026-11-18T17:42:26.0170290Z QUOTE Assets/Audio/SFX/UnityAI/ui_confirm_01.wav points=27
+2026-11-18T17:42:37.5622550Z RESULT Assets/Audio/SFX/UnityAI/ui_confirm_01.wav samples=46080 frequency=44100
+2026-11-18T17:42:37.5633120Z END
+2026-11-18T17:43:17.8621120Z START
+2026-11-18T17:43:26.1934100Z MODEL elevenlabs-multilingual-v2 ElevenLabs Multilingual V2, ElevenLabs Multilingual V2 is a generative model for creating high-quality multilingual text to speech audio., Modalities: Sound, SupportsTextPrompt, AvailableVoices: Adam | Alice | Bella | Bill | Brian | Callum | Charlie | Chris | Daniel | Eric | George | Harry | Jessica | Laura | Liam | Lily | Matilda | River | Roger | Sarah | Will.
+2026-11-18T17:43:26.1944640Z MODEL elevenlabs-sound-effects-v2 ElevenLabs Sound Effects V2, ElevenLabs Sound Effects V2 is a generative model for creating high-quality sound effects., Modalities: Sound, SupportsTextPrompt, SupportsAudioLooping.
+2026-11-18T17:43:26.1951600Z MODEL google-lyria-3-clip Google Lyria 3 Clip, Google Lyria 3 Clip generates expressive 30-second music clips in MP3 format from text prompts. Purpose-built for short-form and loopable game audio., Modalities: Sound, SupportsTextPrompt.
+2026-11-18T17:43:26.1958030Z MODEL google-lyria-3-pro Google Lyria 3 Pro, Google Lyria 3 Pro generates complete, structured songs of up to ~2 minutes from text prompts. Supports genre, instruments, tempo, key, mood, and arrangement structure tags., Modalities: Sound, SupportsTextPrompt.
+2026-11-18T17:43:26.1964670Z MODEL meta-musicgen Meta MusicGen, Meta MusicGen generates music from text and can be guided by a reference melody., Modalities: Sound, SupportsTextPrompt, SupportsImageReference, SupportsEditWithPrompt.
+2026-11-18T17:43:26.1971090Z MODEL video-seedance-2-5 Seedance 2.5, ByteDance's Seedance 2.5 generates video from a text prompt, a first and optional last frame, or up to 10 reference images, at up to 1080p and 4 to 30 seconds, with an optional generated soundtrack., Modalities: Video, SupportsTextPrompt, SupportsSpritesheets, SupportsAnimatedSprites, SupportsImageReference, SupportsEditWithPrompt.
+2026-11-18T17:43:26.1983600Z GENERATING combat_hit_light_02
+2026-11-18T17:43:26.6898170Z QUOTE Assets/Audio/SFX/UnityAI/combat_hit_light_02.wav points=27
+2026-11-18T17:43:38.4233810Z RESULT Assets/Audio/SFX/UnityAI/combat_hit_light_02.wav samples=46080 frequency=44100
+2026-11-18T17:43:38.4245170Z GENERATING combat_hit_light_03
+2026-11-18T17:43:38.6964580Z QUOTE Assets/Audio/SFX/UnityAI/combat_hit_light_03.wav points=27
+2026-11-18T17:43:49.9073330Z RESULT Assets/Audio/SFX/UnityAI/combat_hit_light_03.wav samples=46080 frequency=44100
+2026-11-18T17:43:49.9083780Z GENERATING attack_bow_01
+2026-11-18T17:43:50.1747510Z QUOTE Assets/Audio/SFX/UnityAI/attack_bow_01.wav points=27
+2026-11-18T17:44:01.3422970Z RESULT Assets/Audio/SFX/UnityAI/attack_bow_01.wav samples=46080 frequency=44100
+2026-11-18T17:44:01.3432950Z GENERATING attack_bow_02
+2026-11-18T17:44:01.6061800Z QUOTE Assets/Audio/SFX/UnityAI/attack_bow_02.wav points=27
+2026-11-18T17:44:12.9823230Z RESULT Assets/Audio/SFX/UnityAI/attack_bow_02.wav samples=46080 frequency=44100
+2026-11-18T17:44:12.9834040Z GENERATING attack_sling_01
+2026-11-18T17:44:13.2966980Z QUOTE Assets/Audio/SFX/UnityAI/attack_sling_01.wav points=27
+2026-11-18T17:44:23.8076430Z RESULT Assets/Audio/SFX/UnityAI/attack_sling_01.wav samples=46080 frequency=44100
+2026-11-18T17:44:23.8086850Z GENERATING attack_sling_02
+2026-11-18T17:44:24.9232700Z QUOTE Assets/Audio/SFX/UnityAI/attack_sling_02.wav points=27
+2026-11-18T17:47:02.6061000Z START
+2026-11-18T17:47:10.2107430Z MODEL elevenlabs-multilingual-v2 ElevenLabs Multilingual V2, ElevenLabs Multilingual V2 is a generative model for creating high-quality multilingual text to speech audio., Modalities: Sound, SupportsTextPrompt, AvailableVoices: Adam | Alice | Bella | Bill | Brian | Callum | Charlie | Chris | Daniel | Eric | George | Harry | Jessica | Laura | Liam | Lily | Matilda | River | Roger | Sarah | Will.
+2026-11-18T17:47:10.2119210Z MODEL elevenlabs-sound-effects-v2 ElevenLabs Sound Effects V2, ElevenLabs Sound Effects V2 is a generative model for creating high-quality sound effects., Modalities: Sound, SupportsTextPrompt, SupportsAudioLooping.
+2026-11-18T17:47:10.2126700Z MODEL google-lyria-3-clip Google Lyria 3 Clip, Google Lyria 3 Clip generates expressive 30-second music clips in MP3 format from text prompts. Purpose-built for short-form and loopable game audio., Modalities: Sound, SupportsTextPrompt.
+2026-11-18T17:47:10.2133900Z MODEL google-lyria-3-pro Google Lyria 3 Pro, Google Lyria 3 Pro generates complete, structured songs of up to ~2 minutes from text prompts. Supports genre, instruments, tempo, key, mood, and arrangement structure tags., Modalities: Sound, SupportsTextPrompt.
+2026-11-18T17:47:10.2141800Z MODEL meta-musicgen Meta MusicGen, Meta MusicGen generates music from text and can be guided by a reference melody., Modalities: Sound, SupportsTextPrompt, SupportsImageReference, SupportsEditWithPrompt.
+2026-11-18T17:47:10.2148260Z MODEL video-seedance-2-5 Seedance 2.5, ByteDance's Seedance 2.5 generates video from a text prompt, a first and optional last frame, or up to 10 reference images, at up to 1080p and 4 to 30 seconds, with an optional generated soundtrack., Modalities: Video, SupportsTextPrompt, SupportsSpritesheets, SupportsAnimatedSprites, SupportsImageReference, SupportsEditWithPrompt.
+2026-11-18T17:47:10.2162630Z SKIP downloaded combat_hit_light_02
+2026-11-18T17:47:10.2169150Z SKIP downloaded combat_hit_light_03
+2026-11-18T17:47:10.2175390Z SKIP downloaded attack_bow_01
+2026-11-18T17:47:10.2181890Z SKIP downloaded attack_bow_02
+2026-11-18T17:47:10.2188340Z SKIP downloaded attack_sling_01
+2026-11-18T17:47:10.2826230Z GENERATING attack_sling_02
+2026-11-18T17:47:10.7886350Z QUOTE Assets/Audio/SFX/UnityAI/attack_sling_02.wav points=27
+2026-11-18T17:47:22.6754910Z RESULT Assets/Audio/SFX/UnityAI/attack_sling_02.wav samples=46080 frequency=44100
+2026-11-18T17:47:22.6767470Z GENERATING core_hit_01
+2026-11-18T17:47:23.1394250Z QUOTE Assets/Audio/SFX/UnityAI/core_hit_01.wav points=27
+2026-11-18T17:47:39.8308910Z RESULT Assets/Audio/SFX/UnityAI/core_hit_01.wav samples=46080 frequency=44100
+2026-11-18T17:47:39.8318910Z GENERATING core_hit_02
+2026-11-18T17:47:40.1483250Z QUOTE Assets/Audio/SFX/UnityAI/core_hit_02.wav points=27
+2026-11-18T17:47:57.2346350Z RESULT Assets/Audio/SFX/UnityAI/core_hit_02.wav samples=46080 frequency=44100
+2026-11-18T17:47:57.2360220Z GENERATING spell_attack
+2026-11-18T17:47:57.5491970Z QUOTE Assets/Audio/SFX/UnityAI/spell_attack.wav points=27
+2026-11-18T17:48:09.1972840Z RESULT Assets/Audio/SFX/UnityAI/spell_attack.wav samples=46080 frequency=44100
+2026-11-18T17:48:09.1988400Z GENERATING spell_heal
+2026-11-18T17:48:09.5116570Z QUOTE Assets/Audio/SFX/UnityAI/spell_heal.wav points=27
+2026-11-18T17:48:22.0421360Z RESULT Assets/Audio/SFX/UnityAI/spell_heal.wav samples=46080 frequency=44100
+2026-11-18T17:48:22.0432980Z GENERATING spell_speed
+2026-11-18T17:48:22.4060670Z QUOTE Assets/Audio/SFX/UnityAI/spell_speed.wav points=27
+2026-11-18T17:48:34.0992790Z RESULT Assets/Audio/SFX/UnityAI/spell_speed.wav samples=46080 frequency=44100
+2026-11-18T17:48:34.1002840Z GENERATING spell_armor
+2026-11-18T17:48:34.4161310Z QUOTE Assets/Audio/SFX/UnityAI/spell_armor.wav points=27
+2026-11-18T17:48:45.7496220Z RESULT Assets/Audio/SFX/UnityAI/spell_armor.wav samples=46080 frequency=44100
+2026-11-18T17:48:45.7506780Z GENERATING wall_place_01
+2026-11-18T17:48:46.0632540Z QUOTE Assets/Audio/SFX/UnityAI/wall_place_01.wav points=27
+2026-11-18T17:48:56.9485340Z RESULT Assets/Audio/SFX/UnityAI/wall_place_01.wav samples=46080 frequency=44100
+2026-11-18T17:48:56.9502350Z GENERATING wall_place_02
+2026-11-18T17:48:57.2127180Z QUOTE Assets/Audio/SFX/UnityAI/wall_place_02.wav points=27
+2026-11-18T17:49:08.7319690Z RESULT Assets/Audio/SFX/UnityAI/wall_place_02.wav samples=46080 frequency=44100
+2026-11-18T17:49:08.7337110Z GENERATING wall_remove_01
+2026-11-18T17:49:09.0968670Z QUOTE Assets/Audio/SFX/UnityAI/wall_remove_01.wav points=27
+2026-11-18T17:49:37.4764730Z RESULT Assets/Audio/SFX/UnityAI/wall_remove_01.wav samples=46080 frequency=44100
+2026-11-18T17:49:37.4775430Z GENERATING wall_remove_02
+2026-11-18T17:49:37.7937160Z QUOTE Assets/Audio/SFX/UnityAI/wall_remove_02.wav points=27
+2026-11-18T17:49:50.1846300Z RESULT Assets/Audio/SFX/UnityAI/wall_remove_02.wav samples=46080 frequency=44100
+2026-11-18T17:49:50.1856660Z SKIP downloaded ui_confirm_01
+2026-11-18T17:49:50.1864110Z GENERATING ui_confirm_02
+2026-11-18T17:49:50.4995530Z QUOTE Assets/Audio/SFX/UnityAI/ui_confirm_02.wav points=27
+2026-11-18T17:50:15.6503090Z RESULT Assets/Audio/SFX/UnityAI/ui_confirm_02.wav samples=46080 frequency=44100
+2026-11-18T17:50:15.6514000Z GENERATING ui_cancel
+2026-11-18T17:50:16.0179170Z QUOTE Assets/Audio/SFX/UnityAI/ui_cancel.wav points=27
+2026-11-18T17:50:27.4548120Z RESULT Assets/Audio/SFX/UnityAI/ui_cancel.wav samples=46080 frequency=44100
+2026-11-18T17:50:27.4563200Z GENERATING ui_denied
+2026-11-18T17:50:27.7736090Z ERROR System.InvalidOperationException: prompt: string_length - Must be at most 450 characters
+  at Unity.AI.Generators.Tools.AssetGenerators.QuoteSoundGenerationAsync (Unity.AI.Generators.Redux.Store store, System.String prompt, System.String modelId, Unity.AI.Generators.Tools.SoundSettings soundSettings, System.Threading.CancellationToken cancellationToken) [0x0026d] in ./Library/PackageCache/com.unity.ai.assistant@b2c71963ca57/Modules/Unity.AI.Generators.Tools/AssetGeneratorQuote.cs:192 
+  at Unity.AI.Generators.Tools.AssetGenerators+<>c__DisplayClass48_0`1[TSettings].<GenerateSoundAsync>b__0 (Unity.AI.Generators.Tools.GenerationHandle`1[T] handle) [0x0006f] in ./Library/PackageCache/com.unity.ai.assistant@b2c71963ca57/Modules/Unity.AI.Generators.Tools/AssetGenerators.cs:589 
+  at Unity.AI.Generators.Tools.AssetGenerators+<>c__DisplayClass48_0`1[TSettings].<GenerateSoundAsync>b__1 (Unity.AI.Generators.Tools.GenerationHandle`1[T] handle) [0x0002d] in ./Library/PackageCache/com.unity.ai.assistant@b2c71963ca57/Modules/Unity.AI.Generators.Tools/AssetGenerators.cs:596 
+  at Unity.AI.Generators.Tools.AssetGenerators+<>c__DisplayClass48_0`1[TSettings].<GenerateSoundAsync>b__2 (Unity.AI.Generators.Tools.GenerationHandle`1[T] handle) [0x0002b] in ./Library/PackageCache/com.unity.ai.assistant@b2c71963ca57/Modules/Unity.AI.Generators.Tools/AssetGenerators.cs:641 
+  at Unity.AI.Generators.Tools.AssetGenerators+<>c__DisplayClass69_0`1[T].<ConvertToObjectHandle>b__1 (Unity.AI.Generators.Tools.GenerationHandle`1[T] newHandle) [0x00025] in ./Library/PackageCache/com.unity.ai.assistant@b2c71963ca57/Modules/Unity.AI.Generators.Tools/AssetGenerators.cs:2225 
+  at UnityAiSfxBatch.Run () [0x00623] in /private/tmp/be-sound-validation/Assets/Editor/UnityAiSfxBatch.cs:59 
+2026-11-18T17:51:17.8235660Z START
+2026-11-18T17:51:25.3414780Z MODEL elevenlabs-multilingual-v2 ElevenLabs Multilingual V2, ElevenLabs Multilingual V2 is a generative model for creating high-quality multilingual text to speech audio., Modalities: Sound, SupportsTextPrompt, AvailableVoices: Adam | Alice | Bella | Bill | Brian | Callum | Charlie | Chris | Daniel | Eric | George | Harry | Jessica | Laura | Liam | Lily | Matilda | River | Roger | Sarah | Will.
+2026-11-18T17:51:25.3432260Z MODEL elevenlabs-sound-effects-v2 ElevenLabs Sound Effects V2, ElevenLabs Sound Effects V2 is a generative model for creating high-quality sound effects., Modalities: Sound, SupportsTextPrompt, SupportsAudioLooping.
+2026-11-18T17:51:25.3440190Z MODEL google-lyria-3-clip Google Lyria 3 Clip, Google Lyria 3 Clip generates expressive 30-second music clips in MP3 format from text prompts. Purpose-built for short-form and loopable game audio., Modalities: Sound, SupportsTextPrompt.
+2026-11-18T17:51:25.3446010Z MODEL google-lyria-3-pro Google Lyria 3 Pro, Google Lyria 3 Pro generates complete, structured songs of up to ~2 minutes from text prompts. Supports genre, instruments, tempo, key, mood, and arrangement structure tags., Modalities: Sound, SupportsTextPrompt.
+2026-11-18T17:51:25.3453520Z MODEL meta-musicgen Meta MusicGen, Meta MusicGen generates music from text and can be guided by a reference melody., Modalities: Sound, SupportsTextPrompt, SupportsImageReference, SupportsEditWithPrompt.
+2026-11-18T17:51:25.3461470Z MODEL video-seedance-2-5 Seedance 2.5, ByteDance's Seedance 2.5 generates video from a text prompt, a first and optional last frame, or up to 10 reference images, at up to 1080p and 4 to 30 seconds, with an optional generated soundtrack., Modalities: Video, SupportsTextPrompt, SupportsSpritesheets, SupportsAnimatedSprites, SupportsImageReference, SupportsEditWithPrompt.
+2026-11-18T17:51:25.3474070Z SKIP downloaded combat_hit_light_02
+2026-11-18T17:51:25.3480740Z SKIP downloaded combat_hit_light_03
+2026-11-18T17:51:25.3486990Z SKIP downloaded attack_bow_01
+2026-11-18T17:51:25.3493310Z SKIP downloaded attack_bow_02
+2026-11-18T17:51:25.3499560Z SKIP downloaded attack_sling_01
+2026-11-18T17:51:25.3505690Z SKIP downloaded attack_sling_02
+2026-11-18T17:51:25.3512090Z SKIP downloaded core_hit_01
+2026-11-18T17:51:25.3518480Z SKIP downloaded core_hit_02
+2026-11-18T17:51:25.3525040Z SKIP downloaded spell_attack
+2026-11-18T17:51:25.3531190Z SKIP downloaded spell_heal
+2026-11-18T17:51:25.3537420Z SKIP downloaded spell_speed
+2026-11-18T17:51:25.3543740Z SKIP downloaded spell_armor
+2026-11-18T17:51:25.3549940Z SKIP downloaded wall_place_01
+2026-11-18T17:51:25.3556160Z SKIP downloaded wall_place_02
+2026-11-18T17:51:25.3562840Z SKIP downloaded wall_remove_01
+2026-11-18T17:51:25.3568930Z SKIP downloaded wall_remove_02
+2026-11-18T17:51:25.3575070Z SKIP downloaded ui_confirm_01
+2026-11-18T17:51:25.3581280Z SKIP downloaded ui_confirm_02
+2026-11-18T17:51:25.3587340Z SKIP downloaded ui_cancel
+2026-11-18T17:51:25.3593580Z GENERATING ui_denied
+2026-11-18T17:51:26.4420510Z QUOTE Assets/Audio/SFX/UnityAI/ui_denied.wav points=27
+2026-11-18T17:51:38.3897970Z RESULT Assets/Audio/SFX/UnityAI/ui_denied.wav samples=46080 frequency=44100
+2026-11-18T17:51:38.3909910Z GENERATING wave_start
+2026-11-18T17:51:38.7036540Z QUOTE Assets/Audio/SFX/UnityAI/wave_start.wav points=27
+2026-11-18T17:51:50.2565470Z RESULT Assets/Audio/SFX/UnityAI/wave_start.wav samples=66816 frequency=44100
+2026-11-18T17:51:50.2575890Z GENERATING wave_clear
+2026-11-18T17:51:50.5740010Z QUOTE Assets/Audio/SFX/UnityAI/wave_clear.wav points=27
+2026-11-18T17:52:02.6133230Z RESULT Assets/Audio/SFX/UnityAI/wave_clear.wav samples=66816 frequency=44100
+2026-11-18T17:52:02.6145110Z GENERATING game_defeat
+2026-11-18T17:52:02.9773310Z QUOTE Assets/Audio/SFX/UnityAI/game_defeat.wav points=27
+2026-11-18T17:52:14.7865870Z RESULT Assets/Audio/SFX/UnityAI/game_defeat.wav samples=89856 frequency=44100
+2026-11-18T17:52:14.7878150Z END_BATCH

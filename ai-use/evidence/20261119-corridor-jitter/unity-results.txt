@@ -1,0 +1,13 @@
+Unity 6000.3.28f1 / EditMode (검증용 프로젝트 복사본, 작업 트리와 같은 소스)
+id="2" testcasecount="64" result="Passed" total="64" passed="64" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-18 17:39:47Z" end-time="2026-11-18 17:40:02Z" duration="15.5587478"
+
+임의 타격 지점 규칙만 끈 상태(복사본에서만 실행):
+id="2" testcasecount="64" result="Passed" total="64" passed="64" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-18 17:38:48Z" end-time="2026-11-18 17:39:00Z" duration="11.876937"
+
+수정 과정에서 실패했던 실행(원인: 타깃 없는 유닛끼리의 문 앞 교착)
+testcasecount="62" result="Failed(Child)" total="62" passed="61" failed="1"
+  FAILED CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(20,True)
+testcasecount="62" result="Failed(Child)" total="62" passed="61" failed="1"
+  FAILED CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,True)
+testcasecount="62" result="Failed(Child)" total="62" passed="61" failed="1"
+  FAILED CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,False)

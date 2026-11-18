@@ -26775,6 +26775,7 @@ MonoBehaviour:
   encounterIcon: {fileID: 2800000, guid: c37be215002b4edea1fa17f08c0cee92, type: 3}
   routeChevron: {fileID: 21300000, guid: 46ebbe5b08e24fc9841b086637f821aa, type: 3}
   enemyCatalog: {fileID: 11400000, guid: a8554bb775d6a4466accf5ad2630f7b6, type: 2}
+  hitSound: {fileID: 8300000, guid: 2016945ea5385429e84a913ea9bead8a, type: 3}
   hudArt:
     Panel: {fileID: 21300000, guid: 71d454b5c2b146bb850d3f0c894ac591, type: 3}
     Button: {fileID: 21300000, guid: 63e057d7b44c4882803a83059acff73f, type: 3}

@@ -1,0 +1,24 @@
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/attack_bow_01.wav duration=0.69 channels=1 peak=0.3439026
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/attack_bow_02.wav duration=0.81 channels=1 peak=0.3311462
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/attack_sling_01.wav duration=0.9 channels=1 peak=0.3392029
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/attack_sling_02.wav duration=0.36 channels=1 peak=0.3540955
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/combat_hit_light_02.wav duration=0.39 channels=1 peak=0.3563232
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/combat_hit_light_03.wav duration=0.17 channels=1 peak=0.3514099
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/core_hit_01.wav duration=0.62 channels=1 peak=0.3593445
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/core_hit_02.wav duration=0.84 channels=1 peak=0.3499756
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/game_defeat.wav duration=1.23 channels=1 peak=0.3484802
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/spell_armor.wav duration=0.55 channels=1 peak=0.3554382
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/spell_attack.wav duration=0.76 channels=1 peak=0.3628235
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/spell_heal.wav duration=0.67 channels=1 peak=0.3544312
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/spell_speed.wav duration=0.63 channels=1 peak=0.3529968
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/ui_cancel.wav duration=0.87 channels=1 peak=0.335022
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/ui_confirm_01.wav duration=0.17 channels=1 peak=0.3458557
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/ui_confirm_02.wav duration=0.5 channels=1 peak=0.3557434
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/ui_denied.wav duration=0.52 channels=1 peak=0.3587036
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/wall_place_01.wav duration=0.54 channels=1 peak=0.3334656
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/wall_place_02.wav duration=0.86 channels=1 peak=0.354248
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/wall_remove_01.wav duration=0.3 channels=1 peak=0.3493958
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/wall_remove_02.wav duration=0.9 channels=1 peak=0.3560486
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/wave_clear.wav duration=0.51 channels=1 peak=0.3521729
+SFX_IMPORT_OK Assets/Audio/SFX/UnityAI/wave_start.wav duration=0.62 channels=1 peak=0.348053
+SFX_IMPORT_PASS 23

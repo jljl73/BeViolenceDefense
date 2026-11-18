@@ -1,0 +1,4 @@
+Final Play Mode: W1/W2/W3 complete; core 115/109/105; remaining 0 each.
+Rows: 27064
+Round+unit pairs with stored navigation paths: 20
+All sampled fixed ticks passed required pair spacing (tolerance 0.0001).

@@ -34,6 +34,7 @@ public sealed class DefenseGrid
     // 경로 계산이 실패한 첫 스폰 인덱스. 성공하면 -1.
     public int UnreachableSpawn { get; private set; } = -1;
     public int WallCount => placed.Count;
+    public int NavigationVersion { get; private set; }
     public Vector3 CorePosition => new(coreFootprint.center.x - 0.5f, 0f, coreFootprint.center.y - 0.5f);
     public Vector2Int CoreSize => coreFootprint.size;
     public Vector3 Center => new((Width - 1) * 0.5f, 0, (Depth - 1) * 0.5f);
@@ -90,6 +91,7 @@ public sealed class DefenseGrid
             return result;
 
         placed.Add(cell);
+        NavigationVersion++;
         routes = updated;
         return BuildResult.Placed;
     }
@@ -117,6 +119,7 @@ public sealed class DefenseGrid
             return false;
 
         routes = FindRoutes();
+        NavigationVersion++;
         return true;
     }
 

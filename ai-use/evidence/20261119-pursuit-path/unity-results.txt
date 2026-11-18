@@ -1,0 +1,11 @@
+Unity 6000.3.28f1 / EditMode 58 passed, 0 failed, exit 0
+Play Mode exit 0
+ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+PURSUIT_ROUND_PASS: cleared=1, core=115, remaining=0
+PURSUIT_ROUND_PASS: cleared=2, core=109, remaining=0
+RANGED_HIT_REACTION: round=3, tick=616, victim=0/orc, source=7/skeleton-archer, target=7
+RANGED_HIT_REACTION: round=3, tick=739, victim=9/skeleton-archer, source=6/goblin-slinger, target=2
+RANGED_HIT_REACTION: round=3, tick=771, victim=6/goblin-slinger, source=10/skeleton-archer, target=9
+RANGED_HIT_REACTION: round=3, tick=1057, victim=10/skeleton-archer, source=4/goblin-slinger, target=6
+PURSUIT_ROUND_PASS: cleared=3, core=105, remaining=0
+PURSUIT_PLAYMODE_PASS: rounds=3, rangedRecognitions=4, rangedResponses=1, clearance=0.00000, captures=51

@@ -1,0 +1,15 @@
+{
+    "asset": "2bcb1bb257826416ba02bb9ef636689b",
+    "fileName": "01a1efc9-a475-71b9-ba34-5fddb2de8785.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A short gentle fantasy defeat stinger: two descending mellow wooden bell notes and a low soft magical sigh fading out. Bittersweet and restrained, 1.5 seconds, no dramatic orchestra or voices.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 2.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

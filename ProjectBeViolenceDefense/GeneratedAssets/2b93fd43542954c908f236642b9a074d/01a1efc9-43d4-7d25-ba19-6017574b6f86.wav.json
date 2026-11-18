@@ -1,0 +1,15 @@
+{
+    "asset": "2b93fd43542954c908f236642b9a074d",
+    "fileName": "01a1efc9-43d4-7d25-ba19-6017574b6f86.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A short fantasy wave starting signal: one soft rounded horn call with a small wooden percussion pickup. Readable and gently urgent, under 1.2 seconds, no marching or continuing music.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.5,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

@@ -1,0 +1,15 @@
+{
+    "asset": "2016945ea5385429e84a913ea9bead8a",
+    "fileName": "01a1efa4-4b25-7828-b75b-01650697f729.wav",
+    "prompt": "A single short casual cartoon combat punch impact: crisp soft smack, rounded compact thump, tiny playful rubbery pop. Friendly but satisfying. One hit lasting 0.25 seconds followed by silence. Dry isolated recording. No repeated hits, music, voice, screams, gore, ambience or reverb.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

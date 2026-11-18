@@ -37,6 +37,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private Texture2D encounterIcon;
     [SerializeField] private Sprite routeChevron;
     [SerializeField] private EnemyCatalog enemyCatalog;
+    [SerializeField, Tooltip("임시 적 타격 효과음. 비우면 타격음 없이 재생한다.")]
+    private AudioClip hitSound;
     [SerializeField] private DefenseHud.Art hudArt = new();
     [Tooltip("선택. 연결하면 기존 코어 패널 대신 초상이 있는 좌상단 코어 HUD를 쓴다.")]
     [SerializeField] private LeftCoreHud leftCoreHud;
@@ -64,6 +66,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private DefenseGrid grid;
     private DefenseBoardView view;
     private DefenseBattle battle;
+    private BattleSoundPlayer soundPlayer;
     private DefenseHud hud;
     private readonly BattleClock battleClock = new();
     private DefenseBattle.Spell? aimedSpell;
@@ -101,8 +104,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         }
 
         grid = CreateGrid(out usedStage);
+        soundPlayer = gameObject.AddComponent<BattleSoundPlayer>();
+        soundPlayer.Initialize(hitSound);
         view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme,
-            enemyCatalog, usedStage);
+            enemyCatalog, usedStage, soundPlayer.PlayHit);
         StageWaves waves = UsableWaves();
         battle = new DefenseBattle(grid, factions, BuildRoundLineup(waves), waves != null ? waves.waves.Count : 0);
         battle.EnemySpawned += view.AddEnemy;

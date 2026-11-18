@@ -1,0 +1,15 @@
+{
+    "asset": "7a6c3072819df4f97b07bb1bd60ae1e9",
+    "fileName": "01a1efc9-7239-7755-96cf-cc88cafb4f41.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A restrained fantasy round complete stinger: three warm rounded bell notes gently rising to a tiny satisfying wooden chime. Cheerful small success, under 1.2 seconds, not a grand victory fanfare.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.5,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

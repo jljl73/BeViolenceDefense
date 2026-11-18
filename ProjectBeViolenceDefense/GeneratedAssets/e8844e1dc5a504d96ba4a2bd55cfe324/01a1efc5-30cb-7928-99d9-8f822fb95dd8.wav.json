@@ -1,0 +1,15 @@
+{
+    "asset": "e8844e1dc5a504d96ba4a2bd55cfe324",
+    "fileName": "01a1efc5-30cb-7928-99d9-8f822fb95dd8.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A single cartoon leather sling throw: quick soft rope whirl, a hollow air flick as a small stone leaves. One 0.3 second gesture, no impact.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

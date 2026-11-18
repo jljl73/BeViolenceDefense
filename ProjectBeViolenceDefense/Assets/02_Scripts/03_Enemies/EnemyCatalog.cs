@@ -31,7 +31,7 @@ public sealed class EnemyCatalog : ScriptableObject
         [SerializeField, Min(0)] private int damage = 10;
         [SerializeField, Min(0.05f)] private float attackInterval = 0.65f;
         [SerializeField, Min(0.1f)] private float attackRange = 1.5f;
-        [SerializeField, Min(0.1f)] private float awarenessRange = 2.2f;
+        [SerializeField, Min(0.1f)] private float awarenessRange = 3f;
         [SerializeField, Min(0.01f)] private float moveSpeed = 1.7f;
         [SerializeField, Min(0)] private int armor;
 

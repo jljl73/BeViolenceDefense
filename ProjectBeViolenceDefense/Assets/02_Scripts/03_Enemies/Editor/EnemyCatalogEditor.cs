@@ -93,7 +93,7 @@ internal sealed class EnemyCatalogEditor : Editor
             entry.FindPropertyRelative("damage").intValue = 10;
             entry.FindPropertyRelative("attackInterval").floatValue = 0.65f;
             entry.FindPropertyRelative("attackRange").floatValue = 1.5f;
-            entry.FindPropertyRelative("awarenessRange").floatValue = 2.2f;
+            entry.FindPropertyRelative("awarenessRange").floatValue = 3f;
             entry.FindPropertyRelative("moveSpeed").floatValue = 1.7f;
             entry.FindPropertyRelative("armor").intValue = 0;
         }

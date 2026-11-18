@@ -1,0 +1,8 @@
+crowd9 walls=False ticks 2159 fin True core 117 engaged 66.8 rev 67 switch 19 atk 102 minClr 0.000
+crowd9 walls=True ticks 2506 fin True core 111 engaged 39.8 rev 22 switch 7 atk 62 minClr 0.000
+crowd20 walls=False ticks 3418 fin True core 114 engaged 133.6 rev 118 switch 34 atk 215 minClr 0.000
+crowd20 walls=True ticks 4199 fin True core 109 engaged 110.0 rev 80 switch 22 atk 176 minClr 0.000
+crowd40 walls=False ticks 20000 fin False core 110 engaged 262.0 rev 229 switch 61 atk 410 minClr 0.000
+crowd40 walls=True ticks 8400 fin True core 101 engaged 229.9 rev 183 switch 42 atk 374 minClr 0.000
+crowd60 walls=False ticks 7638 fin True core 103 engaged 410.3 rev 356 switch 87 atk 641 minClr 0.000
+crowd60 walls=True ticks 20000 fin False core 99 engaged 356.9 rev 288 switch 79 atk 580 minClr 0.000

@@ -372,18 +372,35 @@ internal sealed class DefenseBattle
             enemy.TickTimers(deltaTime);
             if (enemy.Target is { IsAlive: true } target)
             {
-                enemy.Face(target.Position);
+                enemy.Face(grid.HasLineOfSight(enemy.Position, target.Position) ? target.Position : enemy.LastKnownTargetPosition);
                 if (enemy.CanAttack && combat.CanAttack(enemy, target))
-                    target.QueueDamage(enemy.Attack(target));
+                {
+                    target.QueueDamage(enemy.Attack(target), enemy);
+                }
             }
         }
 
+        bool replanBeforeMoving = false;
         for (int i = enemies.Count - 1; i >= 0; i--)
         {
             EnemyUnit enemy = enemies[i];
             enemy.ResolveDamage();
             if (!enemy.IsAlive)
+            {
                 RemoveEnemyAt(i);
+                replanBeforeMoving = true;
+            }
+            else
+                replanBeforeMoving |= enemy.HasRetaliationRequest;
+        }
+
+        // All hits resolve before replanning, preserving simultaneous lethal attacks.
+        // React before route movement so a hit unit cannot walk into the core first, and
+        // a unit whose opponent just died does not take one step toward its route and back.
+        if (replanBeforeMoving)
+        {
+            combat.Plan();
+            untilCombatPlan = CombatPlanInterval;
         }
 
         if (!pauseMovement)
@@ -393,7 +410,7 @@ internal sealed class DefenseBattle
                 if ((enemy.Target ?? enemy.CombatQueue?.Target) is { IsAlive: true } target)
                 {
                     if (enemy.Target == null)
-                        enemy.Face(target.Position);
+                        enemy.Face(grid.HasLineOfSight(enemy.Position, target.Position) ? target.Position : enemy.LastKnownTargetPosition);
                     combat.Move(enemy, target, deltaTime);
                     continue;
                 }
@@ -515,7 +532,14 @@ internal sealed class DefenseBattle
             enemy.RouteYieldDestination = null;
         }
 
-        if (!enemy.Position.Equals(enemy.RoutePosition) && TryRejoinRoute(enemy, deltaTime))
+        // Finish a return path already under way. Choosing between it and a direct line to
+        // the route on every tick zigzags along the edge of where that line is clear.
+        bool offRoute = !enemy.Position.Equals(enemy.RoutePosition);
+        if (offRoute && combat.IsReturningAlongPath(enemy) && combat.TryReturnAlongPath(enemy, deltaTime))
+            return;
+        if (offRoute && TryRejoinRoute(enemy, deltaTime))
+            return;
+        if (offRoute && combat.TryReturnAlongPath(enemy, deltaTime))
             return;
 
         // Off-route units wait for their forward connection, rather than walking back
@@ -543,6 +567,8 @@ internal sealed class DefenseBattle
             enemy.RouteYieldDestination = destination;
             enemy.RouteBypassOffset = offset;
         }
+        else if (offRoute && combat.TryStepAside(enemy, out destination))
+            enemy.RouteYieldDestination = destination;
     }
 
     private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime)

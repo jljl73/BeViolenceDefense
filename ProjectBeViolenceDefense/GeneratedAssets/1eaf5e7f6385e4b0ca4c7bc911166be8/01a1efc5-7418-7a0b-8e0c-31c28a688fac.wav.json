@@ -1,0 +1,15 @@
+{
+    "asset": "1eaf5e7f6385e4b0ca4c7bc911166be8",
+    "fileName": "01a1efc5-7418-7a0b-8e0c-31c28a688fac.wav",
+    "prompt": "For a charming colorful chunky low-poly fantasy strategy game. Dry close isolated one-shot, soft rounded transients, warm playful tone, restrained treble, very short tail. No speech, music bed, ambience, repeated actions, gore or harsh distortion. A protected magical core taking one hit: a rounded low stone thump with a soft resonant crystal pulse. Distinct and urgent but not frightening, 0.6 seconds then silence.",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}
