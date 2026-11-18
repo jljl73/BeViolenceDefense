@@ -1,0 +1,88 @@
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using UnityEditor;
+using UnityEngine;
+
+// 임시 확인용(프로젝트 복사본에만 둔다): Stage2.asset 이 Unity에서 읽히고 경로·교전 예측이 설계와 같은지 본다.
+public sealed class Stage2DiagTests
+{
+    private static StageData Load() => AssetDatabase.LoadAssetAtPath<StageData>("Assets/04_Data/04_Stages/Stage2.asset");
+    private static EnemyCatalog Catalog() => AssetDatabase.LoadAssetAtPath<EnemyCatalog>("Assets/04_Data/03_Balance/EnemyCatalog.asset");
+
+    private static DefenseGrid Grid(string walls)
+    {
+        DefenseGrid grid = Load().CreateGrid();
+        foreach (string w in walls.Split(';', System.StringSplitOptions.RemoveEmptyEntries))
+        {
+            string[] p = w.Split(',');
+            Assert.That(grid.TryPlace(new Vector2Int(int.Parse(p[0]), int.Parse(p[1]))), Is.EqualTo(DefenseGrid.BuildResult.Placed), w);
+        }
+        return grid;
+    }
+
+    private static string Run(string walls, string spec, out int[] lengths, out string forecast, out bool finished)
+    {
+        DefenseGrid grid = Grid(walls);
+        lengths = grid.Routes.Select(r => r.Length - 2).ToArray();
+        EnemyFaction[] sides = Enumerable.Range(0, StageData.FactionCount)
+            .Select(i => new EnemyFaction(StageData.FactionNames[i], StageData.FactionColors[i], spawnCount: 0)).ToArray();
+        var queues = new IReadOnlyList<EnemyFaction>[StageData.FactionCount];
+        string[] parts = spec.Split('|');
+        var units = new Dictionary<(string, int), EnemyFaction>();
+        for (int s = 0; s < queues.Length; s++)
+        {
+            var q = new List<EnemyFaction>();
+            if (s < parts.Length)
+                foreach (string item in parts[s].Split(','))
+                {
+                    string[] kv = item.Split('*');
+                    if (!units.TryGetValue((kv[0], s), out EnemyFaction unit))
+                        units[(kv[0], s)] = unit = Catalog().GetUnit(kv[0], sides[s].Color, "diag");
+                    Assert.That(unit, Is.Not.Null, kv[0]);
+                    for (int i = 0; i < int.Parse(kv[1]); i++) q.Add(unit);
+                }
+            queues[s] = q;
+        }
+        var battle = new DefenseBattle(grid, sides, _ => queues);
+        var all = new List<EnemyUnit>();
+        battle.EnemySpawned += e => all.Add(e);
+        battle.StartRound();
+        forecast = string.Join(" ", battle.ForecastEncounterCells().Select(c => $"({c.x},{c.y})"));
+        int ticks = 0;
+        for (; ticks < 300 * 60 && battle.CurrentPhase == DefenseBattle.Phase.Combat; ticks++)
+            battle.Tick(DefenseBattle.TickDuration, pauseMovement: false);
+        finished = battle.CurrentPhase != DefenseBattle.Phase.Combat;
+        string Side(int s) => $"진영{s} 출전 {all.Count(e => e.FactionIndex == s)} 코어도달 {all.Count(e => e.FactionIndex == s && e.ReachedCore)} 공격 {all.Where(e => e.FactionIndex == s).Sum(e => e.AttacksPerformed)}회";
+        return $"벽[{walls}] 경로 {string.Join("/", lengths)}칸 예측[{forecast}] {(finished ? "종료" : "미종료")} {ticks / 60f:0.0}s | {Side(0)} | {Side(1)}";
+    }
+
+    [Test]
+    public void Stage2LoadsAndRoutesMatchTheDesign()
+    {
+        StageData stage = Load();
+        Assert.That(stage, Is.Not.Null);
+        Assert.That(stage.Validate(stage.CreateGrid()), Is.Null);
+        Assert.That(GameText.Get(stage.displayNameKey), Is.EqualTo("2 스테이지"));
+        const string basic = "goblin-grunt-1500*6|skeleton*6";
+        (string walls, int length, string forecast)[] cases =
+        {
+            ("", 20, ""), ("0,4;1,4;15,4;16,4", 27, "(8,3)"), ("0,8;1,8;15,8;16,8", 23, "(8,7)"), ("3,12;13,12", 21, "(8,11)"),
+        };
+        foreach (var c in cases)
+        {
+            string line = Run(c.walls, basic, out int[] lengths, out string forecast, out bool finished);
+            TestContext.WriteLine(line);
+            Assert.That(lengths, Is.EqualTo(new[] { c.length, c.length }), line);
+            Assert.That(forecast, Is.EqualTo(c.forecast), line);
+            Assert.That(finished, Is.True, line);
+        }
+        foreach (string walls in new[] { "0,4;1,4;15,8;16,8", "0,8;1,8", "3,12", "0,8;1,8;15,8;16,8;8,12" })
+            TestContext.WriteLine(Run(walls, basic, out _, out _, out _));
+        TestContext.WriteLine(Run("", "wolf*6|zombie*3", out _, out _, out _));
+        TestContext.WriteLine(Run("0,4;1,4;15,4;16,4", "wolf*6|zombie*3", out _, out _, out _));
+        TestContext.WriteLine(Run("", "goblin-slinger*5|skeleton-archer*5", out _, out _, out _));
+        TestContext.WriteLine("코어 너머 멈춤 재현: " + Run("5,6;11,6;8,12",
+            "orc*3,goblin-grunt-1500*8,goblin-slinger*4|skeleton*8,necromancer*1,skeleton-archer*4,zombie*3", out _, out _, out _));
+    }
+}

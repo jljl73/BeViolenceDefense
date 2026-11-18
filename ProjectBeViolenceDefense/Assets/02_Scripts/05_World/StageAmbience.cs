@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// 스테이지 분위기 연출: 화면에 떠다니는 입자(낙엽·눈)와, 유닛이 쓰러진 자리에서 한 번 흩날리는 입자.
-/// 씬에 놓인 파티클을 연결해 쓰며, VoxelDefensePrototype에 이 컴포넌트가 연결된 씬에서만 동작한다.
+/// 스테이지 프리팹의 파티클을 연결해 쓰며, 선택된 StageContent를 통해 VoxelDefensePrototype에 연결된다.
 /// 전투 규칙에는 관여하지 않는다(보기 연출만).
 /// </summary>
 public sealed class StageAmbience : MonoBehaviour

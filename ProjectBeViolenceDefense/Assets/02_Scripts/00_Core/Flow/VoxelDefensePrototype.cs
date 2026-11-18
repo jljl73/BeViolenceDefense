@@ -87,7 +87,35 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
 
     private int SpellRangeStep => Mathf.RoundToInt(aimedRangeScroll);
 
+    [SerializeField] private bool waitForStageSelection;
+    private System.Action restartStage;
+
     private void Awake()
+    {
+        if (waitForStageSelection)
+        {
+            if (victoryPanelHud != null)
+                victoryPanelHud.Bind(next: null, retry: Restart);
+            enabled = false;
+            return;
+        }
+        InitializeBattle();
+    }
+
+    public void InitializeStage(StageContent content, System.Action retry)
+    {
+        if (view != null)
+            throw new System.InvalidOperationException("A stage has already been initialized.");
+        stage = content.Data;
+        boardTheme = content.Theme;
+        boardCamera = content.BoardCamera;
+        stageAmbience = content.Ambience;
+        restartStage = retry;
+        enabled = true;
+        InitializeBattle();
+    }
+
+    private void InitializeBattle()
     {
         if (enemyCatalog == null)
         {
@@ -640,7 +668,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         aimedRangeScroll = rangeStep;
     }
 
-    private void Restart() => SceneManager.LoadScene(gameObject.scene.buildIndex);
+    private void Restart()
+    {
+        if (restartStage != null)
+            restartStage();
+        else
+            SceneManager.LoadScene(gameObject.scene.buildIndex);
+    }
 
     private void LateUpdate()
     {

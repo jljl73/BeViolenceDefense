@@ -70,6 +70,7 @@
     {"key": "spell.taunt.description", "text": "유닛 하나가 {0:0}초간 커지고 최대 체력이 {1:0}% 증가. 벽 너머까지 반경 {2:0.0}칸 안의 다른 진영 유닛을 유인"},
     {"key": "spell.taunt.name", "text": "도발"},
     {"key": "stage.1", "text": "1 스테이지"},
+    {"key": "stage.2", "text": "2 스테이지"},
     {"key": "stage.4", "text": "4 스테이지"},
     {"key": "stage.test", "text": "시험 스테이지"},
     {"key": "ui.start", "text": "전투 시작"},
@@ -88,6 +89,12 @@
     {"key": "unit.werewolf", "text": "늑대인간"},
     {"key": "unit.wolf", "text": "늑대"},
     {"key": "unit.wyvern", "text": "와이번"},
-    {"key": "unit.zombie", "text": "좀비"}
+    {"key": "unit.zombie", "text": "좀비"},
+    {"key": "stage_select.title", "text": "스테이지 선택"},
+    {"key": "stage_select.subtitle", "text": "전장을 선택하세요"},
+    {"key": "stage_select.default", "text": "기본 전장"},
+    {"key": "stage_select.maple", "text": "단풍"},
+    {"key": "stage_select.snow", "text": "설원"},
+    {"key": "stage_select.graveyard", "text": "묘지"}
   ]
 }
