@@ -1,0 +1,69 @@
+stage 25x25, spawns 4, obstacle cells 95
+layouts 40 (incl. no walls)
+
+W1 TEST: 10 units, 2 factions
+  power Gob 6.0 / Und 5.3
+  A no spells      lost% Gob   0 Und   0 | leaks Gob 6.0 Und 4.0 | total leak 10.0 | spread 0.00 even(<=.2) 100% | 25s casts 0.0
+  B greedy spells  lost% Gob   0 Und   0 | leaks Gob 6.0 Und 4.0 | total leak 10.0 | spread 0.00 even(<=.2) 100% | 25s casts 0.0
+  pair Gob-Und (open board)
+    A none         lost% Gob  83 Und  71 | leaks Gob 1.1 Und 2.7 | total leak 3.8 | spread 0.16 even(<=.2) 95% | 26s casts 0.0
+    B greedy       lost% Gob  84 Und  43 | leaks Gob 1.0 Und 3.9 | total leak 4.9 | spread 0.42 even(<=.2) 2% | 21s casts 4.0
+
+W2 TEST: 13 units, 2 factions
+  power Bst 6.8 / Drg 6.8
+  A no spells      lost% Bst  87 Drg  79 | leaks Bst 1.3 Drg 1.8 | total leak 3.1 | spread 0.19 even(<=.2) 82% | 33s casts 0.0
+  B greedy spells  lost% Bst  80 Drg  50 | leaks Bst 2.8 Drg 1.9 | total leak 4.6 | spread 0.32 even(<=.2) 20% | 27s casts 7.2
+  pair Bst-Drg (open board)
+    A none         lost% Bst  77 Drg  69 | leaks Bst 2.0 Drg 2.7 | total leak 4.7 | spread 0.12 even(<=.2) 100% | 24s casts 0.0
+    B greedy       lost% Bst  77 Drg  50 | leaks Bst 2.0 Drg 2.9 | total leak 4.9 | spread 0.27 even(<=.2) 0% | 19s casts 5.0
+
+W3 TEST: 16 units, 3 factions
+  power Gob 7.6 / Und 5.5 / Bst 7.8
+  A no spells      lost% Gob  16 Und  21 Bst   0 | leaks Gob 5.7 Und 3.1 Bst 5.0 | total leak 13.7 | spread 0.21 even(<=.2) 5% | 34s casts 0.0
+  B greedy spells  lost% Gob  24 Und  18 Bst   0 | leaks Gob 4.1 Und 4.0 Bst 5.0 | total leak 13.0 | spread 0.25 even(<=.2) 0% | 31s casts 3.8
+  pair Gob-Und (open board)
+    A none         lost% Gob  63 Und  48 | leaks Gob 1.0 Und 3.7 | total leak 4.7 | spread 0.15 even(<=.2) 97% | 27s casts 0.0
+    B greedy       lost% Gob  63 Und  54 | leaks Gob 1.1 Und 3.8 | total leak 4.8 | spread 0.10 even(<=.2) 97% | 24s casts 5.4
+  pair Gob-Bst (open board)
+    A none         lost% Gob  22 Bst  50 | leaks Gob 6.0 Bst 1.0 | total leak 7.0 | spread 0.28 even(<=.2) 2% | 20s casts 0.0
+    B greedy       lost% Gob  47 Bst  50 | leaks Gob 5.1 Bst 1.0 | total leak 6.1 | spread 0.03 even(<=.2) 97% | 18s casts 3.4
+  pair Und-Bst (open board)
+    A none         lost% Und   0 Bst   0 | leaks Und 5.0 Bst 5.0 | total leak 10.0 | spread 0.00 even(<=.2) 100% | 19s casts 0.0
+    B greedy       lost% Und   0 Bst   0 | leaks Und 5.0 Bst 5.0 | total leak 10.0 | spread 0.00 even(<=.2) 100% | 19s casts 0.0
+
+W4 TEST: 21 units, 3 factions
+  power Gob 10.7 / Bst 10.4 / Drg 9.9
+  A no spells      lost% Gob  13 Bst  52 Drg  36 | leaks Gob 6.9 Bst 4.7 Drg 2.8 | total leak 14.4 | spread 0.40 even(<=.2) 7% | 39s casts 0.0
+  B greedy spells  lost% Gob   8 Bst  45 Drg  43 | leaks Gob 6.8 Bst 6.6 Drg 2.4 | total leak 15.8 | spread 0.52 even(<=.2) 7% | 31s casts 6.8
+  pair Gob-Bst (open board)
+    A none         lost% Gob  38 Bst  65 | leaks Gob 6.9 Bst 1.1 | total leak 8.0 | spread 0.28 even(<=.2) 2% | 25s casts 0.0
+    B greedy       lost% Gob  44 Bst  57 | leaks Gob 6.4 Bst 2.2 | total leak 8.6 | spread 0.20 even(<=.2) 87% | 21s casts 5.1
+  pair Gob-Drg (open board)
+    A none         lost% Gob  52 Drg  99 | leaks Gob 5.9 Drg 0.1 | total leak 6.0 | spread 0.47 even(<=.2) 5% | 27s casts 0.0
+    B greedy       lost% Gob  80 Drg  70 | leaks Gob 3.0 Drg 2.1 | total leak 5.0 | spread 0.11 even(<=.2) 100% | 26s casts 7.3
+  pair Bst-Drg (open board)
+    A none         lost% Bst  76 Drg  99 | leaks Bst 4.4 Drg 0.1 | total leak 4.5 | spread 0.25 even(<=.2) 7% | 25s casts 0.0
+    B greedy       lost% Bst  85 Drg  98 | leaks Bst 3.9 Drg 0.2 | total leak 4.1 | spread 0.16 even(<=.2) 92% | 24s casts 8.8
+
+W5 TEST: 29 units, 4 factions
+  power Gob 11.7 / Und 10.6 / Bst 14.8 / Drg 13.5
+  A no spells      lost% Gob  18 Und  11 Bst  54 Drg  60 | leaks Gob 7.4 Und 5.5 Bst 6.0 Drg 1.3 | total leak 20.1 | spread 0.55 even(<=.2) 2% | 37s casts 0.0
+  B greedy spells  lost% Gob  21 Und  10 Bst  66 Drg  62 | leaks Gob 6.8 Und 5.5 Bst 5.1 Drg 1.1 | total leak 18.5 | spread 0.59 even(<=.2) 2% | 39s casts 9.0
+  pair Gob-Und (open board)
+    A none         lost% Gob  93 Und  97 | leaks Gob 1.5 Und 1.5 | total leak 2.9 | spread 0.10 even(<=.2) 75% | 37s casts 0.0
+    B greedy       lost% Gob  98 Und  70 | leaks Gob 0.4 Und 3.5 | total leak 3.8 | spread 0.32 even(<=.2) 10% | 37s casts 9.0
+  pair Gob-Bst (open board)
+    A none         lost% Gob  47 Bst  73 | leaks Gob 7.3 Bst 1.0 | total leak 8.3 | spread 0.26 even(<=.2) 7% | 27s casts 0.0
+    B greedy       lost% Gob  76 Bst  69 | leaks Gob 4.0 Bst 1.9 | total leak 5.8 | spread 0.12 even(<=.2) 82% | 27s casts 8.4
+  pair Gob-Drg (open board)
+    A none         lost% Gob  97 Drg  86 | leaks Gob 0.5 Drg 2.5 | total leak 3.0 | spread 0.17 even(<=.2) 92% | 32s casts 0.0
+    B greedy       lost% Gob  98 Drg  90 | leaks Gob 0.3 Drg 1.0 | total leak 1.3 | spread 0.11 even(<=.2) 97% | 34s casts 9.0
+  pair Und-Bst (open board)
+    A none         lost% Und  61 Bst  61 | leaks Und 4.9 Bst 5.9 | total leak 10.8 | spread 0.04 even(<=.2) 97% | 29s casts 0.0
+    B greedy       lost% Und  69 Bst  67 | leaks Und 4.4 Bst 3.2 | total leak 7.6 | spread 0.07 even(<=.2) 87% | 37s casts 9.0
+  pair Und-Drg (open board)
+    A none         lost% Und  87 Drg  97 | leaks Und 2.6 Drg 0.3 | total leak 2.8 | spread 0.15 even(<=.2) 95% | 36s casts 0.0
+    B greedy       lost% Und  98 Drg  97 | leaks Und 0.9 Drg 0.4 | total leak 1.3 | spread 0.04 even(<=.2) 97% | 44s casts 9.0
+  pair Bst-Drg (open board)
+    A none         lost% Bst  73 Drg  55 | leaks Bst 1.1 Drg 4.0 | total leak 5.0 | spread 0.19 even(<=.2) 95% | 26s casts 0.0
+    B greedy       lost% Bst  72 Drg  50 | leaks Bst 1.1 Drg 4.9 | total leak 6.0 | spread 0.23 even(<=.2) 10% | 29s casts 6.0

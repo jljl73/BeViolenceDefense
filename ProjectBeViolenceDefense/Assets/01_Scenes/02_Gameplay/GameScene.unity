@@ -811,39 +811,107 @@ MonoBehaviour:
     color: {r: 0.68, g: 0.45, b: 0.95, a: 1}
     spawnCount: 0
   rounds:
-  - note: "W1 \uAD11\uC7A5\uC758 \uCCAB \uCDA9\uB3CC"
+  - note: W1 TEST
     greenHorde:
     - unitId: goblin-grunt-1500
-      count: 4
-    undead:
-    - unitId: skeleton
-      count: 6
-    beasts: []
-    dragonAndDemon: []
-  - note: "W2 \uC5C7\uAC08\uB9AC\uB294 \uBC1C\uAC78\uC74C"
-    greenHorde:
-    - unitId: wolf
       count: 6
     undead:
     - unitId: zombie
-      count: 3
+      count: 2
+    - unitId: skeleton
+      count: 2
     beasts: []
     dragonAndDemon: []
-  - note: "W3 \uC131\uBB38 \uC55E \uACB0\uC804"
+  - note: W2 TEST
+    greenHorde: []
+    undead: []
+    beasts:
+    - unitId: wolf
+      count: 7
+    - unitId: bat
+      count: 2
+    dragonAndDemon:
+    - unitId: hatchling
+      count: 3
+    - unitId: demon
+      count: 1
+  - note: W3 TEST
+    greenHorde:
+    - unitId: orc
+      count: 1
+    - unitId: goblin-grunt-1500
+      count: 3
+    - unitId: goblin-slinger
+      count: 2
+    undead:
+    - unitId: living-armor
+      count: 1
+    - unitId: skeleton
+      count: 2
+    - unitId: skeleton-archer
+      count: 2
+    beasts:
+    - unitId: werewolf
+      count: 1
+    - unitId: wolf
+      count: 3
+    - unitId: bat
+      count: 1
+    dragonAndDemon: []
+  - note: W4 TEST
     greenHorde:
     - unitId: orc
       count: 2
+    - unitId: goblin-grunt-1500
+      count: 2
+    - unitId: goblin-slinger
+      count: 3
+    undead: []
+    beasts:
+    - unitId: werewolf
+      count: 1
+    - unitId: wolf
+      count: 5
+    - unitId: bat
+      count: 3
+    dragonAndDemon:
+    - unitId: demon
+      count: 2
+    - unitId: hatchling
+      count: 3
+  - note: W5 TEST
+    greenHorde:
+    - unitId: orc
+      count: 2
+    - unitId: goblin-grunt-1500
+      count: 3
     - unitId: goblin-slinger
       count: 3
     undead:
-    - unitId: skeleton
-      count: 2
+    - unitId: reaper
+      count: 1
     - unitId: living-armor
       count: 1
+    - unitId: zombie
+      count: 1
+    - unitId: skeleton
+      count: 2
     - unitId: skeleton-archer
+      count: 2
+    beasts:
+    - unitId: werewolf
+      count: 2
+    - unitId: wolf
+      count: 5
+    - unitId: bat
+      count: 2
+    dragonAndDemon:
+    - unitId: wyvern
+      count: 1
+    - unitId: demon
+      count: 1
+    - unitId: hatchling
       count: 3
-    beasts: []
-    dragonAndDemon: []
   stage: {fileID: 11400000, guid: 851ed955543d64d46b3e858f7a9cb1c1, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
