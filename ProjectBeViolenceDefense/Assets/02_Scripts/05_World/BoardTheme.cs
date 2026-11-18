@@ -19,4 +19,15 @@ public sealed class BoardTheme
     [Tooltip("나무 블록 프리팹을 고정 벽으로 쓸 때 곱하는 색")]
     public Color fixedWallTint = new Color32(130, 130, 140, 255);
     public Color trim = new Color32(178, 198, 199, 255);
+
+    [Header("타일 형태")]
+    [Tooltip("타일 사이 간격 (칸 크기 1 기준)")]
+    [Range(0f, 0.2f)] public float tileGap = 0.06f;
+    [Tooltip("타일 윗면 모서리를 깎는 폭. 0이면 기본 큐브를 쓴다.")]
+    [Range(0f, 0.15f)] public float tileBevel;
+    [Tooltip("바닥 타일·스폰 패드 윗면에 곱하는 질감. 비우면 단색")]
+    public Texture2D tileTexture;
+    [Tooltip("보드 둘레 테두리 폭. 0이면 테두리를 만들지 않는다.")]
+    [Range(0f, 1f)] public float borderWidth;
+    public Color border = new Color32(40, 54, 69, 255);
 }

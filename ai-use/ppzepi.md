@@ -168,3 +168,90 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 셸 PATH에 Unity CLI가 없어 `unity --help` 실행 불가, Unity MCP로 검증함. Windows Player 빌드·수동 입력 전체 플레이·BalanceSim 독립 실행은 미검증. 상세 제한은 증거 문서 참고.
+
+### [20261118-1918] TestScene 기초 타일 형태·질감 구성 (2단계)
+- 시각: 2026-11-18 19:18:00 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code / Claude Opus 5.5 (claude-opus-5-5), Unity Editor MCP (Pipeline)
+- 목적 및 적용 위치: Emberward 가을 숲 레퍼런스를 참고해 TestScene 보드 타일을 모서리를 깎은 흙 타일로 바꾸고 보드 테두리를 추가.
+- 사용 방식: BoardTheme에 타일 간격·모서리 경사 폭·질감·테두리 설정 추가. 경사 모서리 상자 메시를 코드로 생성하고, 흙 질감 128px PNG를 에디터 스크립트로 생성. TestScene에만 값 적용(간격 0.04, 경사 0.07, 테두리 0.45, 테두리 색 #7A4A33).
+- 결과 및 확인 방법: 성공. 컴파일 실패 없음, Play Mode 중 새 경고·에러 없음. TestScene 2560×1440 캡처를 잘라 타일 경사면·흙 질감·스폰 패드·테두리 확인. GameScene 캡처에서 기존 회색 타일 모습 유지 확인(새 설정 기본값은 기존 동작).
+- 사람의 개입: 2단계 진행을 사용자가 지시. 수치와 질감은 AI 임시 선택, 사람 검토 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/BeveledBoxMesh.cs | Claude Code | 생성 | 윗면 모서리를 깎은 상자 메시 생성기. 검토 중 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/BoardTheme.cs | Claude Code | 수정 | tileGap, tileBevel, tileTexture, borderWidth, border 추가. 검토 중 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Claude Code | 수정 | 타일·스폰 패드에 경사 메시와 질감 적용, 보드 테두리 생성, 생성 메시 해제. 검토 중 |
+| ProjectBeViolenceDefense/Assets/05_Art/04_Tiles/DirtTile.png | Claude Code + Unity Editor MCP | 생성 | 절차적 흙 질감(128×128). 검토 중 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/TestScene.unity | Unity Editor MCP | 수정 | boardTheme 타일·테두리 값 설정. 검토 중 |
+
+#### 증거
+- 없음. Play Mode 캡처는 세션 임시 폴더에만 저장.
+
+#### 미확인 및 후속 확인
+- Unity CLI는 사용하지 않음. 컴파일·Play Mode 확인은 Unity Editor MCP로 수행.
+- 전투 시작 후 유닛과 타일의 가독성, 벽 배치 클릭은 직접 조작해 확인하지 않음(선택 판정 코드는 변경 없음).
+- Netmarble Medium SDF.asset 1줄과 AssetPaths.g.cs·TimelineSettings.asset 줄바꿈 변경은 에디터가 만든 것으로 보이며 이번 작업 범위가 아님. 커밋 여부 확인 필요.
+- 3단계(지면·나무·안개·후처리)는 미구현.
+
+### [20261118-192019] Unity CLI 및 CLI MCP 연결 점검
+- 시각: 2026-11-18 19:20:19 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / Unity CLI 1.0.0 / Unity MCP
+- 목적 및 적용 위치: ProjectBeViolenceDefense의 CLI 및 MCP 연결 확인
+- 사용 방식: 프로젝트 버전·패키지 확인, CLI status와 MCP editor.status 읽기 전용 조회
+- 결과 및 확인 방법: 성공 / CLI가 해당 프로젝트를 ready(포트 7801)로 반환. MCP는 Unity 6000.3.28f1, playing, playerLoopTicking=true 반환. 샌드박스에서는 실행 파일이 보이지 않았으나 샌드박스 밖 절대 경로 실행 성공. 최신 CLI 1.0.1 확인, 업데이트는 수행하지 않음.
+- 사람의 개입: 연결 점검 요청. 업데이트 선택은 미확인.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ai-use/ppzepi.md | Codex | 수정(추가) | 점검 기록 적용 |
+
+#### 증거
+- 없음(도구 응답으로 확인)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 버전, 프로젝트 연결, 업데이트 유무 조회
+- 활용 방식: --version, status --project-path 지정, self-update --check. Codex는 실행·결과 해석, CLI는 로컬 Editor 상태 조회 담당.
+- 잘된 점: 해당 프로젝트의 실행 중 Editor 연결 확인
+- 잘 안된 점 및 개선 필요: 샌드박스 내부에서는 CLI 실행 파일 접근 불가. 샌드박스 밖 실행으로 확인.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 프로젝트 셸 및 Unity MCP
+- 사용 방식: 파일 확인과 읽기 전용 연결 조회 및 기록 추가
+
+### [20261118-testscene-investigation] TestScene 실행 불가 원인 조사
+- 시각: 2026-11-18 19:32:00 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / 모델 버전 확인 필요, Unity CLI 1.0.0, Unity Editor 6000.3.28f1
+- 목적 및 적용 위치: TestScene의 실행 및 조작 불가 원인 확인.
+- 사용 방식: 씬·패키지·코드 읽기, CLI Play Mode 재현, 상태 조회 및 전투 시작 콜백 직접 호출. 기존 변경 보존, 게임 코드 수정 없음.
+- 결과 및 확인 방법: 부분 성공 / 입력 장치 0개·Keyboard/Mouse.current=null 확인. 전투 콜백 호출 후 10명 스폰·2라운드 준비·코어 118/120 확인. 현재 컴파일 실패 및 이번 실행의 새 Console 오류 없음. Play Mode와 임시 실행 설정 복원.
+- 사람의 개입: 사용자 원인 조사 요청. 기존 미커밋 변경 작성자 및 추가 검토 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ai-use/evidence/20261118-testscene-investigation.md | Codex | 생성 | 관찰·원인·미확인 범위 기록, 조사 근거로 사용 |
+| ai-use/evidence/20261118-testscene-investigation.png | Unity CLI capture / Codex 지시 | 생성 | 2라운드 준비 화면 캡처, 조사 근거로 사용 |
+| ai-use/ppzepi.md | Codex | 추가 | 이번 작업 기록 |
+
+#### 증거
+- ai-use/evidence/20261118-testscene-investigation.md
+- ai-use/evidence/20261118-testscene-investigation.png
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 에디터·씬·Console 조회, Play Mode 재현, 입력 장치·UI 액션·게임 상태 검사, 전투 콜백 호출, 화면 캡처 및 재생 종료.
+- 활용 방식: Codex는 코드와 씬의 실행 경로를 분석하고, Unity CLI는 해당 프로젝트 에디터의 런타임 상태 조회와 임시 실행 검증을 담당.
+- 잘된 점: 전투 로직 진행과 입력 장치 미인식을 분리해 확인하고 과거 오류와 현재 상태를 구분함.
+- 잘 안된 점 및 개선 필요: 샌드박스에서는 CLI 실행 경로에 접근하지 못해 승인된 실행 경로 사용. CLI 1.0.1 업데이트 존재 확인, 업데이트 미수행. 네이티브 장치 미인식의 근본 원인 및 재시작 후 복구는 미검증.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex의 셸·파일 도구로 저장소와 Unity CLI 조사, 이미지 보기로 캡처 확인, 웹 검색으로 Unity Input System 공식 설치 안내 확인.
+- 사용 방식: 관찰에 근거한 원인 분리와 조사 문서 작성.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Unity 재시작 후 Input Debugger의 Keyboard/Mouse 인식 및 실제 Space·클릭 입력. TestScene은 빌드 목록에 없어 현재 buildIndex 기반 재시작 경로도 별도 수정 필요. 독립 실행 빌드 미검증.

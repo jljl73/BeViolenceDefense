@@ -12,7 +12,7 @@ internal sealed class DefenseBoardView
     private const float ZoomSnapDistance = 0.0005f;
     private const float MinViewScale = 0.55f;
     private const float MaxViewScale = 1.45f;
-    private const float TileSize = 0.94f;
+    private const float TileHeight = 0.28f;
     private const float RouteMarkerSize = 0.68f;
     private const float RouteLaneSpacing = 0.49f;
     private const float RouteMarkerHeight = 0.02f;
@@ -66,6 +66,7 @@ internal sealed class DefenseBoardView
     private readonly HashSet<Vector2Int> spawnCells;
     private readonly List<SpriteRenderer> routeMarkers = new();
     private readonly List<Material> materials = new();
+    private readonly List<Mesh> meshes = new();
     private readonly Dictionary<Vector2Int, Transform> wallViews = new();
     private readonly Dictionary<EnemyUnit, EnemyView> enemyViews = new();
     private readonly List<HitEffect> hitEffects = new();
@@ -119,9 +120,9 @@ internal sealed class DefenseBoardView
         FitCamera();
 
         Material foundation = Palette(theme.foundation);
-        tiles = new[] { Palette(theme.tileA), Palette(theme.tileB) };
-        routeTile = Palette(theme.routeTile);
-        encounterTile = Palette(theme.encounterTile);
+        tiles = new[] { Palette(theme.tileA, theme.tileTexture), Palette(theme.tileB, theme.tileTexture) };
+        routeTile = Palette(theme.routeTile, theme.tileTexture);
+        encounterTile = Palette(theme.encounterTile, theme.tileTexture);
         buildWall = Palette(theme.buildWall);
         Material fixedWall = Palette(theme.fixedWall);
         trim = Palette(theme.trim);
@@ -131,14 +132,20 @@ internal sealed class DefenseBoardView
 
         Box("Board base", root, grid.Center - Vector3.up * 0.55f,
             new Vector3(DefenseGrid.Width, 0.6f, DefenseGrid.Depth), foundation);
+        float tileSize = 1f - theme.tileGap;
+        var tileScale = new Vector3(tileSize, TileHeight, tileSize);
+        Mesh tileMesh = theme.tileBevel > 0f ? Beveled("Board Tile", tileScale, theme.tileBevel) : null;
         for (int x = 0; x < DefenseGrid.Width; x++)
         {
             for (int z = 0; z < DefenseGrid.Depth; z++)
             {
-                floor[x, z] = Box($"Tile {x},{z}", root, new Vector3(x, -0.14f, z),
-                    new Vector3(TileSize, 0.28f, TileSize), tiles[(x + z) % tiles.Length]).GetComponent<MeshRenderer>();
+                floor[x, z] = Box($"Tile {x},{z}", root, new Vector3(x, -TileHeight * 0.5f, z),
+                    tileScale, tiles[(x + z) % tiles.Length], tileMesh).GetComponent<MeshRenderer>();
             }
         }
+
+        if (theme.borderWidth > 0f)
+            CreateBorder(grid, theme);
 
         foreach (Vector2Int cell in grid.FixedWalls)
             wallViews.Add(cell, CreateWall(cell, $"Fixed Wall {cell.x},{cell.y}", fixedWall));
@@ -147,8 +154,10 @@ internal sealed class DefenseBoardView
         {
             EnemyFaction faction = factions[i];
             Vector3 position = DefenseGrid.CellPosition(grid.SpawnCells[i]);
+            var padScale = new Vector3(0.9f, 0.07f, 0.9f);
+            Mesh padMesh = theme.tileBevel > 0f ? Beveled("Spawn Pad", padScale, Mathf.Min(theme.tileBevel, 0.03f)) : null;
             Box($"{faction.DisplayName} spawn pad", root, position + Vector3.up * 0.035f,
-                new Vector3(0.9f, 0.07f, 0.9f), FactionMaterial(faction));
+                padScale, FactionMaterial(faction), padMesh);
             Box("Spawn pad center", root, position + Vector3.up * 0.075f, new Vector3(0.55f, 0.03f, 0.55f), foundation);
         }
 
@@ -171,6 +180,37 @@ internal sealed class DefenseBoardView
         areaSpellPreview.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         areaSpellPreview.receiveShadows = false;
         areaSpellPreview.enabled = false;
+    }
+
+    // 보드 바깥을 두르는 테두리. 칸 안쪽을 침범하지 않아 선택과 경로에 영향이 없다.
+    private void CreateBorder(DefenseGrid grid, BoardTheme theme)
+    {
+        Material material = Palette(theme.border);
+        float width = theme.borderWidth;
+        const float bottom = -0.85f;
+        const float top = 0.06f;
+        float height = top - bottom;
+        float bevel = Mathf.Max(theme.tileBevel, 0.04f);
+        float y = (top + bottom) * 0.5f;
+        Vector3 center = grid.Center;
+        float halfX = DefenseGrid.Width * 0.5f + width * 0.5f;
+        float halfZ = DefenseGrid.Depth * 0.5f + width * 0.5f;
+
+        var longSize = new Vector3(DefenseGrid.Width + width * 2f, height, width);
+        var shortSize = new Vector3(width, height, DefenseGrid.Depth);
+        Mesh longMesh = Beveled("Board Border Long", longSize, bevel);
+        Mesh shortMesh = Beveled("Board Border Short", shortSize, bevel);
+        Box("Border near", root, new Vector3(center.x, y, center.z - halfZ), longSize, material, longMesh);
+        Box("Border far", root, new Vector3(center.x, y, center.z + halfZ), longSize, material, longMesh);
+        Box("Border left", root, new Vector3(center.x - halfX, y, center.z), shortSize, material, shortMesh);
+        Box("Border right", root, new Vector3(center.x + halfX, y, center.z), shortSize, material, shortMesh);
+    }
+
+    private Mesh Beveled(string name, Vector3 size, float bevel)
+    {
+        Mesh mesh = BeveledBoxMesh.Create(name, size, bevel);
+        meshes.Add(mesh);
+        return mesh;
     }
 
     private void CreateCore(DefenseGrid grid, Material foundation, Material wall, Material core)
@@ -770,6 +810,8 @@ internal sealed class DefenseBoardView
         Object.Destroy(previewRingMesh);
         foreach (Material material in materials)
             Object.Destroy(material);
+        foreach (Mesh mesh in meshes)
+            Object.Destroy(mesh);
     }
 
     private Transform CreateWall(Vector2Int cell, string label, Material material)
@@ -798,10 +840,12 @@ internal sealed class DefenseBoardView
         return wall;
     }
 
-    private Material Palette(Color color)
+    private Material Palette(Color color, Texture2D texture = null)
     {
         var material = new Material(shader) { color = color };
         material.SetFloat("_Smoothness", 0.15f);
+        if (texture != null)
+            material.SetTexture("_BaseMap", texture);
         materials.Add(material);
         return material;
     }
@@ -813,14 +857,26 @@ internal sealed class DefenseBoardView
         return material;
     }
 
-    private static Transform Box(string label, Transform parent, Vector3 position, Vector3 size, Material material)
+    // mesh를 주면 그 크기 그대로 쓰는 메시이므로 size로 늘리지 않는다.
+    private static Transform Box(string label, Transform parent, Vector3 position, Vector3 size, Material material,
+        Mesh mesh = null)
     {
-        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        GameObject cube;
+        if (mesh == null)
+        {
+            cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            Object.Destroy(cube.GetComponent<BoxCollider>());
+            cube.transform.localScale = size;
+        }
+        else
+        {
+            cube = new GameObject(label, typeof(MeshFilter), typeof(MeshRenderer));
+            cube.GetComponent<MeshFilter>().sharedMesh = mesh;
+        }
+
         cube.name = label;
         cube.transform.SetParent(parent, false);
         cube.transform.localPosition = position;
-        cube.transform.localScale = size;
-        Object.Destroy(cube.GetComponent<BoxCollider>());
         cube.GetComponent<MeshRenderer>().sharedMaterial = material;
         return cube.transform;
     }
