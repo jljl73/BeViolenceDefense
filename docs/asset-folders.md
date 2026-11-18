@@ -10,7 +10,7 @@ LuckyNumber의 번호·역할별 분류를 참고했다. Addressables 폴더·�
 - 06_Audio: Music / SFX / Ambience
 - 07_UI: Fonts / Icons / Layouts
 - 08_Input: Input Actions
-- 09_Tests: Validation
+- 09_Tests: Validation / Editor(EditMode 테스트)
 
 Resources, Settings, TextMesh Pro, TutorialInfo, ai.meshy는 기존 위치를 유지한다. Resources 내부 경로와 로딩 키는 동일하다. 캐릭터의 모델·텍스처·애니메이션·재질은 모델별 묶음을 유지한다. 빈 분류는 Unity 폴더 메타로 버전 관리한다.
 

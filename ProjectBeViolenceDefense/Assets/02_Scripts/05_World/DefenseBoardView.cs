@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 internal sealed class DefenseBoardView
 {
@@ -29,19 +30,32 @@ internal sealed class DefenseBoardView
     private const int AimOverlayRenderQueue = 3100;
     // Run 상태가 없는 모델(좀비)은 Walk 클립으로 이동한다. 발이 미끄러지면 이 값을 조절한다.
     private const float WalkStrideSpeed = 0.9f;
+    // 별도 Idle 클립이 없는 적은 Walk를 느리게 반복해 대기 중의 완전한 정지를 피한다.
+    private const float StationaryWalkSpeed = 0.25f;
     // 공격 애니메이션에서 무기가 닿는 지점 (0~1). 이펙트가 빠르거나 늦으면 이 값만 조절한다.
     private const float HitImpactTime = 0.45f;
     private const float HitHeight = 0.5f;
     private const float HitForwardOffset = 0.2f;
     private const int MaxHitEffects = 24;
+    private const float CoreStrikeWindup = 0.24f;
+    private const float CoreStrikeFadeDuration = 0.25f;
+    private const float CoreStrikeFlashScale = 1.50f;
+    private const float CoreBodyFlashDuration = 0.17f;
+    private const float CoreBodyFlashBrightness = 1.36f;
+    private const float CoreShockwaveHeight = 0.44f;
+    private const float SpellBodyFlashDuration = 0.26f;
+    private const float SpellBodyFlashBrightness = 1.8f;
 
     private static readonly Plane BoardGround = new(Vector3.up, Vector3.zero);
     private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
     private static readonly int WalkState = Animator.StringToHash("Base Layer.Walk");
+    private static readonly int IdleState = Animator.StringToHash("Base Layer.Idle");
+    private static readonly int CoreHitState = Animator.StringToHash("Base Layer.Hit");
     private static readonly int RunState = Animator.StringToHash("Base Layer.Run");
     private static readonly int AttackState = Animator.StringToHash("Base Layer.Attack");
 
     public static readonly Color32 CoreColor = new(255, 209, 112, 255);
+    private static readonly Color CoreDamageColor = new Color32(255, 58, 66, 255);
     public static readonly Color32 MoveSpeedBuffColor = new(102, 218, 255, 255);
 
     private sealed class EnemyView
@@ -49,6 +63,8 @@ internal sealed class DefenseBoardView
         public Transform Root;
         public Transform Head;
         public Renderer[] Renderers;
+        public Renderer FactionRing;
+        public (Renderer Renderer, int Slot, Color BaseColor)[] TintSlots;
         public Animator Animator;
         public int AnimationState;
         public int MoveState;
@@ -59,15 +75,30 @@ internal sealed class DefenseBoardView
         public LineRenderer[] MoveSpeedTrails;
         public float StoppedTime;
         public Material PreviewMaterial;
-        public bool PreviewEligible;
-        public MeshRenderer PreviewRing;
-        public LineRenderer PreviewOutline;
+        public (Renderer Renderer, Material[] Original, Material[] Preview, int Order)[] PreviewSurfaces;
+        public Color SpellFlashColor;
+        public float SpellFlashRemaining;
+    }
+
+    private sealed class CoreStrike
+    {
+        public EnemyView View;
+        public Vector3 From;
+        public Vector3 Stance;
+        public Vector3 Impact;
+        public Vector3 Heading;
+        public bool Animated;
+        public bool HasHit;
+        public float Age;
+        public int CoreDamage;
     }
 
     private readonly Transform root;
+    private readonly Vector3 coreShockwaveCenter;
     private readonly Camera camera;
     private readonly Shader shader;
     private readonly IReadOnlyList<EnemyFaction> factions;
+    private readonly EnemyCatalog catalog;
     private readonly Sprite routeChevron;
     private readonly HashSet<Vector2Int> spawnCells;
     private readonly IReadOnlyList<int> spawnFactions;
@@ -82,9 +113,11 @@ internal sealed class DefenseBoardView
     private readonly Dictionary<Vector2Int, Transform> wallViews = new();
     private readonly Dictionary<EnemyUnit, EnemyView> enemyViews = new();
     private readonly List<HitEffect> hitEffects = new();
+    private readonly List<CoreStrike> coreStrikes = new();
+    private readonly Dictionary<Material, Material> fadeMaterials = new();
     private readonly SpellEffects spellEffects;
     private readonly SpellCastMarkers spellCastMarkers;
-    private readonly MaterialPropertyBlock enemyTint = new();
+    private readonly MaterialPropertyBlock tintBlock = new();
     private readonly Dictionary<EnemyFaction, Material> factionMaterials = new();
     private readonly MeshRenderer[,] floor;
     private readonly Material[] tiles;
@@ -98,29 +131,33 @@ internal sealed class DefenseBoardView
     private readonly Material moveSpeedBuffPreviewMaterial;
     private readonly Material healPreviewMaterial;
     private readonly Material armorBuffPreviewMaterial;
-    private readonly Material nearbyPreviewMaterial;
-    private readonly Material attackOutlineMaterial;
-    private readonly Material healOutlineMaterial;
-    private readonly Material moveSpeedOutlineMaterial;
-    private readonly Material armorOutlineMaterial;
-    private readonly Material nearbyOutlineMaterial;
+    private readonly Dictionary<DefenseBattle.Spell, Material> targetSilhouettes = new();
+    private readonly Dictionary<(Material Preview, Material Source), Material> texturedSilhouettes = new();
     private readonly MeshRenderer areaSpellPreview;
     private readonly Mesh areaSpellPreviewMesh;
     private readonly List<int> areaSpellTriangles = new(64 * 6);
     private readonly Mesh factionRingMesh;
-    private readonly Mesh previewRingMesh;
     private int nextHitEffect;
+    private int observedCoreHealth = DefenseBattle.CoreMaxHealth;
+    private Animator coreAnimator;
+    private (Renderer Renderer, int Slot, Color BaseColor)[] coreTintSlots;
+    private float coreFlashRemaining;
+    private bool coreHitPlaying;
     private Vector3 cameraFocus;
     private float viewScale = 1f;
     private float targetViewScale = 1f;
     private Vector2? zoomAnchorViewport;
 
     public IReadOnlyCollection<Vector2Int> PlannedEncounters { get; private set; } = System.Array.Empty<Vector2Int>();
+    public int PendingCoreDamage { get; private set; }
 
     public DefenseBoardView(Transform root, Camera camera, Shader shader, DefenseGrid grid,
-        IReadOnlyList<EnemyFaction> factions, Sprite routeChevron, BoardTheme theme, StageData stage = null)
+        IReadOnlyList<EnemyFaction> factions, Sprite routeChevron, BoardTheme theme, EnemyCatalog catalog,
+        StageData stage = null)
     {
+        this.catalog = catalog;
         this.root = root;
+        coreShockwaveCenter = grid.CorePosition + Vector3.up * CoreShockwaveHeight;
         this.camera = camera;
         this.shader = shader;
         this.factions = factions;
@@ -187,7 +224,6 @@ internal sealed class DefenseBoardView
         CreateCore(grid, theme, foundation, fixedWall, core);
         areaSpellPreviewMesh = CreateRingMesh("Area Spell Range", DefenseBattle.DefaultAreaSpellRadius, 0.075f, 64);
         factionRingMesh = CreateRingMesh("Faction Ring", 0.23f, 0.075f, 24);
-        previewRingMesh = CreateRingMesh("Spell Target Ring", 0.48f, 0.12f, 32);
         var preview = new GameObject("Area Spell Range", typeof(MeshFilter), typeof(MeshRenderer));
         preview.transform.SetParent(root, false);
         preview.GetComponent<MeshFilter>().sharedMesh = areaSpellPreviewMesh;
@@ -196,12 +232,16 @@ internal sealed class DefenseBoardView
         moveSpeedBuffPreviewMaterial = Palette(MoveSpeedBuffColor);
         healPreviewMaterial = Palette(UIPalette.Heal);
         armorBuffPreviewMaterial = Palette(UIPalette.Armor);
-        nearbyPreviewMaterial = Palette(UIPalette.TextPrimary);
-        attackOutlineMaterial = UnlitPalette(UIPalette.Attack);
-        healOutlineMaterial = UnlitPalette(UIPalette.Heal);
-        moveSpeedOutlineMaterial = UnlitPalette(UIPalette.MoveSpeed);
-        armorOutlineMaterial = UnlitPalette(UIPalette.Armor);
-        nearbyOutlineMaterial = UnlitPalette(UIPalette.TextPrimary);
+        Shader silhouetteShader = Resources.Load<Shader>("SpellTargetSilhouette");
+        foreach (DefenseBattle.Spell spell in System.Enum.GetValues(typeof(DefenseBattle.Spell)))
+        {
+            var silhouette = new Material(silhouetteShader) { name = $"{spell} Target Silhouette" };
+            Color color = SpellEffects.SpellColor(spell);
+            silhouette.SetColor("_SilhouetteColor", color);
+            silhouette.SetColor("_OutlineColor", UIPalette.Background);
+            targetSilhouettes.Add(spell, silhouette);
+            materials.Add(silhouette);
+        }
         areaSpellPreview.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         areaSpellPreview.receiveShadows = false;
         areaSpellPreview.enabled = false;
@@ -354,20 +394,68 @@ internal sealed class DefenseBoardView
             GameObject character = Object.Instantiate(theme.coreCharacterPrefab, model, false);
             character.transform.SetLocalPositionAndRotation(Vector3.up * platformTop, Quaternion.LookRotation(Vector3.back));
             character.transform.localScale *= theme.coreCharacterScale;
+            Renderer[] body = character.GetComponentsInChildren<SkinnedMeshRenderer>();
+            coreTintSlots = CollectTintSlots(body.Length > 0 ? body : character.GetComponentsInChildren<Renderer>());
             if (character.GetComponentInChildren<Animator>() is { } animator && animator.runtimeAnimatorController != null)
             {
-                // Hold the frame where the caster stands upright with its staff.
-                if (animator.HasState(0, WalkState))
-                    animator.Play(WalkState, 0, 0.25f);
-                animator.speed = 0f;
-                animator.Update(0f);
+                coreAnimator = animator;
+                if (animator.HasState(0, IdleState))
+                    animator.Play(IdleState, 0, 0f);
             }
             return;
         }
 
-        Box("Core body", model, Vector3.up * 0.56f, new Vector3(0.86f, 0.52f, 0.86f), core);
+        Transform coreBody = Box("Core body", model, Vector3.up * 0.56f, new Vector3(0.86f, 0.52f, 0.86f), core);
         Transform crown = Box("Core crown", model, Vector3.up * 0.94f, new Vector3(0.58f, 0.24f, 0.58f), core);
         crown.localRotation = Quaternion.Euler(0, 45, 0);
+        coreTintSlots = CollectTintSlots(new Renderer[] { coreBody.GetComponent<Renderer>(), crown.GetComponent<Renderer>() });
+    }
+
+    private void PlayCoreHit()
+    {
+        coreFlashRemaining = CoreBodyFlashDuration;
+        ApplyCoreFlash();
+        if (coreAnimator == null || !coreAnimator.HasState(0, CoreHitState))
+            return;
+
+        coreAnimator.Play(CoreHitState, 0, 0f);
+        coreHitPlaying = true;
+    }
+
+    private void ApplyCoreFlash()
+    {
+        float strength = Mathf.SmoothStep(0f, 1f, coreFlashRemaining / CoreBodyFlashDuration);
+        foreach (var (renderer, slot, baseColor) in coreTintSlots)
+        {
+            if (strength <= 0f)
+            {
+                renderer.SetPropertyBlock(null, slot);
+                continue;
+            }
+
+            Color color = Color.Lerp(baseColor, CoreDamageColor * CoreBodyFlashBrightness, strength);
+            color.a = baseColor.a;
+            tintBlock.SetColor(BaseColor, color);
+            renderer.SetPropertyBlock(tintBlock, slot);
+        }
+    }
+
+    public void AdvanceCoreAnimation(float deltaTime, float playbackSpeed)
+    {
+        if (coreAnimator == null)
+            return;
+
+        coreAnimator.speed = deltaTime > 0f ? playbackSpeed : 0f;
+        if (!coreHitPlaying)
+            return;
+
+        AnimatorStateInfo state = coreAnimator.GetCurrentAnimatorStateInfo(0);
+        if (state.fullPathHash != CoreHitState || state.normalizedTime < 1f)
+            return;
+
+        coreHitPlaying = false;
+        if (coreAnimator.HasState(0, IdleState))
+            coreAnimator.Play(IdleState, 0, 0f);
     }
 
     public void FitCamera()
@@ -571,11 +659,12 @@ internal sealed class DefenseBoardView
             UpdateAreaSpellRing(point, radius);
         }
 
+        Material silhouette = material != null ? targetSilhouettes[spell.Value] : null;
         foreach (var entry in enemyViews)
         {
-            bool inRange = material != null && DefenseBattle.IsInAreaSpellRange(entry.Key, point, radius);
-            bool eligible = inRange && DefenseBattle.CanReceiveAreaSpell(entry.Key, spell.Value);
-            SetEnemyPreviewTint(entry.Value, inRange ? material : null, eligible);
+            bool eligible = silhouette != null && DefenseBattle.IsInAreaSpellRange(entry.Key, point, radius) &&
+                DefenseBattle.CanReceiveAreaSpell(entry.Key, spell.Value);
+            SetEnemyPreviewMaterial(entry.Value, eligible ? silhouette : null);
         }
     }
 
@@ -586,11 +675,17 @@ internal sealed class DefenseBoardView
             return;
 
         spellEffects.PlayArea(spell, center, radius);
+        Color flashColor = SpellEffects.SpellColor(spell);
         foreach (EnemyUnit enemy in recipients)
         {
             if (enemyViews.TryGetValue(enemy, out EnemyView view))
+            {
+                view.SpellFlashColor = flashColor;
+                view.SpellFlashRemaining = SpellBodyFlashDuration;
+                ApplyEnemyTint(view);
                 spellCastMarkers.Play(spell, view.Root, EnemyMarkerPoint(enemy, 0.76f),
                     DefenseHud.UnitMarkerViewportClearance(enemy));
+            }
         }
     }
 
@@ -680,38 +775,77 @@ internal sealed class DefenseBoardView
         areaSpellPreviewMesh.SetTriangles(areaSpellTriangles, 0, false);
     }
 
-    private void SetEnemyPreviewTint(EnemyView view, Material material, bool eligible)
+    private void SetEnemyPreviewMaterial(EnemyView view, Material material)
     {
-        if (view.PreviewMaterial == material && view.PreviewEligible == eligible)
+        if (view.PreviewMaterial == material)
             return;
 
         view.PreviewMaterial = material;
-        view.PreviewEligible = eligible;
-        view.PreviewRing.enabled = material != null;
-        view.PreviewOutline.enabled = material != null;
+        if (view.FactionRing != null)
+            view.FactionRing.enabled = material == null;
 
-        if (material == null)
+        if (view.PreviewSurfaces == null)
         {
-            foreach (Renderer renderer in view.Renderers)
-                renderer.SetPropertyBlock(null);
-            return;
+            view.PreviewSurfaces = new (Renderer, Material[], Material[], int)[view.Renderers.Length];
+            for (int i = 0; i < view.Renderers.Length; i++)
+            {
+                Renderer renderer = view.Renderers[i];
+                Material[] original = renderer.sharedMaterials;
+                view.PreviewSurfaces[i] = (renderer, original, new Material[original.Length], renderer.sortingOrder);
+            }
         }
 
-        view.PreviewRing.sharedMaterial = eligible ? material : nearbyPreviewMaterial;
-        view.PreviewRing.transform.localScale = Vector3.one * (eligible ? 1.2f : 1f);
-        view.PreviewOutline.sharedMaterial = eligible
-            ? material == attackBuffPreviewMaterial ? attackOutlineMaterial
-                : material == healPreviewMaterial ? healOutlineMaterial
-                : material == armorBuffPreviewMaterial ? armorOutlineMaterial : moveSpeedOutlineMaterial
-            : nearbyOutlineMaterial;
-        view.PreviewOutline.widthMultiplier = eligible ? 0.085f : 0.055f;
-        PositionPreviewOutline(view);
-        Color tint = eligible ? Color.Lerp(material.color, UIPalette.TextPrimary, 0.5f) : UIPalette.TextPrimary;
-        float strength = eligible ? 0.62f : 0.22f;
-        foreach (Renderer renderer in view.Renderers)
+        foreach (var (renderer, original, preview, order) in view.PreviewSurfaces)
         {
-            enemyTint.SetColor(BaseColor, Color.Lerp(renderer.sharedMaterial.color, tint, strength));
-            renderer.SetPropertyBlock(enemyTint);
+            if (material != null)
+            {
+                for (int i = 0; i < original.Length; i++)
+                    preview[i] = TexturedSilhouette(material, original[i]);
+            }
+            renderer.sharedMaterials = material != null ? preview : original;
+            renderer.sortingOrder = material != null ? AimDimSortingOrder + 1 : order;
+        }
+    }
+
+    private Material TexturedSilhouette(Material preview, Material source)
+    {
+        if (source == null)
+            return preview;
+
+        var key = (preview, source);
+        if (texturedSilhouettes.TryGetValue(key, out Material result))
+            return result;
+
+        result = new Material(preview) { name = $"{preview.name} ({source.name})" };
+        if (source.mainTexture != null)
+        {
+            result.SetTexture("_SourceMap", source.mainTexture);
+            result.SetTextureScale("_SourceMap", source.mainTextureScale);
+            result.SetTextureOffset("_SourceMap", source.mainTextureOffset);
+        }
+        if (source.HasProperty(BaseColor))
+            result.SetColor("_SourceColor", source.GetColor(BaseColor));
+        texturedSilhouettes.Add(key, result);
+        materials.Add(result);
+        return result;
+    }
+
+    private void ApplyEnemyTint(EnemyView view)
+    {
+        float flashStrength = Mathf.SmoothStep(0f, 1f, view.SpellFlashRemaining / SpellBodyFlashDuration);
+        Color flashTint = view.SpellFlashColor * SpellBodyFlashBrightness;
+        foreach (var (renderer, slot, baseColor) in view.TintSlots)
+        {
+            if (flashStrength == 0f)
+            {
+                renderer.SetPropertyBlock(null, slot);
+                continue;
+            }
+
+            Color tint = Color.Lerp(baseColor, flashTint, flashStrength);
+            tint.a = baseColor.a;
+            tintBlock.SetColor(BaseColor, tint);
+            renderer.SetPropertyBlock(tintBlock, slot);
         }
     }
 
@@ -777,8 +911,10 @@ internal sealed class DefenseBoardView
 
     private Vector3 EnemyMarkerPoint(EnemyUnit enemy, float height)
     {
-        Vector3 worldPoint = root.TransformPoint(enemy.Position + Vector3.up * height);
-        if (enemyViews.TryGetValue(enemy, out EnemyView view) && view.Animator != null)
+        bool hasView = enemyViews.TryGetValue(enemy, out EnemyView view);
+        Vector3 shown = hasView ? view.Root.localPosition : enemy.Position;
+        Vector3 worldPoint = root.TransformPoint(shown + Vector3.up * height);
+        if (hasView && view.Animator != null)
         {
             foreach (Renderer renderer in view.Renderers)
                 worldPoint.y = Mathf.Max(worldPoint.y, renderer.bounds.max.y + 0.05f);
@@ -806,11 +942,12 @@ internal sealed class DefenseBoardView
         model.SetParent(root, false);
         model.localPosition = enemy.Position;
         EnemyView view;
-        GameObject prefab = enemy.Faction.Model;
+        EnemyCatalog.UnitVisual look = default;
+        GameObject prefab = catalog != null && catalog.TryGetVisual(enemy.Faction.UnitId, out look) ? look.Model : null;
         if (prefab != null)
         {
             GameObject visual = Object.Instantiate(prefab, model);
-            ApplyFactionModel(visual, enemy.Faction);
+            ApplyUnitVisual(visual, look);
 
             view = new EnemyView
             {
@@ -832,78 +969,55 @@ internal sealed class DefenseBoardView
             var renderer = ring.GetComponent<MeshRenderer>();
             renderer.sharedMaterial = material;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            view.FactionRing = renderer;
         }
         else
         {
             view = CreateBlockEnemy(model, material, enemy.FactionIndex);
         }
-        var previewRing = new GameObject("Spell Target Ring", typeof(MeshFilter), typeof(MeshRenderer));
-        previewRing.transform.SetParent(model, false);
-        previewRing.transform.localPosition = Vector3.up * 0.12f;
-        previewRing.GetComponent<MeshFilter>().sharedMesh = previewRingMesh;
-        view.PreviewRing = previewRing.GetComponent<MeshRenderer>();
-        view.PreviewRing.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        view.PreviewRing.receiveShadows = false;
-        view.PreviewRing.enabled = false;
-        view.PreviewOutline = new GameObject("Spell Unit Outline").AddComponent<LineRenderer>();
-        view.PreviewOutline.transform.SetParent(model, false);
-        view.PreviewOutline.useWorldSpace = false;
-        view.PreviewOutline.loop = true;
-        view.PreviewOutline.positionCount = 40;
-        view.PreviewOutline.numCornerVertices = 2;
-        view.PreviewOutline.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        view.PreviewOutline.receiveShadows = false;
-        view.PreviewOutline.enabled = false;
+        view.TintSlots = CollectTintSlots(view.Renderers);
         enemyViews.Add(enemy, view);
         SyncEnemy(enemy);
     }
 
-    private void PositionPreviewOutline(EnemyView view)
+    private static (Renderer, int, Color)[] CollectTintSlots(Renderer[] renderers)
     {
-        Bounds bounds = view.Renderers[0].bounds;
-        for (int i = 1; i < view.Renderers.Length; i++)
-            bounds.Encapsulate(view.Renderers[i].bounds);
-
-        Vector3 right = camera.transform.right;
-        Vector3 up = camera.transform.up;
-        Vector3 extent = bounds.extents;
-        float radiusX = Mathf.Clamp(Mathf.Abs(right.x) * extent.x + Mathf.Abs(right.y) * extent.y +
-            Mathf.Abs(right.z) * extent.z + 0.1f, 0.38f, 0.75f);
-        float radiusY = Mathf.Clamp(Mathf.Abs(up.x) * extent.x + Mathf.Abs(up.y) * extent.y +
-            Mathf.Abs(up.z) * extent.z + 0.12f, 0.55f, 0.95f);
-
-        LineRenderer outline = view.PreviewOutline;
-        outline.transform.position = bounds.center;
-        outline.transform.rotation = camera.transform.rotation;
-        for (int i = 0; i < outline.positionCount; i++)
+        var slots = new List<(Renderer, int, Color)>();
+        foreach (Renderer renderer in renderers)
         {
-            float angle = i * (2f * Mathf.PI / outline.positionCount);
-            outline.SetPosition(i, new Vector3(Mathf.Cos(angle) * radiusX, Mathf.Sin(angle) * radiusY, 0f));
+            Material[] shared = renderer.sharedMaterials;
+            for (int i = 0; i < shared.Length; i++)
+            {
+                Material material = shared[i];
+                if (material != null && material.HasProperty(BaseColor))
+                    slots.Add((renderer, i, material.GetColor(BaseColor)));
+            }
         }
+        return slots.ToArray();
     }
 
     // 팩션에 지정한 모델은 FBX 를 그대로 쓰므로 애니메이터, 머티리얼, 크기를 여기서 맞춘다.
-    private static void ApplyFactionModel(GameObject visual, EnemyFaction faction)
+    private static void ApplyUnitVisual(GameObject visual, EnemyCatalog.UnitVisual look)
     {
-        visual.transform.localScale = Vector3.one * faction.ModelScale;
+        visual.transform.localScale = Vector3.one * look.ModelScale;
 
-        if (faction.Animations != null)
+        if (look.Animations != null)
         {
             Animator animator = visual.GetComponentInChildren<Animator>();
             if (animator == null)
                 animator = visual.AddComponent<Animator>();
             animator.applyRootMotion = false;
-            animator.runtimeAnimatorController = faction.Animations;
+            animator.runtimeAnimatorController = look.Animations;
             animator.Rebind();
         }
 
-        if (faction.Skin != null)
+        if (look.Skin != null)
         {
             foreach (Renderer renderer in visual.GetComponentsInChildren<Renderer>())
             {
                 Material[] materials = renderer.sharedMaterials;
                 for (int i = 0; i < materials.Length; i++)
-                    materials[i] = faction.Skin;
+                    materials[i] = look.Skin;
                 renderer.sharedMaterials = materials;
             }
         }
@@ -932,8 +1046,11 @@ internal sealed class DefenseBoardView
         };
     }
 
-    public void RemoveEnemy(EnemyUnit enemy)
+    public void RemoveEnemy(EnemyUnit enemy, int currentCoreHealth)
     {
+        // 코어 체력이 이미 0이면 같은 틱의 추가 도착은 HUD에서 뺄 피해가 없다.
+        int coreDamage = observedCoreHealth - currentCoreHealth;
+        observedCoreHealth = currentCoreHealth;
         if (!enemyViews.Remove(enemy, out EnemyView view))
             return;
 
@@ -949,7 +1066,144 @@ internal sealed class DefenseBoardView
             foreach (LineRenderer trail in view.MoveSpeedTrails)
                 trail.enabled = false;
         }
+        if (enemy.ReachedCore)
+        {
+            // 코어 피해를 처리한 적의 모델만 남겨 타격과 퇴장 연출을 재생한다.
+            BeginCoreStrike(enemy, view, coreDamage);
+            return;
+        }
         Object.Destroy(view.Root.gameObject);
+    }
+
+    private void BeginCoreStrike(EnemyUnit enemy, EnemyView view, int coreDamage)
+    {
+        SetEnemyPreviewMaterial(view, null);
+        view.SpellFlashRemaining = 0f;
+        ApplyEnemyTint(view);
+
+        Vector3 heading = enemy.Heading.normalized;
+        view.Root.localRotation = Quaternion.LookRotation(heading);
+        bool animated = view.Animator != null && view.Animator.HasState(0, AttackState);
+        if (view.Animator != null)
+            view.Animator.speed = 0f;
+
+        var strike = new CoreStrike
+        {
+            View = view,
+            From = view.Root.localPosition,
+            Stance = enemy.Position - heading * 0.32f,
+            Impact = enemy.Position + heading * (animated ? 0.58f : 0.16f) +
+                Vector3.up * (animated ? 0.85f : 0.45f),
+            Heading = heading,
+            Animated = animated,
+            CoreDamage = coreDamage
+        };
+        PoseCoreStrike(strike, 0f);
+        PendingCoreDamage += coreDamage;
+        coreStrikes.Add(strike);
+    }
+
+    private void AdvanceCoreStrikes(float deltaTime)
+    {
+        bool coreImpacted = false;
+        for (int i = coreStrikes.Count - 1; i >= 0; i--)
+        {
+            CoreStrike strike = coreStrikes[i];
+            strike.Age += deltaTime;
+            float impactProgress = Mathf.Clamp01(strike.Age / CoreStrikeWindup);
+            float fadeProgress = Mathf.Clamp01((strike.Age - CoreStrikeWindup) / CoreStrikeFadeDuration);
+            PoseCoreStrike(strike, impactProgress, fadeProgress);
+
+            if (!strike.HasHit && impactProgress >= 1f)
+            {
+                strike.HasHit = true;
+                PendingCoreDamage -= strike.CoreDamage;
+                coreImpacted = true;
+                NextHitEffect().Play(root.TransformPoint(strike.Impact), CoreDamageColor, CoreStrikeFlashScale,
+                    colorEmphasis: 0.85f);
+                PrepareCoreStrikeFade(strike.View);
+            }
+            if (!strike.HasHit)
+                continue;
+
+            if (fadeProgress < 1f)
+            {
+                SetCoreStrikeOpacity(strike.View, 1f - Mathf.SmoothStep(0f, 1f, fadeProgress));
+                continue;
+            }
+
+            Object.Destroy(strike.View.Root.gameObject);
+            coreStrikes.RemoveAt(i);
+        }
+        if (coreImpacted)
+        {
+            PlayCoreHit();
+            spellEffects.PlayCoreShockwave(coreShockwaveCenter, CoreColor);
+        }
+    }
+
+    private static void PoseCoreStrike(CoreStrike strike, float impactProgress, float fadeProgress = 0f)
+    {
+        EnemyView view = strike.View;
+        float settle = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(impactProgress * 3f));
+        view.Root.localPosition = Vector3.Lerp(strike.From, strike.Stance, settle);
+        if (strike.Animated)
+        {
+            float pose = HitImpactTime * impactProgress + 0.33f * fadeProgress;
+            view.Animator.Play(AttackState, 0, pose);
+            view.Animator.Update(0f);
+        }
+        else
+        {
+            float lunge = Mathf.SmoothStep(0f, 1f, impactProgress) * (1f - fadeProgress);
+            view.Root.localPosition += strike.Heading * (0.24f * lunge);
+        }
+    }
+
+    private void PrepareCoreStrikeFade(EnemyView view)
+    {
+        if (view.FactionRing != null)
+            view.FactionRing.enabled = false;
+        foreach (Renderer renderer in view.Renderers)
+        {
+            Material[] shared = renderer.sharedMaterials;
+            for (int i = 0; i < shared.Length; i++)
+            {
+                Material original = shared[i];
+                if (original == null || !original.HasProperty(BaseColor) || !original.HasProperty("_Surface"))
+                    continue;
+
+                if (!fadeMaterials.TryGetValue(original, out Material fade))
+                {
+                    fade = new Material(original);
+                    fade.SetFloat("_Surface", 1f);
+                    fade.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
+                    fade.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+                    fade.SetFloat("_SrcBlendAlpha", (float)BlendMode.One);
+                    fade.SetFloat("_DstBlendAlpha", (float)BlendMode.OneMinusSrcAlpha);
+                    fade.SetFloat("_ZWrite", 0f);
+                    fade.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                    fade.DisableKeyword("_ALPHAMODULATE_ON");
+                    fade.SetShaderPassEnabled("ShadowCaster", false);
+                    fade.renderQueue = (int)RenderQueue.Transparent;
+                    fadeMaterials.Add(original, fade);
+                    materials.Add(fade);
+                }
+                shared[i] = fade;
+            }
+            renderer.sharedMaterials = shared;
+        }
+    }
+
+    private void SetCoreStrikeOpacity(EnemyView view, float opacity)
+    {
+        foreach (var (renderer, slot, baseColor) in view.TintSlots)
+        {
+            Color color = baseColor;
+            color.a *= opacity;
+            tintBlock.SetColor(BaseColor, color);
+            renderer.SetPropertyBlock(tintBlock, slot);
+        }
     }
 
     public void AdvanceEffects(float deltaTime)
@@ -959,13 +1213,32 @@ internal sealed class DefenseBoardView
                 effect.Advance(deltaTime);
         spellEffects.Advance(deltaTime);
         spellCastMarkers.Advance(deltaTime);
+        if (deltaTime <= 0f)
+            return;
+
+        if (coreFlashRemaining > 0f)
+        {
+            coreFlashRemaining = Mathf.Max(0f, coreFlashRemaining - deltaTime);
+            ApplyCoreFlash();
+        }
+        AdvanceCoreStrikes(deltaTime);
+        foreach (EnemyView view in enemyViews.Values)
+        {
+            if (view.SpellFlashRemaining <= 0f)
+                continue;
+
+            view.SpellFlashRemaining = Mathf.Max(0f, view.SpellFlashRemaining - deltaTime);
+            ApplyEnemyTint(view);
+        }
     }
 
-    public void SyncEnemy(EnemyUnit enemy, float deltaTime = 0f, float playbackSpeed = 1f)
+    // interpolation: 직전 틱(0)과 현재 틱(1) 사이 어디를 그릴지. deltaTime 은 화면용 전투 시간이다.
+    public void SyncEnemy(EnemyUnit enemy, float deltaTime = 0f, float playbackSpeed = 1f, float interpolation = 1f)
     {
         EnemyView view = enemyViews[enemy];
-        Vector3 step = enemy.Position - view.Root.localPosition;
-        view.Root.localPosition = enemy.Position;
+        Vector3 shown = Vector3.Lerp(enemy.PreviousPosition, enemy.Position, interpolation);
+        Vector3 step = shown - view.Root.localPosition;
+        view.Root.localPosition = shown;
         if (view.Animator != null)
         {
             SyncGoblinMotion(view, enemy, step, deltaTime, playbackSpeed);
@@ -1058,12 +1331,16 @@ internal sealed class DefenseBoardView
     private static void SyncGoblinMotion(EnemyView view, EnemyUnit enemy, Vector3 step, float deltaTime, float playbackSpeed)
     {
         Animator animator = view.Animator;
-        bool moving = IsMoving(step, deltaTime, playbackSpeed);
+        // 화면 보간 step은 틱이 없는 프레임에 0이 될 수 있으므로 실제 틱 이동량으로 상태와 속도를 정한다.
+        Vector3 tickStep = enemy.Position - enemy.PreviousPosition;
+        bool moving = IsMoving(tickStep, deltaTime, playbackSpeed);
         view.StoppedTime = moving ? 0f : view.StoppedTime + deltaTime;
         bool newAttack = view.AttacksPlayed != enemy.AttacksPerformed;
         if (newAttack)
-        {
             view.AttacksPlayed = enemy.AttacksPerformed;
+        newAttack &= animator.HasState(0, AttackState);
+        if (newAttack)
+        {
             view.AnimationState = AttackState;
             animator.Play(AttackState, 0, 0f);
         }
@@ -1075,7 +1352,8 @@ internal sealed class DefenseBoardView
             {
                 // Keep the run phase across brief gaps between movement steps.
                 bool resumeRun = view.AnimationState == view.MoveState && view.StoppedTime < RunStopGrace;
-                int state = moving || resumeRun ? view.MoveState : WalkState;
+                int state = moving || resumeRun ? view.MoveState :
+                    animator.HasState(0, IdleState) ? IdleState : WalkState;
                 if (view.AnimationState != state)
                 {
                     view.AnimationState = state;
@@ -1084,14 +1362,20 @@ internal sealed class DefenseBoardView
             }
         }
 
-        Vector3 facing = view.AnimationState == AttackState ? enemy.AttackHeading : moving ? step : enemy.Heading;
+        Vector3 travelHeading = step.sqrMagnitude > 0f ? step : tickStep;
+        Vector3 facing = view.AnimationState == AttackState ? enemy.AttackHeading :
+            moving ? travelHeading : enemy.Heading;
         Quaternion heading = Quaternion.LookRotation(facing);
         view.Root.localRotation = newAttack || deltaTime <= 0f ? heading :
             Quaternion.RotateTowards(view.Root.localRotation, heading, GoblinTurnSpeed * deltaTime);
 
-        animator.speed = view.AnimationState == AttackState ? playbackSpeed * AttackPlaybackScale(animator, enemy) : 0f;
-        if (view.AnimationState == view.MoveState && moving)
-            animator.speed = step.magnitude * playbackSpeed / (deltaTime * view.StrideSpeed * animator.transform.localScale.z);
+        if (view.AnimationState == AttackState)
+            animator.speed = playbackSpeed * AttackPlaybackScale(animator, enemy);
+        else if (view.AnimationState == view.MoveState && moving)
+            animator.speed = tickStep.magnitude * playbackSpeed /
+                (DefenseBattle.TickDuration * view.StrideSpeed * animator.transform.localScale.z);
+        else
+            animator.speed = playbackSpeed * (view.AnimationState == IdleState ? 1f : StationaryWalkSpeed);
     }
 
     public void ReleaseMaterials()
@@ -1104,7 +1388,6 @@ internal sealed class DefenseBoardView
             Release(aimDim.sprite.texture);
             Release(aimDim.sprite);
         }
-        Release(previewRingMesh);
         foreach (Material material in materials)
             Release(material);
         foreach (Mesh mesh in meshes)
@@ -1143,13 +1426,6 @@ internal sealed class DefenseBoardView
         material.SetFloat("_Smoothness", 0.15f);
         if (texture != null)
             material.SetTexture("_BaseMap", texture);
-        materials.Add(material);
-        return material;
-    }
-
-    private Material UnlitPalette(Color color)
-    {
-        var material = new Material(Shader.Find("Universal Render Pipeline/Unlit")) { color = color };
         materials.Add(material);
         return material;
     }

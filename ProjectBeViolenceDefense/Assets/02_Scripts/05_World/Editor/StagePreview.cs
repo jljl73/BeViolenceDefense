@@ -54,7 +54,8 @@ internal sealed class StagePreview
         try
         {
             DefenseGrid grid = stage.CreateGrid();
-            view = new DefenseBoardView(root, utility.camera, shader, grid, factions, chevron, theme, stage);
+            view = new DefenseBoardView(root, utility.camera, shader, grid, factions, chevron, theme,
+                catalog: null, stage: stage);
             // 준비 단계 화면처럼 경로와 예상 교전 타일을 보여 준다.
             if (stage.Validate(grid) == null)
                 view.ShowPlanningTiles(grid.Routes, new DefenseBattle(grid, factions).ForecastEncounterCells());

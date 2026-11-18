@@ -13,6 +13,7 @@ public static class AssetPaths
         "LineBreaking Leading Characters",
         "Meshy_AppIcon_16",
         "Prefabs/WoodBlockWall",
+        "SpellTargetSilhouette",
         "Style Sheets/Default Style Sheet",
         "TMP Settings",
     };
@@ -20,6 +21,7 @@ public static class AssetPaths
     public const string LineBreaking_Following_Characters = "LineBreaking Following Characters";
     public const string LineBreaking_Leading_Characters = "LineBreaking Leading Characters";
     public const string Meshy_AppIcon_16 = "Meshy_AppIcon_16";
+    public const string SpellTargetSilhouette = "SpellTargetSilhouette";
     public const string TMP_Settings = "TMP Settings";
 
     public static class Fonts___Materials

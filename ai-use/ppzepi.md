@@ -515,3 +515,43 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: Editor 메모리의 Stage1에 저장되지 않은 기본 벽 (10,11)이 있음(디스크는 55개). 의도한 배치가 아니면 저장하지 말고 지울 것. 미리보기 색감 차이, 실제 마우스로 칠하기·줌·이동 조작감, 17×17이 아닌 보드의 미리보기는 미확인.
+
+### [20261118-2330-merge-conflicts] 스테이지·적 외형 변경 병합 충돌 해결
+- 시각: 2026-11-18 23:30:00 +09:00
+- 작업자: ppzepi (git config user.name)
+- 사용 도구: Codex / Unity CLI 1.0.0 / Unity Editor 6000.3.28f1 / Git
+- 목적 및 적용 위치: feature/first-stage에 main을 병합하면서 충돌한 게임 흐름·보드 표시 코드.
+- 사용 방식: 공통 조상·양쪽 변경과 호출부를 비교해 스테이지 데이터와 적 외형 카탈로그 연결을 함께 보존하고 삭제된 메시 참조를 정리.
+- 결과 및 확인 방법: 성공 / Unity 컴파일 오류 0, EditMode 3/3 통과, StagePreview 생성·정리 및 Play Mode 559틱·적 10명 생성/표시 확인, 런타임 오류 0. git ls-files -u 비어 있음. 해결 파일 스테이징, 커밋 미생성.
+- 사람의 개입: 사용자가 충돌 분석 및 판단 가능한 범위의 해결을 요청. 최종 코드 검토 여부는 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Codex | 수정 | EnemyCatalog·StageData를 함께 전달, 적용·스테이징 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Codex | 수정 | 생성자 통합, 삭제된 previewRingMesh 참조 제거, 적용·스테이징 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/Editor/StagePreview.cs | Codex | 수정 | 적 미표시 미리보기에 catalog:null 및 stage 전달, 적용·스테이징 |
+| ai-use/evidence/20261118-2330-merge-conflicts.md | Codex | 생성 | 검증 결과·범위와 병합 판단 기록, 채택 |
+| .utmp/conflict-resolution-20261118/ | Codex / Unity CLI | 생성 | 임시 미리보기·플레이 검증 C# 및 결과 JSON, 검증에 사용·Git 제외 |
+
+#### 증거
+- [검증 기록](evidence/20261118-2330-merge-conflicts.md)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일, 기존 EditMode 테스트, 미리보기 생성·정리, 실제 GameScene 웨이브 진행 및 콘솔 오류 검사.
+- 활용 방식: Codex가 분석·패치·검증 스크립트를 작성하고 Unity CLI가 실행 중인 6000.3.28f1 Editor에서 recompile, test run/status, script eval, Play Mode 제어를 수행.
+- 잘된 점: 스테이지·카탈로그 연결과 실제 전투 진행까지 확인. 임시 Play Mode 및 백그라운드 실행 설정 복원.
+- 잘 안된 점 및 개선 필요: 도메인 재로드 중 일시적으로 상태 조회 연결이 끊겼으나 완료 후 정상 연결. CLI 1.0.1 업데이트 알림만 확인하고 업그레이드하지 않음.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 저장소 충돌 코드 및 관련 호출부.
+- 사용 방식: git 3-way 비교, 최소 코드 패치, Unity CLI 검증, 해결 파일 스테이징 및 본 기록 추가.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: “현재 git에 conflict가 있다. 분석 후 너가 해결할 수 있는 범위와 의도면 해결하도록”
+- 결과 및 실제 활용 방식: 충돌 2개와 관련 호출부 1개를 수정해 양쪽 기능을 유지.
+- 선정 이유: 변경 의도를 분석해 자율적으로 해결할 범위를 정한 핵심 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 전체 웨이브 완주와 빌드는 미실행. 기존 incoming Editor.meta의 기본 빈 필드 공백 3줄은 유지. 최종 검토 후 병합 커밋 필요.

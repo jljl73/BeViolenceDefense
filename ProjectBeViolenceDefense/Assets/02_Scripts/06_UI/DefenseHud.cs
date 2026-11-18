@@ -295,9 +295,11 @@ internal sealed class DefenseHud
             lineupRound = battle.Round;
             lineup.text = LineupText(battle);
         }
-        core.text = $"{battle.CoreHealth} <size=65%>/ {DefenseBattle.CoreMaxHealth}</size>";
-        coreFill.color = battle.CoreHealth <= DefenseBattle.CoreMaxHealth / 4 ? UIPalette.ButtonDanger : UIPalette.ButtonPrimary;
-        SetBarFraction(coreFill, (float)battle.CoreHealth / DefenseBattle.CoreMaxHealth);
+        int displayedCoreHealth = battle.CoreHealth + view.PendingCoreDamage;
+        core.text = $"{displayedCoreHealth} <size=65%>/ {DefenseBattle.CoreMaxHealth}</size>";
+        coreFill.color = displayedCoreHealth <= DefenseBattle.CoreMaxHealth / 4
+            ? UIPalette.ButtonDanger : UIPalette.ButtonPrimary;
+        SetBarFraction(coreFill, (float)displayedCoreHealth / DefenseBattle.CoreMaxHealth);
         wallSupply.gameObject.SetActive(!inCombat && !defeated);
         if (!inCombat && !defeated)
         {

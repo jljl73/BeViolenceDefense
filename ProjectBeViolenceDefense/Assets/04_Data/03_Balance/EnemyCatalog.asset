@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: EnemyCatalog
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCatalog
   entries:
-  - id: goblin-grunt-1500
+  - factionGroup: 0
+    id: goblin-grunt-1500
     displayName: "\uACE0\uBE14\uB9B0 \uC804\uC0AC (1500)"
     model: {fileID: 6069468936470726084, guid: 218af73703ffe4b5ca096770dcbf9665, type: 3}
     animations: {fileID: 0}
@@ -26,7 +27,8 @@ MonoBehaviour:
     awarenessRange: 2.2
     moveSpeed: 1.7
     armor: 0
-  - id: zombie
+  - factionGroup: 1
+    id: zombie
     displayName: "\uC880\uBE44"
     model: {fileID: 919132149155446097, guid: ae4a287ea2455b04c98140f1d60b3e6b, type: 3}
     animations: {fileID: 9100000, guid: 540f004d4dada8344ba500c596233a98, type: 2}
@@ -39,7 +41,8 @@ MonoBehaviour:
     awarenessRange: 2.2
     moveSpeed: 1.2
     armor: 0
-  - id: bat
+  - factionGroup: 2
+    id: bat
     displayName: "\uBC15\uC950"
     model: {fileID: 9142216904294559398, guid: cd6b2187ced7a484581ce48b96e2961b, type: 3}
     animations: {fileID: 0}
@@ -52,7 +55,8 @@ MonoBehaviour:
     awarenessRange: 2.2
     moveSpeed: 2.4
     armor: 0
-  - id: demon
+  - factionGroup: 3
+    id: demon
     displayName: "\uC545\uB9C8"
     model: {fileID: 919132149155446097, guid: 759038a512e5aca40a9ca6a3a6a0d770, type: 3}
     animations: {fileID: 9100000, guid: b481ee71520a5aa448de50425f225b37, type: 2}
@@ -65,7 +69,8 @@ MonoBehaviour:
     awarenessRange: 2.2
     moveSpeed: 1.7
     armor: 0
-  - id: goblin-slinger
+  - factionGroup: 0
+    id: goblin-slinger
     displayName: "\uACE0\uBE14\uB9B0 \uD22C\uC11D\uBCD1"
     model: {fileID: 919132149155446097, guid: a436b0d7324bfa04290a4fa08eec81b0, type: 3}
     animations: {fileID: 9100000, guid: 1818da51ac2a08e48b886e831995dcaf, type: 2}
@@ -78,7 +83,8 @@ MonoBehaviour:
     awarenessRange: 3.5
     moveSpeed: 1.7
     armor: 0
-  - id: hatchling
+  - factionGroup: 3
+    id: hatchling
     displayName: "\uD574\uCE28\uB9C1"
     model: {fileID: 8523329212451943726, guid: cfc71b86f7594d44d999dde218625b23, type: 3}
     animations: {fileID: 0}
@@ -91,7 +97,8 @@ MonoBehaviour:
     awarenessRange: 2.2
     moveSpeed: 1.6
     armor: 0
-  - id: living-armor
+  - factionGroup: 1
+    id: living-armor
     displayName: "\uB9AC\uBE59 \uC544\uBA38"
     model: {fileID: 1474687742719612628, guid: 1a4f91a6fe09419488d2951105eca5bd, type: 3}
     animations: {fileID: 0}
@@ -104,7 +111,8 @@ MonoBehaviour:
     awarenessRange: 2.2
     moveSpeed: 1.1
     armor: 3
-  - id: necromancer
+  - factionGroup: 1
+    id: necromancer
     displayName: "\uB124\uD06C\uB85C\uB9E8\uC11C"
     model: {fileID: 738508159450999057, guid: d315cd44faed3a14f9369080b2edf30a, type: 3}
     animations: {fileID: 0}
@@ -117,7 +125,8 @@ MonoBehaviour:
     awarenessRange: 3.5
     moveSpeed: 1.4
     armor: 0
-  - id: orc
+  - factionGroup: 0
+    id: orc
     displayName: "\uC624\uD06C"
     model: {fileID: 5797661131896500938, guid: 5706c7920d3e65f43b23b2ac83c2c352, type: 3}
     animations: {fileID: 0}
@@ -130,7 +139,8 @@ MonoBehaviour:
     awarenessRange: 2.2
     moveSpeed: 1.5
     armor: 0
-  - id: reaper
+  - factionGroup: 1
+    id: reaper
     displayName: "\uC0AC\uC2E0"
     model: {fileID: 7061331611392860295, guid: 02f39df419ab7eb49987e2a46e04002e, type: 3}
     animations: {fileID: 0}
@@ -143,7 +153,8 @@ MonoBehaviour:
     awarenessRange: 2.5
     moveSpeed: 1.8
     armor: 0
-  - id: skeleton-archer
+  - factionGroup: 1
+    id: skeleton-archer
     displayName: "\uD574\uACE8 \uAD81\uC218"
     model: {fileID: 8018881163147974876, guid: 9a714bab17b6b1841b2fb281051d5b40, type: 3}
     animations: {fileID: 0}
@@ -156,7 +167,8 @@ MonoBehaviour:
     awarenessRange: 3.5
     moveSpeed: 1.6
     armor: 0
-  - id: wyvern
+  - factionGroup: 3
+    id: wyvern
     displayName: "\uC640\uC774\uBC88"
     model: {fileID: 2269374595641088485, guid: 6003c4e604cf8e54a8812fb36be2b948, type: 3}
     animations: {fileID: 0}
@@ -169,7 +181,8 @@ MonoBehaviour:
     awarenessRange: 2.5
     moveSpeed: 1.4
     armor: 0
-  - id: skeleton
+  - factionGroup: 1
+    id: skeleton
     displayName: "\uD574\uACE8"
     model: {fileID: 919132149155446097, guid: 9abb0a4070ff90e4c89d7fe1a87db330, type: 3}
     animations: {fileID: 9100000, guid: fb00204cc67e22b48a664e92fbb7cf5c, type: 2}
@@ -182,7 +195,8 @@ MonoBehaviour:
     awarenessRange: 2.2
     moveSpeed: 1.6
     armor: 0
-  - id: werewolf
+  - factionGroup: 2
+    id: werewolf
     displayName: "\uB291\uB300\uC778\uAC04"
     model: {fileID: 919132149155446097, guid: 4ab228fa7f34111489e3aa81272a85c5, type: 3}
     animations: {fileID: 9100000, guid: b4e7b0c936910404284f23a2d8b542f6, type: 2}
@@ -195,7 +209,8 @@ MonoBehaviour:
     awarenessRange: 2.2
     moveSpeed: 2.1
     armor: 0
-  - id: wolf
+  - factionGroup: 2
+    id: wolf
     displayName: "\uB291\uB300"
     model: {fileID: 919132149155446097, guid: 05ae39b36f8dc5e4d8211ccd3c5ffb41, type: 3}
     animations: {fileID: 9100000, guid: e10db4c737a2d7246854adba68c78e59, type: 2}
@@ -208,7 +223,8 @@ MonoBehaviour:
     awarenessRange: 2.2
     moveSpeed: 2.6
     armor: 0
-  - id: goblin-grunt
+  - factionGroup: 0
+    id: goblin-grunt
     displayName: "\uACE0\uBE14\uB9B0 \uC804\uC0AC (\uC6D0\uBCF8)"
     model: {fileID: 919132149155446097, guid: 7951bd0e291782d47b076f0c75b53dd4, type: 3}
     animations: {fileID: 9100000, guid: 6f19d133efd6a6548846102a198a70f2, type: 2}

@@ -28,6 +28,7 @@ internal sealed class HitEffect : MonoBehaviour
     private SpriteRenderer ring;
     private Transform view;
     private Color tint;
+    private float colorEmphasis;
     private float age;
 
     public bool IsPlaying => gameObject.activeSelf;
@@ -46,11 +47,13 @@ internal sealed class HitEffect : MonoBehaviour
         return effect;
     }
 
-    public void Play(Vector3 worldPosition, Color tint)
+    public void Play(Vector3 worldPosition, Color tint, float size = 1f, float colorEmphasis = 0f)
     {
         this.tint = tint;
+        this.colorEmphasis = colorEmphasis;
         age = 0f;
         transform.SetPositionAndRotation(worldPosition - view.forward * TowardCamera, view.rotation);
+        transform.localScale = Vector3.one * size;
         flash.transform.localRotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 90f));
 
         float start = Random.Range(0f, 360f);
@@ -88,14 +91,14 @@ internal sealed class HitEffect : MonoBehaviour
         float fade = 1f - t;
 
         flash.transform.localScale = Vector3.one * (FlashSize * Mathf.Lerp(0.55f, 1f, burst));
-        flash.color = WithAlpha(Color.Lerp(Color.white, tint, t * 0.7f), fade * fade);
+        flash.color = WithAlpha(Color.Lerp(Color.white, tint, Mathf.Lerp(t * 0.7f, 1f, colorEmphasis)), fade * fade);
 
         ring.transform.localScale = Vector3.one * (RingSize * Mathf.Lerp(0.3f, 1f, burst));
         ring.color = WithAlpha(tint, fade * 0.85f);
 
         float drag = Mathf.Exp(-SparkDrag * deltaTime);
         float sparkSize = Mathf.Lerp(0.16f, 0.04f, t);
-        Color sparkColor = WithAlpha(Color.Lerp(Color.white, tint, 0.45f), fade);
+        Color sparkColor = WithAlpha(Color.Lerp(Color.white, tint, Mathf.Lerp(0.45f, 1f, colorEmphasis)), fade);
         for (int i = 0; i < SparkCount; i++)
         {
             Vector2 velocity = sparkVelocity[i] * drag;

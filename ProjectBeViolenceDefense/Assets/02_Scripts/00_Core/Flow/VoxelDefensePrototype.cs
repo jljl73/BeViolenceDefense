@@ -71,7 +71,6 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private DefenseBattle battle;
     private DefenseHud hud;
     private readonly BattleClock battleClock = new();
-    private readonly List<EnemyUnit> spellRecipients = new();
     private DefenseBattle.Spell? aimedSpell;
     private float aimedRangeScroll;
     private int battleSpeed = 1;
@@ -102,10 +101,11 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         grid = CreateGrid(out StageData usedStage);
         var factions = new[] { coralFaction, tealFaction };
         view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme,
-            usedStage);
+            enemyCatalog, usedStage);
         battle = new DefenseBattle(grid, factions, BuildRoundLineup());
         battle.EnemySpawned += view.AddEnemy;
-        battle.EnemyRemoved += view.RemoveEnemy;
+        battle.EnemyRemoved += enemy => view.RemoveEnemy(enemy, battle.CoreHealth);
+        battle.SpellResolved += OnSpellResolved;
         hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions);
         if (leftCoreHud != null)
             hud.UseExternalCorePanel(new Vector2(320, -236));
@@ -205,17 +205,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                     StartBattle();
                 break;
             case DefenseBattle.Phase.Combat:
-                float deltaTime = battleClock.DeltaTime;
-                if (deltaTime <= 0f)
-                    break;
-
-                battle.RecoverMana(deltaTime);
-                // Use separate ticks so 2x runs the same movement and attack checks twice.
+                // 고정 틱만 돌린다. 마나 회복과 큐에 넣은 마법도 틱 안에서 처리된다.
                 for (int tick = 0; tick < battleClock.StepCount && battle.CurrentPhase == DefenseBattle.Phase.Combat; tick++)
                     battle.Tick(battleClock.StepDeltaTime, pauseMovement: false);
 
-                foreach (EnemyUnit enemy in battle.Enemies)
-                    view.SyncEnemy(enemy, deltaTime, battleClock.PlaybackSpeed);
+                if (battleClock.DeltaTime > 0f)
+                    foreach (EnemyUnit enemy in battle.Enemies)
+                        view.SyncEnemy(enemy, battleClock.DeltaTime, battleClock.PlaybackSpeed, battleClock.Interpolation);
                 if (battle.CurrentPhase == DefenseBattle.Phase.Preparation)
                 {
                     RefreshPlanningTiles();
@@ -243,6 +239,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             return;
 
         battle.StartRound();
+        battleClock.Reset();
         view.ShowPlanningTiles();
         hud.Notify("");
     }
@@ -410,10 +407,16 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             return;
         }
 
-        hud.Notify(battle.CastAreaSpell(spell, center, rangeStep, spellRecipients));
-        view.PlayAreaSpell(spell, center, DefenseBattle.AreaSpellRadius(rangeStep), spellRecipients);
-        spellRecipients.Clear();
+        // 바로 적용하지 않고 다음 틱 시작에 적용한다. 결과는 OnSpellResolved 로 돌아온다.
+        battle.QueueSpell(spell, center, rangeStep);
         SetAimedSpell(null);
+    }
+
+    private void OnSpellResolved(DefenseBattle.SpellCommand command, string message,
+        IReadOnlyList<EnemyUnit> recipients)
+    {
+        hud.Notify(message);
+        view.PlayAreaSpell(command.Spell, command.Center, DefenseBattle.AreaSpellRadius(command.RangeStep), recipients);
     }
 
     private bool TryPickAreaSpellCenter(Mouse mouse, out Vector3 center)
@@ -455,6 +458,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             SetAimedSpell(null);
 
         view.AdvanceEffects(battleClock.DeltaTime);
+        view.AdvanceCoreAnimation(battleClock.DeltaTime, battleClock.PlaybackSpeed);
         Vector3? spellCenter = aimedSpell.HasValue && TryPickAreaSpellCenter(Mouse.current, out Vector3 center)
             ? center
             : null;
