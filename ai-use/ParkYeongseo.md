@@ -1624,3 +1624,192 @@
 #### 미확인 및 후속 확인
 - 잠긴 슬롯 표시와 마나 바 테두리는 아직 이전 톤
 - 전경이 화면 하단 약 1/4을 덮어 보드 아래 꼭짓점 주변 지형이 가려짐
+
+### [20261118-wall-build-mode] 벽 건설 모드(토글 버튼 + 하단 패널) 시제품과 목업
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), Codex CLI 0.170.0(목업 시도), OpenAI Images API(gpt-image-2.6-sunburst), Unity CLI
+- 목적 및 적용 위치: 벽 건설 조작 개선. 왼쪽 중간 토글 버튼으로 건설 모드를 켜면 하단 중앙에 건설 패널이 올라오고 기존 하단 행동 UI가 내려감. `BuildModeHud.cs`, `03_Prefabs/05_UI/BuildModeHud.prefab`, 테스트 씬 3종. 목업은 `ArtDirection/Mockups/G9_WallBuildMode_20261118/`(git 제외)
+- 사용 방식:
+  - 직전 작업: 테마 씬 하단 전경의 가운데 가지를 지우고 dim을 약하게·좁게 조정 후 커밋
+  - 목업(스킬 1단계): 요청서 `REQUEST.md` 작성 → Codex 실행. Codex 세션에 이미지 생성 도구가 없어 전송 0회로 종료 → 같은 요청 내용을 Images API로 직접 전송해 켜짐(B) 1장, B를 입력으로 꺼짐(A) 1장 생성
+  - 기능 시제품: `BuildModeHud`(토글, 남은 벽 표시, 놓기/철거 도구, 완료)와 LitMotion 애니메이션(패널 상승 OutBack, 기존 하단 UI 하강, 알파, 버튼 팝, 시간 배속 무시). 아트는 기존 슬롯 프레임·벽 아이콘으로 임시 구성
+  - `VoxelDefensePrototype` 선택 필드 `buildModeHud`: 연결된 씬에서는 건설 모드(버튼 또는 `B`)에서만 보드 클릭으로 벽을 놓고 철거, 철거 도구 선택 시 왼쪽 클릭도 철거, 전투 시작 시 자동 종료. `DefenseHud`에 `ActionBar` 노출과 `UseExternalBuildPanel`(우상단 벽 개수 숨김) 추가. LitMotion은 팀원이 이미 추가한 패키지를 사용
+- 결과 및 확인 방법: 부분 성공(기능 동작, 아트는 임시). 컴파일 오류 0, 콘솔 오류 0. Play Mode에서 버튼 onClick 호출로 확인: 토글 후 패널 Y -186 → 74·알파 0 → 1, 철거 도구 전환, 완료 후 원위치·비활성, 전투 시작 시 모드 꺼짐과 버튼 비활성. 실제 마우스로 벽을 놓는 조작은 미확인
+- 사람의 개입: 건설 모드 구조(위치, 스킬 UI 대체, 패널 상승, LitMotion 사용)와 GPT·스킬 절차 사용 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/BuildModeHud.cs` | Claude Code | 생성 | 건설 모드 HUD와 LitMotion 애니메이션. 사용 |
+| `Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs`, `Assets/02_Scripts/06_UI/DefenseHud.cs` | Claude Code | 수정 | 선택 연결 지점. 연결하지 않은 씬은 기존 동작 |
+| `Assets/03_Prefabs/05_UI/BuildModeHud.prefab` | Unity CLI | 생성 | 임시 아트 배치. 사용(아트 교체 예정) |
+| `Assets/01_Scenes/03_Test/GameScene_LeftCoreHud.unity`, `Stage_GoldenMaple.unity`, `Stage_Snowfield.unity` | Unity CLI | 수정 | 건설 모드 연결, 전경·dim 조정 |
+| `ArtDirection/Mockups/G9_WallBuildMode_20261118/BuildMode_A_Off_Mockup.png`, `BuildMode_B_On_Mockup.png` | GPT 이미지 | 생성 | 목업. 검토 대기, 미분절 |
+
+#### 증거
+- `Tools/_out/ui_mock/build_compare.jpg`, `ArtDirection/Mockups/G9_WallBuildMode_20261118/README.md`·`PROMPTS.txt` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 프리팹 조립, 씬 연결, Play Mode에서 건설 모드 상태·패널 위치 조회와 캡처
+- 활용 방식: `script eval --file`, 테스트 셸 스크립트
+- 잘된 점: 애니메이션 전후 값을 읽어 동작 확인
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex CLI(목업 요청, 이미지 도구 없음으로 미생성), Images API 편집 2회(목업 A·B)
+- 사용 방식: 요청서 → Codex 시도 → API 직접 호출로 대체, 프롬프트와 경위를 목업 폴더 README·PROMPTS에 기록
+- 특별히 활용한 점: 꺼짐 상태는 켜짐 결과를 입력으로 고쳐 같은 장면 유지
+
+#### 주요 프롬프트
+- 사용 도구: Claude Code
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: `ai-use/prompts/20261118-wall-build-mode-01.md`
+- 결과 및 실제 활용 방식: 건설 모드 구조와 목업 요청서의 근거로 사용
+- 선정 이유: 벽 건설 조작 방식을 바꾸는 기능 지시
+
+#### 미확인 및 후속 확인
+- 목업 검토 후 분절(2단계)과 아트 교체 필요
+- 준비 단계에는 원래 스킬 바가 보이지 않아, 지금은 "빈 하단에 패널이 올라오는" 형태로 보임
+- 놓을 칸 미리보기(목업의 반투명 벽)는 미구현
+
+### [20261119-build-mode-art] 벽 건설 모드 HUD 아트 분절·적용, 완료 버튼 제거
+- 시각: 2026-11-19 00:14:36 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / OpenAI Images API (gpt-image-2.6-sunburst) / Unity CLI
+- 목적 및 적용 위치: G9 목업 B안을 확정(패널 최우측 체크 버튼만 제거)하고 `BuildModeHud.prefab`의 임시 아트를 목업 조각으로 교체
+- 사용 방식: 목업 B를 참조로 회색 배경 부품 시트를 이미지 API로 생성 → Python으로 조각 분리·알파 추출·124px 타일화 → Unity 빌더 스크립트로 프리팹 재조립. `BuildModeHud.cs`에서 완료 버튼을 없애고 상태 표시를 겹침 그림 켜기/끄기 방식으로 변경
+- 결과 및 확인 방법: 성공 / Play Mode에서 토글 버튼 이벤트로 열림(패널 Y -186→74)·도구 전환·닫힘·전투 시작 시 닫힘 확인, 콘솔 오류 0, 캡처 육안 확인. 실제 마우스 조작은 미확인
+- 사람의 개입: 목업 B안 선택, 체크 버튼이 토글과 중복이라 제거하도록 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/07_UI/01_Icons/Hud/BuildMode/ (타일 24장) | OpenAI Images API + Python 분절 | 생성 | 토글 켜짐/꺼짐, 패널, 도구 프레임, 벽 핍, 놓기·철거·마우스 아이콘 / 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/BuildModeHud.prefab | Claude Code + Unity CLI | 수정 | 임시 아트를 새 조각으로 교체, 완료 버튼 제거 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/BuildModeHud.cs | Claude Code | 수정 | 완료 버튼 제거, 상태별 그림 전환 방식 변경 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/ (GameScene_LeftCoreHud, Stage_GoldenMaple, Stage_Snowfield) | Unity CLI | 수정 | 새 프리팹 반영해 재생성 / 사용 |
+| ArtDirection/Mockups/G9_WallBuildMode_20261118/SPLIT_PROMPT.txt | Claude Code | 생성 | 부품 시트 요청문 (git 제외 폴더) |
+
+#### 증거
+- Tools/_out/ui_mock/build_v2.jpg, Tools/_out/g9/g9_parts.png (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 프리팹 재조립, 테스트 씬 3종 갱신, Play Mode 동작 검증과 캡처
+- 활용 방식: `script eval --file`로 빌더 실행, Play Mode에서 리플렉션으로 버튼 이벤트 호출
+- 잘된 점: 조각 매니페스트에서 빌더를 생성해 재실행 가능
+- 잘 안된 점 및 개선 필요: 실제 포인터 입력은 CLI로 검증하지 못함
+
+### [20261119-victory-panel-test] 승리 패널 UI 테스트 (판정 미연결), 승리 포즈 일러스트, pull 충돌 해결
+- 시각: 2026-11-19 00:29:41 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / NovelAI Diffusion V5 / OpenAI Images API (gpt-image-2.6-sunburst) / Unity CLI
+- 목적 및 적용 위치: 스테이지 클리어 시 띄울 승리 패널의 모양과 연출을 테스트 씬에서 미리 확인. 승리 판정 코드는 만들지 않음
+- 사용 방식: NAI로 승리 포즈 후보 4장 생성(1-F) → 원판과 다르다는 피드백에 GPT 리드로우 2장·NAI 수정 태그 3장(1-G)을 추가 비교 → 사용자가 첫 시트 1안 선택. 그 그림과 현재 화면 캡처로 GPT 승리 화면 목업 생성. `VictoryPanelHud`를 새로 만들어 LitMotion 연출과 V 키 테스트 토글을 넣고 프리팹을 테스트 씬 3종에 배치. 작업 전 `git pull --rebase`로 팀 변경을 받고 충돌 3건 해결
+- 결과 및 확인 방법: 부분 성공 / Play Mode에서 `Show` 호출 후 캡처, 버튼 이벤트로 닫힘 확인, 콘솔 오류 0. 패널 아트는 기존 HUD 스프라이트를 쓴 임시 상태이며 목업 분절은 미진행. 실제 키·마우스 입력은 미확인
+- 사람의 개입: 승리 포즈 후보가 원판과 맞지 않는다고 지적, 최종적으로 v1 시트 1안(시드 2819059771) 선택. 판정 코드 없이 UI 테스트만 하도록 범위 지정
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/CasterVictory/Caster_Victory.png | NovelAI (02:1-F, seed 2819059771) | 생성 | 승리 포즈 일러스트, 수정 없음 / 테스트 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/VictoryPanelHud.cs | Claude Code | 생성 | 승리 패널 표시·연출, V 키 테스트 / 테스트 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/VictoryPanelHud.prefab | Claude Code + Unity CLI | 생성 | 임시 아트로 조립 / 테스트 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/ (3종) | Unity CLI | 수정 | 승리 패널 배치 / 사용 |
+| Art Prompts/[Characters] 02_Party.txt | Claude Code | 수정 | 1-F(승리 포즈), 1-G(원판 맞춤 시도, 미채택) 추가 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs | Claude Code | 수정 | pull 충돌 해결(팀 변경 유지 + 건설 패널 조건) |
+| ArtDirection/Mockups/G10_VictoryPanel_20261119/ | OpenAI Images API | 생성 | 승리 화면 목업 (git 제외 폴더) / 검토 대기 |
+
+#### 증거
+- Tools/_out/victory/victory_open.jpg, Tools/_nai_out/victory_sheet.jpg, Tools/_out/victory/sheet_v2.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: pull 후 컴파일 확인, 프리팹 조립, 테스트 씬 갱신, Play Mode 캡처
+- 활용 방식: `script eval --file` 빌더, Play Mode에서 `Show` 호출과 버튼 이벤트 호출
+- 잘된 점: 판정 코드 없이 패널만 띄워 확인 가능
+- 잘 안된 점 및 개선 필요: 캡처만으로 dim 적용 여부를 잘못 읽어 밝기 측정으로 재확인함
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 일러스트(946×1508)는 HUD 이미지 128px 제한을 넘는 단일 텍스처임. 승리 판정 연결 시 `VictoryPanelHud.testKey`를 끌 것
+
+### [20261119-victory-panel-art] 승리 패널 아트를 목업 조각으로 교체
+- 시각: 2026-11-19 00:45:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / OpenAI Images API (gpt-image-2.6-sunburst) / Unity CLI
+- 목적 및 적용 위치: `VictoryPanelHud.prefab`의 임시 아트를 G10 목업 조각(패널, 리본, 버튼 2종, 아이콘 3종, 단풍잎 3종)으로 교체
+- 사용 방식: 목업을 참조로 회색 배경 부품 시트 생성 → Python 분절·124px 타일화 → 빌더로 프리팹 재조립. 캐릭터 뒤 광채는 128px 방사 그라디언트를 코드로 생성. 잎 살랑임 연출 추가
+- 결과 및 확인 방법: 성공 / Play Mode에서 `Show` 호출 후 단풍 테마 씬 캡처 육안 확인(첫 캡처에서 셋째 줄과 버튼 겹침 발견 → 간격 조정 후 재확인), 버튼 닫힘 확인, 콘솔 오류 0
+- 사람의 개입: 목업대로 교체 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/07_UI/01_Icons/Hud/VictoryPanel/ (타일 52장 + Glow.png) | OpenAI Images API + Python | 생성 | 패널·리본·버튼·아이콘·잎 조각 / 테스트 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/VictoryPanelHud.prefab | Claude Code + Unity CLI | 수정 | 새 조각으로 재조립 / 테스트 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/VictoryPanelHud.cs | Claude Code | 수정 | 잎 살랑임 추가 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/ (3종) | Unity CLI | 수정 | 프리팹 반영 |
+
+#### 증거
+- Tools/_out/victory/victory_maple.jpg, Tools/_out/victory/g10_parts.png (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 프리팹 재조립, 테스트 씬 갱신, Play Mode 캡처
+- 활용 방식: 조각 매니페스트에서 생성한 빌더를 `script eval --file`로 실행
+- 잘된 점: 캡처로 줄 겹침을 바로 발견해 수정
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+### [20261119-portrait-idle-loop] 초상 idle 루프 끊김 수정, 곤란 표정 idle 시트 추가
+- 시각: 2026-11-19 01:10:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / spriteLab MCP / Unity CLI
+- 목적 및 적용 위치: 좌상단 초상(`LeftCoreHud`)의 기본 idle이 끊겨 보이는 문제 수정, 체력 50% 이하에서 뜨는 곤란 표정도 움직이게 함
+- 사용 방식: 48프레임 시트의 프레임 간 차이를 측정해 앞 6·뒤 14프레임이 정지 구간임을 확인 → `idleLoop` 구간 필드를 추가해 5~33번만 반복(14fps). `Caster_Portrait_troubled.png`로 spriteLab 3초 idle 생성 후 48프레임 재추출, 같은 방식으로 정지 구간을 빼고 5~32번 28프레임만 타일화해 `troubledIdleFrames`에 연결
+- 결과 및 확인 방법: 성공 / Play Mode에서 기본 4컷·코어 체력 48로 낮춘 뒤 곤란 4컷 캡처, 프레임이 바뀌는 것 확인, 콘솔 오류 0. 루프 이음매의 체감은 사람이 봐야 함
+- 사람의 개입: 끊김 원인 추정(눈 감았다 뜬 뒤 멈춘 시간)과 곤란 표정 시트 추가 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/LeftCoreHud.cs | Claude Code | 수정 | idle 반복 구간, 곤란 표정 idle 재생 추가 / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/CasterHud/TroubledIdle_*.png (168장) | spriteLab + Python 타일화 | 생성 | 곤란 idle 28프레임 × 6타일 / 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/LeftCoreHud.prefab | Unity CLI | 수정 | idleLoop (5,33), idleFps 14, troubledIdleFrames 연결 / 사용 |
+
+#### 증거
+- Tools/_out/spritelab/troubled/portrait_check.jpg, spriteLab jobId 40dda66386488b5476bb1ffd001f35c7 (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 타일 임포트·프리팹 연결, Play Mode 캡처
+- 활용 방식: `script eval --file`로 연결 스크립트 실행, 리플렉션으로 코어 체력을 낮춰 곤란 표정 유도
+- 잘된 점: 기존 타일과 .meta를 건드리지 않고 새 프레임만 추가
+- 잘 안된 점 및 개선 필요: 정지 캡처로는 루프의 부드러움을 판단할 수 없음
+
+### [20261119-dialogue-hud] 다이얼로그 UI 목업·분절·테스트용 대화창
+- 시각: 2026-11-19 01:40:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / OpenAI Images API (gpt-image-2.6-sunburst) / Unity CLI
+- 목적 및 적용 위치: 스토리 대화창 UI 구상과 테스트 씬 3종에서의 동작 확인. 실제 대화 흐름·대사 데이터는 연결하지 않음
+- 사용 방식: 현재 화면 캡처와 주인공 초상을 참조로 GPT 목업 생성 → 사용자가 Auto·Log 제거 지시 → 부품 시트(상자, 이름표, 알약 버튼, 아이콘 2종) 생성·분절 → `DialogueHud`(타자 효과, 표정 전환, 넘김·건너뛰기, LitMotion 등장)와 T 키 테스트용 `DialogueHudTester` 작성, 프리팹 조립
+- 결과 및 확인 방법: 성공 / Play Mode에서 `Play`·`Advance`·Skip 버튼 이벤트 호출로 열림(팝업 등록, HUD 숨김), 4줄 진행, 마지막 줄 뒤 닫힘, 건너뛰기 닫힘 확인. 단풍 테마 씬 캡처 육안 확인, 콘솔 오류 0. 실제 키·마우스 입력은 미확인
+- 사람의 개입: 다이얼로그 UI 구상 지시, Auto·Log 버튼 제외 결정
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DialogueHud.cs | Claude Code | 생성 | 대화창 표시·진행 / 테스트 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DialogueHudTester.cs | Claude Code | 생성 | T 키 예시 대사 재생(테스트 전용) |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/DialogueHud.prefab | Claude Code + Unity CLI | 생성 | 목업 조각으로 조립 / 테스트 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/01_Icons/Hud/Dialogue/ (타일 40장) | OpenAI Images API + Python | 생성 | 상자·이름표·버튼·아이콘 조각 / 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/CasterDialogue/ (5장) | 기존 Art2D 초상 복사 | 생성 | 표정 5종 원본 크기(993×1536), 수정 없음 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/03_Test/ (3종) | Unity CLI | 수정 | 대화창과 테스트 오브젝트 배치 |
+| ArtDirection/Mockups/G11_Dialogue_20261119/ | OpenAI Images API | 생성 | 목업·요청문 (git 제외 폴더) |
+
+#### 증거
+- Tools/_out/dialogue/dialogue_check.jpg, Tools/_out/g11_parts.png (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 프리팹 조립, 테스트 씬 갱신, Play Mode 진행 검증과 캡처
+- 활용 방식: 조각 매니페스트에서 생성한 빌더 실행, 리플렉션으로 대사 진행 상태 조회
+- 잘된 점: 팝업 등록·HUD 숨김·닫힘 후 복구를 값으로 확인
+- 잘 안된 점 및 개선 필요: 예시 대사는 영어 임시 문구이며 한글 폰트 표시는 확인하지 않음
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 초상은 993×1536 단일 텍스처(HUD 128px 제한 초과). 화자 이름 "Mage"와 대사는 임시

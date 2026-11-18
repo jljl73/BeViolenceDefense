@@ -37,6 +37,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private BattleInfoHud battleInfoHud;
     [Tooltip("선택. 연결하면 유닛이 쓰러진 자리에 스테이지 입자(낙엽·눈)를 흩날린다.")]
     [SerializeField] private StageAmbience stageAmbience;
+    [Tooltip("선택. 연결하면 벽은 건설 모드(왼쪽 토글 버튼, B)에서만 놓고 철거한다.")]
+    [SerializeField] private BuildModeHud buildModeHud;
     [SerializeField] private BoardTheme boardTheme = new();
     [SerializeField] private FactionSlot coral;
     [SerializeField] private FactionSlot teal;
@@ -76,6 +78,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private DefenseBattle.Spell? aimedSpell;
     private float aimedRangeScroll;
     private int battleSpeed = 1;
+    private bool buildMode;
+    private BuildModeHud.Tool buildTool;
     private bool trackingRightButton;
     private bool draggingCamera;
     private Vector2 previousDragPointer;
@@ -113,6 +117,11 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             hud.UseExternalCorePanel(new Vector2(320, -236));
         if (manaBarHud != null)
             hud.UseExternalManaBar((RectTransform)manaBarHud.transform, new Vector2(33, hudArt.SlotFrame != null ? -146 : -130));
+        if (buildModeHud != null)
+        {
+            hud.UseExternalBuildPanel();
+            buildModeHud.Bind(ToggleBuildMode, tool => buildTool = tool, hud.ActionBar);
+        }
         if (stageAmbience != null)
             battle.EnemyRemoved += enemy => stageAmbience.Burst(transform.TransformPoint(enemy.Position));
         if (battleInfoHud != null)
@@ -204,6 +213,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 if (!boardInputAllowed)
                     break;
 
+                if (buildModeHud != null && keyboard?.bKey.wasPressedThisFrame == true)
+                    ToggleBuildMode();
                 ReadBuildInput();
                 if (keyboard?.spaceKey.wasPressedThisFrame == true)
                     StartBattle();
@@ -242,6 +253,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Preparation)
             return;
 
+        buildMode = false;
         battle.StartRound();
         battleClock.Reset();
         view.ShowPlanningTiles();
@@ -320,8 +332,22 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         rightClickPointer = null;
     }
 
+    private void ToggleBuildMode()
+    {
+        if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Preparation)
+            return;
+
+        buildMode = !buildMode;
+        buildTool = BuildModeHud.Tool.Place;
+        hud.Notify("");
+    }
+
     private void ReadBuildInput()
     {
+        // 건설 모드 HUD가 있는 씬에서는 모드가 켜져 있을 때만 보드 클릭이 벽을 바꾼다.
+        if (buildModeHud != null && !buildMode)
+            return;
+
         Mouse mouse = Mouse.current;
         if (trackingRightButton || mouse == null || (!mouse.leftButton.wasPressedThisFrame && !rightClickPointer.HasValue))
             return;
@@ -332,7 +358,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             return;
         }
 
-        if (rightClickPointer.HasValue)
+        if (rightClickPointer.HasValue || (buildModeHud != null && buildTool == BuildModeHud.Tool.Remove))
         {
             if (grid.TryRemove(cell))
             {
@@ -473,6 +499,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             leftCoreHud.Refresh(battle.CoreHealth, DefenseBattle.CoreMaxHealth);
         if (manaBarHud != null)
             manaBarHud.Refresh(battle.Mana, DefenseBattle.MaxMana);
+        if (buildModeHud != null)
+        {
+            bool canBuild = !ui.HasOpenPopup && battle.CurrentPhase == DefenseBattle.Phase.Preparation;
+            if (!canBuild)
+                buildMode = false;
+            buildModeHud.Refresh(canBuild, buildMode, DefenseGrid.WallLimit - grid.WallCount, DefenseGrid.WallLimit, buildTool);
+        }
         if (battleInfoHud != null)
         {
             int left = 0, right = 0;
