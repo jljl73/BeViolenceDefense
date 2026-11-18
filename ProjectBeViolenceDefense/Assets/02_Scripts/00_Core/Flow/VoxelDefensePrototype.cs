@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
 
 public sealed class VoxelDefensePrototype : MonoBehaviour
@@ -10,16 +11,24 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [System.Serializable]
     private sealed class FactionSlot
     {
-        [SerializeField, Tooltip("Enemy Catalog의 유닛 ID")]
+        [SerializeField, Tooltip("Enemy Catalog의 유닛 ID. 비우면 이 종족은 라운드 편성으로만 나온다.")]
         private string unitId;
         [SerializeField] private string displayName;
         [SerializeField] private Color color;
         [SerializeField, Min(0)] private int spawnCount;
 
+        public FactionSlot() { }
+        public FactionSlot(string displayName, Color color)
+        {
+            this.displayName = displayName;
+            this.color = color;
+        }
+
         public Color Color => color;
 
-        public EnemyFaction GetFaction(EnemyCatalog catalog) =>
-            catalog.GetFaction(unitId, displayName, color, spawnCount);
+        public EnemyFaction GetFaction(EnemyCatalog catalog) => string.IsNullOrWhiteSpace(unitId)
+            ? new EnemyFaction(displayName, color, spawnCount: 0)
+            : catalog.GetFaction(unitId, displayName, color, spawnCount);
     }
 
     [SerializeField] private Camera boardCamera;
@@ -36,9 +45,14 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [Tooltip("선택. 연결하면 상단 중앙 정보·우상단 설정/배속·우하단 웨이브 호출 버튼을 새 HUD로 쓴다.")]
     [SerializeField] private BattleInfoHud battleInfoHud;
     [SerializeField] private BoardTheme boardTheme = new();
-    [SerializeField] private FactionSlot coral;
-    [SerializeField] private FactionSlot teal;
-    [SerializeField, Tooltip("라운드별 편성. 마지막 라운드 다음에는 처음부터 반복한다. 비어 있으면 Coral/Teal 슬롯과 기존 증원 규칙을 쓴다.")]
+    // 진영 = 종족. 순서는 EnemyFactionGroup 과 같다.
+    [SerializeField, FormerlySerializedAs("coral")]
+    private FactionSlot greenHorde = new("Goblin", StageData.FactionColors[0]);
+    [SerializeField, FormerlySerializedAs("teal")]
+    private FactionSlot undead = new("Undead", StageData.FactionColors[1]);
+    [SerializeField] private FactionSlot beasts = new("Beasts", StageData.FactionColors[2]);
+    [SerializeField] private FactionSlot dragonAndDemon = new("Dragon", StageData.FactionColors[3]);
+    [SerializeField, Tooltip("라운드별 편성. 마지막 라운드 다음에는 처음부터 반복한다. 비어 있으면 종족 슬롯과 기존 증원 규칙을 쓴다.")]
     private RoundLineup[] rounds = System.Array.Empty<RoundLineup>();
     [SerializeField, Tooltip("보드 크기·코어·스폰·고정 장애물. Tools/Stage Editor에서 편집한다. 비우면 기본 지형을 쓴다.")]
     private StageData stage;
@@ -58,12 +72,22 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private sealed class RoundLineup
     {
         [SerializeField] private string note;
-        [SerializeField, Tooltip("왼쪽 스폰. 위에서부터 순서대로 나온다.")]
-        private SpawnGroup[] coral = System.Array.Empty<SpawnGroup>();
-        [SerializeField, Tooltip("오른쪽 스폰. 위에서부터 순서대로 나온다.")]
-        private SpawnGroup[] teal = System.Array.Empty<SpawnGroup>();
+        [SerializeField, FormerlySerializedAs("coral"), Tooltip("고블린 스폰. 위에서부터 순서대로 나온다.")]
+        private SpawnGroup[] greenHorde = System.Array.Empty<SpawnGroup>();
+        [SerializeField, FormerlySerializedAs("teal"), Tooltip("언데드 스폰. 위에서부터 순서대로 나온다.")]
+        private SpawnGroup[] undead = System.Array.Empty<SpawnGroup>();
+        [SerializeField, Tooltip("짐승 스폰. 위에서부터 순서대로 나온다.")]
+        private SpawnGroup[] beasts = System.Array.Empty<SpawnGroup>();
+        [SerializeField, Tooltip("드래곤·악마 스폰. 위에서부터 순서대로 나온다.")]
+        private SpawnGroup[] dragonAndDemon = System.Array.Empty<SpawnGroup>();
 
-        public SpawnGroup[] Side(int index) => (index == 0 ? coral : teal) ?? System.Array.Empty<SpawnGroup>();
+        public SpawnGroup[] Side(int index) => index switch
+        {
+            0 => greenHorde,
+            1 => undead,
+            2 => beasts,
+            _ => dragonAndDemon
+        } ?? System.Array.Empty<SpawnGroup>();
     }
 
     private DefenseGrid grid;
@@ -90,16 +114,18 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             return;
         }
 
-        EnemyFaction coralFaction = coral.GetFaction(enemyCatalog);
-        EnemyFaction tealFaction = teal.GetFaction(enemyCatalog);
-        if (coralFaction == null || tealFaction == null)
+        var factions = new EnemyFaction[StageData.FactionCount];
+        for (int i = 0; i < factions.Length; i++)
         {
-            enabled = false;
-            return;
+            factions[i] = Slot(i).GetFaction(enemyCatalog);
+            if (factions[i] == null)
+            {
+                enabled = false;
+                return;
+            }
         }
 
         grid = CreateGrid(out StageData usedStage);
-        var factions = new[] { coralFaction, tealFaction };
         view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme,
             enemyCatalog, usedStage);
         battle = new DefenseBattle(grid, factions, BuildRoundLineup());
@@ -118,6 +144,14 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         }
         RefreshPlanningTiles();
     }
+
+    private FactionSlot Slot(int faction) => faction switch
+    {
+        0 => greenHorde,
+        1 => undead,
+        2 => beasts,
+        _ => dragonAndDemon
+    };
 
     private DefenseGrid CreateGrid(out StageData usedStage)
     {
@@ -143,13 +177,12 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (rounds == null || rounds.Length == 0)
             return null;
 
-        var sideColors = new[] { coral.Color, teal.Color };
         var units = new Dictionary<(string, int), EnemyFaction>();
         var lineups = new IReadOnlyList<EnemyFaction>[rounds.Length][];
         for (int r = 0; r < rounds.Length; r++)
         {
-            lineups[r] = new IReadOnlyList<EnemyFaction>[2];
-            for (int side = 0; side < 2; side++)
+            lineups[r] = new IReadOnlyList<EnemyFaction>[StageData.FactionCount];
+            for (int side = 0; side < StageData.FactionCount; side++)
             {
                 var queue = new List<EnemyFaction>();
                 foreach (SpawnGroup group in rounds[r].Side(side))
@@ -157,7 +190,12 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                     if (group == null || group.Count <= 0)
                         continue;
                     if (!units.TryGetValue((group.UnitId, side), out EnemyFaction unit))
-                        units[(group.UnitId, side)] = unit = enemyCatalog.GetUnit(group.UnitId, sideColors[side], $"Round {r + 1}");
+                    {
+                        units[(group.UnitId, side)] = unit = enemyCatalog.GetUnit(group.UnitId, Slot(side).Color, $"Round {r + 1}");
+                        if (enemyCatalog.TryGetFactionGroup(group.UnitId, out EnemyFactionGroup race) && (int)race != side)
+                            Debug.LogWarning($"Round {r + 1}: '{group.UnitId}' is {race} but listed under faction {side}. " +
+                                $"It fights for faction {side}.", this);
+                    }
                     if (unit == null)
                         continue;
                     for (int i = 0; i < group.Count; i++)
@@ -166,7 +204,19 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 lineups[r][side] = queue;
             }
         }
+        for (int side = 0; side < StageData.FactionCount; side++)
+            if (!HasSpawn(side) && System.Array.Exists(lineups, lineup => lineup[side].Count > 0))
+                Debug.LogWarning($"Faction {side} units are in the round lineup, but this stage has no spawn for " +
+                    "them. They will not appear.", this);
         return round => lineups[(round - 1) % lineups.Length];
+    }
+
+    private bool HasSpawn(int faction)
+    {
+        foreach (int spawnFaction in grid.SpawnFactions)
+            if (spawnFaction == faction)
+                return true;
+        return false;
     }
 
     private void Update()
@@ -471,19 +521,21 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             manaBarHud.Refresh(battle.Mana, DefenseBattle.MaxMana);
         if (battleInfoHud != null)
         {
+            var (leftSide, rightSide) = DefenseHud.ShownSides(battle);
             int left = 0, right = 0;
             foreach (EnemyUnit enemy in battle.Enemies)
             {
                 if (!enemy.IsAlive)
                     continue;
-                if (enemy.FactionIndex == 0)
+                if (enemy.FactionIndex == leftSide)
                     left++;
-                else
+                else if (enemy.FactionIndex == rightSide)
                     right++;
             }
             bool inCombat = battle.CurrentPhase == DefenseBattle.Phase.Combat;
             bool canCallWave = !ui.HasOpenPopup && battle.CurrentPhase == DefenseBattle.Phase.Preparation;
-            battleInfoHud.Refresh(battle.Round, inCombat, canCallWave, left, right, coral.Color, teal.Color, battleSpeed);
+            battleInfoHud.Refresh(battle.Round, inCombat, canCallWave, left, right, Slot(leftSide).Color,
+                Slot(rightSide).Color, battleSpeed);
         }
     }
 

@@ -46,8 +46,10 @@ internal sealed class StagePreview
         if (shader == null)
             shader = Shader.Find("Universal Render Pipeline/Lit");
         var chevron = settings?.FindProperty("routeChevron").objectReferenceValue as Sprite;
-        var factions = new[] { Faction(settings, "coral", "Coral", new Color(0.94f, 0.42f, 0.36f)),
-            Faction(settings, "teal", "Teal", new Color(0.27f, 0.87f, 0.81f)) };
+        string[] slots = { "greenHorde", "undead", "beasts", "dragonAndDemon" };
+        var factions = new EnemyFaction[StageData.FactionCount];
+        for (int i = 0; i < factions.Length; i++)
+            factions[i] = Faction(settings, slots[i], StageData.FactionNames[i], StageData.FactionColors[i]);
 
         root = new GameObject("Stage Preview").transform;
         utility.AddSingleGO(root.gameObject);

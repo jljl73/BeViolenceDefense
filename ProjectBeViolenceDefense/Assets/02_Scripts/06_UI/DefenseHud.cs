@@ -112,7 +112,7 @@ internal sealed class DefenseHud
         phase = Label("Phase", status, 0, -41, 220, 28, 20, TextAlignmentOptions.Center);
         phase.color = UIPalette.TextSecondary;
         lineup = Label("Round Lineup", status, -190, -70, 600, 26, 18, TextAlignmentOptions.Center);
-        combatBalance = new CombatBalance(status, factions[0], factions[1]);
+        combatBalance = new CombatBalance(status, factions);
 
         coreStatus = Rect("Core Status", ui.HudLayer, Vector2.up, Vector2.up,
             new Vector2(55, -35), new Vector2(204, 72));
@@ -236,12 +236,33 @@ internal sealed class DefenseHud
         noticeUntil = Time.unscaledTime + 2.5f;
     }
 
-    // 예: "Goblin Grunt ×6   vs   Zombie ×4". 연속한 같은 유닛은 묶어서 보여준다.
+    // 좌우 세력 바에 보여 줄 두 진영: 이번 라운드에 나오는 진영 중 앞의 둘.
+    // shortcut: 한 라운드에 3종족 이상이 나오면 셋째부터 바에서 빠진다. 그런 편성이 생기면 N분할 바로 바꾼다.
+    internal static (int Left, int Right) ShownSides(DefenseBattle battle)
+    {
+        int left = -1, right = -1;
+        for (int side = 0; side < battle.FactionCount && right < 0; side++)
+        {
+            if (battle.RoundSpawnCount(side) == 0)
+                continue;
+            if (left < 0)
+                left = side;
+            else
+                right = side;
+        }
+        if (left < 0)
+            return (0, 1);
+        return right < 0 ? (left, left == 0 ? 1 : 0) : (left, right);
+    }
+
+    // 예: "Goblin Grunt ×6   vs   Zombie ×4". 연속한 같은 유닛은 묶어서 보여준다. 나오지 않는 진영은 뺀다.
     private static string LineupText(DefenseBattle battle)
     {
-        var sides = new string[2];
-        for (int side = 0; side < 2; side++)
+        var sides = new List<string>();
+        for (int side = 0; side < battle.FactionCount; side++)
         {
+            if (battle.RoundSpawnCount(side) == 0)
+                continue;
             var parts = new List<string>();
             string last = null;
             int count = 0;
@@ -260,12 +281,10 @@ internal sealed class DefenseHud
             }
             if (last != null)
                 parts.Add($"{last} ×{count}");
-            string color = battle.RoundSpawnCount(side) > 0
-                ? ColorUtility.ToHtmlStringRGB(battle.RoundUnit(side, 0).Color)
-                : ColorUtility.ToHtmlStringRGB(UIPalette.TextSecondary);
-            sides[side] = $"<color=#{color}>{(parts.Count > 0 ? string.Join(", ", parts) : "-")}</color>";
+            string color = ColorUtility.ToHtmlStringRGB(battle.RoundUnit(side, 0).Color);
+            sides.Add($"<color=#{color}>{string.Join(", ", parts)}</color>");
         }
-        return $"{sides[0]}   vs   {sides[1]}";
+        return sides.Count > 0 ? string.Join("   vs   ", sides) : "-";
     }
 
     // 카탈로그 ID를 HUD 폰트로 읽을 수 있는 영어 이름으로 바꾼다. goblin-grunt-1500 -> Goblin Grunt
@@ -288,7 +307,7 @@ internal sealed class DefenseHud
         round.text = $"Round {battle.Round}";
         phase.text = defeated ? "Defeat" : aimedSpell.HasValue ? $"Slow {BattleClock.AimSpeed:0.0}×" : inCombat ? "Battle" : "Build";
         phase.color = aimedSpell.HasValue ? UIPalette.TextPrimary : UIPalette.TextSecondary;
-        combatBalance.Refresh(battle.Enemies, inCombat);
+        combatBalance.Refresh(battle.Enemies, inCombat, ShownSides(battle));
         lineup.gameObject.SetActive(!inCombat && !defeated);
         if (!inCombat && !defeated && lineupRound != battle.Round)
         {
@@ -353,35 +372,45 @@ internal sealed class DefenseHud
         private readonly Image divider;
         private readonly TextMeshProUGUI leftCount;
         private readonly TextMeshProUGUI rightCount;
-        private readonly string leftFormat;
-        private readonly string rightFormat;
+        private readonly IReadOnlyList<EnemyFaction> factions;
+        private (int Left, int Right) shown = (-1, -1);
+        private string leftFormat;
+        private string rightFormat;
 
-        public CombatBalance(RectTransform parent, EnemyFaction left, EnemyFaction right)
+        public CombatBalance(RectTransform parent, IReadOnlyList<EnemyFaction> factions)
         {
+            this.factions = factions;
             Vector2 topCenter = new(0.5f, 1f);
             root = Rect("Combat Balance", parent, topCenter, topCenter, new Vector2(0, -70), new Vector2(500, 30));
             leftCount = Label("Left Alive", root, 0, -4, 112, 25, 19, TextAlignmentOptions.Right);
             rightCount = Label("Right Alive", root, 388, -4, 112, 25, 19);
-            leftFormat = left.DisplayName + "  {0}";
-            rightFormat = "{0}  " + right.DisplayName;
             TextMeshProUGUI caption = Label("Metric", root, 122, 0, 256, 17, 15, TextAlignmentOptions.Center);
             caption.text = "Field HP";
             caption.color = UIPalette.TextSecondary;
 
             leftFill = Bar("Field Health", root, Vector2.up, Vector2.up, new Vector2(122, -18),
-                new Vector2(256, 8), left.Color);
+                new Vector2(256, 8), factions[0].Color);
             var track = (RectTransform)leftFill.transform.parent;
-            rightFill = Graphic("Right Fill", track, Vector2.one, Vector2.one, Vector2.zero, Vector2.zero, right.Color);
+            rightFill = Graphic("Right Fill", track, Vector2.one, Vector2.one, Vector2.zero, Vector2.zero, factions[1].Color);
             divider = Graphic("Divider", track, Vector2.zero, new Vector2(0.5f, 0),
                 new Vector2(0, -2), new Vector2(3, 12), UIPalette.TextPrimary);
             root.gameObject.SetActive(false);
         }
 
-        public void Refresh(IReadOnlyList<EnemyUnit> enemies, bool inCombat)
+        public void Refresh(IReadOnlyList<EnemyUnit> enemies, bool inCombat, (int Left, int Right) sides)
         {
             root.gameObject.SetActive(inCombat);
             if (!inCombat)
                 return;
+
+            if (sides != shown)
+            {
+                shown = sides;
+                leftFormat = factions[sides.Left].DisplayName + "  {0}";
+                rightFormat = "{0}  " + factions[sides.Right].DisplayName;
+                leftFill.color = factions[sides.Left].Color;
+                rightFill.color = factions[sides.Right].Color;
+            }
 
             int leftAlive = 0;
             int rightAlive = 0;
@@ -392,12 +421,12 @@ internal sealed class DefenseHud
                 if (!enemy.IsAlive)
                     continue;
 
-                if (enemy.FactionIndex == 0)
+                if (enemy.FactionIndex == sides.Left)
                 {
                     leftAlive++;
                     leftHealth += enemy.Health;
                 }
-                else
+                else if (enemy.FactionIndex == sides.Right)
                 {
                     rightAlive++;
                     rightHealth += enemy.Health;

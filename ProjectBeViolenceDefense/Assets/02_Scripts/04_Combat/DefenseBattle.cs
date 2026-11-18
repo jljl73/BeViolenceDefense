@@ -120,7 +120,9 @@ internal sealed class DefenseBattle
             roundQueues = roundLineup(Round);
             for (int i = 0; i < factions.Length; i++)
             {
-                roundSpawnCounts[i] = roundQueues != null && i < roundQueues.Length && roundQueues[i] != null
+                // 스폰 지점이 없는 진영(종족)은 이 스테이지에 나오지 않는다.
+                roundSpawnCounts[i] = factionSpawns[i].Length > 0 && roundQueues != null && i < roundQueues.Length &&
+                    roundQueues[i] != null
                     ? roundQueues[i].Count
                     : 0;
                 EnemiesPerRound += roundSpawnCounts[i];
@@ -130,8 +132,8 @@ internal sealed class DefenseBattle
 
         for (int i = 0; i < factions.Length; i++)
         {
-            int baseCount = factions[i].SpawnCount;
-            // Teal receives the first larger reinforcement, then Coral and Teal alternate.
+            int baseCount = factionSpawns[i].Length > 0 ? factions[i].SpawnCount : 0;
+            // Faction 1 (Undead) receives the first larger reinforcement, then it alternates with the others.
             int largerReinforcements = roundsCleared / 2 + (i == 1 ? roundsCleared % 2 : 0);
             int reinforcements = roundsCleared * ReinforcementsPerFaction + largerReinforcements * ExtraReinforcements;
             roundSpawnCounts[i] = baseCount > 0 ? baseCount + reinforcements : 0;
@@ -291,16 +293,19 @@ internal sealed class DefenseBattle
 
     public IReadOnlyCollection<Vector2Int> ForecastEncounterCells()
     {
-        if (roundSpawnCounts[0] == 0 || roundSpawnCounts[1] == 0)
-            return Array.Empty<Vector2Int>();
-
-        float range = Mathf.Max(RoundUnit(0, 0).AttackRange, RoundUnit(1, 0).AttackRange);
-        // 임시 가정: 모든 스폰의 선두가 동시에 출발한다. Coral·Teal 스폰 쌍마다 교전 칸 하나.
+        // 임시 가정: 모든 스폰의 선두가 동시에 출발한다. 서로 다른 진영의 스폰 쌍마다 교전 칸 하나.
         var cells = new HashSet<Vector2Int>();
-        foreach (int first in factionSpawns[0])
-            foreach (int second in factionSpawns[1])
-                if (ForecastEncounter(grid.Routes[first], grid.Routes[second], range) is { } cell)
-                    cells.Add(cell);
+        for (int a = 0; a < factions.Length; a++)
+        for (int b = a + 1; b < factions.Length; b++)
+        {
+            if (roundSpawnCounts[a] == 0 || roundSpawnCounts[b] == 0)
+                continue;
+            float range = Mathf.Max(RoundUnit(a, 0).AttackRange, RoundUnit(b, 0).AttackRange);
+            foreach (int first in factionSpawns[a])
+                foreach (int second in factionSpawns[b])
+                    if (ForecastEncounter(grid.Routes[first], grid.Routes[second], range) is { } cell)
+                        cells.Add(cell);
+        }
         return cells;
     }
 
@@ -424,6 +429,8 @@ internal sealed class DefenseBattle
         roundQueues != null ? roundQueues[side][index] : factions[side];
 
     public int RoundSpawnCount(int side) => roundSpawnCounts[side];
+
+    public int FactionCount => factions.Length;
 
     private void SpawnNext()
     {

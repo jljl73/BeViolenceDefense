@@ -785,12 +785,12 @@ MonoBehaviour:
     border: {r: 0.15686275, g: 0.21176471, b: 0.27058825, a: 1}
   coral:
     unitId: goblin-grunt-1500
-    displayName: Coral
+    displayName: Goblin
     color: {r: 1, g: 0.4509804, b: 0.34117648, a: 1}
     spawnCount: 6
   teal:
     unitId: zombie
-    displayName: Teal
+    displayName: Undead
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
     spawnCount: 4
   rounds:

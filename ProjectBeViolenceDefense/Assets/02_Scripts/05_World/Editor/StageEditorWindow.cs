@@ -15,8 +15,8 @@ internal sealed class StageEditorWindow : EditorWindow
     private const float SidebarWidth = 300f;
     private const float PaletteTile = 70f;
     private static readonly Regex FootprintPattern = new(@"(\d+)x(\d+)");
-    private static readonly Color[] FactionColors = { new(0.94f, 0.42f, 0.36f), new(0.27f, 0.87f, 0.81f) };
-    private static readonly string[] FactionNames = { "Coral", "Teal" };
+    private static readonly Color[] FactionColors = StageData.FactionColors;
+    private static readonly string[] FactionNames = StageData.FactionNames;
     private static readonly Color TileA = new(0.28f, 0.36f, 0.40f);
     private static readonly Color TileB = new(0.32f, 0.40f, 0.42f);
     private static readonly Color WallColor = new(0.45f, 0.36f, 0.30f);
@@ -221,7 +221,10 @@ internal sealed class StageEditorWindow : EditorWindow
             if (spawn.faction >= 0 && spawn.faction < spawnCounts.Length)
                 spawnCounts[spawn.faction]++;
         EditorGUILayout.LabelField($"장애물 {stage.obstacles.Count}개 · 막힌 칸 {preview.FixedWalls.Count}칸");
-        EditorGUILayout.LabelField($"스폰 Coral {spawnCounts[0]} · Teal {spawnCounts[1]}");
+        var spawnSummary = new string[spawnCounts.Length];
+        for (int i = 0; i < spawnCounts.Length; i++)
+            spawnSummary[i] = $"{FactionNames[i]} {spawnCounts[i]}";
+        EditorGUILayout.LabelField("스폰 " + string.Join(" · ", spawnSummary));
         if (problem != null)
             EditorGUILayout.HelpBox(problem, MessageType.Error);
         else

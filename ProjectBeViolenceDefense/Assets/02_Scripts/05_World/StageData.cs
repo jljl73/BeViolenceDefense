@@ -13,13 +13,17 @@ public sealed class StageData : ScriptableObject
 {
     public const int MinSize = 5;
     public const int MaxSize = 40;
-    public const int FactionCount = 2;
+    // 진영 = 종족. 순서는 EnemyFactionGroup 과 같다. 스테이지마다 일부 종족만 나올 수 있다.
+    public const int FactionCount = 4;
+    public static readonly string[] FactionNames = { "고블린", "언데드", "짐승", "드래곤·악마" };
+    public static readonly Color[] FactionColors =
+        { new(1f, 0.45f, 0.34f), new(0.27f, 0.87f, 0.81f), new(0.95f, 0.78f, 0.3f), new(0.68f, 0.45f, 0.95f) };
 
     [System.Serializable]
     public struct Spawn
     {
         public Vector2Int cell;
-        [Tooltip("0 = Coral(왼쪽 슬롯), 1 = Teal(오른쪽 슬롯)")]
+        [Tooltip("0 = 고블린, 1 = 언데드, 2 = 짐승, 3 = 드래곤·악마")]
         public int faction;
     }
 
@@ -67,9 +71,8 @@ public sealed class StageData : ScriptableObject
     // 게임을 시작할 수 없는 문제. 없으면 null.
     public string Validate(DefenseGrid grid)
     {
-        for (int faction = 0; faction < FactionCount; faction++)
-            if (!spawns.Exists(spawn => spawn.faction == faction))
-                return $"{(faction == 0 ? "Coral" : "Teal")} 스폰이 없습니다.";
+        if (spawns.Count == 0)
+            return "스폰이 없습니다.";
         foreach (Spawn spawn in spawns)
             if (spawn.faction < 0 || spawn.faction >= FactionCount)
                 return $"스폰 {spawn.cell}의 진영 값({spawn.faction})이 잘못되었습니다.";

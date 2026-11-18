@@ -555,3 +555,42 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 전체 웨이브 완주와 빌드는 미실행. 기존 incoming Editor.meta의 기본 빈 필드 공백 3줄은 유지. 최종 검토 후 병합 커밋 필요.
+
+### [20261119-0028-four-race-factions] 적 진영을 종족 4개로 확장
+- 시각: 2026-11-19 00:28:49 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (Claude 데스크톱 앱 Code 탭) / claude-opus-5-5, Unity CLI(unity-pipeline)
+- 목적 및 적용 위치: 전투 진영을 Coral/Teal 2개에서 종족 4개(고블린·언데드·짐승·드래곤/악마, EnemyFactionGroup 순서)로 바꿔 종족끼리 서로 적대하게 함. 스폰도 종족 기준이며, 스폰이 없는 종족은 그 스테이지에 나오지 않음.
+- 사용 방식: AI가 진영 하드코딩 위치를 조사하고, 사용자에게 '팩션' 의미와 스폰 구조를 두 차례 질문해 확정한 뒤 수정함. 기존 진영 번호 0/1을 고블린/언데드로 그대로 매핑해 Stage1·Stage4 에셋은 바꾸지 않음. 씬의 coral/teal 필드는 FormerlySerializedAs로 greenHorde/undead에 이어 붙임.
+- 결과 및 확인 방법: 성공 / Unity CLI 재컴파일 성공(오류 0), EditMode 테스트 5개 통과(신규 FourFactionBattleTests 2개 포함), GameScene_LeftCoreHud Play Mode 진입 시 프로토타입 활성·기존 편성 이전 확인, 콘솔 오류 0.
+- 사람의 개입: '각 종족이 곧 팩션', 'Stage1/Stage4는 coral·teal을 고블린·언데드로 대체하고 나머지는 준비만' 방향을 사용자가 결정.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/StageData.cs | Claude Code | 수정 | FactionCount 4, 종족 이름·색 표, 검증을 '스폰 1개 이상'으로 완화 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs | Claude Code | 수정 | 스폰 없는 진영 제외, 모든 진영 쌍 교전 예측, FactionCount / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 종족 슬롯 4개·라운드 편성 4개, 종족 불일치·스폰 없음 경고 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs | Claude Code | 수정 | 편성 문구 N진영, 세력 바는 라운드의 앞 두 진영 표시 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/Editor/StageEditorWindow.cs, StagePreview.cs | Claude Code | 수정 | 스폰 도구·미리보기 4종족 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyCatalog.cs | Claude Code | 수정 | 주석만 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/(GameScene, TestScene, GameScene_LeftCoreHud).unity | Claude Code | 수정 | 슬롯 표시 이름 Coral→Goblin, Teal→Undead / 사용 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/FourFactionBattleTests.cs | Claude Code | 생성 | 4종족 교전·스폰 없는 종족 제외 테스트 / 사용 |
+
+#### 증거
+- 없음
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 재컴파일, EditMode 테스트 실행, Play Mode 진입 후 직렬화 데이터·콘솔 확인.
+- 활용 방식: script recompile/recompile_status, test run --mode editor, editor.playmode start/stop, script eval, console get/status.
+- 잘된 점: 신규 테스트 실패 원인(열린 보드에서 종족이 만나지 않음)을 바로 확인하고 수정함.
+- 잘 안된 점 및 개선 필요: set_auto_tick 인자 이름(--enabled)을 처음에 잘못 씀. 이전부터 남아 있던 GameScene 임포트 경고가 콘솔 출력에 섞여 나옴.
+
+#### 주요 프롬프트
+- 사용 도구: Claude Code
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: "현재 등록된 적 팩션이 2개 뿐인 것 같은데 4개로 늘려줄 수 있나?" / "각 종족이 곧 팩션이다. 각 종족들이 서로를 적대해서 싸워야 한다." / "스폰도 종족 기반으로 바꾸지만, 모든 스테이지에 4 종족이 전부 등장하지 않을 수 있다. 예를들어 stage 1/ stage4의 경우에는 기존 coral과 Teal을 고블린과 언데드로 대체하고 나머지는 준비만 해둔다."
+- 결과 및 실제 활용 방식: 진영 = 종족 구조로 전투·스폰·편성·HUD·에디터를 변경.
+- 선정 이유: 핵심 전투 규칙(누가 누구와 싸우는가)을 바꾼 결정.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: GameScene W2 편성에서 wolf(짐승)가 고블린 칸에 있어 고블린 편으로 싸움(경고 출력). 짐승 스폰을 둘지, 고블린 유닛으로 바꿀지 결정 필요. 한 라운드에 3종족 이상이 나오면 세력 바는 앞 두 종족만 표시함. 전체 웨이브 완주·빌드는 미실행.

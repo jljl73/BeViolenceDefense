@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-// 종족 묶음. Coral/Teal 출현 진영과는 별개다.
+// 종족 = 전투 진영. 순서가 StageData.Spawn.faction 과 라운드 편성의 진영 번호다.
 internal enum EnemyFactionGroup
 {
     GreenHorde,
