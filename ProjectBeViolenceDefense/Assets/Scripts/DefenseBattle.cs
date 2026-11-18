@@ -174,7 +174,8 @@ internal sealed class DefenseBattle
         {
             enemy.TickTimers(deltaTime);
             enemy.Target = FindTarget(enemy);
-            enemy.AttackingCore = enemy.Target == null && CanReach(enemy, grid.CorePosition);
+            Vector3 coreTarget = grid.ClosestCorePoint(enemy.Position);
+            enemy.AttackingCore = enemy.Target == null && CanReach(enemy, coreTarget);
             if (enemy.Target != null)
             {
                 enemy.Face(enemy.Target.Position);
@@ -192,7 +193,7 @@ internal sealed class DefenseBattle
             }
             else if (enemy.AttackingCore)
             {
-                enemy.Face(grid.CorePosition);
+                enemy.Face(coreTarget);
                 if (enemy.CanAttack)
                     coreDamage += enemy.Attack();
             }

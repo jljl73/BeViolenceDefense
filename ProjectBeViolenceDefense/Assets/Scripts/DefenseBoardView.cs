@@ -5,12 +5,14 @@ internal sealed class DefenseBoardView
 {
     private const float CameraPanSpeed = 6f;
     private const float CameraDistance = 20f;
+    private const float CameraFocusOffset = 0.9f;
     private const float ZoomStep = 0.9f;
     private const float ZoomResponse = 18f;
     private const float MaxZoomFrameTime = 0.05f;
     private const float ZoomSnapDistance = 0.0005f;
     private const float MinViewScale = 0.55f;
     private const float MaxViewScale = 1.45f;
+    private const float TileSize = 0.94f;
 
     private static readonly Plane BoardGround = new(Vector3.up, Vector3.zero);
 
@@ -53,11 +55,13 @@ internal sealed class DefenseBoardView
         this.root = root;
         this.camera = camera;
         this.shader = shader;
-        cameraFocus = grid.Center;
+        // Aim slightly toward the near corner to leave room for the battle controls.
+        Vector3 boardForward = root.InverseTransformDirection(camera.transform.forward);
+        cameraFocus = grid.Center - Vector3.ProjectOnPlane(boardForward, Vector3.up).normalized * CameraFocusOffset;
         PositionCamera();
         camera.orthographic = true;
         camera.clearFlags = CameraClearFlags.SolidColor;
-        camera.backgroundColor = new Color32(25, 33, 47, 255);
+        camera.backgroundColor = UIPalette.Background;
         FitCamera();
 
         Material foundation = Palette(new Color32(40, 54, 69, 255));
@@ -80,7 +84,7 @@ internal sealed class DefenseBoardView
             for (int z = 0; z < DefenseGrid.Depth; z++)
             {
                 floor[x, z] = Box($"Tile {x},{z}", root, new Vector3(x, -0.14f, z),
-                    new Vector3(0.97f, 0.28f, 0.97f), tiles[(x + z) % tiles.Length]).GetComponent<MeshRenderer>();
+                    new Vector3(TileSize, 0.28f, TileSize), tiles[(x + z) % tiles.Length]).GetComponent<MeshRenderer>();
             }
         }
 
@@ -94,11 +98,7 @@ internal sealed class DefenseBoardView
             Box("Spawn pad center", root, position + Vector3.up * 0.075f, new Vector3(0.55f, 0.03f, 0.55f), foundation);
         }
 
-        Box("Core plinth", root, grid.CorePosition + Vector3.up * 0.13f, new Vector3(0.94f, 0.26f, 0.94f), foundation);
-        Box("Core body", root, grid.CorePosition + Vector3.up * 0.55f, new Vector3(0.6f, 0.6f, 0.6f), core);
-        Transform crown = Box("Core crown", root, grid.CorePosition + Vector3.up * 0.93f,
-            new Vector3(0.42f, 0.24f, 0.42f), core);
-        crown.localRotation = Quaternion.Euler(0, 45, 0);
+        CreateCore(grid, foundation, fixedWall, core);
         areaBuffPreviewMesh = CreateAreaBuffPreviewMesh();
         var preview = new GameObject("Area Buff Range", typeof(MeshFilter), typeof(MeshRenderer));
         preview.transform.SetParent(root, false);
@@ -111,7 +111,32 @@ internal sealed class DefenseBoardView
         areaBuffPreview.enabled = false;
     }
 
-    public void FitCamera() => camera.orthographicSize = Mathf.Max(6.8f, 7.8f / camera.aspect) * viewScale;
+    private void CreateCore(DefenseGrid grid, Material foundation, Material wall, Material core)
+    {
+        var model = new GameObject("Core").transform;
+        model.SetParent(root, false);
+        model.localPosition = grid.CorePosition;
+
+        float width = grid.CoreSize.x - 0.04f;
+        float depth = grid.CoreSize.y - 0.04f;
+        const float rim = 0.16f;
+        Box("Core base", model, Vector3.up * 0.1f, new Vector3(width, 0.2f, depth), foundation);
+        Box("Core platform", model, Vector3.up * 0.26f, new Vector3(width - rim, 0.12f, depth - rim), trim);
+
+        // The rim meshes are part of the core model and sit entirely within its footprint.
+        float sideX = (width - rim) * 0.5f;
+        float sideZ = (depth - rim) * 0.5f;
+        Box("Core rim left", model, new Vector3(-sideX, 0.29f, 0f), new Vector3(rim, 0.26f, depth), wall);
+        Box("Core rim right", model, new Vector3(sideX, 0.29f, 0f), new Vector3(rim, 0.26f, depth), wall);
+        Box("Core rim front", model, new Vector3(0f, 0.29f, -sideZ), new Vector3(width - rim * 2f, 0.26f, rim), wall);
+        Box("Core rim back", model, new Vector3(0f, 0.29f, sideZ), new Vector3(width - rim * 2f, 0.26f, rim), wall);
+
+        Box("Core body", model, Vector3.up * 0.56f, new Vector3(0.86f, 0.52f, 0.86f), core);
+        Transform crown = Box("Core crown", model, Vector3.up * 0.94f, new Vector3(0.58f, 0.24f, 0.58f), core);
+        crown.localRotation = Quaternion.Euler(0, 45, 0);
+    }
+
+    public void FitCamera() => camera.orthographicSize = Mathf.Max(9.4f, 9.5f / camera.aspect) * viewScale;
 
     public void QueueZoom(float scrollDelta, Vector2 pointer)
     {
@@ -176,7 +201,10 @@ internal sealed class DefenseBoardView
         if (routes != null)
             foreach (Vector3[] path in routes)
                 foreach (Vector3 point in path)
-                    floor[(int)point.x, (int)point.z].sharedMaterial = routeTile;
+                {
+                    Vector2Int cell = DefenseGrid.PositionToCell(point);
+                    floor[cell.x, cell.y].sharedMaterial = routeTile;
+                }
 
         foreach (Vector2Int cell in PlannedEncounters)
             floor[cell.x, cell.y].sharedMaterial = encounterTile;

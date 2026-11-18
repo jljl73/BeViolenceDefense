@@ -30,6 +30,7 @@ internal sealed class EnemyUnit
     private const float MoveSpeed = 2.25f;
 
     private readonly Vector3[] path;
+    private readonly float lastStepLength;
     private int waypoint = 1;
     private int pendingDamage;
     private float cooldown;
@@ -49,14 +50,15 @@ internal sealed class EnemyUnit
     public EnemyUnit Target { get; set; }
     public bool AttackingCore { get; set; }
 
-    // Every remaining grid edge beyond the next waypoint is one unit long.
-    public float DistanceToCore => Vector3.Distance(Position, path[waypoint]) + path.Length - 1 - waypoint;
+    public float DistanceToCore => Vector3.Distance(Position, path[waypoint]) +
+        (waypoint == path.Length - 1 ? 0f : path.Length - 2 - waypoint + lastStepLength);
 
     public EnemyUnit(EnemyFaction faction, Vector3[] path, int spawnOrder)
     {
         Faction = faction;
         SpawnOrder = spawnOrder;
         this.path = path;
+        lastStepLength = Vector3.Distance(path[^2], path[^1]);
         Position = path[0];
         Heading = path[1] - Position;
     }

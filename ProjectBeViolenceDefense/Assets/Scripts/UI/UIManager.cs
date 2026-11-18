@@ -34,7 +34,7 @@ public sealed class UIManager : MonoBehaviour
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
         rect.offsetMin = rect.offsetMax = Vector2.zero;
-        backdrop.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.56f);
+        backdrop.GetComponent<Image>().color = UIPalette.Overlay;
         backdrop.SetActive(false);
         modalBackdrop = backdrop;
     }
