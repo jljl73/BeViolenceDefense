@@ -1,0 +1,103 @@
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using UnityEngine;
+
+// 스테이지 웨이브 SO 규칙(팩션 2~4개, 팩션별 그룹 하나 선택)과 마지막 웨이브 클리어 시 승리.
+public sealed class StageWavesTests
+{
+    private static StageWaves.FactionEntry Faction(int faction, int groupCount) => new()
+    {
+        faction = faction,
+        groups = Enumerable.Range(0, groupCount)
+            .Select(g => new StageWaves.Group { note = $"{faction}-{g}" })
+            .ToList()
+    };
+
+    private static StageWaves Waves(params StageWaves.FactionEntry[] factions)
+    {
+        var waves = ScriptableObject.CreateInstance<StageWaves>();
+        waves.waves.Add(new StageWaves.Wave { factions = factions.ToList() });
+        return waves;
+    }
+
+    [Test]
+    public void ValidateAcceptsTwoToFourFactions()
+    {
+        Assert.That(Waves(Faction(0, 1), Faction(1, 2)).Validate(), Is.Null);
+        Assert.That(Waves(Faction(0, 1), Faction(1, 1), Faction(2, 1), Faction(3, 1)).Validate(), Is.Null);
+    }
+
+    [Test]
+    public void ValidateRejectsBadWaves()
+    {
+        Assert.That(ScriptableObject.CreateInstance<StageWaves>().Validate(), Is.Not.Null, "웨이브 0개");
+        Assert.That(Waves(Faction(0, 1)).Validate(), Is.Not.Null, "팩션 1개");
+        Assert.That(Waves(Faction(0, 1), Faction(1, 1), Faction(2, 1), Faction(3, 1), Faction(0, 1)).Validate(),
+            Is.Not.Null, "팩션 5개");
+        Assert.That(Waves(Faction(0, 1), Faction(0, 1)).Validate(), Is.Not.Null, "팩션 중복");
+        Assert.That(Waves(Faction(0, 1), Faction(4, 1)).Validate(), Is.Not.Null, "팩션 범위");
+        Assert.That(Waves(Faction(0, 1), Faction(1, 0)).Validate(), Is.Not.Null, "그룹 0개");
+    }
+
+    [Test]
+    public void PickGroupsChoosesOneGroupPerFaction()
+    {
+        StageWaves waves = Waves(Faction(1, 3), Faction(3, 2));
+        var asked = new List<int>();
+        StageWaves.Group[] picked = waves.PickGroups(0, n =>
+        {
+            asked.Add(n);
+            return n - 1;
+        });
+
+        Assert.That(asked, Is.EqualTo(new[] { 3, 2 }), "팩션마다 자기 그룹 수 안에서 한 번씩 고른다.");
+        Assert.That(picked.Length, Is.EqualTo(StageData.FactionCount));
+        Assert.That(picked[1].note, Is.EqualTo("1-2"));
+        Assert.That(picked[3].note, Is.EqualTo("3-1"));
+        Assert.That(picked[0], Is.Null, "웨이브에 없는 팩션");
+        Assert.That(picked[2], Is.Null, "웨이브에 없는 팩션");
+    }
+
+    private static DefenseBattle Battle(int roundLimit)
+    {
+        EnemyFaction[] sides = Enumerable.Range(0, StageData.FactionCount)
+            .Select(i => new EnemyFaction(StageData.FactionNames[i], StageData.FactionColors[i], spawnCount: 0))
+            .ToArray();
+        var cells = new[] { new Vector2Int(7, 2), new Vector2Int(9, 2) };
+        var grid = new DefenseGrid(17, 17, new RectInt(8, 15, 2, 2), cells, new[] { 0, 1 }, null);
+        return new DefenseBattle(grid, sides, _ => sides
+            .Select(side => (IReadOnlyList<EnemyFaction>)new List<EnemyFaction> { side, side })
+            .ToArray(), roundLimit);
+    }
+
+    private static void PlayRound(DefenseBattle battle)
+    {
+        battle.StartRound();
+        for (int t = 0; t < 60 * 120 && battle.CurrentPhase == DefenseBattle.Phase.Combat; t++)
+            battle.Tick(DefenseBattle.TickDuration, pauseMovement: false);
+    }
+
+    [Test]
+    public void ClearingTheLastWaveWins()
+    {
+        DefenseBattle battle = Battle(roundLimit: 2);
+        PlayRound(battle);
+        Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Preparation));
+        Assert.That(battle.Round, Is.EqualTo(2));
+
+        PlayRound(battle);
+        Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Victory));
+        Assert.That(battle.Round, Is.EqualTo(2));
+        Assert.That(battle.Enemies, Is.Empty);
+    }
+
+    [Test]
+    public void NoRoundLimitKeepsGoing()
+    {
+        DefenseBattle battle = Battle(roundLimit: 0);
+        PlayRound(battle);
+        Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Preparation));
+        Assert.That(battle.Round, Is.EqualTo(2));
+    }
+}

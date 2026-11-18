@@ -658,3 +658,65 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 원하는 스테이지에 배치 후 외형 검토. 작업 중 나타난 Netmarble Medium SDF.asset 변경은 직접 편집하지 않았으며 발생 원인 확인 필요.
+
+### [20261119-enemy-stats-location] 적 능력치 관리 구조 확인
+- 시각: 2026-11-19 02:46:23 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / PowerShell
+- 목적 및 적용 위치: 적 공격력 등 기본 수치의 저장 위치와 적용 흐름 안내
+- 사용 방식: EnemyCatalog 에셋, 사용자 정의 Inspector, EnemyUnit 및 씬 연결 코드를 정적으로 확인
+- 결과 및 확인 방법: 성공 / 저장된 능력치와 ID 기반 로딩, 버프·방어 계산 코드를 확인. 게임 파일 변경 및 실행 검증 없음
+- 사람의 개입: 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ai-use/ppzepi.md | Codex | 추가 | 조사 기록 추가 |
+
+#### 증거
+- ProjectBeViolenceDefense/Assets/04_Data/03_Balance/EnemyCatalog.asset
+- ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyCatalog.cs
+- ProjectBeViolenceDefense/Assets/02_Scripts/03_Enemies/EnemyUnit.cs
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 프로젝트 코드·에셋 조사
+- 사용 방식: 파일 검색 및 읽기로 데이터 관리 구조를 확인하고 답변 작성
+
+### [20261119-0305-stage-waves-so] 스테이지 웨이브 SO 분리·팩션별 그룹 무작위 선택·승리 처리
+- 시각: 2026-11-19 03:05:54 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (Claude Opus 5.5, claude-opus-5-5) / Unity CLI + Unity 6000.3.28f1 Editor(Pipeline)
+- 목적 및 적용 위치: 씬의 `VoxelDefensePrototype.rounds`에 있던 웨이브 편성을 스테이지별 SO(`StageWaves`, `StageData.waves`로 연결)로 분리. 웨이브=팩션 2~4개, 팩션=그룹 1개 이상, 준비 단계마다 팩션별 그룹 하나를 무작위 선택. 마지막 웨이브 클리어 시 승리(`DefenseBattle.Phase.Victory`)와 승리 패널 연결.
+- 사용 방식: 사용자가 연결 위치(StageData)와 마지막 웨이브 처리(승리 추가)를 선택. AI가 계획 작성 후 코드·테스트 작성, Unity CLI로 컴파일·에셋 생성·씬 수정·테스트·Play Mode 확인.
+- 결과 및 확인 방법: 성공 / Unity 컴파일 오류 0, EditMode 47/47 통과(신규 5개 포함). GameScene Play Mode에서 반사로 5웨이브를 틱 진행: 웨이브별 스폰 수가 이전 편성과 일치, 5웨이브 후 Victory, 승리 패널 표시(코어 73/120, 새어 나감 47, 쓰러짐 42 = 총 89 스폰과 일치), 콘솔 경고·오류 0.
+- 사람의 개입: SO 연결 위치·승리 처리 범위 결정. 결과 검토는 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/StageWaves.cs | Claude Code | 생성 | 웨이브 SO, `Validate`, `PickGroups` / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/StageData.cs | Claude Code | 수정 | `waves` 참조 추가 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs | Claude Code | 수정 | `Phase.Victory`, `roundLimit` / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | `rounds` 제거, 웨이브 SO로 라인업 생성(매 준비 단계 그룹 무작위), 승리 표시 / 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs, VictoryPanelHud.cs | Claude Code | 수정 | Victory 표시, 패널 `Bind`, `Show(string stage, …)` / 사용 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/StageWavesTests.cs | Claude Code | 생성 | 검증·그룹 선택·승리 테스트 / 사용 |
+| ProjectBeViolenceDefense/Assets/04_Data/04_Stages/StageTEST_Waves.asset, StageTEST.asset | Unity CLI(script eval) | 생성·수정 | GameScene W1~W5 편성 이전(팩션당 그룹 1개, 이전 데이터와 자동 비교 일치), StageTEST에 연결 / 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity | Unity CLI(script eval) | 수정 | VictoryPanelHud 프리팹 배치·연결, 구 `rounds` 직렬화 제거 / 사용 |
+
+#### 증거
+- ai-use/evidence/20261119-stage-waves/victory-panel.png
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일, 웨이브 에셋 생성·StageTEST 연결, GameScene 승리 패널 배치·저장, EditMode 테스트, Play Mode 진입·웨이브 진행·화면 캡처·콘솔 확인
+- 활용 방식: `unity recompile`, `unity command script eval`, `unity command test run --mode editor`, `unity command editor.playmode start/stop`, `unity command capture game_view`, `unity command console get`
+- 잘된 점: 열린 Editor에서 에셋·씬을 직접 수정해 .meta와 참조가 유지됨. 이전 편성과 새 에셋을 스크립트로 비교 가능.
+- 잘 안된 점 및 개선 필요: `script eval`에서 internal 클래스(`DefenseBattle`)를 직접 쓸 수 없어 반사로 접근해야 했음.
+
+#### 주요 프롬프트
+- 사용 도구: Claude Code
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: "현재 스테이지에 맞는 적 웨이브 구조를 SO형태로 관리하도록 분리한다. 한 웨이브에는 한 팩션의 여러 그룹이 들어있을 수 있다. 그룹 안에는 같은 팩션에 해당하는 적 데이터가 들어있을 수 있다(어떤 것이 얼마나 나올지). 웨이브 안 한 팩션에는 여러 그룹이 들어있을 수 있다. 웨이브에는 이러한 팩션이 최대 4개, 최소 2개 있을 수 있다. 한 팩션 안에 여러 그룹이 들어있을 경우, 매 웨이브 시작 전 준비단계에서 한 그룹을 랜덤하게 지정한다. 해당 그룹이 이번 웨이브에서 나올 그룹이다. 한 웨이브에 들어있는 각 팩션에서 이렇게 그룹을 하나씩 고른다. 그것이 이번 웨이브에 나올 적들이다."
+- 결과 및 실제 활용 방식: StageWaves SO 구조와 무작위 그룹 선택 구현
+- 선정 이유: 웨이브 데이터 구조와 진행 방식을 정한 핵심 요청
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 테스트 씬(GameScene_LeftCoreHud, Stage_GoldenMaple, Stage_Graveyard, Stage_Snowfield)은 StageData가 없어 웨이브 편성이 빠지고 기존 증원 규칙으로 끝없이 진행됨(구 `rounds` 데이터는 씬 파일에 남아 있지만 읽히지 않음). 그룹이 2개 이상인 웨이브의 실제 무작위 선택은 단위 테스트(주입한 선택값)로만 확인. BalanceSim의 씬 편성 파서는 이전부터 현재 씬 형식과 맞지 않으며 수정하지 않음. 승리 패널의 스테이지 표시는 에셋 이름(예: "StageTEST")을 씀.

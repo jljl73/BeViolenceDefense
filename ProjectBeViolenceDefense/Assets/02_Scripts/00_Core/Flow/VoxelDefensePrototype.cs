@@ -56,43 +56,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private FactionSlot undead = new("Undead", StageData.FactionColors[1]);
     [SerializeField] private FactionSlot beasts = new("Beasts", StageData.FactionColors[2]);
     [SerializeField] private FactionSlot dragonAndDemon = new("Dragon", StageData.FactionColors[3]);
-    [SerializeField, Tooltip("라운드별 편성. 마지막 라운드 다음에는 처음부터 반복한다. 비어 있으면 종족 슬롯과 기존 증원 규칙을 쓴다.")]
-    private RoundLineup[] rounds = System.Array.Empty<RoundLineup>();
-    [SerializeField, Tooltip("보드 크기·코어·스폰·고정 장애물. Tools/Stage Editor에서 편집한다. 비우면 기본 지형을 쓴다.")]
+    [SerializeField, Tooltip("보드 크기·코어·스폰·고정 장애물·웨이브 편성. Tools/Stage Editor에서 편집한다. 비우면 기본 지형을 쓴다.")]
     private StageData stage;
-
-    [System.Serializable]
-    private sealed class SpawnGroup
-    {
-        [SerializeField, Tooltip("Enemy Catalog의 유닛 ID")]
-        private string unitId;
-        [SerializeField, Min(0)] private int count = 1;
-
-        public string UnitId => unitId;
-        public int Count => count;
-    }
-
-    [System.Serializable]
-    private sealed class RoundLineup
-    {
-        [SerializeField] private string note;
-        [SerializeField, FormerlySerializedAs("coral"), Tooltip("고블린 스폰. 위에서부터 순서대로 나온다.")]
-        private SpawnGroup[] greenHorde = System.Array.Empty<SpawnGroup>();
-        [SerializeField, FormerlySerializedAs("teal"), Tooltip("언데드 스폰. 위에서부터 순서대로 나온다.")]
-        private SpawnGroup[] undead = System.Array.Empty<SpawnGroup>();
-        [SerializeField, Tooltip("짐승 스폰. 위에서부터 순서대로 나온다.")]
-        private SpawnGroup[] beasts = System.Array.Empty<SpawnGroup>();
-        [SerializeField, Tooltip("드래곤·악마 스폰. 위에서부터 순서대로 나온다.")]
-        private SpawnGroup[] dragonAndDemon = System.Array.Empty<SpawnGroup>();
-
-        public SpawnGroup[] Side(int index) => index switch
-        {
-            0 => greenHorde,
-            1 => undead,
-            2 => beasts,
-            _ => dragonAndDemon
-        } ?? System.Array.Empty<SpawnGroup>();
-    }
+    [Tooltip("선택. 연결하면 마지막 웨이브를 클리어했을 때 승리 패널을 띄운다.")]
+    [SerializeField] private VictoryPanelHud victoryPanelHud;
 
     private DefenseGrid grid;
     private DefenseBoardView view;
@@ -108,6 +75,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private bool draggingCamera;
     private Vector2 previousDragPointer;
     private Vector2? rightClickPointer;
+    private StageData usedStage;
+    private int fallenEnemies;
 
     private int SpellRangeStep => Mathf.RoundToInt(aimedRangeScroll);
 
@@ -131,12 +100,20 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             }
         }
 
-        grid = CreateGrid(out StageData usedStage);
+        grid = CreateGrid(out usedStage);
         view = new DefenseBoardView(transform, boardCamera, voxelShader, grid, factions, routeChevron, boardTheme,
             enemyCatalog, usedStage);
-        battle = new DefenseBattle(grid, factions, BuildRoundLineup());
+        StageWaves waves = UsableWaves();
+        battle = new DefenseBattle(grid, factions, BuildRoundLineup(waves), waves != null ? waves.waves.Count : 0);
         battle.EnemySpawned += view.AddEnemy;
         battle.EnemyRemoved += enemy => view.RemoveEnemy(enemy, battle.CoreHealth);
+        battle.EnemyRemoved += enemy =>
+        {
+            if (!enemy.ReachedCore)
+                fallenEnemies++;
+        };
+        if (victoryPanelHud != null)
+            victoryPanelHud.Bind(next: null, retry: Restart);
         battle.SpellResolved += OnSpellResolved;
         hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions);
         if (leftCoreHud != null)
@@ -184,44 +161,65 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         return new DefenseGrid();
     }
 
-    // 라운드 편성을 진영(편)별 스폰 순서로 펼친다. 같은 유닛 종류는 한 객체를 공유한다.
-    private System.Func<int, IReadOnlyList<EnemyFaction>[]> BuildRoundLineup()
+    // 스테이지의 웨이브 편성. 없거나 잘못되었으면 null(기존 증원 규칙으로 끝없이 진행).
+    private StageWaves UsableWaves()
     {
-        if (rounds == null || rounds.Length == 0)
+        StageWaves waves = usedStage != null ? usedStage.waves : null;
+        if (waves == null)
+            return null;
+
+        string error = waves.Validate();
+        if (error != null)
+        {
+            Debug.LogError($"Waves '{waves.name}' are invalid ({error}). Using the default reinforcement rules.", waves);
+            return null;
+        }
+
+        foreach (StageWaves.Wave wave in waves.waves)
+            foreach (StageWaves.FactionEntry entry in wave.factions)
+                if (!HasSpawn(entry.faction))
+                    Debug.LogWarning($"Waves '{waves.name}' ({wave.note}): faction {entry.faction} has no spawn on " +
+                        "this stage. Its units will not appear.", waves);
+        return waves;
+    }
+
+    // 매 준비 단계(라운드 시작 전)에 팩션별로 그룹 하나를 무작위로 골라 스폰 순서로 펼친다.
+    // 무작위는 전투 입력(편성)을 정할 때만 쓰므로 전투 결정론에는 영향이 없다. 같은 유닛 종류는 한 객체를 공유한다.
+    private System.Func<int, IReadOnlyList<EnemyFaction>[]> BuildRoundLineup(StageWaves waves)
+    {
+        if (waves == null)
             return null;
 
         var units = new Dictionary<(string, int), EnemyFaction>();
-        var lineups = new IReadOnlyList<EnemyFaction>[rounds.Length][];
-        for (int r = 0; r < rounds.Length; r++)
+        return round =>
         {
-            lineups[r] = new IReadOnlyList<EnemyFaction>[StageData.FactionCount];
+            StageWaves.Group[] groups = waves.PickGroups(round - 1, n => Random.Range(0, n));
+            var lineup = new IReadOnlyList<EnemyFaction>[StageData.FactionCount];
             for (int side = 0; side < StageData.FactionCount; side++)
             {
                 var queue = new List<EnemyFaction>();
-                foreach (SpawnGroup group in rounds[r].Side(side))
+                lineup[side] = queue;
+                if (groups[side] == null)
+                    continue;
+                foreach (StageWaves.Entry entry in groups[side].enemies)
                 {
-                    if (group == null || group.Count <= 0)
+                    if (entry == null || entry.count <= 0)
                         continue;
-                    if (!units.TryGetValue((group.UnitId, side), out EnemyFaction unit))
+                    if (!units.TryGetValue((entry.unitId, side), out EnemyFaction unit))
                     {
-                        units[(group.UnitId, side)] = unit = enemyCatalog.GetUnit(group.UnitId, Slot(side).Color, $"Round {r + 1}");
-                        if (enemyCatalog.TryGetFactionGroup(group.UnitId, out EnemyFactionGroup race) && (int)race != side)
-                            Debug.LogWarning($"Round {r + 1}: '{group.UnitId}' is {race} but listed under faction {side}. " +
-                                $"It fights for faction {side}.", this);
+                        units[(entry.unitId, side)] = unit = enemyCatalog.GetUnit(entry.unitId, Slot(side).Color, $"Wave {round}");
+                        if (enemyCatalog.TryGetFactionGroup(entry.unitId, out EnemyFactionGroup race) && (int)race != side)
+                            Debug.LogWarning($"Wave {round}: '{entry.unitId}' is {race} but listed under faction {side}. " +
+                                $"It fights for faction {side}.", waves);
                     }
                     if (unit == null)
                         continue;
-                    for (int i = 0; i < group.Count; i++)
+                    for (int i = 0; i < entry.count; i++)
                         queue.Add(unit);
                 }
-                lineups[r][side] = queue;
             }
-        }
-        for (int side = 0; side < StageData.FactionCount; side++)
-            if (!HasSpawn(side) && System.Array.Exists(lineups, lineup => lineup[side].Count > 0))
-                Debug.LogWarning($"Faction {side} units are in the round lineup, but this stage has no spawn for " +
-                    "them. They will not appear.", this);
-        return round => lineups[(round - 1) % lineups.Length];
+            return lineup;
+        };
     }
 
     private bool HasSpawn(int faction)
@@ -237,7 +235,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         view.FitCamera();
         Keyboard keyboard = Keyboard.current;
         bool boardInputAllowed = !ui.HasOpenPopup;
-        if ((boardInputAllowed || battle.CurrentPhase == DefenseBattle.Phase.Defeat) &&
+        if ((boardInputAllowed || battle.CurrentPhase is DefenseBattle.Phase.Defeat or DefenseBattle.Phase.Victory) &&
             keyboard?.rKey.wasPressedThisFrame == true)
         {
             Restart();
@@ -288,13 +286,31 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 {
                     hud.ShowDefeat();
                 }
+                else if (battle.CurrentPhase == DefenseBattle.Phase.Victory)
+                {
+                    ShowVictory();
+                }
                 break;
         }
     }
 
+    private void ShowVictory()
+    {
+        if (leftCoreHud != null)
+            leftCoreHud.Cheer();
+        if (victoryPanelHud == null)
+        {
+            hud.Notify("Victory! Press R to restart.");
+            return;
+        }
+        int coreMax = DefenseBattle.CoreMaxHealth;
+        victoryPanelHud.Show(usedStage != null ? usedStage.name : "", battle.CoreHealth, coreMax,
+            coreMax - battle.CoreHealth, fallenEnemies);
+    }
+
     private void SetBattleSpeed(int speed)
     {
-        if (!ui.HasOpenPopup && battle.CurrentPhase != DefenseBattle.Phase.Defeat)
+        if (!ui.HasOpenPopup && battle.CurrentPhase is not (DefenseBattle.Phase.Defeat or DefenseBattle.Phase.Victory))
             battleSpeed = speed;
     }
 

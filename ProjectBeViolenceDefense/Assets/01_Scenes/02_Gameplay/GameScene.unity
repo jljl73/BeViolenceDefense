@@ -581,6 +581,119 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &892500930
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1670040556}
+    m_Modifications:
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4297760806441783826, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+      propertyPath: m_Name
+      value: VictoryPanelHud
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+--- !u!224 &892500931 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3860520570736645371, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+  m_PrefabInstance: {fileID: 892500930}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &892500932 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5500946594841087442, guid: f9fd374d2d3f32f44ab24f7697e554ed, type: 3}
+  m_PrefabInstance: {fileID: 892500930}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e878f152593d514db03358dd3775cc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VictoryPanelHud
 --- !u!1 &1670040551
 GameObject:
   m_ObjectHideFlags: 0
@@ -693,6 +806,7 @@ RectTransform:
   m_Children:
   - {fileID: 569695939}
   - {fileID: 310873187}
+  - {fileID: 892500931}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -771,6 +885,8 @@ MonoBehaviour:
   leftCoreHud: {fileID: 0}
   manaBarHud: {fileID: 0}
   battleInfoHud: {fileID: 0}
+  stageAmbience: {fileID: 0}
+  buildModeHud: {fileID: 0}
   boardTheme:
     background: {r: 0.043137256, g: 0.050980393, b: 0.16862746, a: 1}
     foundation: {r: 0.15686275, g: 0.21176471, b: 0.27058825, a: 1}
@@ -785,6 +901,9 @@ MonoBehaviour:
     trim: {r: 0.69803923, g: 0.7764706, b: 0.78039217, a: 1}
     coreCharacterPrefab: {fileID: 4139517323781185027, guid: a9939411723c35a419584baa25b6e7ca, type: 3}
     coreCharacterScale: 2
+    corePlatformPrefab: {fileID: 0}
+    corePlatformScale: 1
+    corePlatformTop: 0.32
     tileGap: 0.06
     tileBevel: 0
     tileTexture: {fileID: 0}
@@ -810,109 +929,8 @@ MonoBehaviour:
     displayName: Dragon
     color: {r: 0.68, g: 0.45, b: 0.95, a: 1}
     spawnCount: 0
-  rounds:
-  - note: W1 TEST
-    greenHorde:
-    - unitId: goblin-grunt-1500
-      count: 6
-    undead:
-    - unitId: zombie
-      count: 2
-    - unitId: skeleton
-      count: 2
-    beasts: []
-    dragonAndDemon: []
-  - note: W2 TEST
-    greenHorde: []
-    undead: []
-    beasts:
-    - unitId: wolf
-      count: 7
-    - unitId: bat
-      count: 2
-    dragonAndDemon:
-    - unitId: hatchling
-      count: 3
-    - unitId: demon
-      count: 1
-  - note: W3 TEST
-    greenHorde:
-    - unitId: orc
-      count: 1
-    - unitId: goblin-grunt-1500
-      count: 3
-    - unitId: goblin-slinger
-      count: 2
-    undead:
-    - unitId: living-armor
-      count: 1
-    - unitId: skeleton
-      count: 2
-    - unitId: skeleton-archer
-      count: 2
-    beasts:
-    - unitId: werewolf
-      count: 1
-    - unitId: wolf
-      count: 3
-    - unitId: bat
-      count: 1
-    dragonAndDemon: []
-  - note: W4 TEST
-    greenHorde:
-    - unitId: orc
-      count: 2
-    - unitId: goblin-grunt-1500
-      count: 2
-    - unitId: goblin-slinger
-      count: 3
-    undead: []
-    beasts:
-    - unitId: werewolf
-      count: 1
-    - unitId: wolf
-      count: 5
-    - unitId: bat
-      count: 3
-    dragonAndDemon:
-    - unitId: demon
-      count: 2
-    - unitId: hatchling
-      count: 3
-  - note: W5 TEST
-    greenHorde:
-    - unitId: orc
-      count: 2
-    - unitId: goblin-grunt-1500
-      count: 3
-    - unitId: goblin-slinger
-      count: 3
-    undead:
-    - unitId: reaper
-      count: 1
-    - unitId: living-armor
-      count: 1
-    - unitId: zombie
-      count: 1
-    - unitId: skeleton
-      count: 2
-    - unitId: skeleton-archer
-      count: 2
-    beasts:
-    - unitId: werewolf
-      count: 2
-    - unitId: wolf
-      count: 5
-    - unitId: bat
-      count: 2
-    dragonAndDemon:
-    - unitId: wyvern
-      count: 1
-    - unitId: demon
-      count: 1
-    - unitId: hatchling
-      count: 3
   stage: {fileID: 11400000, guid: 851ed955543d64d46b3e858f7a9cb1c1, type: 2}
+  victoryPanelHud: {fileID: 892500932}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

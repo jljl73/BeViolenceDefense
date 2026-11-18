@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 스테이지 클리어(승리) 패널: 화면을 어둡게 깔고, 왼쪽에 기뻐하는 주인공 그림, 오른쪽에 결과 패널을 띄운다.
-/// 아직 승리 판정과 연결하지 않은 UI 테스트용이다. <see cref="testKey"/>가 켜져 있으면 V 키로 예시 값을 띄우고 닫는다.
+/// VoxelDefensePrototype 이 <see cref="Bind"/>로 승리 판정에 연결한다. 연결 전 <see cref="testKey"/>가 켜져 있으면 V 키로 예시 값을 띄우고 닫는다.
 /// 배치는 VictoryPanelHud.prefab에 있다.
 /// </summary>
 public sealed class VictoryPanelHud : MonoBehaviour
@@ -42,7 +42,7 @@ public sealed class VictoryPanelHud : MonoBehaviour
     [SerializeField] private bool testKey = true;
 
     private Vector2 characterShown, panelShown;
-    private bool initialized;
+    private bool initialized, bound;
     private float[] leafAngles;
     private MotionHandle[] leafSway = System.Array.Empty<MotionHandle>();
     private MotionHandle dimFade, characterMove, characterFade, characterBob, panelMove, panelFade, glowSpin, glowPulse;
@@ -52,9 +52,24 @@ public sealed class VictoryPanelHud : MonoBehaviour
     private void Awake()
     {
         Initialize();
-        // 판정과 연결하기 전이라 두 버튼 모두 패널만 닫는다.
+        // Bind 전(UI 테스트)에는 두 버튼 모두 패널만 닫는다. Awake 순서상 Bind 가 먼저 불렸을 수 있다.
+        if (bound)
+            return;
         nextButton.onClick.AddListener(Hide);
         retryButton.onClick.AddListener(Hide);
+    }
+
+    /// <summary>승리 판정에 연결한다. next 가 null 이면 Next 버튼을 숨긴다. 테스트 키는 끈다.</summary>
+    public void Bind(System.Action next, System.Action retry)
+    {
+        bound = true;
+        testKey = false;
+        nextButton.onClick.RemoveAllListeners();
+        retryButton.onClick.RemoveAllListeners();
+        nextButton.gameObject.SetActive(next != null);
+        if (next != null)
+            nextButton.onClick.AddListener(() => next());
+        retryButton.onClick.AddListener(() => retry());
     }
 
     private void Initialize()
@@ -78,11 +93,11 @@ public sealed class VictoryPanelHud : MonoBehaviour
         if (IsOpen)
             Hide();
         else
-            Show(1, 96, 120, 24, 58);
+            Show("1", 96, 120, 24, 58);
     }
 
     /// <summary>결과 값을 채우고 패널을 띄운다.</summary>
-    public void Show(int stage, int coreHealth, int coreMax, int leaked, int fallen)
+    public void Show(string stage, int coreHealth, int coreMax, int leaked, int fallen)
     {
         Initialize();
         Cancel();

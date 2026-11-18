@@ -28,7 +28,7 @@ internal sealed class DefenseBattle
     private const int ReinforcementsPerFaction = 1;
     private const int ExtraReinforcements = 3;
 
-    public enum Phase { Preparation, Combat, Defeat }
+    public enum Phase { Preparation, Combat, Defeat, Victory }
     public enum Spell { AttackBuff, Heal, MoveSpeedBuff, ArmorBuff }
 
     private readonly DefenseGrid grid;
@@ -41,6 +41,8 @@ internal sealed class DefenseBattle
     private readonly int[][] factionSpawns;
     // 라운드 번호 -> 진영(편)별 스폰 순서. null 이면 진영 하나를 기존 증원 규칙대로 반복한다.
     private readonly Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup;
+    // 이 라운드를 클리어하면 승리. 0 이면 끝없이 이어진다.
+    private readonly int roundLimit;
     private IReadOnlyList<EnemyFaction>[] roundQueues;
     private float untilSpawn;
     private float untilCombatPlan;
@@ -90,11 +92,12 @@ internal sealed class DefenseBattle
     public float Mana { get; private set; }
 
     public DefenseBattle(DefenseGrid grid, EnemyFaction[] factions,
-        Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup = null)
+        Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup = null, int roundLimit = 0)
     {
         this.grid = grid;
         this.factions = factions;
         this.roundLineup = roundLineup;
+        this.roundLimit = roundLimit;
         combat = new CombatPositioning(grid, enemies);
         spawnedPerFaction = new int[factions.Length];
         roundSpawnCounts = new int[factions.Length];
@@ -420,8 +423,13 @@ internal sealed class DefenseBattle
 
         if (SpawnCount == EnemiesPerRound && enemies.Count == 0)
         {
-            CurrentPhase = Phase.Preparation;
             Mana = 0f;
+            if (Round == roundLimit)
+            {
+                CurrentPhase = Phase.Victory;
+                return;
+            }
+            CurrentPhase = Phase.Preparation;
             Round++;
             PrepareRoundSpawns();
         }

@@ -48,6 +48,8 @@ public sealed class StageData : ScriptableObject
     public RectInt core = new(DefenseGrid.DefaultSize / 2 - 1, DefenseGrid.DefaultSize - 3, 3, 3);
     public List<Spawn> spawns = new();
     public List<Obstacle> obstacles = new();
+    [Tooltip("웨이브 편성. 비우면 기존 증원 규칙으로 끝없이 반복한다.")]
+    public StageWaves waves;
 
     public IEnumerable<Vector2Int> BlockedCells()
     {

@@ -1,0 +1,157 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 595c939316e1d03479642f44f3bd1ae1, type: 3}
+  m_Name: StageTEST_Waves
+  m_EditorClassIdentifier: Assembly-CSharp::StageWaves
+  waves:
+  - note: W1 TEST
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-grunt-1500
+          count: 6
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: zombie
+          count: 2
+        - unitId: skeleton
+          count: 2
+  - note: W2 TEST
+    factions:
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: wolf
+          count: 7
+        - unitId: bat
+          count: 2
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: hatchling
+          count: 3
+        - unitId: demon
+          count: 1
+  - note: W3 TEST
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 1
+        - unitId: goblin-grunt-1500
+          count: 3
+        - unitId: goblin-slinger
+          count: 2
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: living-armor
+          count: 1
+        - unitId: skeleton
+          count: 2
+        - unitId: skeleton-archer
+          count: 2
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: werewolf
+          count: 1
+        - unitId: wolf
+          count: 3
+        - unitId: bat
+          count: 1
+  - note: W4 TEST
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 2
+        - unitId: goblin-grunt-1500
+          count: 2
+        - unitId: goblin-slinger
+          count: 3
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: werewolf
+          count: 1
+        - unitId: wolf
+          count: 5
+        - unitId: bat
+          count: 3
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: demon
+          count: 2
+        - unitId: hatchling
+          count: 3
+  - note: W5 TEST
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 2
+        - unitId: goblin-grunt-1500
+          count: 3
+        - unitId: goblin-slinger
+          count: 3
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: reaper
+          count: 1
+        - unitId: living-armor
+          count: 1
+        - unitId: zombie
+          count: 1
+        - unitId: skeleton
+          count: 2
+        - unitId: skeleton-archer
+          count: 2
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: werewolf
+          count: 2
+        - unitId: wolf
+          count: 5
+        - unitId: bat
+          count: 2
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: wyvern
+          count: 1
+        - unitId: demon
+          count: 1
+        - unitId: hatchling
+          count: 3

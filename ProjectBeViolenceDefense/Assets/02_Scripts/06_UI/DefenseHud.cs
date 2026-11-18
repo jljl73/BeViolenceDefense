@@ -296,9 +296,11 @@ internal sealed class DefenseHud
         DefenseBattle.Spell? aimedSpell, Vector3? spellCenter, int rangeStep, int battleSpeed)
     {
         bool inCombat = battle.CurrentPhase == DefenseBattle.Phase.Combat;
-        bool defeated = battle.CurrentPhase == DefenseBattle.Phase.Defeat;
+        // 승리도 패배처럼 판이 끝난 상태로 그린다.
+        bool won = battle.CurrentPhase == DefenseBattle.Phase.Victory;
+        bool defeated = won || battle.CurrentPhase == DefenseBattle.Phase.Defeat;
         round.text = $"Round {battle.Round}";
-        phase.text = defeated ? "Defeat" : aimedSpell.HasValue ? $"Slow {BattleClock.AimSpeed:0.0}×" : inCombat ? "Battle" : "Build";
+        phase.text = won ? "Victory" : defeated ? "Defeat" : aimedSpell.HasValue ? $"Slow {BattleClock.AimSpeed:0.0}×" : inCombat ? "Battle" : "Build";
         phase.color = aimedSpell.HasValue ? UIPalette.TextPrimary : UIPalette.TextSecondary;
         combatBalance.Refresh(battle.Enemies, inCombat, ShownSides(battle));
         lineup.gameObject.SetActive(!inCombat && !defeated);
