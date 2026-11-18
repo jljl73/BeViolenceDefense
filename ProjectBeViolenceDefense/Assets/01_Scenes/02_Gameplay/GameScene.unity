@@ -472,7 +472,7 @@ MonoBehaviour:
   ui: {fileID: 1670040552}
   encounterIcon: {fileID: 2800000, guid: c37be215002b4edea1fa17f08c0cee92, type: 3}
   routeChevron: {fileID: 21300000, guid: 46ebbe5b08e24fc9841b086637f821aa, type: 3}
-  goblinPrefab: {fileID: 6069468936470726084, guid: 218af73703ffe4b5ca096770dcbf9665, type: 3}
+  enemyCatalog: {fileID: 11400000, guid: a8554bb775d6a4466accf5ad2630f7b6, type: 2}
   hudArt:
     Panel: {fileID: 21300000, guid: 71d454b5c2b146bb850d3f0c894ac591, type: 3}
     Button: {fileID: 21300000, guid: 63e057d7b44c4882803a83059acff73f, type: 3}
@@ -487,28 +487,96 @@ MonoBehaviour:
     Enemy: {fileID: 21300000, guid: 9dce938c5e2c4b3c91272d1e3834d2f7, type: 3}
     Mana: {fileID: 21300000, guid: bddccabed31f41598fd449b1dc6bf524, type: 3}
     Lock: {fileID: 21300000, guid: 4ff7c9dc22374be0a4bfb9b29de52b0d, type: 3}
+  boardTheme:
+    coreCharacterPrefab: {fileID: 4139517323781185027, guid: a9939411723c35a419584baa25b6e7ca, type: 3}
+    coreCharacterScale: 2
   coral:
+    unitId: goblin-grunt-1500
     displayName: Coral
     color: {r: 1, g: 0.4509804, b: 0.34117648, a: 1}
-    attackRange: 1.5
-    awarenessRange: 2.2
-    maxHealth: 50
-    damage: 10
-    attackInterval: 0.65
     spawnCount: 6
   teal:
+    unitId: zombie
     displayName: Teal
     color: {r: 0.27058825, g: 0.87058824, b: 0.80784315, a: 1}
-    attackRange: 1.5
-    awarenessRange: 2.2
-    maxHealth: 90
-    damage: 15
-    attackInterval: 1
     spawnCount: 4
-    model: {fileID: 919132149155446097, guid: ae4a287ea2455b04c98140f1d60b3e6b, type: 3}
-    animations: {fileID: 9100000, guid: 540f004d4dada8344ba500c596233a98, type: 2}
-    skin: {fileID: 2100000, guid: fc637a2448e415743b7c00a46b74d135, type: 2}
-    modelScale: 1.3
+  rounds:
+  - note: "R1 \uAE30\uC900: \uC878\uBCD1 vs \uB290\uB9B0 \uC880\uBE44"
+    coral:
+    - unitId: goblin-grunt-1500
+      count: 6
+    teal:
+    - unitId: zombie
+      count: 4
+  - note: "R2 \uBE60\uB978 \uC9D0\uC2B9\uB07C\uB9AC"
+    coral:
+    - unitId: wolf
+      count: 5
+    teal:
+    - unitId: bat
+      count: 9
+  - note: "R3 \uC6D0\uAC70\uB9AC \uCCAB \uB4F1\uC7A5"
+    coral:
+    - unitId: goblin-slinger
+      count: 3
+    - unitId: goblin-grunt-1500
+      count: 3
+    teal:
+    - unitId: skeleton-archer
+      count: 3
+    - unitId: skeleton
+      count: 3
+  - note: "R4 \uC815\uC608\uC640 \uBC29\uBCBD"
+    coral:
+    - unitId: orc
+      count: 2
+    - unitId: goblin-slinger
+      count: 2
+    teal:
+    - unitId: living-armor
+      count: 2
+  - note: "R5 \uC0C8\uB07C\uC6A9 vs \uC18C\uD658\uC0AC"
+    coral:
+    - unitId: hatchling
+      count: 4
+    teal:
+    - unitId: skeleton
+      count: 3
+    - unitId: necromancer
+      count: 2
+  - note: "R6 \uC9D0\uC2B9 \uC815\uC608 vs \uCC98\uD615\uC790"
+    coral:
+    - unitId: werewolf
+      count: 1
+    - unitId: wolf
+      count: 2
+    teal:
+    - unitId: skeleton
+      count: 3
+    - unitId: reaper
+      count: 1
+  - note: "R7 \uC545\uB9C8 vs \uC880\uBE44 \uBB34\uB9AC"
+    coral:
+    - unitId: demon
+      count: 3
+    teal:
+    - unitId: zombie
+      count: 4
+  - note: "R8 \uBCF4\uC2A4\uC804"
+    coral:
+    - unitId: wyvern
+      count: 1
+    - unitId: goblin-slinger
+      count: 2
+    - unitId: goblin-grunt-1500
+      count: 2
+    teal:
+    - unitId: living-armor
+      count: 1
+    - unitId: reaper
+      count: 1
+    - unitId: skeleton-archer
+      count: 2
 --- !u!1 &310873186
 GameObject:
   m_ObjectHideFlags: 0

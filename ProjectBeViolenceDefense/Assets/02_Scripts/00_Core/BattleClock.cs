@@ -1,26 +1,18 @@
 internal sealed class BattleClock
 {
-    private bool paused;
+    public const float AimSpeed = 0.1f;
 
     public float StepDeltaTime { get; private set; }
     public int StepCount { get; private set; }
+    public float PlaybackSpeed { get; private set; } = 1f;
 
     // The elapsed gameplay time for effects and other systems updated once per frame.
     public float DeltaTime => StepDeltaTime * StepCount;
 
-    public void BeginFrame(float frameDeltaTime, int battleSpeed)
+    public void BeginFrame(float frameDeltaTime, int battleSpeed, bool aiming)
     {
-        StepDeltaTime = paused ? 0f : frameDeltaTime;
-        StepCount = StepDeltaTime > 0f ? battleSpeed : 0;
-    }
-
-    public void SetPaused(bool value)
-    {
-        paused = value;
-        if (paused)
-        {
-            StepDeltaTime = 0f;
-            StepCount = 0;
-        }
+        PlaybackSpeed = aiming ? AimSpeed : battleSpeed;
+        StepDeltaTime = aiming ? frameDeltaTime * AimSpeed : frameDeltaTime;
+        StepCount = StepDeltaTime > 0f ? (aiming ? 1 : battleSpeed) : 0;
     }
 }

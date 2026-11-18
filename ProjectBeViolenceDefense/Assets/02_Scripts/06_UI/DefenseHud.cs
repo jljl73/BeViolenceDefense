@@ -26,7 +26,6 @@ internal sealed class DefenseHud
         public Sprite Lock;
     }
 
-    private const int LockedSpellCount = 3;
     private static readonly Vector2 SpellSlotSize = new(110, 124);
     private static readonly Vector2 ActionsSize = new(600, 184);
 
@@ -36,6 +35,9 @@ internal sealed class DefenseHud
     private readonly RectTransform defeatPopup;
     private readonly TextMeshProUGUI round;
     private readonly TextMeshProUGUI phase;
+    private readonly TextMeshProUGUI lineup;
+    private int lineupRound = -1;
+    private readonly CombatBalance combatBalance;
     private readonly TextMeshProUGUI core;
     private readonly Image coreFill;
     private readonly RectTransform wallSupply;
@@ -55,6 +57,7 @@ internal sealed class DefenseHud
     private readonly SpellSlot attackBuff;
     private readonly SpellSlot heal;
     private readonly SpellSlot moveSpeedBuff;
+    private readonly SpellSlot armorBuff;
     private readonly TextMeshProUGUI actionTip;
     private readonly HudButton help;
     private readonly TextMeshProUGUI helpTip;
@@ -67,7 +70,7 @@ internal sealed class DefenseHud
     private float noticeUntil;
 
     public DefenseHud(UIManager ui, UnityAction restart, UnityAction start, Action<DefenseBattle.Spell> cast,
-        Action<int> setBattleSpeed, Texture2D encounterIcon, Art art)
+        Action<int> setBattleSpeed, Texture2D encounterIcon, Art art, IReadOnlyList<EnemyFaction> factions)
     {
         this.ui = ui;
         this.encounterIcon = encounterIcon;
@@ -77,10 +80,12 @@ internal sealed class DefenseHud
 
         Vector2 topCenter = new(0.5f, 1f);
         RectTransform status = Rect("Round Status", ui.HudLayer, topCenter, topCenter,
-            new Vector2(0, -35), new Vector2(220, 75));
+            new Vector2(0, -22), new Vector2(220, 75));
         round = Label("Round", status, 0, 0, 220, 40, 30, TextAlignmentOptions.Center);
         phase = Label("Phase", status, 0, -41, 220, 28, 20, TextAlignmentOptions.Center);
         phase.color = UIPalette.TextSecondary;
+        lineup = Label("Round Lineup", status, -190, -70, 600, 26, 18, TextAlignmentOptions.Center);
+        combatBalance = new CombatBalance(status, factions[0], factions[1]);
 
         RectTransform coreStatus = Rect("Core Status", ui.HudLayer, Vector2.up, Vector2.up,
             new Vector2(55, -35), new Vector2(204, 72));
@@ -138,10 +143,8 @@ internal sealed class DefenseHud
             DefenseBattle.Spell.Heal, UIPalette.Heal, cast);
         moveSpeedBuff = CreateSpellSlot("Move Speed Buff", 2, "3", this.art.MoveSpeedBuff,
             DefenseBattle.Spell.MoveSpeedBuff, UIPalette.MoveSpeed, cast);
-        AddIcon("Locked Spells", spellBar, this.art.Lock, new Vector2(550, -42), 17, UIPalette.TextSecondary);
-        TextMeshProUGUI locked = Label("Locked Count", spellBar, 573, -39, 40, 23, 19);
-        locked.text = $"×{LockedSpellCount}";
-        locked.color = UIPalette.TextSecondary;
+        armorBuff = CreateSpellSlot("Armor Buff", 3, "4", this.art.Wall,
+            DefenseBattle.Spell.ArmorBuff, UIPalette.Armor, cast);
 
         RectTransform manaGauge = Rect("Mana Gauge", spellBar, Vector2.up, Vector2.up,
             new Vector2(82, -138), new Vector2(436, 29));
@@ -152,7 +155,7 @@ internal sealed class DefenseHud
         mana.color = UIPalette.Mana;
 
         actionTip = Tip("Action Tip", actionBar, topCenter, bottomCenter,
-            new Vector2(0, 5), new Vector2(520, 52), TextAlignmentOptions.Bottom);
+            new Vector2(0, 5), new Vector2(600, 70), TextAlignmentOptions.Bottom);
 
         Vector2 center = Vector2.one * 0.5f;
         defeatPopup = Panel("Defeat", ui.PopupLayer, center, center, Vector2.zero,
@@ -171,14 +174,65 @@ internal sealed class DefenseHud
         noticeUntil = Time.unscaledTime + 2.5f;
     }
 
+    // 예: "Goblin Grunt ×6   vs   Zombie ×4". 연속한 같은 유닛은 묶어서 보여준다.
+    private static string LineupText(DefenseBattle battle)
+    {
+        var sides = new string[2];
+        for (int side = 0; side < 2; side++)
+        {
+            var parts = new List<string>();
+            string last = null;
+            int count = 0;
+            for (int i = 0; i < battle.RoundSpawnCount(side); i++)
+            {
+                string name = UnitLabel(battle.RoundUnit(side, i));
+                if (name == last)
+                {
+                    count++;
+                    continue;
+                }
+                if (last != null)
+                    parts.Add($"{last} ×{count}");
+                last = name;
+                count = 1;
+            }
+            if (last != null)
+                parts.Add($"{last} ×{count}");
+            string color = battle.RoundSpawnCount(side) > 0
+                ? ColorUtility.ToHtmlStringRGB(battle.RoundUnit(side, 0).Color)
+                : ColorUtility.ToHtmlStringRGB(UIPalette.TextSecondary);
+            sides[side] = $"<color=#{color}>{(parts.Count > 0 ? string.Join(", ", parts) : "-")}</color>";
+        }
+        return $"{sides[0]}   vs   {sides[1]}";
+    }
+
+    // 카탈로그 ID를 HUD 폰트로 읽을 수 있는 영어 이름으로 바꾼다. goblin-grunt-1500 -> Goblin Grunt
+    private static string UnitLabel(EnemyFaction unit)
+    {
+        if (string.IsNullOrEmpty(unit.UnitId))
+            return unit.DisplayName;
+        var words = new List<string>();
+        foreach (string word in unit.UnitId.Split('-'))
+            if (word.Length > 0 && !char.IsDigit(word[0]))
+                words.Add(char.ToUpperInvariant(word[0]) + word.Substring(1));
+        return string.Join(" ", words);
+    }
+
     public void Refresh(DefenseBattle battle, DefenseGrid grid, DefenseBoardView view,
-        DefenseBattle.Spell? aimedSpell, Vector3? spellCenter, int battleSpeed)
+        DefenseBattle.Spell? aimedSpell, Vector3? spellCenter, int rangeStep, int battleSpeed)
     {
         bool inCombat = battle.CurrentPhase == DefenseBattle.Phase.Combat;
         bool defeated = battle.CurrentPhase == DefenseBattle.Phase.Defeat;
         round.text = $"Round {battle.Round}";
-        phase.text = defeated ? "Defeat" : aimedSpell.HasValue ? "Paused" : inCombat ? "Battle" : "Build";
+        phase.text = defeated ? "Defeat" : aimedSpell.HasValue ? $"Slow {BattleClock.AimSpeed:0.0}×" : inCombat ? "Battle" : "Build";
         phase.color = aimedSpell.HasValue ? UIPalette.TextPrimary : UIPalette.TextSecondary;
+        combatBalance.Refresh(battle.Enemies, inCombat);
+        lineup.gameObject.SetActive(!inCombat && !defeated);
+        if (!inCombat && !defeated && lineupRound != battle.Round)
+        {
+            lineupRound = battle.Round;
+            lineup.text = LineupText(battle);
+        }
         core.text = $"{battle.CoreHealth} <size=65%>/ {DefenseBattle.CoreMaxHealth}</size>";
         coreFill.color = battle.CoreHealth <= DefenseBattle.CoreMaxHealth / 4 ? UIPalette.ButtonDanger : UIPalette.ButtonPrimary;
         SetBarFraction(coreFill, (float)battle.CoreHealth / DefenseBattle.CoreMaxHealth);
@@ -196,7 +250,7 @@ internal sealed class DefenseHud
             notice.text = noticeText;
 
         bool blocked = ui.HasOpenPopup;
-        RefreshActions(battle, aimedSpell, spellCenter, inCombat, defeated, blocked);
+        RefreshActions(battle, aimedSpell, spellCenter, rangeStep, inCombat, defeated, blocked);
         speedPanel.gameObject.SetActive(inCombat);
         RefreshSpeedButton(normalSpeed, battleSpeed == 1, blocked);
         RefreshSpeedButton(doubleSpeed, battleSpeed == 2, blocked);
@@ -205,8 +259,8 @@ internal sealed class DefenseHud
         help.Button.interactable = !blocked;
         StyleFlatButton(help, help.ShowTip ? UIPalette.TextPrimary : UIPalette.TextSecondary);
         SetTip(helpTip, !blocked && !defeated && (help.ShowTip || helpPinned)
-            ? (inCombat ? "1–3 aim · Left click casts · Esc cancels" : "Left click builds · Right click removes") +
-              "\nWASD pan · Wheel zoom · R restart"
+            ? (inCombat ? "1–4 aim · Left click casts · Esc cancels" : "Left click builds · Right click removes") +
+              "\nWASD / RMB drag · " + (aimedSpell.HasValue ? "Wheel radius" : "Wheel zoom") + " · R restart"
             : null);
         StyleButton(restartButton, UIPalette.ButtonPrimary, UIPalette.TextOnAccent);
 
@@ -216,19 +270,86 @@ internal sealed class DefenseHud
         foreach (EnemyUnit enemy in battle.Enemies)
         {
             if (enemy.Health == enemy.MaxHealth && enemy.HealFlash <= 0 &&
-                enemy.AttackBuffRemaining <= 0 && enemy.MoveSpeedBuffRemaining <= 0)
+                enemy.AttackBuffStacks == 0 && enemy.MoveSpeedBuffStacks == 0 && enemy.ArmorBuffStacks == 0)
                 continue;
 
-            Color color = enemy.HealFlash > 0 ? UIPalette.Heal : enemy.Faction.Color;
-            AddMarker(view.ScreenPoint(enemy, 0.76f), (float)enemy.Health / enemy.MaxHealth, color,
-                enemy.AttackBuffRemaining / DefenseBattle.BuffDuration,
-                enemy.MoveSpeedBuffRemaining / DefenseBattle.BuffDuration);
+            AddMarker(view.ScreenPoint(enemy, 0.76f), enemy);
         }
         for (int i = visibleMarkers; i < unitMarkers.Count; i++)
             unitMarkers[i].Root.gameObject.SetActive(false);
     }
 
     public void ShowDefeat() => ui.ShowPopup(defeatPopup, dismissOnEscape: false);
+
+    private sealed class CombatBalance
+    {
+        private readonly RectTransform root;
+        private readonly Image leftFill;
+        private readonly Image rightFill;
+        private readonly Image divider;
+        private readonly TextMeshProUGUI leftCount;
+        private readonly TextMeshProUGUI rightCount;
+        private readonly string leftFormat;
+        private readonly string rightFormat;
+
+        public CombatBalance(RectTransform parent, EnemyFaction left, EnemyFaction right)
+        {
+            Vector2 topCenter = new(0.5f, 1f);
+            root = Rect("Combat Balance", parent, topCenter, topCenter, new Vector2(0, -70), new Vector2(500, 30));
+            leftCount = Label("Left Alive", root, 0, -4, 112, 25, 19, TextAlignmentOptions.Right);
+            rightCount = Label("Right Alive", root, 388, -4, 112, 25, 19);
+            leftFormat = left.DisplayName + "  {0}";
+            rightFormat = "{0}  " + right.DisplayName;
+            TextMeshProUGUI caption = Label("Metric", root, 122, 0, 256, 17, 15, TextAlignmentOptions.Center);
+            caption.text = "Field HP";
+            caption.color = UIPalette.TextSecondary;
+
+            leftFill = Bar("Field Health", root, Vector2.up, Vector2.up, new Vector2(122, -18),
+                new Vector2(256, 8), left.Color);
+            var track = (RectTransform)leftFill.transform.parent;
+            rightFill = Graphic("Right Fill", track, Vector2.one, Vector2.one, Vector2.zero, Vector2.zero, right.Color);
+            divider = Graphic("Divider", track, Vector2.zero, new Vector2(0.5f, 0),
+                new Vector2(0, -2), new Vector2(3, 12), UIPalette.TextPrimary);
+            root.gameObject.SetActive(false);
+        }
+
+        public void Refresh(IReadOnlyList<EnemyUnit> enemies, bool inCombat)
+        {
+            root.gameObject.SetActive(inCombat);
+            if (!inCombat)
+                return;
+
+            int leftAlive = 0;
+            int rightAlive = 0;
+            float leftHealth = 0f;
+            float rightHealth = 0f;
+            foreach (EnemyUnit enemy in enemies)
+            {
+                if (!enemy.IsAlive)
+                    continue;
+
+                if (enemy.FactionIndex == 0)
+                {
+                    leftAlive++;
+                    leftHealth += enemy.Health;
+                }
+                else
+                {
+                    rightAlive++;
+                    rightHealth += enemy.Health;
+                }
+            }
+
+            leftCount.SetText(leftFormat, leftAlive);
+            rightCount.SetText(rightFormat, rightAlive);
+            float totalHealth = leftHealth + rightHealth;
+            float split = totalHealth > 0f ? leftHealth / totalHealth : 0f;
+            SetBarFraction(leftFill, split);
+            rightFill.rectTransform.anchorMin = new Vector2(totalHealth > 0f ? split : 1f, 0f);
+            divider.enabled = totalHealth > 0f;
+            divider.rectTransform.anchorMin = divider.rectTransform.anchorMax = new Vector2(split, 0f);
+        }
+    }
 
     private static void RefreshSpeedButton(HudButton control, bool selected, bool blocked)
     {
@@ -287,7 +408,7 @@ internal sealed class DefenseHud
     }
 
     private void RefreshActions(DefenseBattle battle, DefenseBattle.Spell? aimedSpell, Vector3? spellCenter,
-        bool inCombat, bool defeated, bool blocked)
+        int rangeStep, bool inCombat, bool defeated, bool blocked)
     {
         actionBar.gameObject.SetActive(!defeated);
         preparePanel.gameObject.SetActive(!inCombat);
@@ -303,40 +424,54 @@ internal sealed class DefenseHud
 
         mana.text = $"{Mathf.FloorToInt(battle.Mana)} <size=80%>/ {DefenseBattle.MaxMana}</size>";
         SetBarFraction(manaFill, battle.Mana / DefenseBattle.MaxMana);
-        bool spellHovered = attackBuff.Control.Hovered || heal.Control.Hovered || moveSpeedBuff.Control.Hovered;
-        string attackTip = RefreshSpell(attackBuff, battle, blocked, aimedSpell, spellHovered);
-        string healTip = RefreshSpell(heal, battle, blocked, aimedSpell, spellHovered);
-        string speedTip = RefreshSpell(moveSpeedBuff, battle, blocked, aimedSpell, spellHovered);
+        bool spellHovered = attackBuff.Control.Hovered || heal.Control.Hovered ||
+            moveSpeedBuff.Control.Hovered || armorBuff.Control.Hovered;
+        string attackTip = RefreshSpell(attackBuff, battle, blocked, aimedSpell, rangeStep, spellHovered);
+        string healTip = RefreshSpell(heal, battle, blocked, aimedSpell, rangeStep, spellHovered);
+        string speedTip = RefreshSpell(moveSpeedBuff, battle, blocked, aimedSpell, rangeStep, spellHovered);
+        string armorTip = RefreshSpell(armorBuff, battle, blocked, aimedSpell, rangeStep, spellHovered);
         if (!blocked && aimedSpell is { } spell)
         {
-            SpellSlot slot = spell == attackBuff.Spell ? attackBuff : spell == heal.Spell ? heal : moveSpeedBuff;
+            SpellSlot slot = spell switch
+            {
+                DefenseBattle.Spell.AttackBuff => attackBuff,
+                DefenseBattle.Spell.Heal => heal,
+                DefenseBattle.Spell.MoveSpeedBuff => moveSpeedBuff,
+                _ => armorBuff
+            };
+            float radius = DefenseBattle.AreaSpellRadius(rangeStep);
             int targets = 0;
             if (spellCenter is { } center)
             {
                 foreach (EnemyUnit enemy in battle.Enemies)
-                    if (DefenseBattle.IsInAreaSpellRange(enemy, center) && DefenseBattle.CanReceiveAreaSpell(enemy, spell))
+                    if (DefenseBattle.IsInAreaSpellRange(enemy, center, radius) && DefenseBattle.CanReceiveAreaSpell(enemy, spell))
                         targets++;
             }
 
             string tint = ColorUtility.ToHtmlStringRGB(slot.Tint);
-            SetTip(actionTip, $"<color=#{tint}>◆ {slot.Name}</color>  ·  Targets {targets}  ·  Click to cast  ·  Esc");
+            int cost = DefenseBattle.ManaCost(spell, rangeStep);
+            string reason = battle.SpellBlockReason(spell, rangeStep);
+            string controls = reason == null ? "Wheel adjusts radius · Click to cast · Esc" : $"{reason} · Wheel to adjust · Esc";
+            SetTip(actionTip, $"<color=#{tint}>◆ {slot.Name}</color> · Radius {radius:0.0} · {cost} mana · Targets {targets}\n{controls}");
         }
         else
         {
-            SetTip(actionTip, attackTip ?? healTip ?? speedTip);
+            SetTip(actionTip, attackTip ?? healTip ?? speedTip ?? armorTip);
         }
     }
 
     private static string RefreshSpell(SpellSlot slot, DefenseBattle battle, bool blocked,
-        DefenseBattle.Spell? aimedSpell, bool spellHovered)
+        DefenseBattle.Spell? aimedSpell, int aimedRangeStep, bool spellHovered)
     {
-        string reason = battle.SpellBlockReason(slot.Spell);
+        bool aimed = aimedSpell == slot.Spell;
+        int rangeStep = aimed ? aimedRangeStep : battle.InitialSpellRangeStep(slot.Spell);
+        string reason = battle.SpellBlockReason(slot.Spell, rangeStep);
         bool ready = !blocked && reason == null;
-        bool aimed = ready && aimedSpell == slot.Spell;
         slot.Control.Button.interactable = ready;
-        StyleFlatButton(slot.Control, ready ? slot.Tint : UIPalette.TextDisabled, aimed,
+        StyleFlatButton(slot.Control, ready ? slot.Tint : UIPalette.TextDisabled, aimed && !blocked,
             ready ? UIPalette.TextPrimary : UIPalette.TextDisabled);
         slot.Cost.color = ready ? UIPalette.Mana : UIPalette.TextSecondary;
+        slot.Cost.SetText("{0}", DefenseBattle.ManaCost(slot.Spell, rangeStep));
         slot.Charges.color = ready ? UIPalette.TextSecondary : UIPalette.TextDisabled;
         slot.Charges.text = $"×{battle.CastsLeft(slot.Spell)}";
 
@@ -351,8 +486,8 @@ internal sealed class DefenseHud
     private SpellSlot CreateSpellSlot(string name, int index, string shortcut, Sprite sprite,
         DefenseBattle.Spell spell, Color tint, Action<DefenseBattle.Spell> cast)
     {
-        HudButton control = ActionButton(name, spellBar, new Vector2(77 + index * 168, 0), SpellSlotSize,
-            () => cast(spell), sprite, shortcut, 90, flat: true);
+        HudButton control = ActionButton(name, spellBar, new Vector2(37 + index * 140, 0), SpellSlotSize,
+            () => cast(spell), sprite, shortcut, 82, flat: true);
         RectTransform rect = (RectTransform)control.Button.transform;
         AddFocusRing(control, new Vector2(-3, 6), 116);
         control.Caption.rectTransform.anchoredPosition = new Vector2(99, 2);
@@ -363,9 +498,10 @@ internal sealed class DefenseHud
         TextMeshProUGUI charges = Label("Charges", rect, 60, -105, 40, 24, 21);
         string effect = spell switch
         {
-            DefenseBattle.Spell.AttackBuff => $"Attack buff · +{EnemyUnit.AttackBonus} damage",
-            DefenseBattle.Spell.Heal => $"Area heal · +{DefenseBattle.HealAmount} HP to injured enemies",
-            _ => $"Move speed · +{EnemyUnit.MoveSpeedBonusPercent}%"
+            DefenseBattle.Spell.AttackBuff => $"Attack buff · +{EnemyUnit.AttackBonus} damage for {DefenseBattle.BuffDuration:0}s · Stacks",
+            DefenseBattle.Spell.Heal => $"Area heal · +{DefenseBattle.HealPercent:P0} max HP to injured enemies",
+            DefenseBattle.Spell.MoveSpeedBuff => $"Move speed · +{EnemyUnit.MoveSpeedBonusPercent:P0} per stack for {DefenseBattle.BuffDuration:0}s",
+            _ => $"Armor buff · +{EnemyUnit.ArmorBonus} armor for {DefenseBattle.BuffDuration:0}s · Stacks"
         };
         return new SpellSlot(control, spell, tint, cost, charges, name, effect);
     }
@@ -506,7 +642,7 @@ internal sealed class DefenseHud
         }
     }
 
-    private void AddMarker(Vector3 screen, float health, Color healthColor, float attackBuff, float speedBuff)
+    private void AddMarker(Vector3 screen, EnemyUnit enemy)
     {
         if (screen.z <= 0 ||
             !RectTransformUtility.ScreenPointToLocalPointInRectangle(markers, screen, null, out Vector2 position))
@@ -518,14 +654,25 @@ internal sealed class DefenseHud
         UnitMarker marker = unitMarkers[visibleMarkers++];
         marker.Root.anchoredPosition = position;
         marker.Root.gameObject.SetActive(true);
-        SetBarFraction(marker.Health, health);
-        marker.Health.color = healthColor;
-        marker.AttackBuff.transform.parent.gameObject.SetActive(attackBuff > 0);
-        SetBarFraction(marker.AttackBuff, attackBuff);
+        SetBarFraction(marker.Health, (float)enemy.Health / enemy.MaxHealth);
+        marker.Health.color = enemy.HealFlash > 0 ? UIPalette.Heal : enemy.Faction.Color;
+        SetBuffMarker(marker.AttackBuff, marker.AttackStacks, enemy.AttackBuffStacks, enemy.AttackBuffRemaining);
         var speedBar = (RectTransform)marker.SpeedBuff.transform.parent;
-        speedBar.gameObject.SetActive(speedBuff > 0);
-        speedBar.anchoredPosition = new Vector2(0, attackBuff > 0 ? 20 : 13);
-        SetBarFraction(marker.SpeedBuff, speedBuff);
+        speedBar.anchoredPosition = new Vector2(0, enemy.AttackBuffStacks > 0 ? 20 : 13);
+        SetBuffMarker(marker.SpeedBuff, marker.SpeedStacks, enemy.MoveSpeedBuffStacks, enemy.MoveSpeedBuffRemaining);
+        var armorBar = (RectTransform)marker.ArmorBuff.transform.parent;
+        armorBar.anchoredPosition = new Vector2(0, 13 + 7 *
+            ((enemy.AttackBuffStacks > 0 ? 1 : 0) + (enemy.MoveSpeedBuffStacks > 0 ? 1 : 0)));
+        SetBuffMarker(marker.ArmorBuff, marker.ArmorStacks, enemy.ArmorBuffStacks, enemy.ArmorBuffRemaining);
+    }
+
+    private static void SetBuffMarker(Image fill, TextMeshProUGUI stacks, int count, float remaining)
+    {
+        fill.transform.parent.gameObject.SetActive(count > 0);
+        SetBarFraction(fill, remaining / DefenseBattle.BuffDuration);
+        stacks.gameObject.SetActive(count > 1);
+        if (count > 1)
+            stacks.SetText("×{0}", count);
     }
 
     private sealed class UnitMarker
@@ -534,6 +681,10 @@ internal sealed class DefenseHud
         public readonly Image Health;
         public readonly Image AttackBuff;
         public readonly Image SpeedBuff;
+        public readonly Image ArmorBuff;
+        public readonly TextMeshProUGUI AttackStacks;
+        public readonly TextMeshProUGUI SpeedStacks;
+        public readonly TextMeshProUGUI ArmorStacks;
 
         public UnitMarker(RectTransform parent)
         {
@@ -544,6 +695,15 @@ internal sealed class DefenseHud
                 UIPalette.Attack);
             SpeedBuff = Bar("Move Speed Buff", Root, center, center, new Vector2(0, 13), new Vector2(26, 4),
                 UIPalette.MoveSpeed);
+            ArmorBuff = Bar("Armor Buff", Root, center, center, new Vector2(0, 13), new Vector2(26, 4),
+                UIPalette.Armor);
+            AttackStacks = Label("Stacks", (RectTransform)AttackBuff.transform.parent, 29, 4, 21, 13, 11);
+            AttackStacks.color = UIPalette.Attack;
+            SpeedStacks = Label("Stacks", (RectTransform)SpeedBuff.transform.parent, -24, 4, 21, 13, 11,
+                TextAlignmentOptions.Right);
+            SpeedStacks.color = UIPalette.MoveSpeed;
+            ArmorStacks = Label("Stacks", (RectTransform)ArmorBuff.transform.parent, 29, 4, 21, 13, 11);
+            ArmorStacks.color = UIPalette.Armor;
         }
     }
 

@@ -5,31 +5,39 @@ using UnityEngine;
 internal sealed class DefenseBattle
 {
     public const int CoreMaxHealth = 120;
-    public const int HealAmount = 15;
-    public const float BuffDuration = 5f;
-    public const float AreaSpellRadius = 2f;
-    public const int MaxMana = 100;
+    public const float HealPercent = 0.25f;
+    public const float BuffDuration = 6f;
+    public const float DefaultAreaSpellRadius = DefaultSpellRadiusTenths / 10f;
+    public const int MinSpellRangeStep = -4;
+    public const int MaxSpellRangeStep = 5;
+    public const int MaxMana = 70;
 
     private const int CastsPerSpell = 3;
+    private const int DefaultSpellRadiusTenths = 14;
+    private const int MaxSpellManaAdjustment = 2;
     private const float StartingMana = MaxMana * 0.5f;
-    private const float ManaPerSecond = 10f;
+    private const float ManaPerSecond = 7f;
     // 스폰 지점마다 이 간격으로 한 마리씩 줄지어 나온다.
     private const float SpawnInterval = 0.6f;
     internal const float UnitSpacing = 0.44f;
-    private const float ForecastStep = 1f / 60f;
-    private const int ForecastTickLimit = 90 * 60;
     private const float CombatPlanInterval = 0.12f;
     private const float RouteYieldDelay = 0.35f;
     private const int RouteRejoinWaypoints = 3;
+    private const int ReinforcementsPerFaction = 1;
+    private const int ExtraReinforcements = 3;
 
     public enum Phase { Preparation, Combat, Defeat }
-    public enum Spell { AttackBuff, Heal, MoveSpeedBuff }
+    public enum Spell { AttackBuff, Heal, MoveSpeedBuff, ArmorBuff }
 
     private readonly DefenseGrid grid;
     private readonly EnemyFaction[] factions;
     private readonly List<EnemyUnit> enemies = new();
     private readonly CombatPositioning combat;
     private readonly int[] spawnedPerFaction;
+    private readonly int[] roundSpawnCounts;
+    // 라운드 번호 -> 진영(편)별 스폰 순서. null 이면 진영 하나를 기존 증원 규칙대로 반복한다.
+    private readonly Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup;
+    private IReadOnlyList<EnemyFaction>[] roundQueues;
     private float untilSpawn;
     private float untilCombatPlan;
 
@@ -41,21 +49,51 @@ internal sealed class DefenseBattle
     public int Round { get; private set; } = 1;
     public int CoreHealth { get; private set; } = CoreMaxHealth;
     public int SpawnCount { get; private set; }
-    // 진영별 SpawnCount 의 합. 스테이지 구성은 각 EnemyFaction 의 spawnCount 로 정한다.
-    public int EnemiesPerRound { get; }
+    public int EnemiesPerRound { get; private set; }
     public int AttackBuffsLeft { get; private set; }
     public int MoveSpeedBuffsLeft { get; private set; }
+    public int ArmorBuffsLeft { get; private set; }
     public int HealsLeft { get; private set; }
     public float Mana { get; private set; }
 
-    public DefenseBattle(DefenseGrid grid, EnemyFaction[] factions)
+    public DefenseBattle(DefenseGrid grid, EnemyFaction[] factions,
+        Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup = null)
     {
         this.grid = grid;
         this.factions = factions;
+        this.roundLineup = roundLineup;
         combat = new CombatPositioning(grid, enemies, UnitSpacing);
         spawnedPerFaction = new int[factions.Length];
-        foreach (EnemyFaction faction in factions)
-            EnemiesPerRound += faction.SpawnCount;
+        roundSpawnCounts = new int[factions.Length];
+        PrepareRoundSpawns();
+    }
+
+    private void PrepareRoundSpawns()
+    {
+        int roundsCleared = Round - 1;
+        EnemiesPerRound = 0;
+        if (roundLineup != null)
+        {
+            roundQueues = roundLineup(Round);
+            for (int i = 0; i < factions.Length; i++)
+            {
+                roundSpawnCounts[i] = roundQueues != null && i < roundQueues.Length && roundQueues[i] != null
+                    ? roundQueues[i].Count
+                    : 0;
+                EnemiesPerRound += roundSpawnCounts[i];
+            }
+            return;
+        }
+
+        for (int i = 0; i < factions.Length; i++)
+        {
+            int baseCount = factions[i].SpawnCount;
+            // Teal receives the first larger reinforcement, then Coral and Teal alternate.
+            int largerReinforcements = roundsCleared / 2 + (i == 1 ? roundsCleared % 2 : 0);
+            int reinforcements = roundsCleared * ReinforcementsPerFaction + largerReinforcements * ExtraReinforcements;
+            roundSpawnCounts[i] = baseCount > 0 ? baseCount + reinforcements : 0;
+            EnemiesPerRound += roundSpawnCounts[i];
+        }
     }
 
     public void StartRound()
@@ -70,6 +108,7 @@ internal sealed class DefenseBattle
         untilCombatPlan = 0f;
         AttackBuffsLeft = CastsPerSpell;
         MoveSpeedBuffsLeft = CastsPerSpell;
+        ArmorBuffsLeft = CastsPerSpell;
         HealsLeft = CastsPerSpell;
         Mana = StartingMana;
     }
@@ -80,50 +119,58 @@ internal sealed class DefenseBattle
             Mana = Mathf.Min(MaxMana, Mana + ManaPerSecond * deltaTime);
     }
 
-    public static int ManaCost(Spell spell) => spell == Spell.Heal ? 40 : 30;
+    public static float AreaSpellRadius(int rangeStep) =>
+        (DefaultSpellRadiusTenths + Mathf.Clamp(rangeStep, MinSpellRangeStep, MaxSpellRangeStep) * 2) / 10f;
+
+    public static int ManaCost(Spell spell, int rangeStep = 0) =>
+        (spell == Spell.Heal ? 32 : 24) + Mathf.Clamp(rangeStep, -MaxSpellManaAdjustment, MaxSpellManaAdjustment);
+
+    public int InitialSpellRangeStep(Spell spell) =>
+        Mathf.Clamp(Mathf.FloorToInt(Mana) - ManaCost(spell), -MaxSpellManaAdjustment, 0);
 
     public int CastsLeft(Spell spell) => spell switch
     {
         Spell.AttackBuff => AttackBuffsLeft,
         Spell.MoveSpeedBuff => MoveSpeedBuffsLeft,
+        Spell.ArmorBuff => ArmorBuffsLeft,
         _ => HealsLeft
     };
 
-    public string SpellBlockReason(Spell spell)
+    public string SpellBlockReason(Spell spell, int rangeStep)
     {
         if (CurrentPhase != Phase.Combat)
             return "Battle only";
         if (CastsLeft(spell) == 0)
             return "No casts left";
-        if (Mana < ManaCost(spell))
+        if (Mana < ManaCost(spell, rangeStep))
             return "Not enough mana";
         return null;
     }
 
-    public static bool IsInAreaSpellRange(EnemyUnit enemy, Vector3 center)
+    public static bool IsInAreaSpellRange(EnemyUnit enemy, Vector3 center, float radius)
     {
         Vector3 offset = enemy.Position - center;
-        return enemy.IsAlive && offset.x * offset.x + offset.z * offset.z <= AreaSpellRadius * AreaSpellRadius;
+        return enemy.IsAlive && offset.x * offset.x + offset.z * offset.z <= radius * radius;
     }
 
     public static bool CanReceiveAreaSpell(EnemyUnit enemy, Spell spell) => spell switch
     {
-        Spell.AttackBuff => enemy.AttackBuffRemaining <= 0,
-        Spell.MoveSpeedBuff => enemy.MoveSpeedBuffRemaining <= 0,
+        Spell.AttackBuff or Spell.MoveSpeedBuff or Spell.ArmorBuff => enemy.IsAlive,
         Spell.Heal => enemy.Health < enemy.MaxHealth,
         _ => false
     };
 
-    public string CastAreaSpell(Spell spell, Vector3 center)
+    public string CastAreaSpell(Spell spell, Vector3 center, int rangeStep)
     {
-        string blocked = SpellBlockReason(spell);
+        string blocked = SpellBlockReason(spell, rangeStep);
         if (blocked != null)
             return blocked;
 
+        float radius = AreaSpellRadius(rangeStep);
         int affected = 0;
         foreach (EnemyUnit enemy in enemies)
         {
-            if (!IsInAreaSpellRange(enemy, center) || !CanReceiveAreaSpell(enemy, spell))
+            if (!IsInAreaSpellRange(enemy, center, radius) || !CanReceiveAreaSpell(enemy, spell))
                 continue;
 
             switch (spell)
@@ -134,8 +181,11 @@ internal sealed class DefenseBattle
                 case Spell.MoveSpeedBuff:
                     enemy.ApplyMoveSpeedBuff(BuffDuration);
                     break;
+                case Spell.ArmorBuff:
+                    enemy.ApplyArmorBuff(BuffDuration);
+                    break;
                 case Spell.Heal:
-                    enemy.Heal(HealAmount);
+                    enemy.Heal(Mathf.CeilToInt(enemy.MaxHealth * HealPercent));
                     break;
             }
             affected++;
@@ -144,7 +194,7 @@ internal sealed class DefenseBattle
         if (affected == 0)
             return spell == Spell.Heal ? "No injured enemies in range." : "No eligible enemies in range.";
 
-        Mana -= ManaCost(spell);
+        Mana -= ManaCost(spell, rangeStep);
         switch (spell)
         {
             case Spell.AttackBuff:
@@ -152,6 +202,9 @@ internal sealed class DefenseBattle
                 break;
             case Spell.MoveSpeedBuff:
                 MoveSpeedBuffsLeft--;
+                break;
+            case Spell.ArmorBuff:
+                ArmorBuffsLeft--;
                 break;
             case Spell.Heal:
                 HealsLeft--;
@@ -163,17 +216,29 @@ internal sealed class DefenseBattle
 
     public IReadOnlyCollection<Vector2Int> ForecastEncounterCells()
     {
-        var cells = new HashSet<Vector2Int>();
-        var forecast = new DefenseBattle(grid, factions) { CoreHealth = CoreHealth };
-        forecast.StartRound();
-        for (int i = 0; i < ForecastTickLimit && forecast.CurrentPhase == Phase.Combat; i++)
-            forecast.Tick(ForecastStep, pauseMovement: false, cells);
-        return cells;
+        if (roundSpawnCounts[0] == 0 || roundSpawnCounts[1] == 0)
+            return Array.Empty<Vector2Int>();
+
+        Vector3[] firstRoute = grid.Routes[0];
+        Vector3[] secondRoute = grid.Routes[1];
+        float range = Mathf.Max(RoundUnit(0, 0).AttackRange, RoundUnit(1, 0).AttackRange);
+        // Compare the leaders after each tile step. The last point is a core contact, not a tile.
+        int tileCount = Mathf.Min(firstRoute.Length, secondRoute.Length) - 1;
+        for (int step = 0; step < tileCount; step++)
+        {
+            Vector3 first = firstRoute[step];
+            Vector3 second = secondRoute[step];
+            if ((first - second).sqrMagnitude > range * range || !grid.HasLineOfSight(first, second))
+                continue;
+
+            Vector2Int center = DefenseGrid.PositionToCell((first + second) * 0.5f);
+            return new[] { grid.IsWalkable(center) ? center : DefenseGrid.PositionToCell(first) };
+        }
+
+        return Array.Empty<Vector2Int>();
     }
 
-    public void Tick(float deltaTime, bool pauseMovement) => Tick(deltaTime, pauseMovement, null);
-
-    private void Tick(float deltaTime, bool pauseMovement, HashSet<Vector2Int> forecastCells)
+    public void Tick(float deltaTime, bool pauseMovement)
     {
         if (CurrentPhase != Phase.Combat)
             return;
@@ -207,16 +272,7 @@ internal sealed class DefenseBattle
             {
                 enemy.Face(target.Position);
                 if (enemy.CanAttack && combat.CanAttack(enemy, target))
-                {
-                    if (forecastCells != null)
-                    {
-                        Vector2Int cell = DefenseGrid.PositionToCell((enemy.Position + target.Position) * 0.5f);
-                        if (!grid.IsWalkable(cell))
-                            cell = DefenseGrid.PositionToCell(enemy.Position);
-                        forecastCells.Add(cell);
-                    }
                     target.QueueDamage(enemy.Attack());
-                }
             }
         }
 
@@ -232,12 +288,15 @@ internal sealed class DefenseBattle
         {
             foreach (EnemyUnit enemy in enemies)
             {
-                if (enemy.Target is { IsAlive: true } target)
+                if ((enemy.Target ?? enemy.CombatQueue?.Target) is { IsAlive: true } target)
                 {
+                    if (enemy.Target == null)
+                        enemy.Face(target.Position);
                     combat.Move(enemy, target, deltaTime);
                     continue;
                 }
 
+                enemy.CombatQueue = null;
                 AdvanceUnit(enemy, deltaTime);
             }
 
@@ -264,19 +323,27 @@ internal sealed class DefenseBattle
             CurrentPhase = Phase.Preparation;
             Mana = 0f;
             Round++;
+            PrepareRoundSpawns();
         }
     }
+
+    // 이번 라운드에 진영(편) side 에서 index 번째로 나오는 유닛 종류.
+    public EnemyFaction RoundUnit(int side, int index) =>
+        roundQueues != null ? roundQueues[side][index] : factions[side];
+
+    public int RoundSpawnCount(int side) => roundSpawnCounts[side];
 
     private void SpawnNext()
     {
         for (int factionIndex = 0; factionIndex < grid.Routes.Count; factionIndex++)
         {
-            if (spawnedPerFaction[factionIndex] >= factions[factionIndex].SpawnCount)
+            if (spawnedPerFaction[factionIndex] >= roundSpawnCounts[factionIndex])
                 continue;
 
             spawnedPerFaction[factionIndex]++;
             var path = (Vector3[])grid.Routes[factionIndex].Clone();
-            var enemy = new EnemyUnit(factions[factionIndex], factionIndex, path, SpawnCount);
+            var enemy = new EnemyUnit(RoundUnit(factionIndex, spawnedPerFaction[factionIndex] - 1), factionIndex, path,
+                SpawnCount);
             SpawnCount++;
             enemies.Add(enemy);
             EnemySpawned?.Invoke(enemy);
@@ -285,10 +352,14 @@ internal sealed class DefenseBattle
 
     private bool SpawnPointsClear()
     {
-        foreach (Vector3[] route in grid.Routes)
+        for (int factionIndex = 0; factionIndex < grid.Routes.Count; factionIndex++)
         {
+            if (spawnedPerFaction[factionIndex] >= roundSpawnCounts[factionIndex])
+                continue;
+
+            Vector3 spawn = grid.Routes[factionIndex][0];
             foreach (EnemyUnit enemy in enemies)
-                if ((enemy.Position - route[0]).sqrMagnitude < UnitSpacing * UnitSpacing)
+                if ((enemy.Position - spawn).sqrMagnitude < UnitSpacing * UnitSpacing)
                     return false;
         }
         return true;

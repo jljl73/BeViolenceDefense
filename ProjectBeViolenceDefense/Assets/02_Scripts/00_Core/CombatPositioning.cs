@@ -3,11 +3,12 @@ using UnityEngine;
 
 internal sealed class CombatPositioning
 {
-    internal const int MaxAttackersPerTarget = 2;
+    internal const int MaxAttackersPerTarget = 3;
+    private const int CurrentPositionSlot = -2;
     private const int SlotCount = 8;
     private const int DetourPointsPerSide = SlotCount / 2;
     private const float Diagonal = 0.70710678f;
-    private const float MaxArrivalDistance = 0.22f;
+    private const float QueueAwarenessMargin = 0.22f;
     private static readonly Vector3[] Directions =
     {
         Vector3.right, new(Diagonal, 0f, Diagonal),
@@ -22,6 +23,7 @@ internal sealed class CombatPositioning
     private readonly List<EnemyUnit> assignmentOrder = new();
     private readonly Dictionary<EnemyUnit, (int Mask, int Count)> reservedSlots = new();
     private readonly List<Vector3> reservedPositions = new();
+    private int nextQueueOrder;
 
     public CombatPositioning(DefenseGrid grid, IReadOnlyList<EnemyUnit> enemies, float unitSpacing)
     {
@@ -40,6 +42,8 @@ internal sealed class CombatPositioning
             EnemyUnit target = FindTarget(enemy);
             if (target != enemy.Target)
                 enemy.AttackSlot = -1;
+            if (enemy.CombatQueue is { } queue && queue.Target != target)
+                enemy.CombatQueue = null;
             enemy.Target = target;
             enemy.CombatDestination = null;
             if (target != null)
@@ -50,6 +54,13 @@ internal sealed class CombatPositioning
         foreach (EnemyUnit enemy in assignmentOrder)
         {
             EnemyUnit target = enemy.Target;
+            EnemyUnit immediateTarget = FindImmediateTarget(enemy, target);
+            if (immediateTarget != null)
+            {
+                Reserve(enemy, immediateTarget, CurrentPositionSlot, enemy.Position);
+                continue;
+            }
+
             int slot = enemy.AttackSlot;
             if (slot >= 0 && TryApproachSlot(enemy, target, slot, true, out Vector3 waypoint, out _))
             {
@@ -67,17 +78,24 @@ internal sealed class CombatPositioning
             // A full target or an unreachable slot sends the unit to another visible opponent.
             EnemyUnit alternative = null;
             float nearest = float.PositiveInfinity;
+            EnemyUnit queueTarget = reservedSlots.ContainsKey(target) ? target : null;
             foreach (EnemyUnit other in enemies)
             {
                 float distance = (other.Position - enemy.Position).sqrMagnitude;
-                if (other == target || distance >= nearest || !CanDetect(enemy, other) ||
-                    !FindSlot(enemy, other, out int otherSlot, out Vector3 otherWaypoint))
+                if (other == target || !CanDetect(enemy, other))
                     continue;
 
-                alternative = other;
-                nearest = distance;
-                slot = otherSlot;
-                waypoint = otherWaypoint;
+                if (distance < nearest && FindSlot(enemy, other, out int otherSlot, out Vector3 otherWaypoint))
+                {
+                    alternative = other;
+                    nearest = distance;
+                    slot = otherSlot;
+                    waypoint = otherWaypoint;
+                }
+                else if (queueTarget == null && reservedSlots.ContainsKey(other))
+                {
+                    queueTarget = other;
+                }
             }
             if (alternative != null)
             {
@@ -86,18 +104,21 @@ internal sealed class CombatPositioning
             else
             {
                 enemy.Target = null;
+                if (queueTarget != null)
+                    QueueBehindFight(enemy, queueTarget);
+                else
+                    enemy.CombatQueue = null;
             }
         }
     }
 
-    public bool CanAttack(EnemyUnit enemy, EnemyUnit target)
-    {
-        if (enemy.AttackSlot < 0)
-            return false;
+    public bool CanAttack(EnemyUnit enemy, EnemyUnit target) =>
+        enemy.Target == target && CanAttackFromHere(enemy, target);
 
+    private bool CanAttackFromHere(EnemyUnit enemy, EnemyUnit target)
+    {
         float range = enemy.Faction.AttackRange;
-        float tolerance = Mathf.Min(MaxArrivalDistance, range * 0.5f);
-        return (enemy.Position - SlotPosition(enemy, target, enemy.AttackSlot)).sqrMagnitude <= tolerance * tolerance &&
+        return target.IsAlive && target.FactionIndex != enemy.FactionIndex &&
             (enemy.Position - target.Position).sqrMagnitude <= range * range &&
             grid.HasLineOfSight(enemy.Position, target.Position) &&
             ClearOfUnits(enemy, target, enemy.Position, target.Position, unitSpacing * 0.5f, attacking: true);
@@ -138,7 +159,8 @@ internal sealed class CombatPositioning
 
     private EnemyUnit FindTarget(EnemyUnit enemy)
     {
-        if (enemy.Target is { IsAlive: true } target && CanDetect(enemy, target))
+        EnemyUnit target = enemy.Target ?? enemy.CombatQueue?.Target;
+        if (target != null && CanDetect(enemy, target))
             return target;
 
         EnemyUnit nearest = null;
@@ -155,19 +177,43 @@ internal sealed class CombatPositioning
         return nearest;
     }
 
+    private EnemyUnit FindImmediateTarget(EnemyUnit enemy, EnemyUnit preferred)
+    {
+        if (!IsTargetFull(preferred) && CanAttackFromHere(enemy, preferred))
+            return preferred;
+
+        EnemyUnit nearest = null;
+        float nearestDistance = float.PositiveInfinity;
+        foreach (EnemyUnit other in enemies)
+        {
+            float distance = (other.Position - enemy.Position).sqrMagnitude;
+            if (other == preferred || distance >= nearestDistance ||
+                IsTargetFull(other) || !CanAttackFromHere(enemy, other))
+                continue;
+
+            nearest = other;
+            nearestDistance = distance;
+        }
+        return nearest;
+    }
+
     private bool CanDetect(EnemyUnit enemy, EnemyUnit other)
     {
         float range = enemy.Faction.AwarenessRange;
-        return other.IsAlive && other.Faction != enemy.Faction &&
+        return other.IsAlive && other.FactionIndex != enemy.FactionIndex &&
             (other.Position - enemy.Position).sqrMagnitude <= range * range &&
             grid.HasLineOfSight(enemy.Position, other.Position);
     }
 
     private static int CompareAttackers(EnemyUnit first, EnemyUnit second)
     {
-        int incumbent = (second.AttackSlot >= 0).CompareTo(first.AttackSlot >= 0);
+        int incumbent = (second.AttackSlot != -1).CompareTo(first.AttackSlot != -1);
         if (incumbent != 0)
             return incumbent;
+
+        int queued = (first.CombatQueue?.Order ?? int.MaxValue).CompareTo(second.CombatQueue?.Order ?? int.MaxValue);
+        if (queued != 0)
+            return queued;
 
         float firstDistance = (first.Target.Position - first.Position).sqrMagnitude;
         float secondDistance = (second.Target.Position - second.Position).sqrMagnitude;
@@ -178,20 +224,41 @@ internal sealed class CombatPositioning
     private void Reserve(EnemyUnit enemy, EnemyUnit target, int slot, Vector3 waypoint)
     {
         enemy.Target = target;
+        enemy.CombatQueue = null;
         enemy.AttackSlot = slot;
         enemy.CombatDestination = waypoint;
         enemy.RouteYieldDestination = null;
         enemy.BlockedRouteTime = 0f;
         reservedSlots.TryGetValue(target, out var reservation);
-        reservedSlots[target] = (reservation.Mask | (1 << slot), reservation.Count + 1);
-        reservedPositions.Add(SlotPosition(enemy, target, slot));
+        int mask = slot == CurrentPositionSlot ? reservation.Mask : reservation.Mask | (1 << slot);
+        reservedSlots[target] = (mask, reservation.Count + 1);
+        reservedPositions.Add(slot == CurrentPositionSlot ? waypoint : SlotPosition(enemy, target, slot));
+    }
+
+    private void QueueBehindFight(EnemyUnit enemy, EnemyUnit target)
+    {
+        if (enemy.CombatQueue?.Target != target)
+            enemy.CombatQueue = (target, nextQueueOrder++);
+        enemy.RouteYieldDestination = null;
+        enemy.BlockedRouteTime = 0f;
+
+        // Leave room for the attackers without stepping outside detection range.
+        float range = enemy.Faction.AttackRange;
+        float distance = Mathf.Min(range + unitSpacing, enemy.Faction.AwarenessRange - QueueAwarenessMargin);
+        Vector3 offset = enemy.Position - target.Position;
+        if (distance <= range || offset.sqrMagnitude >= distance * distance)
+            return;
+
+        Vector3 rear = target.Position + offset.normalized * distance;
+        if (CanMove(enemy, target, enemy.Position, rear))
+            enemy.CombatDestination = rear;
     }
 
     private bool FindSlot(EnemyUnit enemy, EnemyUnit target, out int slot, out Vector3 waypoint)
     {
         slot = -1;
         waypoint = default;
-        if (reservedSlots.TryGetValue(target, out var reservation) && reservation.Count >= MaxAttackersPerTarget)
+        if (IsTargetFull(target))
             return false;
 
         float shortest = float.PositiveInfinity;
@@ -216,6 +283,9 @@ internal sealed class CombatPositioning
         }
         return slot >= 0;
     }
+
+    private bool IsTargetFull(EnemyUnit target) =>
+        reservedSlots.TryGetValue(target, out var reservation) && reservation.Count >= MaxAttackersPerTarget;
 
     private bool TryApproachSlot(EnemyUnit enemy, EnemyUnit target, int slot, bool allowDetour,
         out Vector3 waypoint, out float length)

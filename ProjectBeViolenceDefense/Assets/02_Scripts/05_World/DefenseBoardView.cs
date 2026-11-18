@@ -6,6 +6,7 @@ internal sealed class DefenseBoardView
     private const float CameraPanSpeed = 6f;
     private const float CameraDistance = 20f;
     private const float CameraFocusOffset = 0.9f;
+    private const float CameraPanInset = 4f;
     private const float ZoomStep = 0.9f;
     private const float ZoomResponse = 18f;
     private const float MaxZoomFrameTime = 0.05f;
@@ -62,7 +63,6 @@ internal sealed class DefenseBoardView
     private readonly Shader shader;
     private readonly IReadOnlyList<EnemyFaction> factions;
     private readonly Sprite routeChevron;
-    private readonly GameObject goblinPrefab;
     private readonly HashSet<Vector2Int> spawnCells;
     private readonly List<SpriteRenderer> routeMarkers = new();
     private readonly List<Material> materials = new();
@@ -83,13 +83,16 @@ internal sealed class DefenseBoardView
     private readonly Material attackBuffPreviewMaterial;
     private readonly Material moveSpeedBuffPreviewMaterial;
     private readonly Material healPreviewMaterial;
+    private readonly Material armorBuffPreviewMaterial;
     private readonly Material nearbyPreviewMaterial;
     private readonly Material attackOutlineMaterial;
     private readonly Material healOutlineMaterial;
     private readonly Material moveSpeedOutlineMaterial;
+    private readonly Material armorOutlineMaterial;
     private readonly Material nearbyOutlineMaterial;
     private readonly MeshRenderer areaSpellPreview;
     private readonly Mesh areaSpellPreviewMesh;
+    private readonly List<int> areaSpellTriangles = new(64 * 6);
     private readonly Mesh factionRingMesh;
     private readonly Mesh previewRingMesh;
     private int nextHitEffect;
@@ -101,14 +104,13 @@ internal sealed class DefenseBoardView
     public IReadOnlyCollection<Vector2Int> PlannedEncounters { get; private set; } = System.Array.Empty<Vector2Int>();
 
     public DefenseBoardView(Transform root, Camera camera, Shader shader, DefenseGrid grid,
-        IReadOnlyList<EnemyFaction> factions, Sprite routeChevron, BoardTheme theme, GameObject goblinPrefab)
+        IReadOnlyList<EnemyFaction> factions, Sprite routeChevron, BoardTheme theme)
     {
         this.root = root;
         this.camera = camera;
         this.shader = shader;
         this.factions = factions;
         this.routeChevron = routeChevron;
-        this.goblinPrefab = goblinPrefab;
         spawnCells = new HashSet<Vector2Int>(grid.SpawnCells);
         // Aim slightly toward the near corner to leave room for the battle controls.
         Vector3 boardForward = root.InverseTransformDirection(camera.transform.forward);
@@ -161,8 +163,8 @@ internal sealed class DefenseBoardView
             Box("Spawn pad center", root, position + Vector3.up * 0.075f, new Vector3(0.55f, 0.03f, 0.55f), foundation);
         }
 
-        CreateCore(grid, foundation, fixedWall, core);
-        areaSpellPreviewMesh = CreateRingMesh("Area Spell Range", DefenseBattle.AreaSpellRadius, 0.075f, 64);
+        CreateCore(grid, theme, foundation, fixedWall, core);
+        areaSpellPreviewMesh = CreateRingMesh("Area Spell Range", DefenseBattle.DefaultAreaSpellRadius, 0.075f, 64);
         factionRingMesh = CreateRingMesh("Faction Ring", 0.23f, 0.075f, 24);
         previewRingMesh = CreateRingMesh("Spell Target Ring", 0.48f, 0.12f, 32);
         var preview = new GameObject("Area Spell Range", typeof(MeshFilter), typeof(MeshRenderer));
@@ -172,10 +174,12 @@ internal sealed class DefenseBoardView
         attackBuffPreviewMaterial = core;
         moveSpeedBuffPreviewMaterial = Palette(MoveSpeedBuffColor);
         healPreviewMaterial = Palette(UIPalette.Heal);
+        armorBuffPreviewMaterial = Palette(UIPalette.Armor);
         nearbyPreviewMaterial = Palette(UIPalette.TextPrimary);
         attackOutlineMaterial = UnlitPalette(UIPalette.Attack);
         healOutlineMaterial = UnlitPalette(UIPalette.Heal);
         moveSpeedOutlineMaterial = UnlitPalette(UIPalette.MoveSpeed);
+        armorOutlineMaterial = UnlitPalette(UIPalette.Armor);
         nearbyOutlineMaterial = UnlitPalette(UIPalette.TextPrimary);
         areaSpellPreview.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         areaSpellPreview.receiveShadows = false;
@@ -213,7 +217,7 @@ internal sealed class DefenseBoardView
         return mesh;
     }
 
-    private void CreateCore(DefenseGrid grid, Material foundation, Material wall, Material core)
+    private void CreateCore(DefenseGrid grid, BoardTheme theme, Material foundation, Material wall, Material core)
     {
         var model = new GameObject("Core").transform;
         model.SetParent(root, false);
@@ -222,8 +226,11 @@ internal sealed class DefenseBoardView
         float width = grid.CoreSize.x - 0.04f;
         float depth = grid.CoreSize.y - 0.04f;
         const float rim = 0.16f;
+        const float platformTop = 0.32f;
+        const float platformThickness = 0.12f;
         Box("Core base", model, Vector3.up * 0.1f, new Vector3(width, 0.2f, depth), foundation);
-        Box("Core platform", model, Vector3.up * 0.26f, new Vector3(width - rim, 0.12f, depth - rim), trim);
+        Box("Core platform", model, Vector3.up * (platformTop - platformThickness * 0.5f),
+            new Vector3(width - rim, platformThickness, depth - rim), trim);
 
         // The rim meshes are part of the core model and sit entirely within its footprint.
         float sideX = (width - rim) * 0.5f;
@@ -233,12 +240,32 @@ internal sealed class DefenseBoardView
         Box("Core rim front", model, new Vector3(0f, 0.29f, -sideZ), new Vector3(width - rim * 2f, 0.26f, rim), wall);
         Box("Core rim back", model, new Vector3(0f, 0.29f, sideZ), new Vector3(width - rim * 2f, 0.26f, rim), wall);
 
+        if (theme.coreCharacterPrefab != null)
+        {
+            GameObject character = Object.Instantiate(theme.coreCharacterPrefab, model, false);
+            character.transform.SetLocalPositionAndRotation(Vector3.up * platformTop, Quaternion.LookRotation(Vector3.back));
+            character.transform.localScale *= theme.coreCharacterScale;
+            if (character.GetComponentInChildren<Animator>() is { } animator && animator.runtimeAnimatorController != null)
+            {
+                // Hold the frame where the caster stands upright with its staff.
+                if (animator.HasState(0, WalkState))
+                    animator.Play(WalkState, 0, 0.25f);
+                animator.speed = 0f;
+                animator.Update(0f);
+            }
+            return;
+        }
+
         Box("Core body", model, Vector3.up * 0.56f, new Vector3(0.86f, 0.52f, 0.86f), core);
         Transform crown = Box("Core crown", model, Vector3.up * 0.94f, new Vector3(0.58f, 0.24f, 0.58f), core);
         crown.localRotation = Quaternion.Euler(0, 45, 0);
     }
 
-    public void FitCamera() => camera.orthographicSize = Mathf.Max(9.4f, 9.5f / camera.aspect) * viewScale;
+    public void FitCamera()
+    {
+        float boardScale = Mathf.Max(DefenseGrid.Width, DefenseGrid.Depth) / 12f;
+        camera.orthographicSize = Mathf.Max(9.4f, 9.5f / camera.aspect) * boardScale * viewScale;
+    }
 
     public void QueueZoom(float scrollDelta, Vector2 pointer)
     {
@@ -258,20 +285,19 @@ internal sealed class DefenseBoardView
         if (Mathf.Abs(targetViewScale - newScale) < ZoomSnapDistance)
             newScale = targetViewScale;
 
+        Vector3 offset = Vector3.zero;
         if (zoomAnchorViewport is Vector2 viewport)
         {
             Ray ray = BoardRay(camera.ViewportToScreenPoint(viewport));
             if (BoardGround.Raycast(ray, out float distance))
             {
                 // The orthographic ground offset scales with the view. Translate by the portion the zoom removes.
-                Vector3 offset = (ray.GetPoint(distance) - cameraFocus) * (1f - newScale / viewScale);
-                cameraFocus.x += offset.x;
-                cameraFocus.z += offset.z;
-                PositionCamera();
+                offset = (ray.GetPoint(distance) - cameraFocus) * (1f - newScale / viewScale);
             }
         }
 
         viewScale = newScale;
+        MoveCamera(offset);
         FitCamera();
     }
 
@@ -280,14 +306,30 @@ internal sealed class DefenseBoardView
         Vector2 direction = Vector2.ClampMagnitude(input, 1f);
         Quaternion yaw = Quaternion.Euler(0f, camera.transform.eulerAngles.y, 0f);
         Vector3 offset = root.InverseTransformDirection(yaw * new Vector3(direction.x, 0f, direction.y));
-        cameraFocus.x = PanAxis(cameraFocus.x, offset.x * CameraPanSpeed * deltaTime, DefenseGrid.Width - 1f);
-        cameraFocus.z = PanAxis(cameraFocus.z, offset.z * CameraPanSpeed * deltaTime, DefenseGrid.Depth - 1f);
+        MoveCamera(offset * (CameraPanSpeed * deltaTime));
+    }
+
+    public void DragCamera(Vector2 previousPointer, Vector2 pointer)
+    {
+        Ray previousRay = BoardRay(previousPointer);
+        Ray currentRay = BoardRay(pointer);
+        if (BoardGround.Raycast(previousRay, out float previousDistance) &&
+            BoardGround.Raycast(currentRay, out float currentDistance))
+            MoveCamera(previousRay.GetPoint(previousDistance) - currentRay.GetPoint(currentDistance));
+    }
+
+    private void MoveCamera(Vector3 offset)
+    {
+        cameraFocus.x = ClampPanAxis(cameraFocus.x + offset.x, DefenseGrid.Width - 1f);
+        cameraFocus.z = ClampPanAxis(cameraFocus.z + offset.z, DefenseGrid.Depth - 1f);
         PositionCamera();
     }
 
-    // An anchored zoom-out can put the focus past an edge. Pan inward from there without snapping.
-    private static float PanAxis(float focus, float delta, float max) =>
-        Mathf.Clamp(focus + delta, Mathf.Min(0f, focus), Mathf.Max(max, focus));
+    private float ClampPanAxis(float position, float lastTile)
+    {
+        float inset = Mathf.Min(CameraPanInset * viewScale, lastTile * 0.5f);
+        return Mathf.Clamp(position, inset, lastTile - inset);
+    }
 
     private void PositionCamera() =>
         camera.transform.position = root.TransformPoint(cameraFocus) - camera.transform.forward * CameraDistance;
@@ -384,18 +426,23 @@ internal sealed class DefenseBoardView
         if (!BoardGround.Raycast(ray, out float distance))
             return false;
 
+        foreach (Vector2Int wall in wallViews.Keys)
+            if (DefenseGrid.WallBounds(wall).IntersectRay(ray, out float wallDistance) && wallDistance < distance)
+                return false;
+
         point = ray.GetPoint(distance);
         return point.x >= -0.5f && point.x < DefenseGrid.Width - 0.5f &&
             point.z >= -0.5f && point.z < DefenseGrid.Depth - 0.5f;
     }
 
-    public void ShowAreaSpellPreview(DefenseBattle.Spell? spell, Vector3? center)
+    public void ShowAreaSpellPreview(DefenseBattle.Spell? spell, Vector3? center, float radius)
     {
         Material material = center.HasValue ? spell switch
         {
             DefenseBattle.Spell.MoveSpeedBuff => moveSpeedBuffPreviewMaterial,
             DefenseBattle.Spell.Heal => healPreviewMaterial,
             DefenseBattle.Spell.AttackBuff => attackBuffPreviewMaterial,
+            DefenseBattle.Spell.ArmorBuff => armorBuffPreviewMaterial,
             _ => null
         } : null;
 
@@ -406,14 +453,54 @@ internal sealed class DefenseBoardView
             if (areaSpellPreview.sharedMaterial != material)
                 areaSpellPreview.sharedMaterial = material;
             areaSpellPreview.transform.localPosition = point + Vector3.up * 0.04f;
+            float scale = radius / DefenseBattle.DefaultAreaSpellRadius;
+            areaSpellPreview.transform.localScale = new Vector3(scale, 1f, scale);
+            UpdateAreaSpellRing(point, radius);
         }
 
         foreach (var entry in enemyViews)
         {
-            bool inRange = material != null && DefenseBattle.IsInAreaSpellRange(entry.Key, point);
+            bool inRange = material != null && DefenseBattle.IsInAreaSpellRange(entry.Key, point, radius);
             bool eligible = inRange && DefenseBattle.CanReceiveAreaSpell(entry.Key, spell.Value);
             SetEnemyPreviewTint(entry.Value, inRange ? material : null, eligible);
         }
+    }
+
+    private void UpdateAreaSpellRing(Vector3 center, float radius)
+    {
+        areaSpellTriangles.Clear();
+        const int segments = 64;
+        for (int i = 0; i < segments; i++)
+        {
+            // Leave a small break where the ground ring passes through a wall footprint.
+            float angle = (i + 0.5f) * (2f * Mathf.PI / segments);
+            Vector3 midpoint = center + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+            bool onWall = false;
+            foreach (Vector2Int cell in wallViews.Keys)
+            {
+                Vector3 wall = DefenseGrid.CellPosition(cell);
+                float margin = DefenseGrid.WallWidth * 0.5f + 0.1f;
+                if (Mathf.Abs(midpoint.x - wall.x) <= margin && Mathf.Abs(midpoint.z - wall.z) <= margin)
+                {
+                    onWall = true;
+                    break;
+                }
+            }
+
+            if (onWall)
+                continue;
+
+            int inner = i * 2;
+            int next = (i + 1) % segments * 2;
+            areaSpellTriangles.Add(inner);
+            areaSpellTriangles.Add(next);
+            areaSpellTriangles.Add(inner + 1);
+            areaSpellTriangles.Add(inner + 1);
+            areaSpellTriangles.Add(next);
+            areaSpellTriangles.Add(next + 1);
+        }
+
+        areaSpellPreviewMesh.SetTriangles(areaSpellTriangles, 0, false);
     }
 
     private void SetEnemyPreviewTint(EnemyView view, Material material, bool eligible)
@@ -437,7 +524,8 @@ internal sealed class DefenseBoardView
         view.PreviewRing.transform.localScale = Vector3.one * (eligible ? 1.2f : 1f);
         view.PreviewOutline.sharedMaterial = eligible
             ? material == attackBuffPreviewMaterial ? attackOutlineMaterial
-                : material == healPreviewMaterial ? healOutlineMaterial : moveSpeedOutlineMaterial
+                : material == healPreviewMaterial ? healOutlineMaterial
+                : material == armorBuffPreviewMaterial ? armorOutlineMaterial : moveSpeedOutlineMaterial
             : nearbyOutlineMaterial;
         view.PreviewOutline.widthMultiplier = eligible ? 0.085f : 0.055f;
         PositionPreviewOutline(view);
@@ -538,12 +626,11 @@ internal sealed class DefenseBoardView
         model.SetParent(root, false);
         model.localPosition = enemy.Position;
         EnemyView view;
-        GameObject prefab = enemy.Faction.Model != null ? enemy.Faction.Model : goblinPrefab;
+        GameObject prefab = enemy.Faction.Model;
         if (prefab != null)
         {
             GameObject visual = Object.Instantiate(prefab, model);
-            if (enemy.Faction.Model != null)
-                ApplyFactionModel(visual, enemy.Faction);
+            ApplyFactionModel(visual, enemy.Faction);
 
             view = new EnemyView
             {
@@ -677,13 +764,6 @@ internal sealed class DefenseBoardView
         Object.Destroy(view.Root.gameObject);
     }
 
-    public void PauseEnemyAnimations()
-    {
-        foreach (EnemyView view in enemyViews.Values)
-            if (view.Animator != null)
-                view.Animator.speed = 0f;
-    }
-
     public void AdvanceHitEffects(float deltaTime)
     {
         foreach (HitEffect effect in hitEffects)
@@ -764,10 +844,20 @@ internal sealed class DefenseBoardView
         return hitEffects[nextHitEffect];
     }
 
+    // 공격 클립이 공격 간격보다 길면 그만큼 빠르게 재생해서 다음 공격 전에 끝나게 한다.
+    private static float AttackPlaybackScale(Animator animator, EnemyUnit enemy)
+    {
+        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+        if (state.fullPathHash != AttackState || state.length <= 0f)
+            return 1f;
+        return Mathf.Max(1f, state.length / (enemy.Faction.AttackInterval * 0.9f));
+    }
+
     private static void SyncGoblinMotion(EnemyView view, EnemyUnit enemy, Vector3 step, float deltaTime, float playbackSpeed)
     {
         Animator animator = view.Animator;
-        bool moving = deltaTime > 0f && step.sqrMagnitude > 0.000001f;
+        float movementThreshold = 0.001f * Mathf.Min(1f, playbackSpeed);
+        bool moving = deltaTime > 0f && step.sqrMagnitude > movementThreshold * movementThreshold;
         view.StoppedTime = moving ? 0f : view.StoppedTime + deltaTime;
         bool newAttack = view.AttacksPlayed != enemy.AttacksPerformed;
         if (newAttack)
@@ -798,7 +888,7 @@ internal sealed class DefenseBoardView
         view.Root.localRotation = newAttack || deltaTime <= 0f ? heading :
             Quaternion.RotateTowards(view.Root.localRotation, heading, GoblinTurnSpeed * deltaTime);
 
-        animator.speed = view.AnimationState == AttackState ? playbackSpeed : 0f;
+        animator.speed = view.AnimationState == AttackState ? playbackSpeed * AttackPlaybackScale(animator, enemy) : 0f;
         if (view.AnimationState == view.MoveState && moving)
             animator.speed = step.magnitude * playbackSpeed / (deltaTime * view.StrideSpeed * animator.transform.localScale.z);
     }

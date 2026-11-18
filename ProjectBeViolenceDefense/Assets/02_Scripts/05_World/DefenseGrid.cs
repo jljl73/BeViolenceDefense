@@ -4,26 +4,17 @@ using UnityEngine;
 
 internal sealed class DefenseGrid
 {
-    public const int Width = 12;
+    public const int Width = 17;
     public const int Depth = Width;
     public const int SpawnPointCount = 2;
     public const int WallLimit = 8;
     public const float WallWidth = 0.92f;
     public const float WallHeight = 0.8f;
 
-    private static readonly RectInt CoreFootprint = new(0, Depth - 2, 2, 2);
-    // Left and right corners in the default camera view, in faction order.
-    private static readonly Vector2Int[] Spawns = { Vector2Int.zero, new(Width - 1, Depth - 1) };
-    // The two sides meet at (4, 7), the opening in the diagonal barrier.
-    private static readonly Vector2Int[] InitialWalls =
-    {
-        new(0, 3), new(1, 4), new(2, 5), new(3, 6),
-        new(8, 11), new(7, 10), new(6, 9), new(5, 8),
-        new(0, 4), new(1, 5), new(2, 6),
-        new(7, 11), new(6, 10), new(5, 9),
-        // Divider on the centerline between the approaches.
-        new(10, 1), new(9, 2), new(8, 3), new(7, 4), new(6, 5)
-    };
+    private const int MainLaneColumn = Width / 2;
+    private const int GateRow = 7;
+    private static readonly RectInt CoreFootprint = new(MainLaneColumn, Depth - 2, 2, 2);
+    private static readonly Vector2Int[] Spawns = { new(2, 2), new(Width - 3, 2) };
     private static readonly Vector2Int[] Directions =
     {
         Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left
@@ -31,7 +22,7 @@ internal sealed class DefenseGrid
 
     public enum BuildResult { Placed, Outside, Occupied, LimitReached, BlocksRoute }
 
-    private readonly HashSet<Vector2Int> fixedWalls = new(InitialWalls);
+    private readonly HashSet<Vector2Int> fixedWalls = new();
     private readonly HashSet<Vector2Int> placed = new();
     private Vector3[][] routes;
 
@@ -45,6 +36,10 @@ internal sealed class DefenseGrid
 
     public DefenseGrid()
     {
+        // The two entrances share one straight approach from the gate to the core.
+        for (int x = 0; x < Width; x++)
+            if (x != MainLaneColumn)
+                fixedWalls.Add(new Vector2Int(x, GateRow));
         routes = FindRoutes();
     }
 
@@ -181,7 +176,7 @@ internal sealed class DefenseGrid
                 // Mirror the tie-break so equally short paths respect the default terrain's symmetry.
                 foreach (Vector2Int direction in Directions)
                 {
-                    Vector2Int step = i == 0 ? direction : new Vector2Int(-direction.y, -direction.x);
+                    Vector2Int step = i == 0 ? direction : new Vector2Int(-direction.x, direction.y);
                     Vector2Int next = cell + step;
                     if (!InBounds(next) || distances[next.x, next.y] != distance - 1)
                         continue;

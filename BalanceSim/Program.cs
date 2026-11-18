@@ -27,6 +27,12 @@ internal static class Program
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
         var layouts = BuildLayouts(int.Parse(Environment.GetEnvironmentVariable("LAYOUTS") ?? "200"));
 
+        if (args.Length > 0 && args[0] == "mix")
+        {
+            Mix(layouts, args.Skip(1).ToArray());
+            return 0;
+        }
+
         if (args.Length > 0 && args[0] == "sweep")
         {
             Sweep(layouts, args.Skip(1).ToArray());
@@ -167,6 +173,134 @@ internal static class Program
         Console.WriteLine($"  실행 {s.Runs}회 중 교전 {s.Engaged}회 | 고블린 승 {100.0 * s.GoblinWins / n:0}% · 좀비 승 {100.0 * s.ZombieWins / n:0}% · 무승부 {100.0 * s.Draws / n:0}% (양쪽 전멸 {100.0 * s.Wipes / n:0}%)");
         Console.WriteLine($"  평균 생존: 고블린 {s.GoblinLeft / n:0.00}, 좀비 {s.ZombieLeft / n:0.00} | 남은 체력 비율 차 {s.Balance:+0.000;-0.000} | 평균 교전 시간 {s.FightTime / n:0.0}s");
     }
+
+
+    // 교전 구도와 "한쪽에만 마법을 걸 수 있는가"를 측정한다.
+    // 교전 중 0.2초마다: 싸우는 유닛이 몇 대 몇 묶음에 속하는지, 아군만 맞히는 시전 위치가 있는지 기록한다.
+    private static void Mix(List<Vector2Int[]> layouts, string[] a)
+    {
+        var g = a.Length >= 4 ? Parse(a, 0) : new Stats(50, 10, 0.65f, 6);
+        var z = a.Length >= 8 ? Parse(a, 4) : new Stats(90, 15, 1.0f, 4);
+        float[] radii = { DefenseBattle.AreaSpellRadius, 1.25f, 0.75f };
+        long fighters = 0, duel = 0, twoOnOne = 0, brawl = 0;
+        long sideSamples = 0;
+        var clean = new long[radii.Length];
+        var cleanTwo = new long[radii.Length];
+        var selfCastLeaks = new long[radii.Length];
+        long selfCasts = 0;
+        var tolSum = new double[radii.Length];
+        var tolCount = new long[radii.Length];
+        var perRun = new List<(double duelShare, double balance)>();
+
+        foreach (var layout in layouts)
+        for (int seed = 0; seed < Seeds; seed++)
+        {
+            var grid = new DefenseGrid();
+            foreach (Vector2Int cell in layout) grid.TryPlace(cell);
+            var gf = new EnemyFaction("Goblin", new Color(1, 0, 0), Range, g.Hp, g.Dmg, g.Interval, g.Count);
+            var zf = new EnemyFaction("Zombie", new Color(0, 1, 1), Range, z.Hp, z.Dmg, z.Interval, z.Count);
+            var battle = new DefenseBattle(grid, new[] { gf, zf });
+            battle.StartRound();
+            var rng = new System.Random(seed * 7919 + 17);
+            float untilSample = 0f;
+            long runFighters = 0, runDuel = 0;
+            var lastHp = new Dictionary<EnemyUnit, int>();
+            for (int i = 0; i < TickLimit && battle.CurrentPhase == DefenseBattle.Phase.Combat; i++)
+            {
+                foreach (EnemyUnit e in battle.Enemies) lastHp[e] = e.Health;
+                float dt = seed == 0 ? Step : 1f / (40f + (float)rng.NextDouble() * 104f);
+                battle.Tick(dt, pauseMovement: false);
+                untilSample -= dt;
+                if (untilSample > 0f) continue;
+                untilSample = 0.2f;
+
+                var units = battle.Enemies.Where(e => e.IsAlive).ToList();
+                var engaged = units.Where(e => e.Target is { IsAlive: true } t &&
+                    Vector3.Distance(e.Position, t.Position) <= e.Faction.AttackRange + 0.05f).ToList();
+                if (engaged.Count == 0) continue;
+
+                // 서로 때리는 관계로 묶음을 만든다.
+                var parent = units.ToDictionary(e => e, e => e);
+                EnemyUnit Find(EnemyUnit e) { while (parent[e] != e) e = parent[e] = parent[parent[e]]; return e; }
+                foreach (EnemyUnit e in engaged)
+                    if (parent.ContainsKey(e.Target)) parent[Find(e)] = Find(e.Target);
+                var clusters = engaged.Concat(engaged.Select(e => e.Target)).Where(parent.ContainsKey).Distinct()
+                    .GroupBy(Find).ToList();
+                foreach (var c in clusters)
+                {
+                    int n = c.Count();
+                    fighters += n;
+                    runFighters += n;
+                    if (n <= 2) runDuel += n;
+                    if (n <= 2) duel += n; else if (n == 3) twoOnOne += n; else brawl += n;
+                }
+
+                foreach (EnemyFaction side in new[] { gf, zf })
+                {
+                    var ownEngaged = engaged.Where(e => e.Faction == side).ToList();
+                    if (ownEngaged.Count == 0) continue;
+                    sideSamples++;
+                    for (int r = 0; r < radii.Length; r++)
+                    {
+                        float rr = radii[r] * radii[r];
+                        bool anyClean = false, anyTwo = false;
+                        int aimed = 0, aimedClean = 0;
+                        foreach (EnemyUnit anchor in ownEngaged)
+                        for (float dx = -radii[r]; dx <= radii[r] + 0.001f; dx += 0.125f)
+                        for (float dz = -radii[r]; dz <= radii[r] + 0.001f; dz += 0.125f)
+                        {
+                            if (dx * dx + dz * dz > rr) continue;
+                            var c = anchor.Position + new Vector3(dx, 0, dz);
+                            int own = 0, foe = 0;
+                            bool hitsFighter = false;
+                            foreach (EnemyUnit u in units)
+                            {
+                                Vector3 o = u.Position - c;
+                                if (o.x * o.x + o.z * o.z > rr) continue;
+                                if (u.Faction == side) { own++; hitsFighter |= ownEngaged.Contains(u); }
+                                else foe++;
+                            }
+                            if (!hitsFighter) continue;
+                            aimed++;
+                            if (foe > 0) continue;
+                            aimedClean++;
+                            anyClean = true;
+                            if (own >= 2) anyTwo = true;
+                        }
+                        if (aimed > 0) { tolSum[r] += (double)aimedClean / aimed; tolCount[r]++; }
+                        if (anyClean) clean[r]++;
+                        if (anyTwo) cleanTwo[r]++;
+                    }
+                    // 싸우는 아군 머리 위에 그대로 찍었을 때 적이 같이 걸리는가
+                    foreach (EnemyUnit anchor in ownEngaged)
+                    {
+                        selfCasts++;
+                        for (int r = 0; r < radii.Length; r++)
+                            if (units.Any(u => u.Faction != side && Sq(u.Position - anchor.Position) <= radii[r] * radii[r]))
+                                selfCastLeaks[r]++;
+                    }
+                }
+            }
+            double gLeft = lastHp.Where(kv => kv.Key.ReachedCore && kv.Key.Faction == gf).Sum(kv => kv.Value) / (double)(g.Hp * g.Count);
+            double zLeft = lastHp.Where(kv => kv.Key.ReachedCore && kv.Key.Faction == zf).Sum(kv => kv.Value) / (double)(z.Hp * z.Count);
+            if (runFighters > 0) perRun.Add(((double)runDuel / runFighters, gLeft - zLeft));
+        }
+
+        Console.WriteLine($"고블린 {g} / 좀비 {z} / 사거리 {Range} / 배치 {layouts.Count} x 시드 {Seeds}");
+        Console.WriteLine("[구도별 승패] 판마다 싸운 유닛 중 1대1 비율로 나눔");
+        foreach (var (lo, hi, label) in new[] { (0.0, 0.25, "1대1 25% 미만 (난전 위주)"), (0.25, 0.5, "1대1 25~50%"), (0.5, 1.01, "1대1 50% 이상 (한 명씩)") })
+        {
+            var b = perRun.Where(x => x.duelShare >= lo && x.duelShare < hi).ToList();
+            if (b.Count == 0) continue;
+            Console.WriteLine($"  {label,-22} {b.Count,4}판 | 고블린 승 {100.0 * b.Count(x => x.balance > 0.2) / b.Count,3:0}% · 좀비 승 {100.0 * b.Count(x => x.balance < -0.2) / b.Count,3:0}% · 평균 차 {b.Average(x => x.balance):+0.00;-0.00}");
+        }
+        Console.WriteLine($"[교전 구도] 싸우는 유닛 기준: 1대1 {100.0 * duel / fighters:0}% · 2대1 {100.0 * twoOnOne / fighters:0}% · 4명 이상 난전 {100.0 * brawl / fighters:0}%");
+        Console.WriteLine("[한쪽만 마법 걸기] 반경 | 아군 머리 위 시전 시 적도 걸림 | 아군을 맞히는 조준점 중 적이 안 걸리는 비율 | 적 없이 아군 2명 이상 걸 수 있는 순간");
+        for (int r = 0; r < radii.Length; r++)
+            Console.WriteLine($"                  {radii[r],4:0.00}칸 | {100.0 * selfCastLeaks[r] / selfCasts,5:0}% | {100.0 * tolSum[r] / Math.Max(1, tolCount[r]),5:0}% | {100.0 * cleanTwo[r] / sideSamples,5:0}%");
+    }
+
+    private static float Sq(Vector3 v) => v.x * v.x + v.z * v.z;
 
     // 고블린 수치를 고정하고 좀비 후보를 훑어 균형점(남은 체력 비율 차 ≈ 0)을 찾는다.
     private static void Sweep(List<Vector2Int[]> layouts, string[] args)
