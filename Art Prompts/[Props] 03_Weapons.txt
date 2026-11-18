@@ -15,3 +15,16 @@ A long plain wooden magic staff standing perfectly upright and straight, seen fr
 no humans, -3::1girl, 1boy, human, hand, holding, armor, scabbard::, game asset, prop, weapon, {{black background, simple background}}, single object, centered, isolated, {{flat front view}}, vertical, -3::isometric, three-quarter view, perspective, diagonal, tilted, multiple objects, multiple swords::,
 broadsword, straight double-edged steel blade, wide blade, blade pointing up, simple gold crossguard, brown leather wrapped grip, round gold pommel, slightly chipped blade edge, chunky cartoon proportions,
 A sturdy straight broadsword standing perfectly upright with the blade pointing up, seen from the front: a wide steel blade with a slightly chipped edge, a simple gold crossguard, a brown leather wrapped grip and a round gold pommel. The whole sword is visible from tip to pommel. Isolated on a solid black background.
+
+## 3. 활
+### 3-A. 해골 궁수 장궁 (9:21)
+// v1(시드 3장)은 활이 여러 개·거울 대칭·막대기로 나와 폐기. v2: 옆에서 본 D자 한 자루로 지정
+no humans, -3::1girl, 1boy, human, hand, holding, skeleton, arrow, quiver::, game asset, prop, weapon, {{black background, simple background}}, single object, centered, isolated, vertical, -3::multiple bows, two bows, symmetrical pair, reflection, isometric, perspective, tilted, aura, glow, background pattern::,
+1.4::single recurve bow::, side view of a bow, D-shaped silhouette, dark weathered wooden bow, black wood, limbs curving to the left, straight taut pale bowstring on the right side, dark leather grip wrap in the middle, small violet gem below the grip, bone tips at both ends,
+One single dark wooden recurve bow seen exactly from the side, standing upright: the wooden limbs curve out to the left in a D shape and the straight pale bowstring runs top to bottom on the right side. A dark leather grip in the middle, a small violet gem and bone tips at both ends. Dark muted colours. Isolated on a solid black background.
+
+## 4. 지팡이 (언데드)
+### 4-A. 네크로맨서 해골 지팡이 (9:21)
+no humans, -3::1girl, 1boy, human, hand, holding, skeleton::, game asset, prop, weapon, {{black background, simple background}}, single object, centered, isolated, {{flat front view}}, vertical, -3::isometric, three-quarter view, perspective, diagonal, tilted, multiple objects::,
+gnarled black wooden staff, twisted dark shaft, small horned skull on top, violet flame burning above the skull, bone rings around the shaft, pointed bottom end,
+A gnarled black wooden staff standing perfectly upright, seen from the front, topped with a small horned skull with a violet flame burning above it, and a few bone rings around the twisted shaft. The whole staff is visible from the flame to the bottom tip. Dark muted colours. Isolated on a solid black background.

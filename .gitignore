@@ -163,9 +163,10 @@ ArtDirection/
 Tools/
 
 # Unity: test scenes and animation preview controllers built for checking units
-ProjectBeViolenceDefense/Assets/Scenes/Test_*
-ProjectBeViolenceDefense/Assets/Art/**/Preview/
-ProjectBeViolenceDefense/Assets/Art/**/Preview.meta
+ProjectBeViolenceDefense/Assets/Scenes/
+ProjectBeViolenceDefense/Assets/Scenes.meta
+ProjectBeViolenceDefense/Assets/05_Art/**/Preview/
+ProjectBeViolenceDefense/Assets/05_Art/**/Preview.meta
 
 # Codex art job leftovers (wherever they land)
 _codex_*.txt
