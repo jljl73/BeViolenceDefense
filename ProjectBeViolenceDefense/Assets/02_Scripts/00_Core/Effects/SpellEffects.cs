@@ -43,6 +43,12 @@ internal sealed class SpellEffects
             rotation: board.rotation * Quaternion.Euler(90f, 0f, 0f), scale: radius);
     }
 
+    public void PlayCoreShockwave(Vector3 center, Color color)
+    {
+        Play(AreaRing, board.TransformPoint(center), Vector3.zero, color, 0.32f, 0.12f,
+            rotation: board.rotation * Quaternion.Euler(90f, 0f, 0f), scale: 0.50f, scaleGrowth: 0.86f);
+    }
+
     public static Color SpellColor(DefenseBattle.Spell spell) => spell switch
     {
         DefenseBattle.Spell.AttackBuff => UIPalette.Attack,
@@ -130,7 +136,7 @@ internal sealed class SpellEffects
     }
 
     private void Play(Vector2[] shape, Vector3 point, Vector3 motion, Color color, float duration,
-        float width, Quaternion? rotation = null, float scale = UnitEffectScale)
+        float width, Quaternion? rotation = null, float scale = UnitEffectScale, float scaleGrowth = 0f)
     {
         Pulse pulse = available.Count > 0 ? available.Pop() : new Pulse(CreateStroke("Spell Pulse", board));
         pulse.Line.sortingOrder = pulseSortingOrder;
@@ -139,6 +145,8 @@ internal sealed class SpellEffects
         pulse.Color = color;
         pulse.Duration = duration;
         pulse.Width = width;
+        pulse.Scale = scale;
+        pulse.ScaleGrowth = scaleGrowth;
         pulse.Age = 0f;
         pulse.Line.transform.rotation = rotation ?? camera.rotation;
         pulse.Line.transform.localScale = Vector3.one * scale;
@@ -155,6 +163,8 @@ internal sealed class SpellEffects
         float t = pulse.Age / pulse.Duration;
         float travel = 1f - (1f - t) * (1f - t);
         pulse.Line.transform.position = pulse.Point + pulse.Motion * travel;
+        if (pulse.ScaleGrowth > 0f)
+            pulse.Line.transform.localScale = Vector3.one * (pulse.Scale + pulse.ScaleGrowth * travel);
         pulse.Line.widthMultiplier = pulse.Width * Mathf.Lerp(1f, 0.45f, t);
         Color color = Color.Lerp(pulse.Color, UIPalette.TextPrimary, 0.30f * (1f - t));
         color.a = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.25f, 1f, t));
@@ -195,6 +205,8 @@ internal sealed class SpellEffects
         public Color Color;
         public float Duration;
         public float Width;
+        public float Scale;
+        public float ScaleGrowth;
         public float Age;
 
         public Pulse(LineRenderer line) => Line = line;

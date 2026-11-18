@@ -5,6 +5,9 @@ using UnityEngine;
 internal sealed class DefenseBattle
 {
     public const int CoreMaxHealth = 120;
+    // 전투 로직의 고정 틱. 공격 간격·지속시간이 이 단위로 딱 떨어지도록 60을 쓴다.
+    public const int TicksPerSecond = 60;
+    public const float TickDuration = 1f / TicksPerSecond;
     public const float HealPercent = 0.25f;
     public const float BuffDuration = 6f;
     public const float DefaultAreaSpellRadius = DefaultSpellRadiusTenths / 10f;
@@ -42,7 +45,36 @@ internal sealed class DefenseBattle
     private float untilCombatPlan;
 
     public event Action<EnemyUnit> EnemySpawned;
+    // 큐에 넣은 마법이 틱 시작에 적용되었을 때. 메시지와 실제로 효과를 받은 유닛을 함께 알린다.
+    public event Action<SpellCommand, string, IReadOnlyList<EnemyUnit>> SpellResolved;
+
+    // 결과를 바꾸는 플레이어 입력. 틱 번호가 같으면 프레임 속도와 관계없이 같은 결과가 난다.
+    public readonly struct SpellCommand
+    {
+        public SpellCommand(int tick, Spell spell, Vector3 center, int rangeStep)
+        {
+            Tick = tick;
+            Spell = spell;
+            Center = center;
+            RangeStep = rangeStep;
+        }
+
+        public int Tick { get; }
+        public Spell Spell { get; }
+        public Vector3 Center { get; }
+        public int RangeStep { get; }
+    }
+
+    private readonly List<SpellCommand> pendingSpells = new();
+    private readonly List<SpellCommand> commandHistory = new();
+    private readonly List<EnemyUnit> resolvedRecipients = new();
+
+    // 이번 라운드에 진행한 틱 수. 다음에 돌 틱의 번호이기도 하다.
+    public int TickIndex { get; private set; }
+    // 이번 라운드에 적용된 마법 기록. 같은 지형·편성에서 이 기록을 다시 넣으면 같은 판이 재현된다.
+    public IReadOnlyList<SpellCommand> CommandHistory => commandHistory;
     public event Action<EnemyUnit> EnemyRemoved;
+    public event Action CoreHit;
 
     public IReadOnlyList<EnemyUnit> Enemies => enemies;
     public Phase CurrentPhase { get; private set; }
@@ -102,6 +134,9 @@ internal sealed class DefenseBattle
             return;
 
         CurrentPhase = Phase.Combat;
+        TickIndex = 0;
+        pendingSpells.Clear();
+        commandHistory.Clear();
         SpawnCount = 0;
         Array.Clear(spawnedPerFaction, 0, spawnedPerFaction.Length);
         untilSpawn = 0.35f;
@@ -117,6 +152,33 @@ internal sealed class DefenseBattle
     {
         if (CurrentPhase == Phase.Combat)
             Mana = Mathf.Min(MaxMana, Mana + ManaPerSecond * deltaTime);
+    }
+
+    // 마법은 바로 적용하지 않고 다음 틱이 시작될 때 적용한다.
+    public void QueueSpell(Spell spell, Vector3 center, int rangeStep) =>
+        ScheduleSpell(new SpellCommand(TickIndex, spell, center, rangeStep));
+
+    // 리플레이용: 지정한 틱에 마법을 건다. 이미 지난 틱이면 다음 틱에 적용한다.
+    public void ScheduleSpell(SpellCommand command)
+    {
+        if (CurrentPhase != Phase.Combat)
+            return;
+        int index = pendingSpells.Count;
+        while (index > 0 && pendingSpells[index - 1].Tick > command.Tick)
+            index--;
+        pendingSpells.Insert(index, command);
+    }
+
+    private void ApplyPendingSpells()
+    {
+        while (pendingSpells.Count > 0 && pendingSpells[0].Tick <= TickIndex)
+        {
+            SpellCommand command = pendingSpells[0];
+            pendingSpells.RemoveAt(0);
+            string message = CastAreaSpell(command.Spell, command.Center, command.RangeStep, resolvedRecipients);
+            commandHistory.Add(new SpellCommand(TickIndex, command.Spell, command.Center, command.RangeStep));
+            SpellResolved?.Invoke(command, message, resolvedRecipients);
+        }
     }
 
     public static float AreaSpellRadius(int rangeStep) =>
@@ -240,10 +302,17 @@ internal sealed class DefenseBattle
         return Array.Empty<Vector2Int>();
     }
 
+    // 게임에서는 항상 TickDuration 으로 부른다. 다른 값은 시험용이다.
     public void Tick(float deltaTime, bool pauseMovement)
     {
         if (CurrentPhase != Phase.Combat)
             return;
+
+        foreach (EnemyUnit enemy in enemies)
+            enemy.BeginTick();
+        ApplyPendingSpells();
+        RecoverMana(deltaTime);
+        TickIndex++;
 
         untilSpawn -= deltaTime;
         while (SpawnCount < EnemiesPerRound && untilSpawn <= 0)
@@ -309,6 +378,7 @@ internal sealed class DefenseBattle
                     continue;
 
                 CoreHealth = Mathf.Max(0, CoreHealth - 1);
+                CoreHit?.Invoke();
                 enemy.Die();
                 RemoveEnemyAt(i);
             }

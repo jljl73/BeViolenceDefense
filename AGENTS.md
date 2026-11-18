@@ -67,6 +67,8 @@ Emberward의 경로 설계는 참고 대상이다. 테트로미노 블록, 카�
 - 벽으로 동선을 바꾸고 적에게 버프와 힐을 써서 세력 균형을 조절한다는 핵심을 유지한다. 공격 타워나 직접 피해 스킬을 임의로 추가하지 않는다.
 - Unity 에셋의 `.meta`와 참조를 보존한다. 에디터·패키지·렌더 파이프라인 변경은 요청 범위를 확인한 뒤 수행한다.
 - 새 전투 기능의 이동, 타이머, 이펙트에는 `BattleClock`의 델타 시간을 호출부에서 전달한다. 시뮬레이션 반복 갱신은 `StepCount`와 `StepDeltaTime`, 프레임당 한 번 갱신하는 효과는 `DeltaTime`을 사용한다. UI와 카메라는 실시간으로 갱신한다.
+- 전투 로직은 `DefenseBattle.TickDuration`(초당 60틱) 고정 틱으로만 진행한다. 마법처럼 결과를 바꾸는 플레이어 입력은 즉시 적용하지 않고 `DefenseBattle` 명령(`QueueSpell` 등)으로 넣어 틱 시작에 적용한다. 자세한 규칙은 [결정론](docs/determinism.md)을 따른다.
+- 전투 로직(`BattleClock`, `CombatPositioning`, `EnemyUnit`, `DefenseBattle`, `DefenseGrid`)에서는 `Time`, `Random`, `Transform`, `Animator`, `GameObject`·`Material` 같은 화면 데이터, 화면·UI·씬 코드를 쓰지 않는다. 모델 같은 화면 데이터는 `EnemyCatalog.UnitVisual`에 둔다. 정렬은 마지막에 `SpawnOrder`로 동점을 깬다. 전투 로직을 고친 뒤에는 Test Runner의 EditMode 테스트(`Assets/09_Tests/Editor`)를 돌린다.
 - UI 제작·수정 시 [UIPalette.cs](ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/UIPalette.cs)의 역할별 색상 토큰과 [UI 흐름 가이드](docs/ui-flow.md)의 색상 규칙을 적용한다. HUD는 아이콘과 상태 표시를 우선하고, 기능 이름과 상세 설명은 툴팁이나 상황별 메시지에 둔다. 신규 HUD 이미지의 가로·세로는 각각 128px 이하로 유지한다.
 - 프로젝트 버전의 Unity CLI를 실행할 수 있으면 컴파일, Play Mode 검증, 빌드 등 작업에 해당하는 Unity 확인에 가급적 사용한다. 사용한 작업과 검증 결과는 AI 사용 기록의 **Unity CLI 사용** 항목에 남긴다. 필요한 확인을 실행하지 못했다면 이유와 미확인 범위를 남긴다.
 - 변경 후 관련 컴파일 오류와 플레이 동작을 확인한다. 확인하지 못한 사항은 명확히 보고한다.

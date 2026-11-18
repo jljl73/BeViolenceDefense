@@ -5,6 +5,8 @@ using UnityEngine;
 internal sealed class EnemyCatalogEditor : Editor
 {
     private const float StatWidth = 38f;
+    private static readonly string[] GroupNames = { "녹색 무리", "언데드", "짐승", "용족·악마" };
+    private readonly bool[] groupExpanded = { true, true, true, true };
     private static readonly (string Property, GUIContent Label)[] Columns =
     {
         ("maxHealth", new GUIContent("체력", "최대 체력")),
@@ -28,9 +30,34 @@ internal sealed class EnemyCatalogEditor : Editor
                 EditorGUILayout.LabelField(column.Label, GUILayout.Width(StatWidth));
         }
 
+        for (int group = 0; group < GroupNames.Length; group++)
+        {
+            if (DrawGroup(entries, (EnemyFactionGroup)group))
+                break;
+        }
+
+        serializedObject.ApplyModifiedProperties();
+    }
+
+    private bool DrawGroup(SerializedProperty entries, EnemyFactionGroup group)
+    {
+        int index = (int)group;
+        int count = 0;
+        for (int i = 0; i < entries.arraySize; i++)
+            if (entries.GetArrayElementAtIndex(i).FindPropertyRelative("factionGroup").enumValueIndex == index)
+                count++;
+
+        groupExpanded[index] = EditorGUILayout.Foldout(groupExpanded[index], $"{GroupNames[index]} ({count})", true,
+            EditorStyles.foldoutHeader);
+        if (!groupExpanded[index])
+            return false;
+
         for (int i = 0; i < entries.arraySize; i++)
         {
             SerializedProperty entry = entries.GetArrayElementAtIndex(i);
+            if (entry.FindPropertyRelative("factionGroup").enumValueIndex != index)
+                continue;
+
             string displayName = entry.FindPropertyRelative("displayName").stringValue;
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -44,16 +71,17 @@ internal sealed class EnemyCatalogEditor : Editor
             if (entry.isExpanded && DrawDetails(entry))
             {
                 entries.DeleteArrayElementAtIndex(i);
-                break;
+                return true;
             }
         }
 
-        if (GUILayout.Button("유닛 추가"))
+        if (GUILayout.Button($"{GroupNames[index]} 유닛 추가"))
         {
-            int index = entries.arraySize;
+            int newIndex = entries.arraySize;
             entries.arraySize++;
-            SerializedProperty entry = entries.GetArrayElementAtIndex(index);
+            SerializedProperty entry = entries.GetArrayElementAtIndex(newIndex);
             entry.isExpanded = true;
+            entry.FindPropertyRelative("factionGroup").enumValueIndex = index;
             entry.FindPropertyRelative("id").stringValue = "";
             entry.FindPropertyRelative("displayName").stringValue = "";
             entry.FindPropertyRelative("model").objectReferenceValue = null;
@@ -68,14 +96,14 @@ internal sealed class EnemyCatalogEditor : Editor
             entry.FindPropertyRelative("moveSpeed").floatValue = 1.7f;
             entry.FindPropertyRelative("armor").intValue = 0;
         }
-
-        serializedObject.ApplyModifiedProperties();
+        return false;
     }
 
     private static bool DrawDetails(SerializedProperty entry)
     {
         using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
         {
+            EditorGUILayout.PropertyField(entry.FindPropertyRelative("factionGroup"), new GUIContent("소속 팩션"));
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("id"), new GUIContent("유닛 ID"));
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("displayName"), new GUIContent("이름"));
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("model"), new GUIContent("모델"));

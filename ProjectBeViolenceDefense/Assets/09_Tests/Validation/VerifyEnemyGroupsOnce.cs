@@ -74,7 +74,9 @@ internal static class VerifyEnemyGroupsOnce
         bool pursued = false;
         int kills = 0;
         int contacts = 0;
+        int coreHitNotifications = 0;
         float minimumSpacing = float.PositiveInfinity;
+        battle.CoreHit += () => coreHitNotifications++;
         battle.EnemyRemoved += enemy =>
         {
             if (enemy.ReachedCore) contacts++;
@@ -99,6 +101,7 @@ internal static class VerifyEnemyGroupsOnce
         Require(battle.CurrentPhase == DefenseBattle.Phase.Preparation && kills + contacts == expectedEnemies &&
             battle.CoreHealth == DefenseBattle.CoreMaxHealth - contacts,
             "The round must resolve every unit and count contacts correctly.");
+        Require(coreHitNotifications == contacts, "Each core contact must notify the caster hit animation.");
         Require(battle.EnemiesPerRound == expectedEnemies + 5, "The next round must gain five reinforcements.");
         Debug.Log($"ENEMY_GROUPS_PASS: contacts={contacts}, kills={kills}, forecast={forecast}");
     }

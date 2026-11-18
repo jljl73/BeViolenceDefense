@@ -1,12 +1,22 @@
 using System;
 using UnityEngine;
 
+// 종족 묶음. Coral/Teal 출현 진영과는 별개다.
+internal enum EnemyFactionGroup
+{
+    GreenHorde,
+    Undead,
+    Beasts,
+    DragonAndDemon
+}
+
 [CreateAssetMenu(menuName = "BeViolence Defense/Enemy Catalog")]
 public sealed class EnemyCatalog : ScriptableObject
 {
     [Serializable]
     private sealed class Entry
     {
+        [SerializeField] private EnemyFactionGroup factionGroup;
         [SerializeField] private string id;
         [SerializeField] private string displayName;
         [SerializeField] private GameObject model;
@@ -24,13 +34,59 @@ public sealed class EnemyCatalog : ScriptableObject
 
         public string Id => id;
         public string DisplayName => displayName;
+        public EnemyFactionGroup FactionGroup => factionGroup;
 
         public EnemyFaction CreateFaction(string factionName, Color color, int spawnCount) =>
             new(factionName, color, attackRange, maxHealth, damage, attackInterval, spawnCount,
-                awarenessRange, moveSpeed, model, animations, skin, modelScale, armor, id);
+                awarenessRange, moveSpeed, armor, id);
+
+        public UnitVisual Visual => new(model, animations, skin, modelScale);
+    }
+
+    // 화면 전용 데이터. 전투 로직(EnemyFaction)에는 넣지 않고, 화면이 유닛 ID로 찾아 쓴다.
+    internal readonly struct UnitVisual
+    {
+        public UnitVisual(GameObject model, RuntimeAnimatorController animations, Material skin, float modelScale)
+        {
+            Model = model;
+            Animations = animations;
+            Skin = skin;
+            ModelScale = modelScale;
+        }
+
+        public GameObject Model { get; }
+        public RuntimeAnimatorController Animations { get; }
+        public Material Skin { get; }
+        public float ModelScale { get; }
+    }
+
+    internal bool TryGetVisual(string unitId, out UnitVisual visual)
+    {
+        foreach (Entry entry in entries)
+        {
+            if (string.IsNullOrWhiteSpace(unitId) || entry.Id != unitId)
+                continue;
+            visual = entry.Visual;
+            return true;
+        }
+        visual = default;
+        return false;
     }
 
     [SerializeField] private Entry[] entries = Array.Empty<Entry>();
+
+    internal bool TryGetFactionGroup(string unitId, out EnemyFactionGroup group)
+    {
+        foreach (Entry entry in entries)
+        {
+            if (entry.Id != unitId)
+                continue;
+            group = entry.FactionGroup;
+            return true;
+        }
+        group = default;
+        return false;
+    }
 
     internal EnemyFaction GetFaction(string unitId, string factionName, Color color, int spawnCount) =>
         Find(unitId, factionName)?.CreateFaction(factionName, color, spawnCount);

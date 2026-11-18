@@ -54,6 +54,9 @@ internal static class Program
             layouts = new List<Vector2Int[]> { fixedWalls.Split(';', StringSplitOptions.RemoveEmptyEntries)
                 .Select(c => c.Split(',')).Select(c => new Vector2Int(int.Parse(c[0]), int.Parse(c[1]))).ToArray() };
 
+        if (args.Length > 0 && args[0] == "determinism")
+            return Determinism(args.Skip(1).ToArray());
+
         if (args.Length > 0 && args[0] == "rounds")
         {
             Rounds(layouts, args.Skip(1).ToArray());
@@ -102,8 +105,8 @@ internal static class Program
         return result;
     }
 
-    // 실제 게임처럼 프레임마다 델타 시간이 달라지도록 seed 별로 1/144~1/40초 사이에서 흔든다. seed 0 은 고정 1/60.
-    private static readonly int Seeds = int.Parse(Environment.GetEnvironmentVariable("SEEDS") ?? "5");
+    // 게임은 고정 틱(DefenseBattle.TickDuration)으로만 진행하므로 같은 입력이면 seed 와 관계없이 결과가 같다.
+    private static readonly int Seeds = int.Parse(Environment.GetEnvironmentVariable("SEEDS") ?? "1");
 
     private static Outcome Run(Stats g, Stats z, Vector2Int[] layout, int seed = 0)
     {
@@ -135,7 +138,7 @@ internal static class Program
         {
             foreach (EnemyUnit e in battle.Enemies)
                 hpBeforeCore[e] = e.Health;
-            float dt = seed == 0 ? Step : 1f / (40f + (float)rng.NextDouble() * 104f);
+            float dt = DefenseBattle.TickDuration;
             battle.Tick(dt, pauseMovement: false);
             time += dt;
             if (!engaged && battle.Enemies.Any(e => e.AttacksPerformed > 0))
@@ -241,7 +244,7 @@ internal static class Program
             for (int i = 0; i < TickLimit && battle.CurrentPhase == DefenseBattle.Phase.Combat; i++)
             {
                 foreach (EnemyUnit e in battle.Enemies) lastHp[e] = e.Health;
-                float dt = seed == 0 ? Step : 1f / (40f + (float)rng.NextDouble() * 104f);
+                float dt = DefenseBattle.TickDuration;
                 battle.Tick(dt, pauseMovement: false);
                 untilSample -= dt;
                 if (untilSample > 0f) continue;
@@ -484,7 +487,7 @@ internal static class Program
                 for (int i = 0; i < TickLimit && battle.CurrentPhase == DefenseBattle.Phase.Combat; i++)
                 {
                     foreach (EnemyUnit e in battle.Enemies) lastHp[e] = e.Health;
-                    float dt = seed == 0 ? Step : 1f / (40f + (float)rng.NextDouble() * 104f);
+                    float dt = DefenseBattle.TickDuration;
                     battle.Tick(dt, pauseMovement: false);
                     time += dt;
                 }
@@ -519,6 +522,132 @@ internal static class Program
             Console.WriteLine("  유닛별 평균 공격 횟수 / 코어 도달률: " + string.Join(" · ", spawned.Keys.OrderBy(k => k).Select(k =>
                 $"{k} {(double)attacks[k] / spawned[k]:0.0}회/{100.0 * survived.GetValueOrDefault(k) / spawned[k]:0}%")));
         }
+    }
+
+    // ───── 결정론 검증 ─────
+    // 게임 루프와 같은 BattleClock 에 서로 다른 프레임 패턴을 넣고, 틱마다 상태 해시가 같은지 비교한다.
+    private static int Determinism(string[] a)
+    {
+        int roundIndex = a.Length > 0 ? int.Parse(a[0]) - 1 : 0;
+        var catalog = LoadCatalog(CatalogPath);
+        var spec = LoadRounds(ScenePath)[roundIndex];
+        var sideColors = new[] { new Color(1, 0.45f, 0.34f), new Color(0.27f, 0.87f, 0.81f) };
+        var queues = new IReadOnlyList<EnemyFaction>[2];
+        for (int side = 0; side < 2; side++)
+        {
+            var q = new List<EnemyFaction>();
+            foreach (var (id, n) in spec.Sides[side])
+            {
+                UnitStats st = catalog[id];
+                var f = new EnemyFaction(id, sideColors[side], st.Range, st.Hp, st.Dmg, st.Interval, 0,
+                    st.Aware, st.Speed, null, null, null, 1f, st.Armor, id);
+                for (int i = 0; i < n; i++) q.Add(f);
+            }
+            queues[side] = q;
+        }
+        var walls = (Environment.GetEnvironmentVariable("WALLS") ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries)
+            .Select(c => c.Split(',')).Select(c => new Vector2Int(int.Parse(c[0]), int.Parse(c[1]))).ToArray();
+        // 정해진 틱에 거는 마법(리플레이와 같은 방식)
+        var spells = new[]
+        {
+            new DefenseBattle.SpellCommand(420, DefenseBattle.Spell.AttackBuff, new Vector3(8, 0, 10), 0),
+            new DefenseBattle.SpellCommand(780, DefenseBattle.Spell.Heal, new Vector3(8, 0, 11), 0),
+        };
+
+        // 프레임 패턴: (이름, 프레임 번호 -> (실제 프레임 시간, 배속, 조준 중))
+        var rng = new System.Random(7);
+        var patterns = new (string Name, Func<int, (float Dt, int Speed, bool Aim)> Frame)[]
+        {
+            ("30fps", i => (1f / 30f, 1, false)),
+            ("60fps", i => (1f / 60f, 1, false)),
+            ("144fps", i => (1f / 144f, 1, false)),
+            ("들쭉날쭉 20~144fps", i => (1f / (20f + (float)rng.NextDouble() * 124f), 1, false)),
+            ("2배속·조준 슬로우·0.5초 멈칫", i => (i % 97 == 0 ? 0.5f : 1f / 75f, i % 400 < 150 ? 2 : 1, i % 400 >= 300 && i % 400 < 340)),
+        };
+
+        List<ulong> reference = null;
+        string referenceName = null;
+        bool allEqual = true;
+        Console.WriteLine($"라운드 {roundIndex + 1} ({spec.Note}) · 플레이어 벽 {walls.Length}개 · 마법 {spells.Length}회(틱 420, 780)");
+        foreach (var (name, frame) in patterns)
+        {
+            var (hashes, outcome, frames) = RunWithClock(queues, walls, spells, frame);
+            if (reference == null)
+            {
+                reference = hashes;
+                referenceName = name;
+            }
+            int mismatch = -1;
+            for (int t = 0; t < Math.Max(hashes.Count, reference.Count); t++)
+                if (t >= hashes.Count || t >= reference.Count || hashes[t] != reference[t]) { mismatch = t; break; }
+            allEqual &= mismatch < 0;
+            Console.WriteLine($"  {name,-28} 프레임 {frames,6} · 틱 {hashes.Count,5} · 최종 해시 {hashes[^1]:X16} · {outcome} · " +
+                (mismatch < 0 ? $"{referenceName}와 모든 틱 일치" : $"틱 {mismatch}부터 다름"));
+        }
+
+        // 비교용: 예전 방식처럼 프레임 시간을 그대로 한 틱으로 쓰면
+        Console.WriteLine("  [비교] 예전 방식(프레임 시간 = 틱 길이):");
+        foreach (var (name, frame) in patterns.Take(3))
+        {
+            var grid = new DefenseGrid(Board);
+            foreach (Vector2Int cell in walls) grid.TryPlace(cell);
+            var battle = new DefenseBattle(grid, new[] { new EnemyFaction("Coral", sideColors[0]), new EnemyFaction("Teal", sideColors[1]) }, _ => queues);
+            battle.StartRound();
+            for (int i = 0; i < 200000 && battle.CurrentPhase == DefenseBattle.Phase.Combat; i++)
+                battle.Tick(frame(i).Dt, false);
+            Console.WriteLine($"    {name,-8} 최종 해시 {StateHash(battle):X16} · {BattleSummary(battle)}");
+        }
+        Console.WriteLine(allEqual ? "결과: 모든 프레임 패턴에서 틱별 상태가 같다." : "결과: 프레임 패턴에 따라 상태가 달라진다.");
+        return allEqual ? 0 : 1;
+    }
+
+    private static (List<ulong> Hashes, string Outcome, int Frames) RunWithClock(IReadOnlyList<EnemyFaction>[] queues,
+        Vector2Int[] walls, DefenseBattle.SpellCommand[] spells, Func<int, (float Dt, int Speed, bool Aim)> frame)
+    {
+        var grid = new DefenseGrid(Board);
+        foreach (Vector2Int cell in walls) grid.TryPlace(cell);
+        var sides = new[] { new EnemyFaction("Coral", new Color(1, 0, 0)), new EnemyFaction("Teal", new Color(0, 1, 1)) };
+        var battle = new DefenseBattle(grid, sides, _ => queues);
+        var clock = new BattleClock();
+        battle.StartRound();
+        clock.Reset();
+        foreach (var spell in spells) battle.ScheduleSpell(spell);
+        var hashes = new List<ulong>();
+        int frames = 0;
+        for (; frames < 400000 && battle.CurrentPhase == DefenseBattle.Phase.Combat; frames++)
+        {
+            var (dt, speed, aim) = frame(frames);
+            clock.BeginFrame(dt, speed, aim);
+            for (int t = 0; t < clock.StepCount && battle.CurrentPhase == DefenseBattle.Phase.Combat; t++)
+            {
+                battle.Tick(clock.StepDeltaTime, false);
+                hashes.Add(StateHash(battle));
+            }
+        }
+        return (hashes, BattleSummary(battle), frames);
+    }
+
+    private static string BattleSummary(DefenseBattle battle) =>
+        $"코어 {battle.CoreHealth}/{DefenseBattle.CoreMaxHealth}, 마나 {battle.Mana:0.0}";
+
+    private static ulong StateHash(DefenseBattle battle)
+    {
+        ulong h = 14695981039346656037UL;
+        void Mix(long v) { unchecked { h ^= (ulong)v; h *= 1099511628211UL; } }
+        Mix(battle.TickIndex);
+        Mix(BitConverter.SingleToInt32Bits(battle.Mana));
+        Mix(battle.SpawnCount);
+        Mix(battle.CoreHealth);
+        foreach (EnemyUnit e in battle.Enemies)
+        {
+            Mix(e.SpawnOrder);
+            Mix(BitConverter.SingleToInt32Bits(e.Position.x));
+            Mix(BitConverter.SingleToInt32Bits(e.Position.z));
+            Mix(e.Health);
+            Mix(e.AttacksPerformed);
+            Mix(e.AttackBuffStacks);
+        }
+        return h;
     }
 
     // 고블린 수치를 고정하고 좀비 후보를 훑어 균형점(남은 체력 비율 차 ≈ 0)을 찾는다.

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// 전투 로직이 쓰는 유닛 종류 데이터. 화면 데이터(모델·애니메이터·머티리얼)는 넣지 않는다.
+// 화면은 UnitId 로 EnemyCatalog.TryGetVisual 을 찾아 쓴다.
 internal sealed class EnemyFaction
 {
     public string DisplayName { get; }
@@ -14,18 +16,13 @@ internal sealed class EnemyFaction
     public float DamagePerSecond => Damage / AttackInterval;
     public int SpawnCount { get; }
     public float MoveSpeed { get; }
-    public GameObject Model { get; }
-    public RuntimeAnimatorController Animations { get; }
-    public Material Skin { get; }
-    public float ModelScale { get; }
     // 공격 1회마다 받는 피해를 고정으로 줄인다.
     public int Armor { get; }
     public string UnitId { get; }
 
     public EnemyFaction(string displayName, Color color, float attackRange = 1.5f, int maxHealth = 50,
         int damage = 10, float attackInterval = 0.65f, int spawnCount = 9, float awarenessRange = 2.2f,
-        float moveSpeed = 1.7f, GameObject model = null, RuntimeAnimatorController animations = null,
-        Material skin = null, float modelScale = 1f, int armor = 0, string unitId = null)
+        float moveSpeed = 1.7f, int armor = 0, string unitId = null)
     {
         DisplayName = displayName;
         Color = color;
@@ -36,10 +33,6 @@ internal sealed class EnemyFaction
         AttackInterval = attackInterval;
         SpawnCount = spawnCount;
         MoveSpeed = moveSpeed;
-        Model = model;
-        Animations = animations;
-        Skin = skin;
-        ModelScale = modelScale;
         Armor = armor;
         UnitId = unitId;
     }
@@ -66,6 +59,8 @@ internal sealed class EnemyUnit
     public int Health { get; private set; }
     public int MaxHealth => Faction.MaxHealth;
     public Vector3 Position { get; private set; }
+    // 직전 틱 시작 때의 위치. 화면이 틱 사이를 보간할 때만 쓴다.
+    public Vector3 PreviousPosition { get; private set; }
     public Vector3 RoutePosition { get; private set; }
     public Vector3 RouteWaypoint => path[waypoint];
     public int RemainingRouteWaypoints => path.Length - waypoint;
@@ -98,7 +93,7 @@ internal sealed class EnemyUnit
         SpawnOrder = spawnOrder;
         Health = faction.MaxHealth;
         this.path = path;
-        Position = RoutePosition = path[0];
+        Position = RoutePosition = PreviousPosition = path[0];
         Heading = path[1] - Position;
     }
 
@@ -187,6 +182,8 @@ internal sealed class EnemyUnit
         float speed = Faction.MoveSpeed * (1f + MoveSpeedBonusPercent * MoveSpeedBuffStacks);
         return Vector3.MoveTowards(Position, destination, speed * deltaTime);
     }
+
+    public void BeginTick() => PreviousPosition = Position;
 
     public void MoveOffRoute(Vector3 next) => Position = next;
 
