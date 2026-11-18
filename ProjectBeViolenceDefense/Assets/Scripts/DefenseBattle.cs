@@ -5,7 +5,7 @@ using UnityEngine;
 internal sealed class DefenseBattle
 {
     public const int CoreMaxHealth = 120;
-    public const int EnemiesPerRound = 6;
+    public const int EnemiesPerRound = DefenseGrid.SpawnPointCount * UnitsPerGroup * PulsesPerRound;
     public const int HealAmount = 15;
     public const float BuffDuration = 5f;
     public const float AreaBuffRadius = 2f;
@@ -14,8 +14,11 @@ internal sealed class DefenseBattle
     private const int CastsPerSpell = 3;
     private const float StartingMana = MaxMana * 0.5f;
     private const float ManaPerSecond = 10f;
-    private const float SpawnInterval = 1.15f;
-    private const float UnitSpacing = 0.42f;
+    private const int UnitsPerGroup = 3;
+    private const int PulsesPerRound = 3;
+    private const float SpawnInterval = 2.0f;
+    private const float LaneSpacing = 0.29f;
+    private const float UnitSpacing = 0.28f;
     private const float ForecastStep = 1f / 60f;
     private const int ForecastTickLimit = 90 * 60;
 
@@ -158,28 +161,21 @@ internal sealed class DefenseBattle
             return;
 
         untilSpawn -= deltaTime;
-        if (SpawnCount < EnemiesPerRound && untilSpawn <= 0)
+        while (SpawnCount < EnemiesPerRound && untilSpawn <= 0)
         {
-            var enemy = new EnemyUnit(factions[SpawnCount % factions.Length],
-                grid.Routes[SpawnCount % grid.Routes.Count], SpawnCount);
-            SpawnCount++;
             untilSpawn += SpawnInterval;
-            enemies.Add(enemy);
-            EnemySpawned?.Invoke(enemy);
+            SpawnGroups();
         }
 
         // Evaluate attacks from a common snapshot. Both sides of a duel can land a lethal hit.
-        int coreDamage = 0;
         foreach (EnemyUnit enemy in enemies)
         {
             enemy.TickTimers(deltaTime);
             enemy.Target = FindTarget(enemy);
-            Vector3 coreTarget = grid.ClosestCorePoint(enemy.Position);
-            enemy.AttackingCore = enemy.Target == null && CanReach(enemy, coreTarget);
             if (enemy.Target != null)
             {
                 enemy.Face(enemy.Target.Position);
-                if (enemy.CanAttack)
+                if (enemy.CanAttack && CanReach(enemy, enemy.Target.Position, enemy.Faction.AttackRange))
                 {
                     if (forecastCells != null)
                     {
@@ -191,23 +187,39 @@ internal sealed class DefenseBattle
                     enemy.Target.QueueDamage(enemy.Attack());
                 }
             }
-            else if (enemy.AttackingCore)
-            {
-                enemy.Face(coreTarget);
-                if (enemy.CanAttack)
-                    coreDamage += enemy.Attack();
-            }
         }
 
-        CoreHealth = Mathf.Max(0, CoreHealth - coreDamage);
         for (int i = enemies.Count - 1; i >= 0; i--)
         {
             EnemyUnit enemy = enemies[i];
             enemy.ResolveDamage();
             if (!enemy.IsAlive)
+                RemoveEnemyAt(i);
+        }
+
+        if (!pauseMovement)
+        {
+            foreach (EnemyUnit enemy in enemies)
             {
-                enemies.RemoveAt(i);
-                EnemyRemoved?.Invoke(enemy);
+                if (enemy.Target is { IsAlive: true } target)
+                {
+                    if (CanReach(enemy, target.Position, enemy.Faction.AttackRange) ||
+                        TryPursue(enemy, target, deltaTime))
+                        continue;
+                }
+
+                AdvanceUnit(enemy, deltaTime);
+            }
+
+            for (int i = enemies.Count - 1; i >= 0; i--)
+            {
+                EnemyUnit enemy = enemies[i];
+                if (!enemy.ReachedCore)
+                    continue;
+
+                CoreHealth = Mathf.Max(0, CoreHealth - 1);
+                enemy.Die();
+                RemoveEnemyAt(i);
             }
         }
 
@@ -215,15 +227,6 @@ internal sealed class DefenseBattle
         {
             CurrentPhase = Phase.Defeat;
             return;
-        }
-
-        if (!pauseMovement)
-        {
-            foreach (EnemyUnit enemy in enemies)
-            {
-                if (enemy.Target == null && !enemy.AttackingCore)
-                    AdvanceUnit(enemy, deltaTime);
-            }
         }
 
         if (SpawnCount == EnemiesPerRound && enemies.Count == 0)
@@ -234,16 +237,61 @@ internal sealed class DefenseBattle
         }
     }
 
+    private void SpawnGroups()
+    {
+        int pulse = SpawnCount / (DefenseGrid.SpawnPointCount * UnitsPerGroup);
+        for (int factionIndex = 0; factionIndex < grid.Routes.Count; factionIndex++)
+        {
+            Vector3[] route = grid.Routes[factionIndex];
+            for (int lane = -1; lane <= 1; lane++)
+            {
+                var enemy = new EnemyUnit(factions[factionIndex], factionIndex,
+                    GroupRoute(route, lane, pulse), SpawnCount);
+                SpawnCount++;
+                enemies.Add(enemy);
+                EnemySpawned?.Invoke(enemy);
+            }
+        }
+    }
+
+    private static Vector3[] GroupRoute(Vector3[] route, int lane, int pulse)
+    {
+        var path = new Vector3[route.Length];
+        Vector3 previousSide = Vector3.zero;
+        for (int i = 0; i < route.Length; i++)
+        {
+            Vector3 side = i == route.Length - 1 ? Vector3.zero :
+                Vector3.Cross(Vector3.up, (route[i + 1] - route[i]).normalized);
+            // At a corner, join the two lane offsets inside the turning tile.
+            Vector3 offset = side == previousSide ? side : side + previousSide;
+            path[i] = route[i] + offset * (lane * LaneSpacing);
+            previousSide = side;
+        }
+
+        // Fill the spawn tile front to back so all three pulses can start while movement is paused.
+        float startOffset = UnitSpacing * (1 - pulse) + (lane == 0 ? -0.12f : 0.12f);
+        path[0] += (route[1] - route[0]).normalized * startOffset;
+
+        return path;
+    }
+
+    private void RemoveEnemyAt(int index)
+    {
+        EnemyUnit enemy = enemies[index];
+        enemies.RemoveAt(index);
+        EnemyRemoved?.Invoke(enemy);
+    }
+
     private EnemyUnit FindTarget(EnemyUnit enemy)
     {
-        if (enemy.Target is { IsAlive: true } && CanReach(enemy, enemy.Target.Position))
+        if (enemy.Target is { IsAlive: true } && CanReach(enemy, enemy.Target.Position, enemy.Faction.AwarenessRange))
             return enemy.Target;
 
         EnemyUnit nearest = null;
         float nearestDistance = float.PositiveInfinity;
         foreach (EnemyUnit other in enemies)
         {
-            if (other.Faction == enemy.Faction || !CanReach(enemy, other.Position))
+            if (other.Faction == enemy.Faction || !CanReach(enemy, other.Position, enemy.Faction.AwarenessRange))
                 continue;
 
             float distance = (other.Position - enemy.Position).sqrMagnitude;
@@ -256,16 +304,25 @@ internal sealed class DefenseBattle
         return nearest;
     }
 
-    private bool CanReach(EnemyUnit attacker, Vector3 target)
-    {
-        float range = attacker.Faction.AttackRange;
-        return (target - attacker.Position).sqrMagnitude <= range * range &&
+    private bool CanReach(EnemyUnit attacker, Vector3 target, float range) =>
+        (target - attacker.Position).sqrMagnitude <= range * range &&
             grid.HasLineOfSight(attacker.Position, target);
+
+    private bool TryPursue(EnemyUnit enemy, EnemyUnit target, float deltaTime)
+    {
+        Vector3 next = enemy.StepToward(target.Position, deltaTime);
+        // Keep a clear way back to the lane if the target escapes or dies.
+        if (!grid.CanPursue(enemy.Position, next) || !grid.CanPursue(enemy.RoutePosition, next))
+            return false;
+
+        enemy.Face(target.Position);
+        enemy.MoveOffRoute(next);
+        return true;
     }
 
     private void AdvanceUnit(EnemyUnit enemy, float deltaTime)
     {
-        Vector3 next = enemy.NextPosition(deltaTime);
+        Vector3 next = enemy.NextRoutePosition(deltaTime);
         Vector3 step = next - enemy.Position;
         enemy.Face(next);
 
@@ -282,6 +339,6 @@ internal sealed class DefenseBattle
                 return;
             }
         }
-        enemy.MoveTo(next);
+        enemy.FollowRoute(next);
     }
 }

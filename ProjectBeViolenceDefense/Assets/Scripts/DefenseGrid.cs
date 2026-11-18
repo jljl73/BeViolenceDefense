@@ -6,23 +6,23 @@ internal sealed class DefenseGrid
 {
     public const int Width = 12;
     public const int Depth = Width;
+    public const int SpawnPointCount = 2;
     public const int WallLimit = 8;
     public const float WallWidth = 0.92f;
     public const float WallHeight = 0.8f;
 
     private static readonly RectInt CoreFootprint = new(0, Depth - 2, 2, 2);
-    // 4, 6 and 8 o'clock in the default camera view, in spawn order.
-    private static readonly Vector2Int[] Spawns = { new(11, 4), new(8, 0), new(4, 0) };
-    // 22 of 144 cells. The dividers funnel the three approaches into the lane at z = 5.
+    // Left and right corners in the default camera view, in faction order.
+    private static readonly Vector2Int[] Spawns = { Vector2Int.zero, new(Width - 1, Depth - 1) };
+    // The two sides meet at (4, 7), the opening in the diagonal barrier.
     private static readonly Vector2Int[] InitialWalls =
     {
-        // Upper edge of the shared lane.
-        new(4, 6), new(5, 6), new(4, 7), new(4, 8), new(3, 8),
-        new(7, 6), new(8, 6), new(9, 6), new(10, 6), new(11, 6), new(10, 7), new(10, 8),
-        // Dividers on the lower approaches.
-        new(0, 3), new(1, 3), new(2, 3), new(3, 3), new(4, 3), new(5, 3),
-        new(3, 2),
-        new(7, 1), new(7, 2), new(7, 3)
+        new(0, 3), new(1, 4), new(2, 5), new(3, 6),
+        new(8, 11), new(7, 10), new(6, 9), new(5, 8),
+        new(0, 4), new(1, 5), new(2, 6),
+        new(7, 11), new(6, 10), new(5, 9),
+        // Divider on the centerline between the approaches.
+        new(10, 1), new(9, 2), new(8, 3), new(7, 4), new(6, 5)
     };
     private static readonly Vector2Int[] Directions =
     {
@@ -50,7 +50,7 @@ internal sealed class DefenseGrid
 
     public bool IsWalkable(Vector2Int cell) => InBounds(cell) && !CoreFootprint.Contains(cell) && !IsWall(cell);
 
-    public Vector3 ClosestCorePoint(Vector3 position) => new(
+    private static Vector3 ClosestCorePoint(Vector3 position) => new(
         Mathf.Clamp(position.x, CoreFootprint.xMin - 0.5f, CoreFootprint.xMax - 0.5f),
         0f,
         Mathf.Clamp(position.z, CoreFootprint.yMin - 0.5f, CoreFootprint.yMax - 0.5f));
@@ -83,6 +83,21 @@ internal sealed class DefenseGrid
     }
 
     public bool HasLineOfSight(Vector3 from, Vector3 to)
+        => IsWallFree(from, to, 0f);
+
+    public bool CanPursue(Vector3 from, Vector3 to)
+    {
+        Vector3 step = to - from;
+        float length = step.magnitude;
+        if (length == 0f)
+            return true;
+
+        var coreBounds = new Bounds(CorePosition, new Vector3(CoreSize.x, 1f, CoreSize.y));
+        return (!coreBounds.IntersectRay(new Ray(from, step / length), out float distance) || distance > length) &&
+            IsWallFree(from, to, 0.24f);
+    }
+
+    private bool IsWallFree(Vector3 from, Vector3 to, float wallExpansion)
     {
         Vector3 step = to - from;
         float length = step.magnitude;
@@ -92,12 +107,12 @@ internal sealed class DefenseGrid
         var ray = new Ray(from + Vector3.up * (WallHeight * 0.5f), step / length);
         foreach (Vector2Int cell in fixedWalls)
         {
-            if (IntersectsWall(cell, ray, length))
+            if (IntersectsWall(cell, ray, length, wallExpansion))
                 return false;
         }
         foreach (Vector2Int cell in placed)
         {
-            if (IntersectsWall(cell, ray, length))
+            if (IntersectsWall(cell, ray, length, wallExpansion))
                 return false;
         }
         return true;
@@ -111,25 +126,29 @@ internal sealed class DefenseGrid
     public static Vector2Int PositionToCell(Vector3 position) =>
         new(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.z));
 
-    private static bool IntersectsWall(Vector2Int cell, Ray ray, float length) =>
-        WallBounds(cell).IntersectRay(ray, out float distance) && distance <= length;
+    private static bool IntersectsWall(Vector2Int cell, Ray ray, float length, float expansion)
+    {
+        Bounds bounds = WallBounds(cell);
+        bounds.Expand(expansion);
+        return bounds.IntersectRay(ray, out float distance) && distance <= length;
+    }
 
     private bool IsWall(Vector2Int cell) => fixedWalls.Contains(cell) || placed.Contains(cell);
 
     private Vector3[][] FindRoutes(Vector2Int? candidate = null)
     {
         // Flood from all open tiles touching the core's sides.
-        var parents = new Vector2Int?[Width, Depth];
+        var distances = new int[Width, Depth];
         var queue = new Queue<Vector2Int>();
         foreach (Vector2Int coreCell in CoreFootprint.allPositionsWithin)
         {
             foreach (Vector2Int direction in Directions)
             {
                 Vector2Int approach = coreCell + direction;
-                if (!IsWalkable(approach) || approach == candidate || parents[approach.x, approach.y].HasValue)
+                if (!IsWalkable(approach) || approach == candidate || distances[approach.x, approach.y] != 0)
                     continue;
 
-                parents[approach.x, approach.y] = approach;
+                distances[approach.x, approach.y] = 1;
                 queue.Enqueue(approach);
             }
         }
@@ -140,30 +159,40 @@ internal sealed class DefenseGrid
             foreach (Vector2Int direction in Directions)
             {
                 Vector2Int next = cell + direction;
-                if (!IsWalkable(next) || next == candidate || parents[next.x, next.y].HasValue)
+                if (!IsWalkable(next) || next == candidate || distances[next.x, next.y] != 0)
                     continue;
 
-                parents[next.x, next.y] = cell;
+                distances[next.x, next.y] = distances[cell.x, cell.y] + 1;
                 queue.Enqueue(next);
             }
         }
 
-        var result = new Vector3[Spawns.Length][];
-        for (int i = 0; i < Spawns.Length; i++)
+        var result = new Vector3[SpawnPointCount][];
+        for (int i = 0; i < result.Length; i++)
         {
             Vector2Int cell = Spawns[i];
-            if (!parents[cell.x, cell.y].HasValue)
+            int distance = distances[cell.x, cell.y];
+            if (distance == 0)
                 return null;
 
             var path = new List<Vector3> { CellPosition(cell) };
-            while (parents[cell.x, cell.y].Value != cell)
+            while (distance > 1)
             {
-                cell = parents[cell.x, cell.y].Value;
-                path.Add(CellPosition(cell));
+                // Mirror the tie-break so equally short paths respect the default terrain's symmetry.
+                foreach (Vector2Int direction in Directions)
+                {
+                    Vector2Int step = i == 0 ? direction : new Vector2Int(-direction.y, -direction.x);
+                    Vector2Int next = cell + step;
+                    if (!InBounds(next) || distances[next.x, next.y] != distance - 1)
+                        continue;
+
+                    cell = next;
+                    distance--;
+                    path.Add(CellPosition(cell));
+                    break;
+                }
             }
-            // Stop just outside the footprint so even the shortest attack range can reach it.
-            Vector3 approach = CellPosition(cell);
-            path.Add(Vector3.MoveTowards(ClosestCorePoint(approach), approach, 0.08f));
+            path.Add(ClosestCorePoint(CellPosition(cell)));
             result[i] = path.ToArray();
         }
         return result;
