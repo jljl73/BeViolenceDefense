@@ -1414,3 +1414,62 @@
 - 웨이브 버튼의 카운트다운 링은 그림에 고정(약 2/3). 실제 웨이브 타이머 기능이 없음
 - "경합 중인 적 수"는 진영별 생존 수로 임시 구현. 스테이지 번호는 라운드 값 사용
 - 설정 버튼은 알림 문구만 표시. 실제 마우스 클릭으로는 미확인(onClick 직접 호출로 검증)
+
+### [20261118-dialogue-h1] 캐릭터 대사창 UI 목업 제작
+- 시각: 2026-11-18 22:26:41 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / imagegen CLI·OpenAI Image API gpt-image-2.6-sunburst high / Python Pillow·NumPy
+- 목적 및 적용 위치: 비대칭 손그림 프레임과 자두색/모브 팔레트의 캐릭터 대사창 시안.
+- 사용 방식: 사용자 요청을 캐릭터 대사창으로 해석한다고 알리고 빈 패널/이름표를API1회 생성. 기존 주인공 초상과 게임 폰트netmarbleM.ttf를 로컬 합성. 역할명·게임 핵심 규칙 기반 예시 대사2줄·다음 진행 표시 배치.
+- 결과 및 확인 방법: 성공.1536×1024 완성 목업 및 확대 크롭. 프레임/이름표/초상/본문/진행 표시 육안 확인, 본문 폭·초상과 비중첩 계산, 원본 초상 해시 불변·ZIP 무결성 확인. 실제 대사 동작/Unity 적용은 미실행.
+- 사람의 개입: 사용자가 “다이얼로그 UI 한 번 만들어볼래?”라고 요청. 대사창 해석 및 예시 내용의 최종 채택 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/H1_Dialogue_20261118/ | Codex·Image API·Pillow | 생성 | 빈 아트 원본·완성 목업·확인 크롭·요청/프롬프트/참고/로그/배치/검증/재현/README·ZIP. 상세 목록 README.md 참조. 게임 미적용 |
+| Art2D/Portraits/Caster/Caster_Portrait_neutral.png | 기존 사용자 에셋 | 수정 없음 | 초상 원본을 재사용. 목업에서만 크기/하단 끝 페더링 처리 |
+| ProjectBeViolenceDefense/Assets/07_UI/00_Fonts/netmarbleM.ttf | 기존 프로젝트 폰트 | 수정 없음 | 이름/본문/진행 표시 래스터 렌더에 사용. 폰트 재배포 없음 |
+
+#### 증거
+- ArtDirection/Mockups/H1_Dialogue_20261118/api-generation.log
+- ArtDirection/Mockups/H1_Dialogue_20261118/validation.json
+- ArtDirection/Mockups/H1_Dialogue_20261118/Dialogue_H1_Mockup.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: 기존 승인 imagegen CLI edit 경로, gpt-image-2.6-sunburst high,1536×1024,참고2장.
+- 사용 방식: 빈 대사창 아트 생성1회40.0초. 캐릭터와 문자는 추가 생성 없이 기존 초상/폰트로 합성. 비밀키 출력·저장 없음.
+
+#### 주요 프롬프트
+- 사용 도구: Codex·Image API
+- 프롬프트 원문: “다이얼로그 UI 한 번 만들어볼래?”
+- 실제 전송 프롬프트: ArtDirection/Mockups/H1_Dialogue_20261118/PROMPTS.txt
+- 결과 및 실제 활용 방식: 기존 아트 테마의 캐릭터 대사창 목업으로 제작.
+- 선정 이유: 새로운 UI 종류의 시안 제작을 요청한 핵심 입력.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 캐릭터 대사창인지 확인/취소 팝업인지 의도 최종 확인. 이름과 대사는 배치 예시이며 확정 기획이 아님. 생산 에셋 분절·동적 텍스트/다국어·입력·Unity 적용 검증 필요. 코드·씬·프리팹·토큰·메타 변경 없음.
+
+### [20261118-merge-hud] 원격 병합(방어력 버프·스킬 이펙트·밸런싱)과 HUD 재연결
+- 시각: 2026-11-18 (세부 시각 확인 필요)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Claude Fable 5.2), git, Unity CLI
+- 목적 및 적용 위치: 원격 main 3개 커밋 위로 로컬 2개 커밋 리베이스. `VoxelDefensePrototype.cs`, `DefenseHud.cs`, `UIPalette.cs`, `docs/ui-flow.md` 충돌 해결
+- 사용 방식: 양쪽 변경을 모두 유지(범위 조절 인자 + 외부 HUD 갱신, 방어력 색은 팀원의 `Armor` 토큰 사용, 문서 마나 색만 새 값). 진영 구조 변경에 맞춰 적 수 집계를 `FactionIndex`로 수정. 방어력 슬롯용 선택 아이콘 필드 `ArmorBuff` 추가. 테스트 씬은 최신 GameScene을 다시 복사해 HUD 프리팹 3종과 hudArt 값을 재연결
+- 결과 및 확인 방법: 성공. 컴파일 오류 0, 콘솔 오류 0, 테스트 씬 Play Mode에서 전투 시작·조준·마나 부족 캡처 확인(슬롯 4개 모두 프레임·아이콘 표시). GameScene 파일은 변경 없음
+- 사람의 개입: pull·충돌 해결·커밋·푸시 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `Assets/02_Scripts/06_UI/DefenseHud.cs`, `Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs` | Claude Code | 수정 | 충돌 해결, 병합 후 컴파일 오류 2건 수정, `ArmorBuff` 필드 |
+| `Assets/01_Scenes/03_Test/GameScene_LeftCoreHud.unity` | Unity CLI | 교체 | 최신 GameScene 기반으로 재생성 |
+
+#### 증거
+- `Tools/_out/ui_mock/merged_aim.jpg` (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 병합 후 컴파일 확인, 테스트 씬 재생성, Play Mode 캡처
+- 활용 방식: `script eval --file`
+- 잘된 점: 직렬화 필드 중 비어 있는 참조를 나열해 누락(enemyCatalog) 발견
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음

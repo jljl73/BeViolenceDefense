@@ -464,7 +464,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             {
                 if (!enemy.IsAlive)
                     continue;
-                if (enemy.Faction == coral)
+                if (enemy.FactionIndex == 0)
                     left++;
                 else
                     right++;

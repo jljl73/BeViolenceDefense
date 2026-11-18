@@ -24,6 +24,8 @@ internal sealed class DefenseHud
         public Sprite Enemy;
         public Sprite Mana;
         public Sprite Lock;
+        [Tooltip("선택. 비우면 방어력 버프 슬롯은 Wall 아이콘을 쓴다.")]
+        public Sprite ArmorBuff;
         [Tooltip("선택. 넣으면 스킬 슬롯 뒤에 프레임을 깔고, 조준 중인 스킬은 선택 프레임으로 바꾼다.")]
         public Sprite SlotFrame;
         public Sprite SlotFrameSelected;
@@ -168,7 +170,7 @@ internal sealed class DefenseHud
             DefenseBattle.Spell.Heal, UIPalette.Heal, cast);
         moveSpeedBuff = CreateSpellSlot("Move Speed Buff", 2, "3", this.art.MoveSpeedBuff,
             DefenseBattle.Spell.MoveSpeedBuff, UIPalette.MoveSpeed, cast);
-        armorBuff = CreateSpellSlot("Armor Buff", 3, "4", this.art.Wall,
+        armorBuff = CreateSpellSlot("Armor Buff", 3, "4", this.art.ArmorBuff != null ? this.art.ArmorBuff : this.art.Wall,
             DefenseBattle.Spell.ArmorBuff, UIPalette.Armor, cast);
 
         manaGauge = Rect("Mana Gauge", spellBar, Vector2.up, Vector2.up,
