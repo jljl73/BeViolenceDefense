@@ -1,0 +1,178 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.Rendering;
+using Object=UnityEngine.Object;
+
+[InitializeOnLoad]
+public static class MapReadabilityCapture
+{
+    const string Key="MapReadabilityCapture.Running", Folder="/tmp/map-readability-captures";
+    static int stageIndex, phase, settle;
+    static double started;
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static DefenseGrid grid;
+    static DefenseBoardView view;
+    static DefenseHud hud;
+    static Camera camera;
+    static EnemyCatalog catalog;
+    static StageContent stage;
+    static Quaternion commonRotation;
+    static Metadata meta;
+    static object Field(object o,string name)=>o.GetType().GetField(name,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).GetValue(o);
+    static IDictionary Views=>(IDictionary)Field(view,"enemyViews");
+    static MapReadabilityCapture(){EditorApplication.update+=Update;}
+    [Serializable] public class Sample { public string kind,id;public int faction;public float[] rect; }
+    [Serializable] public class Metadata
+    {
+        public int index,width,depth;public string name,prefab,tileA,tileB,routeTile;public float cellSize,nativeZoom,probeZoom;public Vector3 angle,place;public int enemiesAtTenSeconds;public Sample[] samples;
+    }
+    public static void Run()
+    {
+        Directory.CreateDirectory(Folder);EditorSceneManager.OpenScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");
+        SessionState.SetBool(Key,true);EditorApplication.EnterPlaymode();
+    }
+    static void Update()
+    {
+        if(!SessionState.GetBool(Key,false)||!EditorApplication.isPlaying||EditorApplication.isCompiling)return;
+        try
+        {
+            if(started==0)started=EditorApplication.timeSinceStartup;
+            if(EditorApplication.timeSinceStartup-started>360)throw new Exception("Capture timeout");
+            if(phase==-1)
+            {
+                var next=Object.FindFirstObjectByType<StageSelectionController>();
+                if(next==null||next.SelectedStage>=0)return;
+                phase=0;return;
+            }
+            if(phase==0)
+            {
+                var selection=Object.FindFirstObjectByType<StageSelectionController>();if(selection==null)return;
+                if(selection.CurrentStage==null)
+                {
+                    var ui=Object.FindFirstObjectByType<UIManager>();if(ui!=null&&ui.HasOpenPopup)selection.SelectStage(stageIndex);return;
+                }
+                var transition=Object.FindFirstObjectByType<StageTransition>();if(transition!=null&&transition.IsPlaying)return;
+                game=Object.FindFirstObjectByType<VoxelDefensePrototype>();battle=(DefenseBattle)Field(game,"battle");if(battle==null)return;
+                game.enabled=false;stage=selection.CurrentStage;
+                grid=(DefenseGrid)Field(game,"grid");view=(DefenseBoardView)Field(game,"view");hud=(DefenseHud)Field(game,"hud");camera=(Camera)Field(game,"boardCamera");catalog=(EnemyCatalog)Field(game,"enemyCatalog");
+                if(stageIndex==0)commonRotation=camera.transform.rotation;
+                meta=new Metadata {index=stageIndex,name=stage.DisplayName,prefab=stage.name,width=grid.Width,depth=grid.Depth,cellSize=grid.CellSize,nativeZoom=camera.orthographicSize,
+                    tileA=ColorUtility.ToHtmlStringRGB(stage.Theme.tileA),tileB=ColorUtility.ToHtmlStringRGB(stage.Theme.tileB),routeTile=ColorUtility.ToHtmlStringRGB(stage.Theme.routeTile)};
+                view.ShowPlanningTiles(battle.RoundRoutes(),battle.ForecastEncounterCells());view.AdvanceRouteMarkers(.25f);
+                settle=0;phase=1;return;
+            }
+            if(phase==1)
+            {
+                if(++settle<5)return;
+                Capture("planning",true);
+                typeof(VoxelDefensePrototype).GetMethod("StartBattle",BindingFlags.NonPublic|BindingFlags.Instance).Invoke(game,null);
+                for(int tick=0;tick<600;tick++)
+                {
+                    battle.Tick(DefenseBattle.TickDuration,false);
+                    foreach(var unit in battle.Enemies)
+                    {
+                        view.SyncEnemy(unit,DefenseBattle.TickDuration,0f);
+                        var animator=(Animator)Field(Views[unit],"Animator");
+                        if(animator!=null){animator.speed=1;animator.Update(DefenseBattle.TickDuration);animator.speed=0;}
+                    }
+                    view.AdvanceEffects(DefenseBattle.TickDuration);
+                }
+                meta.enemiesAtTenSeconds=battle.Enemies.Count;
+                hud.Refresh(battle,grid,view,null,null,0,1);settle=0;phase=2;return;
+            }
+            if(phase==2)
+            {
+                if(++settle<3)return;
+                Capture("battle-10s",true);
+                // Controlled comparison only: hide gameplay actors/temporary effects and weather.
+                view.AdvanceEffects(10f);
+                foreach(DictionaryEntry entry in Views)((Transform)Field(entry.Value,"Root")).gameObject.SetActive(false);
+                foreach(var particles in Object.FindObjectsByType<ParticleSystem>(FindObjectsSortMode.None))particles.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
+                view.ShowPlanningTiles(null);
+                Vector3 place=Vector3.zero;float best=float.PositiveInfinity;
+                for(int z=2;z<grid.Depth-3;z++)for(int x=2;x<grid.Width-3;x++)
+                {
+                    bool clear=true;for(int dx=-1;dx<=2;dx++)for(int dz=-1;dz<=2;dz++)clear&=grid.IsWalkable(new Vector2Int(x+dx,z+dz));
+                    float score=(new Vector2(x+.5f,z+.5f)-new Vector2(grid.Width*.5f,grid.Depth*.5f)).sqrMagnitude;
+                    if(clear&&score<best){best=score;place=new Vector3(x+.5f,0,z+.5f);}
+                }
+                if(float.IsPositiveInfinity(best))throw new Exception("No 4x4 comparison patch: "+stage.name);
+                camera.transform.rotation=commonRotation;camera.orthographicSize=1.8f;
+                camera.transform.position=game.transform.TransformPoint(place+Vector3.up*.2f)-camera.transform.forward*20;
+                meta.angle=camera.transform.eulerAngles;meta.place=place;meta.probeZoom=1.8f;
+                settle=0;phase=3;return;
+            }
+            if(phase==3)
+            {
+                if(++settle<3)return;
+                Capture("floor-only",false);
+                var samples=new List<Sample>();string[] ids={"goblin-grunt-1500","zombie","bat","demon"};
+                Vector3 right=Vector3.ProjectOnPlane(camera.transform.right,Vector3.up).normalized;
+                Vector3 forward=Vector3.ProjectOnPlane(camera.transform.forward,Vector3.up).normalized;
+                var colors=(IReadOnlyList<EnemyFaction>)Field(view,"factions");
+                float arrowHeight=(float)typeof(DefenseBoardView).GetField("RouteMarkerHeight",BindingFlags.NonPublic|BindingFlags.Static).GetValue(null);
+                float arrowWidth=(float)Field(view,"singleLaneRouteWidth");
+                for(int i=0;i<4;i++)
+                {
+                    Vector3 p=meta.place+right*((i-1.5f)*.72f)-forward*.35f;
+                    var unit=new EnemyUnit(catalog.GetUnit(ids[i],colors[i].Color,"readability probe"),i,new[]{view.ToWorld(p),view.ToWorld(p+forward)},10000+i);
+                    view.AddEnemy(unit);view.SyncEnemy(unit,0,0);
+                    var body=(Renderer[])Field(Views[unit],"Renderers");Bounds bounds=body[0].bounds;foreach(var part in body)bounds.Encapsulate(part.bounds);
+                    samples.Add(new Sample{kind="unit",id=ids[i],faction=i,rect=Rect(bounds)});
+                    var go=new GameObject("Readability Arrow",typeof(MeshFilter),typeof(MeshRenderer));go.transform.SetParent(game.transform,false);
+                    go.transform.localPosition=meta.place+right*((i-1.5f)*.72f)+forward*.6f+Vector3.up*arrowHeight;
+                    go.transform.rotation=Quaternion.LookRotation(game.transform.TransformDirection(forward));go.transform.localScale=new Vector3(arrowWidth,1,1);
+                    go.GetComponent<MeshFilter>().sharedMesh=(Mesh)Field(view,"routeMarkerMesh");var mr=go.GetComponent<MeshRenderer>();mr.sharedMaterial=(Material)Field(view,"routeMarkerMaterial");
+                    mr.shadowCastingMode=ShadowCastingMode.Off;mr.receiveShadows=false;var block=new MaterialPropertyBlock();block.SetColor("_BaseColor",colors[i].Color);mr.SetPropertyBlock(block);
+                    samples.Add(new Sample{kind="arrow",id="faction-"+i,faction=i,rect=Rect(mr.bounds)});
+                }
+                meta.samples=samples.ToArray();settle=0;phase=4;return;
+            }
+            if(phase==4)
+            {
+                if(++settle<3)return;
+                Capture("probe-normal",false);
+                var floor=(MeshRenderer[,])Field(view,"floor");var route=(Material)Field(view,"routeTile");
+                foreach(var tile in floor)tile.sharedMaterial=route;
+                Capture("probe-route",false);
+                File.WriteAllText(Path.Combine(Folder,$"stage-{stageIndex}-meta.json"),JsonUtility.ToJson(meta,true));
+                Debug.Log($"MAP_CAPTURE_PASS index={stageIndex} name={stage.name} grid={grid.Width}x{grid.Depth} enemies10s={meta.enemiesAtTenSeconds}");
+                stageIndex++;
+                if(stageIndex>=5){SessionState.SetBool(Key,false);Debug.Log("ALL_MAP_CAPTURES_PASS count=5");EditorApplication.Exit(0);return;}
+                phase=-1;SceneManager.LoadScene("GameScene");
+            }
+        }
+        catch(Exception e){Debug.LogException(e);SessionState.SetBool(Key,false);EditorApplication.Exit(1);}
+    }
+    static float[] Rect(Bounds bounds)
+    {
+        Vector2 min=new(float.PositiveInfinity,float.PositiveInfinity),max=new(float.NegativeInfinity,float.NegativeInfinity);
+        for(int i=0;i<8;i++)
+        {
+            Vector3 p=bounds.center+Vector3.Scale(bounds.extents,new Vector3((i&1)==0?-1:1,(i&2)==0?-1:1,(i&4)==0?-1:1));
+            Vector3 v=camera.WorldToViewportPoint(p);Vector2 px=new(v.x*1280,(1-v.y)*960);min=Vector2.Min(min,px);max=Vector2.Max(max,px);
+        }
+        return new[]{min.x,min.y,max.x,max.y};
+    }
+    static void Capture(string name,bool ui)
+    {
+        var canvas=((RectTransform)Field(hud,"markers")).GetComponentInParent<Canvas>().rootCanvas;
+        var mode=canvas.renderMode;var oldCamera=canvas.worldCamera;float distance=canvas.planeDistance;int order=canvas.sortingOrder;bool enabled=canvas.enabled;
+        var rt=new RenderTexture(1280,960,24);var previous=camera.targetTexture;var active=RenderTexture.active;
+        camera.targetTexture=rt;canvas.enabled=ui;
+        if(ui){canvas.renderMode=RenderMode.ScreenSpaceCamera;canvas.worldCamera=camera;canvas.planeDistance=1;canvas.sortingOrder=300;}
+        Canvas.ForceUpdateCanvases();camera.Render();RenderTexture.active=rt;
+        var texture=new Texture2D(1280,960,TextureFormat.RGB24,false);texture.ReadPixels(new Rect(0,0,1280,960),0,0);texture.Apply();
+        File.WriteAllBytes(Path.Combine(Folder,$"stage-{stageIndex}-{name}.png"),texture.EncodeToPNG());
+        canvas.enabled=enabled;canvas.renderMode=mode;canvas.worldCamera=oldCamera;canvas.planeDistance=distance;canvas.sortingOrder=order;camera.targetTexture=previous;RenderTexture.active=active;
+        Object.Destroy(texture);rt.Release();Object.Destroy(rt);Canvas.ForceUpdateCanvases();
+    }
+}

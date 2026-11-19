@@ -1,0 +1,1 @@
+598d5c0820607d017593c829059776a6cbe3ce94d658ca1d466b94abef836b8c  ProjectBeViolenceDefense/Assets/Settings/Stage/Stage_GoldenMaple_Volume.asset

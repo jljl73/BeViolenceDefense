@@ -1,0 +1,6 @@
+planning: RGB mean absolute difference = [13.287224934895834, 8.3688134765625, 31.004330240885416]
+battle-10s: RGB mean absolute difference = [12.9893310546875, 8.233455403645833, 30.214453938802084]
+floor-only: RGB mean absolute difference = [10.992259928385417, 7.159352213541666, 31.22189208984375]
+probe-normal: RGB mean absolute difference = [10.447528483072917, 7.5867919921875, 29.505658365885417]
+probe-route: RGB mean absolute difference = [16.031649576822918, 5.360297037760417, 41.30550455729167]
+This verifies different renders, not a readability score.
