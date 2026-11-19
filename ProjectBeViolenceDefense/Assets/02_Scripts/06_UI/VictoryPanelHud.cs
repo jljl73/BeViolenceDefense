@@ -10,6 +10,7 @@ using UnityEngine.UI;
 /// VoxelDefensePrototype 이 <see cref="Bind"/>로 승리·패배 판정에 연결한다. 연결 전 <see cref="testKey"/>가 켜져 있으면
 /// <see cref="testKeyCode"/> 키로 예시 값을 띄우고 닫는다. 주인공 그림은 정지 그림이거나, 프레임을 격자로 이어 붙인 시트를 반복 재생한다.
 /// 배치는 VictoryPanelHud.prefab / DefeatPanelHud.prefab에 있다. 패배 패널은 캡션 필드를 비워 두고 자기 글자를 쓴다.
+/// 승리 패널은 남은 코어 체력 비율로 별 1~3개를 매겨 패널 위에 차례로 띄운다(<see cref="StarCount"/>).
 /// </summary>
 public sealed class VictoryPanelHud : MonoBehaviour
 {
@@ -45,6 +46,12 @@ public sealed class VictoryPanelHud : MonoBehaviour
     [SerializeField] private Button nextButton;
     [SerializeField] private Button retryButton;
 
+    [Header("Stars (승리 패널만. 비우면 별점을 표시하지 않는다)")]
+    [Tooltip("왼쪽부터 별 세 칸")]
+    [SerializeField] private RawImage[] stars = System.Array.Empty<RawImage>();
+    [SerializeField] private Texture2D starOn;
+    [SerializeField] private Texture2D starOff;
+
     [Header("Motion (unscaled seconds)")]
     [SerializeField] private float characterOffset = 420f;
     [SerializeField] private float panelOffset = 260f;
@@ -59,6 +66,7 @@ public sealed class VictoryPanelHud : MonoBehaviour
     private bool initialized, bound;
     private float[] leafAngles;
     private MotionHandle[] leafSway = System.Array.Empty<MotionHandle>();
+    private MotionHandle[] starPop = System.Array.Empty<MotionHandle>();
     private RawImage characterImage;
     private float sheetStart;
     private int shownSheetFrame = -1;
@@ -67,6 +75,17 @@ public sealed class VictoryPanelHud : MonoBehaviour
     public bool IsOpen => content.activeSelf;
 
     public void SetNextCaption(string key) => SetCaption(nextCaption, key);
+
+    /// <summary>남은 코어 체력 비율로 별 수를 정한다: 33% 이하 1개, 33% 초과 66% 이하 2개, 그보다 많으면 3개.</summary>
+    public static int StarCount(int coreHealth, int coreMax)
+    {
+        if (coreMax <= 0)
+            return 1;
+        int scaled = coreHealth * 100;
+        if (scaled <= coreMax * 33)
+            return 1;
+        return scaled <= coreMax * 66 ? 2 : 3;
+    }
 
     private void Awake()
     {
@@ -108,6 +127,7 @@ public sealed class VictoryPanelHud : MonoBehaviour
         for (int i = 0; i < leaves.Length; i++)
             leafAngles[i] = leaves[i].localEulerAngles.z;
         leafSway = new MotionHandle[leaves.Length];
+        starPop = new MotionHandle[stars.Length];
         characterImage = character.GetComponent<RawImage>();
         SetCaption(titleText, "result.complete");
         SetCaption(retryCaption, "result.retry");
@@ -208,6 +228,17 @@ public sealed class VictoryPanelHud : MonoBehaviour
             .WithEase(Ease.OutCubic).WithDelay(0.25f).WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
             .BindToAnchoredPositionX(panel);
         panelFade = Fade(panelGroup, 1f, 0.3f, 0.25f);
+
+        // 패널이 자리 잡은 뒤 별이 왼쪽부터 하나씩 톡 튀어나온다. 못 받은 칸은 빈 별로 둔다.
+        int earned = StarCount(coreHealth, coreMax);
+        for (int i = 0; i < stars.Length; i++)
+        {
+            stars[i].texture = i < earned ? starOn : starOff;
+            stars[i].rectTransform.localScale = Vector3.zero;
+            starPop[i] = LMotion.Create(Vector3.zero, Vector3.one, 0.35f)
+                .WithEase(Ease.OutBack).WithDelay(0.7f + i * 0.2f).WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                .BindToLocalScale(stars[i].rectTransform);
+        }
     }
 
     public void Hide()
@@ -240,6 +271,8 @@ public sealed class VictoryPanelHud : MonoBehaviour
         TryCancel(glowSpin);
         TryCancel(glowPulse);
         foreach (MotionHandle handle in leafSway)
+            TryCancel(handle);
+        foreach (MotionHandle handle in starPop)
             TryCancel(handle);
     }
 
