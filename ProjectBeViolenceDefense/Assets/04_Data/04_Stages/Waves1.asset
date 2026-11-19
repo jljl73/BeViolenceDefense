@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 595c939316e1d03479642f44f3bd1ae1, type: 3}
+  m_Name: Waves1
+  m_EditorClassIdentifier: Assembly-CSharp::StageWaves
+  waves:
+  - note: "W1 \uD29C\uD1A0\uB9AC\uC5BC - \uACE0\uBE14\uB9B0 \uC804\uC0AC \uD55C \uB9C8\uB9AC
+      (\uC5B8\uB370\uB4DC\uB294 \uBE48 \uADF8\uB8F9)"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-grunt
+          count: 1
+    - faction: 1
+      groups:
+      - note: A
+        enemies: []
+  - note: "W2 \uC800\uC808\uB85C \uB9CC\uB098\uB294 \uAD50\uC804 - \uC544\uBB34\uAC83\uB3C4
+      \uC548 \uD574\uB3C4 \uAC70\uC758 \uACF5\uBA78"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-grunt
+          count: 4
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: skeleton
+          count: 3
+  - note: "W3 \uBC00\uB9AC\uB294 \uC5B8\uB370\uB4DC \uB3D5\uAE30 - \uD574\uACE8\uC5D0
+      \uD790\xB7\uBC84\uD504"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-grunt
+          count: 5
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: skeleton
+          count: 2
+        - unitId: skeleton-archer
+          count: 1
+  - note: "W4 \uC6D0\uAC70\uB9AC \uCCAB \uB4F1\uC7A5"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-grunt
+          count: 4
+        - unitId: goblin-slinger
+          count: 2
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: skeleton
+          count: 2
+        - unitId: skeleton-archer
+          count: 1
+  - note: "W5 \uC911\uD615 \uCCAB \uB4F1\uC7A5 - \uC871\uC7A5\uACFC \uC880\uBE44"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-chief
+          count: 1
+        - unitId: goblin-grunt
+          count: 4
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: zombie
+          count: 1
+        - unitId: skeleton
+          count: 2

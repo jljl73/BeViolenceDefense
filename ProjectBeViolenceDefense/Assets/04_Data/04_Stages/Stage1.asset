@@ -150,4 +150,4 @@ MonoBehaviour:
     cell: {x: 9, y: 7}
     size: {x: 1, y: 1}
     rotation: 0
-  waves: {fileID: 0}
+  waves: {fileID: 11400000, guid: 216c3cf82e81fe24ab166ba0828e653d, type: 2}
