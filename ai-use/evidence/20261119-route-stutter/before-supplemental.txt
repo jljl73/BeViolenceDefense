@@ -1,0 +1,12 @@
+FAIL RerouteAfterCombatTests.ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment(1):   Distant traffic must not prevent a safe forward step.
+  Expected: greater than 2.02833223f
+  But was:  2.02833223f
+
+FAIL RerouteAfterCombatTests.ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment(2):   Distant traffic must not prevent a safe forward step.
+  Expected: greater than 4.02833319f
+  But was:  4.02833319f
+
+FAIL RerouteAfterCombatTests.ReturningToFinalApproachDoesNotWaitForADistantAlly():   Expected: greater than 8.0f
+  But was:  8.0f
+
+Supplemental NUnit checks: passed=2, failed=3

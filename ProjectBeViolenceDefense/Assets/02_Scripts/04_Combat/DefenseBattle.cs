@@ -746,9 +746,9 @@ internal sealed class DefenseBattle
         {
             Vector3 approach = enemy.RoutePosition;
             routeInSight = grid.CanPursue(enemy.Position, approach);
-            if (!routeInSight || !combat.CanFollowRoute(enemy, approach))
-                return false;
             Vector3 step = enemy.StepToward(approach, deltaTime);
+            if (!routeInSight || !combat.CanFollowRoute(enemy, step))
+                return false;
             enemy.Face(step);
             enemy.FollowRoute(step);
             enemy.RouteBypassOffset = -1;
@@ -768,17 +768,19 @@ internal sealed class DefenseBattle
         }
         routeInSight = !float.IsPositiveInfinity(shortest);
 
-        // A fighter may have moved well beyond its old route index. Rejoin the furthest
-        // visible, unobstructed point ahead instead of walking backwards through the army.
+        // Keep the forward rejoin point to avoid backtracking, but only require unit
+        // clearance for this tick's step. Traffic farther along the segment can move
+        // away before we get there; waiting for the whole segment stalls the rear.
         for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= first; offset--)
         {
             Vector3 waypoint = enemy.GetRouteWaypoint(offset);
             if (!grid.CanPursue(enemy.Position, waypoint) ||
-                Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset) > shortest + grid.CellSize ||
-                !combat.CanFollowRoute(enemy, waypoint))
+                Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset) > shortest + grid.CellSize)
                 continue;
 
             Vector3 next = enemy.StepToward(waypoint, deltaTime);
+            if (!combat.CanFollowRoute(enemy, next))
+                continue;
             enemy.Face(next);
             if (next.Equals(waypoint))
             {

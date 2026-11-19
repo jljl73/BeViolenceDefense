@@ -1173,3 +1173,89 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 코어 체력 120으로는 벽 없이도 패배 불가. W2 언데드·야수 교전 부족. Stage3 이름 키 비어 있음. 4스테이지 보류.
+
+### [20261119-route-stutter] 교전 후 생존 유닛 경로 복귀 정체 원인 조사
+- 시각: 2026-11-19 11:00:00 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / PowerShell / .NET SDK 11.0.100 C# 컴파일러
+- 목적 및 적용 위치: 2·3스테이지 4웨이브 즈음의 잔존 유닛 정체 원인 확인. DefenseBattle·CombatPositioning·EnemyUnit·DefenseGrid 조사.
+- 사용 방식: 실제 전투 코드와 기존 UnityStubs를 직접 컴파일해 같은 편만 있는 통로에서 최소 재현 및 RouteBypassOffset 제한 해제 비교를 수행했다.
+- 결과 및 확인 방법: 부분 성공. 원본은 다음 한 틱 이동이 안전해도 377틱(약 6.28초) 정지, 진단용 offset 제한 해제 시 0틱 정지. 검증 조건 2개 통과. 게임 코드·씬·에셋 수정 없음. git diff --check 통과. 사용자 판 자체와 Unity Play Mode는 미확인.
+- 사람의 개입: 사용자가 발생 시점을 “2스테이지 4웨이브, 3스테이지 4웨이브 즘”으로 보충. 결과 검토 여부 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ai-use/evidence/20261119-route-stutter/README.md | Codex | 생성 | 원인·코드 위치·수정 방향·검증 한계. 조사 증거로 저장 |
+| ai-use/evidence/20261119-route-stutter/Diagnosis.cs | Codex | 생성 | 원본/진단 조건 비교 실행 및 검증. 실제 실행, 게임 미적용 |
+| ai-use/evidence/20261119-route-stutter/run.ps1 | Codex | 생성 | 설치된 .NET 컴파일러로 원본 전투 소스 직접 실행. 사용 |
+| ai-use/evidence/20261119-route-stutter/result.txt | .NET 진단 실행 / PowerShell | 생성 | 정지·재개 시점과 안전 이동 여부 출력. 증거로 저장 |
+
+#### 증거
+- ai-use/evidence/20261119-route-stutter/README.md
+- ai-use/evidence/20261119-route-stutter/result.txt
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 버전·업데이트·작업 사본 상태 확인 명령 실행 시도.
+- 활용 방식: unity --version, unity self-update --check, unity status 명령으로 진단 준비 시도.
+- 잘된 점: 없음(실행 파일 검색 실패).
+- 잘 안된 점 및 개선 필요: 이 셸에서 unity 명령을 찾지 못했다. 연결 메타데이터는 별도 원본 체크아웃을 가리켜 해당 에디터를 조작하지 않았다. Unity 검증 미실행.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 작업 사본의 코드 분석·진단 파일 작성.
+- 사용 방식: 원인 후보를 실제 게임 코드로 검증하고, 결과 로그·설명을 저장했다.
+- 특별히 활용한 점: 상대 팩션·타깃·대기열이 없는 최소 조건에서 원거리 충돌 검사와 복귀점 제한의 조합을 분리 확인했다.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: 현재 특정 스테이지에서 적이 전혀 없는 상황에도 불구하고 전투 종료 후 뒤쪽의 일부 적 유닛들이 거의 움직이지 않다가 조금씩 멈추면서 경로로 이동하는 것을 반복하는 현상의 근본적인 원인
+- 결과 및 실제 활용 방식: 게임 코드 변경 없이 원인 조사와 최소 재현에 활용했다.
+- 선정 이유: 교전 종료 뒤 이동 전환·경로 복귀를 조사 대상으로 특정했다.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 현재 GameScene의 3번 스테이지는 3웨이브 제한이므로 사용자가 말한 3스테이지 4웨이브의 실제 씬·에셋, 벽 배치와 마법 입력 확인 필요. 이 기록은 사용자 판의 완전 재현이 아닌 공통 이동 코드의 독립 재현이다. 실제 수정 시 역주행·겹침·결정론 회귀와 Unity EditMode/Play Mode 검증 필요.
+
+### [20261119-route-stutter-fix] 교전 후 경로 복귀 정체 수정과 회귀 검증
+- 시각: 2026-11-19 11:13:50 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / Unity CLI 1.0.0 / Unity 6000.3.28f1 Test Runner / .NET SDK 11.0.100
+- 목적 및 적용 위치: DefenseBattle.TryRejoinRoute에서 먼 같은 편 유닛 때문에 경로 복귀가 멈추는 결함 수정.
+- 사용 방식: 정적 지형·복귀점 선택은 유지하고 동적 유닛 충돌 검사를 이번 고정 틱의 이동점까지로 제한했다. 일반 복귀와 코어 직전 복귀 두 분기에 적용하고 회귀 테스트를 추가했다.
+- 결과 및 확인 방법: 수정 및 핵심 검증 성공, 전체 테스트 부분 성공. 최소 재현 정지 377틱→0틱. 새 회귀 3건은 수정 전 별도 실행에서 실패, 수정 후 Unity에서 통과. 별도 NUnit 검사 92/92 통과. Unity 컴파일 성공 및 전체 EditMode 116/117 통과(23.55초), 묘지 맵 너비 기대 17/실제 23인 범위 밖 검사 1건 실패. git diff --check 통과.
+- 사람의 개입: 사용자가 처음 수정·병합 시도를 요청한 뒤 병합하지 말고 이 워크트리에 보관하도록 변경했다. 최종 지시에 따라 병합·커밋·푸시하지 않았다. 브랜치 codex/fix-route-rejoin-stutter에 미커밋 변경으로 보관.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs | Codex | 수정 | 두 복귀 분기의 이동 충돌 검사를 다음 틱 위치까지로 제한. 워크트리 적용, 병합 전 |
+| ProjectBeViolenceDefense/Assets/09_Tests/Editor/RerouteAfterCombatTests.cs | Codex | 수정 | 맵 1·2배 전진/겹침/역주행/코어 도착과 마지막 접근 구간 회귀 검사 3건. Unity 통과 |
+| ai-use/evidence/20261119-route-stutter/ | Codex / Unity Test Runner / .NET | 생성·수정 | README, 진단 실행기, 별도 NUnit 실행기 및 전후 결과·Unity XML 보고서. 조사 증거로 저장 |
+
+#### 증거
+- ai-use/evidence/20261119-route-stutter/README.md
+- ai-use/evidence/20261119-route-stutter/before-supplemental.txt
+- ai-use/evidence/20261119-route-stutter/after-result.txt
+- ai-use/evidence/20261119-route-stutter/after-supplemental.txt
+- ai-use/evidence/20261119-route-stutter/after-editmode.xml
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: CLI 버전·업데이트·작업 사본 에디터 상태 확인, 전체 EditMode 실행.
+- 활용 방식: Codex가 코드와 테스트를 수정하고 Unity CLI가 이 워크트리의 Unity 6000.3.28f1을 실행해 Test Runner 결과를 수집했다.
+- 잘된 점: 샌드박스 밖 실행으로 설치된 CLI에 접근, 실제 Unity 컴파일과 신규 3건을 포함한 116개 검사 통과 확인.
+- 잘 안된 점 및 개선 필요: 1.0.1 업데이트 안내만 전달, 업데이트 미실행. 최초 수정 전 Unity 실행은 초기 임포트 중 제가 시작한 테스트 에디터만 중단해 결과 판정 없음(TEST_RUN_ERROR). 이후 수정 후 전체 실행은 결과 XML 생성. 묘지 크기 검사 실패로 전체 통과 아님. 검증 중 자동 변경된 폰트 2개·AssetPaths.g.cs·EditorBuildSettings는 실행 전 내용으로 복구했다.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 워크트리 코드·테스트·진단 보고서.
+- 사용 방식: 기존 최소 재현을 회귀 테스트로 옮기고 수정 전후 비교 및 전체 검증 결과를 확인했다.
+- 특별히 활용한 점: 복귀점 초기화를 상시 적용하지 않고, 기존 역주행 방지와 간격 검사를 유지하는 작은 수정으로 해결했다.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: 해당 문제 수정을 시도하고 병합 시도해봐
+- 후속 프롬프트 원문: 병합까진 하지말고 해당 워크에서 들고있어
+- 결과 및 실제 활용 방식: 수정·검증까지 진행하고 병합 요청은 후속 지시에 따라 취소했다.
+- 선정 이유: 수정 범위와 결과 보관 방식을 결정했다.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 사용자 판의 실제 벽 배치·마법 입력을 포함한 Play Mode 재현과 플레이어 빌드는 미실행. 묘지 테스트 43줄은 전투 코드가 아닌 맵 가로 크기를 검사하며, 관련 테스트·에셋·DefenseGrid는 기준 HEAD와 같다.
+- 앞선 조사 기록 정정: .meta GUID와 Unity 연결 테스트로 GameScene 2번은 GoldenMaple→Stage2_Temp/Waves2, 3번은 Snowfield→Stage3/Waves3임을 확인했다. 초기 기록의 “3번은 3웨이브 제한”은 별도 Stage_Snowfield 에셋과 혼동한 내용이며 해당 슬롯에는 적용되지 않는다.
