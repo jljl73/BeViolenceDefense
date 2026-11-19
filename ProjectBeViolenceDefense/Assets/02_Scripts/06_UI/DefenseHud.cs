@@ -80,6 +80,8 @@ internal sealed class DefenseHud
     private readonly SpellSlot armorBuff;
     private readonly SpellSlot taunt;
     private readonly TextMeshProUGUI actionTip;
+    private readonly RectTransform actionTipCard;
+    private const float ActionTipMaxWidth = 640f;
     private readonly HudButton help;
     private readonly TextMeshProUGUI helpTip;
     private readonly List<Image> healthMarkers = new();
@@ -181,6 +183,12 @@ internal sealed class DefenseHud
 
         actionTip = Tip("Action Tip", actionBar, topCenter, bottomCenter,
             new Vector2(0, 5), new Vector2(600, 70), TextAlignmentOptions.Bottom);
+        // 스킬 설명·조준 안내는 보드 위에서 묻히지 않게 짙은 카드 위에 쓴다. 카드는 글자 크기에 맞춰 늘어난다.
+        actionTipCard = Panel("Card", (RectTransform)actionTip.transform.parent, bottomCenter, bottomCenter, Vector2.zero,
+            new Vector2(600, 70), new Color(UIPalette.PanelRaised.r, UIPalette.PanelRaised.g, UIPalette.PanelRaised.b, 0.96f));
+        actionTipCard.SetAsFirstSibling();
+        actionTip.textWrappingMode = TextWrappingModes.Normal;
+        actionTip.lineSpacing = 6;
 
         Vector2 center = Vector2.one * 0.5f;
         defeatPopup = Panel("Defeat", ui.PopupLayer, center, center, Vector2.zero,
@@ -558,6 +566,7 @@ internal sealed class DefenseHud
         {
             SetTip(actionTip, attackTip ?? healTip ?? speedTip ?? armorTip ?? tauntTip);
         }
+        FitActionTipCard();
     }
 
     private string RefreshSpell(SpellSlot slot, DefenseBattle battle, bool blocked,
@@ -587,11 +596,15 @@ internal sealed class DefenseHud
         if (blocked || !(spellHovered ? slot.Control.Hovered : slot.Control.Focused))
             return null;
 
+        string tint = ColorUtility.ToHtmlStringRGB(slot.Tint);
+        string manaHex = ColorUtility.ToHtmlStringRGB(UIPalette.Mana);
         if (locked)
-            return $"{slot.Name}\n{GameText.Format("spell.locked", requiredStage)}";
+            return $"<size=125%><b><color=#{tint}>{slot.Name}</color></b></size>\n{GameText.Format("spell.locked", requiredStage)}";
+        string head = $"<size=125%><b><color=#{tint}>{slot.Name}</color></b></size>   <color=#{manaHex}>{slot.Control.Caption.text} · {DefenseBattle.ManaCost(slot.Spell, rangeStep)} 마나</color>";
+        string body = slot.Description ?? slot.Effect;
         if (reason != null)
-            return $"{slot.Effect}\n{reason}";
-        return slot.Effect;
+            return $"{head}\n{body}\n<color=#{ColorUtility.ToHtmlStringRGB(UIPalette.Attack)}>{reason}</color>";
+        return $"{head}\n{body}";
     }
 
     private SpellSlot CreateSpellSlot(string name, int index, string shortcut, Sprite sprite,
@@ -643,7 +656,7 @@ internal sealed class DefenseHud
                 GameText.Format("spell.taunt.description", DefenseBattle.TauntDuration,
                     EnemyUnit.TauntHealthBonusPercent * 100, DefenseBattle.TauntRadius))
         };
-        return new SpellSlot(control, spell, tint, cost, lockIcon, displayName, $"{displayName} · {description}", frame, tintIcon);
+        return new SpellSlot(control, spell, tint, cost, lockIcon, displayName, $"{displayName} · {description}", frame, tintIcon, description);
     }
 
     private HudButton ActionButton(string name, RectTransform parent, Vector2 position, Vector2 size,
@@ -711,6 +724,25 @@ internal sealed class DefenseHud
         return label;
     }
 
+    // 안내 카드: 글자 크기에 맞춰 카드와 글 상자를 키운다(최대 너비에서 줄바꿈).
+    private void FitActionTipCard()
+    {
+        if (actionTipCard == null || !actionTip.transform.parent.gameObject.activeSelf)
+            return;
+        Vector2 size = actionTip.GetPreferredValues(actionTip.text, ActionTipMaxWidth, 0f);
+        size.x = Mathf.Min(size.x, ActionTipMaxWidth);
+        var area = (RectTransform)actionTip.transform.parent;
+        area.sizeDelta = new Vector2(size.x + 44f, size.y + 26f);
+        actionTip.rectTransform.anchorMin = Vector2.zero;
+        actionTip.rectTransform.anchorMax = Vector2.one;
+        actionTip.rectTransform.offsetMin = new Vector2(22f, 12f);
+        actionTip.rectTransform.offsetMax = new Vector2(-22f, -14f);
+        actionTip.alignment = TextAlignmentOptions.Left;
+        actionTipCard.anchorMin = Vector2.zero;
+        actionTipCard.anchorMax = Vector2.one;
+        actionTipCard.offsetMin = actionTipCard.offsetMax = Vector2.zero;
+    }
+
     private static void SetTip(TextMeshProUGUI label, string text)
     {
         label.transform.parent.gameObject.SetActive(text != null);
@@ -768,13 +800,15 @@ internal sealed class DefenseHud
         public readonly Image Lock;
         public readonly string Name;
         public readonly string Effect;
+        public readonly string Description;
         public readonly Image Frame;
         // 채색 아이콘 세트에 전용 그림이 없어 흰 아이콘에 의미 색을 입혀야 하는 슬롯.
         public readonly bool TintIcon;
 
         public SpellSlot(HudButton control, DefenseBattle.Spell spell, Color tint, TextMeshProUGUI cost, Image lockIcon,
-            string name, string effect, Image frame = null, bool tintIcon = false)
+            string name, string effect, Image frame = null, bool tintIcon = false, string description = null)
         {
+            Description = description;
             Frame = frame;
             Control = control;
             Spell = spell;

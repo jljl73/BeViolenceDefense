@@ -877,6 +877,40 @@ internal sealed class DefenseBoardView
     private readonly List<(int Spawn, Transform Model)> spawnStructures = new();
     private readonly List<SpawnBeacon> spawnBeacons = new();
     private Mesh spawnBeaconRing;
+    private Material badgeMaterial;
+    private Material badgeBorderMaterial;
+    private readonly MaterialPropertyBlock badgeTint = new();
+
+    /// <summary>가운데가 원점인 둥근 사각형(가로 w, 세로 h, 모서리 반지름 r) 메시를 다시 만든다.</summary>
+    private static void FillRoundedRect(Mesh mesh, float w, float h, float r)
+    {
+        const int arc = 6;
+        r = Mathf.Min(r, Mathf.Min(w, h) * 0.5f);
+        var verts = new List<Vector3> { Vector3.zero };
+        Vector2[] centers = { new(w * 0.5f - r, h * 0.5f - r), new(-w * 0.5f + r, h * 0.5f - r), new(-w * 0.5f + r, -h * 0.5f + r), new(w * 0.5f - r, -h * 0.5f + r) };
+        for (int c = 0; c < 4; c++)
+            for (int i = 0; i <= arc; i++)
+            {
+                float a = (c * 90f + i * 90f / arc) * Mathf.Deg2Rad;
+                verts.Add(new Vector3(centers[c].x + Mathf.Cos(a) * r, centers[c].y + Mathf.Sin(a) * r, 0f));
+            }
+        var tris = new List<int>();
+        int ring = verts.Count - 1;
+        for (int i = 0; i < ring; i++)
+        {
+            tris.Add(0);
+            tris.Add(1 + (i + 1) % ring);
+            tris.Add(1 + i);
+        }
+        var colors = new List<Color>(verts.Count);
+        for (int i = 0; i < verts.Count; i++)
+            colors.Add(Color.white);
+        mesh.Clear();
+        mesh.SetVertices(verts);
+        mesh.SetColors(colors);
+        mesh.SetTriangles(tris, 0);
+        mesh.RecalculateBounds();
+    }
 
     private sealed class SpawnBeacon
     {
@@ -884,6 +918,9 @@ internal sealed class DefenseBoardView
         public MeshRenderer[] Rings;
         public MeshRenderer Arrow;
         public TMPro.TextMeshPro Label;
+        public MeshFilter Badge;
+        public MeshFilter BadgeBorder;
+        public MeshRenderer BadgeBorderRenderer;
         public int ShownCount = -1;
         public bool ShownNext;
     }
@@ -965,7 +1002,15 @@ internal sealed class DefenseBoardView
                 beacon.ShownCount = count;
                 beacon.ShownNext = nextWave;
                 beacon.Label.text = nextWave ? $"<size=60%>NEXT</size>\n×{count}" : $"×{count}";
-                beacon.Label.color = Color.Lerp(color, Color.white, 0.55f);
+                beacon.Label.color = Color.Lerp(color, Color.white, 0.25f);
+                // 배지는 글자 크기에 맞춰 다시 만든다(바뀔 때만).
+                Vector2 size = beacon.Label.GetPreferredValues(beacon.Label.text) + new Vector2(1.1f, 0.35f);
+                FillRoundedRect(beacon.Badge.sharedMesh, size.x, size.y, size.y * 0.32f);
+                FillRoundedRect(beacon.BadgeBorder.sharedMesh, size.x + 0.28f, size.y + 0.28f, size.y * 0.32f + 0.14f);
+                beacon.Badge.transform.localPosition = new Vector3(0f, 0f, 0.02f);
+                beacon.BadgeBorder.transform.localPosition = new Vector3(0f, 0f, 0.04f);
+                badgeTint.SetColor("_Color", color);
+                beacon.BadgeBorderRenderer.SetPropertyBlock(badgeTint);
             }
         }
     }
@@ -1008,18 +1053,48 @@ internal sealed class DefenseBoardView
 
         var labelObject = new GameObject("Count", typeof(TMPro.TextMeshPro));
         labelObject.transform.SetParent(beaconRoot, false);
-        labelObject.transform.localPosition = Vector3.up * 2.75f;
+        labelObject.transform.localPosition = Vector3.up * 3.3f;
         var label = labelObject.GetComponent<TMPro.TextMeshPro>();
         label.font = TMPro.TMP_Settings.defaultFontAsset;
-        label.fontSize = 8.5f;
+        label.fontSize = 11f;
         label.fontStyle = TMPro.FontStyles.Bold;
         label.alignment = TMPro.TextAlignmentOptions.Center;
         label.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
-        label.outlineWidth = 0.28f;
-        label.outlineColor = UIPalette.Background;
-        label.rectTransform.sizeDelta = new Vector2(6f, 2.6f);
-        label.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.Off;
-        return new SpawnBeacon { Root = beaconRoot, Rings = rings, Arrow = arrowRenderer, Label = label };
+        label.rectTransform.sizeDelta = new Vector2(8f, 3.4f);
+        // 숫자는 짙은 배지(<mark>) 위에 진영 색으로 쓰고, 벽·구조물에 가리지 않게 항상 맨 위에 그린다.
+        label.fontMaterial.SetFloat(TMPro.ShaderUtilities.ShaderTag_ZTestMode, (float)CompareFunction.Always);
+        var labelRenderer = label.GetComponent<MeshRenderer>();
+        labelRenderer.shadowCastingMode = ShadowCastingMode.Off;
+        labelRenderer.sortingOrder = 50;
+        label.fontMaterial.renderQueue = 3102;
+
+        // 숫자 뒤의 배지: 진영 색 테두리 + 짙은 면. 라벨과 함께 카메라를 보고, 항상 맨 위에 그린다.
+        if (badgeMaterial == null)
+        {
+            badgeMaterial = new Material(Shader.Find("UI/Default"));
+            badgeMaterial.SetInt("unity_GUIZTestMode", (int)CompareFunction.Always);
+            badgeMaterial.renderQueue = 3101;
+            badgeMaterial.color = new Color(UIPalette.Background.r, UIPalette.Background.g, UIPalette.Background.b, 0.9f);
+            badgeBorderMaterial = new Material(badgeMaterial) { renderQueue = 3100, color = Color.white };
+            materials.Add(badgeMaterial);
+            materials.Add(badgeBorderMaterial);
+        }
+        MeshFilter Plate(string name, Material material, out MeshRenderer renderer)
+        {
+            var plate = new GameObject(name, typeof(MeshFilter), typeof(MeshRenderer));
+            plate.transform.SetParent(labelObject.transform, false);
+            renderer = plate.GetComponent<MeshRenderer>();
+            renderer.sharedMaterial = material;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            var filter = plate.GetComponent<MeshFilter>();
+            filter.sharedMesh = new Mesh { name = name };
+            meshes.Add(filter.sharedMesh);
+            return filter;
+        }
+        var badge = Plate("Badge", badgeMaterial, out _);
+        var border = Plate("Badge Border", badgeBorderMaterial, out var borderRenderer);
+        return new SpawnBeacon { Root = beaconRoot, Rings = rings, Arrow = arrowRenderer, Label = label, Badge = badge, BadgeBorder = border, BadgeBorderRenderer = borderRenderer };
     }
 
     // ── 웨이브 시작 연출 ──

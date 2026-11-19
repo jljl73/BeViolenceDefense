@@ -9,6 +9,9 @@ public sealed class StageContent : MonoBehaviour
     [SerializeField] private BoardTheme theme = new();
     [SerializeField] private Camera boardCamera;
     [SerializeField] private StageAmbience ambience;
+    [Tooltip("이 스테이지의 배경 음악")]
+    [SerializeField] private AudioClip music;
+    [SerializeField, Range(0f, 1f)] private float musicVolume = 0.7f;
     [SerializeField] private Light sun;
     [SerializeField] private Material skybox;
     [SerializeField] private AmbientMode ambientMode;
@@ -29,6 +32,8 @@ public sealed class StageContent : MonoBehaviour
     public BoardTheme Theme => theme;
     public Camera BoardCamera => boardCamera;
     public StageAmbience Ambience => ambience;
+    public AudioClip Music => music;
+    public float MusicVolume => musicVolume;
 
     public void ApplyEnvironment()
     {
