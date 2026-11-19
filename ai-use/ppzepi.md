@@ -1378,3 +1378,33 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: "총 10마리" 해석(웨이브당 vs 스테이지 전체). Stage1 테스트 씬과 GameScene에서 Rounds 대신 Waves1이 쓰이는지 Play Mode 확인.
+
+### [20261119-stage4-recovery-search] 왕도 Stage4 복구 기록 조사
+- 시각: 2026-11-19 11:43:07 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / Git / Unity MCP
+- 목적 및 적용 위치: Assets/04_Data/04_Stages/Stage4.asset의 사라진 수정본 탐색
+- 사용 방식: 전체 브랜치·reflog·stash·unreachable 객체 조사, 최초 커밋과 현재 비교, Unity 메모리 읽기
+- 결과 및 확인 방법: 부분 성공. 최초 8530c21 대비 현재 지형은 동일하며 이름 키와 빈 waves 필드만 추가됨. stash 및 unreachable blob에서 다른 Stage4 수정본 미발견. Unity의 해당 에셋 dirty=false. 복구할 수정본은 아직 확보하지 못함. 에셋 변경 없음.
+- 사람의 개입: 사용자가 묘지가 아닌 왕도 Stage4.asset임을 지정. 수정 내용·시각 추가 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ai-use/ppzepi.md | Codex | 추가 | 조사 기록만 추가 |
+
+#### 증거
+- Git 8530c21, ebf4ac7, 74fba9c 및 현재 Stage4 blob 300309286ef0fca98c6addc25b150d47110632f3
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 버전 확인·에디터 상태·명령 조회 시도
+- 활용 방식: Codex에서 unity 명령 호출
+- 잘된 점: 없음(실행 파일을 PATH에서 찾지 못함)
+- 잘 안된 점 및 개선 필요: 명령 실행 불가. Unity MCP script_eval로 현재 프로젝트와 로드된 Stage4를 읽음. 저장·새로고침·Play Mode는 하지 않음.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 저장소 조사
+- 사용 방식: 기록 비교 및 복구 후보 검색
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 사라진 수정 내용과 작업 시각, 다른 PC 또는 별도 백업 존재 여부. 복구 미완료.

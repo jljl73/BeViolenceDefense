@@ -23,36 +23,22 @@ MonoBehaviour:
   spawns:
   - cell: {x: 2, y: 0}
     faction: 0
-  - cell: {x: 0, y: 29}
-    faction: 1
-  - cell: {x: 34, y: 29}
-    faction: 1
-  - cell: {x: 25, y: 0}
-    faction: 0
   - cell: {x: 34, y: 22}
     faction: 0
   - cell: {x: 31, y: 0}
     faction: 1
+  - cell: {x: 34, y: 29}
+    faction: 2
+  - cell: {x: 0, y: 29}
+    faction: 3
+  - cell: {x: 25, y: 0}
+    faction: 2
+  - cell: {x: 16, y: 0}
+    faction: 3
   obstacles:
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 7, y: 23}
-    size: {x: 3, y: 1}
-    rotation: 0
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 16, y: 13}
-    size: {x: 3, y: 1}
-    rotation: 0
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 18, y: 24}
-    size: {x: 3, y: 1}
-    rotation: 0
   - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
     cell: {x: 30, y: 24}
     size: {x: 3, y: 1}
-    rotation: 0
-  - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
-    cell: {x: 8, y: 17}
-    size: {x: 2, y: 1}
     rotation: 0
   - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
     cell: {x: 32, y: 26}
@@ -110,22 +96,6 @@ MonoBehaviour:
     cell: {x: 29, y: 23}
     size: {x: 1, y: 1}
     rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 15, y: 24}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 10, y: 23}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 12, y: 26}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
-    cell: {x: 13, y: 24}
-    size: {x: 2, y: 1}
-    rotation: 2
   - prefab: {fileID: 8046832385138047680, guid: e6b131b20991ff244a5f09fea293e94a, type: 3}
     cell: {x: 1, y: 20}
     size: {x: 1, y: 1}
@@ -155,42 +125,6 @@ MonoBehaviour:
     size: {x: 1, y: 3}
     rotation: 1
   - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 3, y: 22}
-    size: {x: 3, y: 1}
-    rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 9, y: 25}
-    size: {x: 1, y: 1}
-    rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 6, y: 22}
-    size: {x: 1, y: 1}
-    rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 6, y: 17}
-    size: {x: 1, y: 1}
-    rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 10, y: 17}
-    size: {x: 1, y: 1}
-    rotation: 2
-  - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
-    cell: {x: 11, y: 17}
-    size: {x: 2, y: 1}
-    rotation: 2
-  - prefab: {fileID: 1571810674048646912, guid: 4288a94bc0c15a040a80c73b0142d069, type: 3}
-    cell: {x: 14, y: 13}
-    size: {x: 2, y: 1}
-    rotation: 2
-  - prefab: {fileID: 1571810674048646912, guid: 4288a94bc0c15a040a80c73b0142d069, type: 3}
-    cell: {x: 13, y: 15}
-    size: {x: 1, y: 2}
-    rotation: 3
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 22, y: 20}
-    size: {x: 1, y: 3}
-    rotation: 3
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
     cell: {x: 0, y: 5}
     size: {x: 3, y: 1}
     rotation: 0
@@ -211,14 +145,6 @@ MonoBehaviour:
     size: {x: 1, y: 2}
     rotation: 3
   - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 12, y: 8}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 6, y: 12}
-    size: {x: 3, y: 1}
-    rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
     cell: {x: 30, y: 3}
     size: {x: 1, y: 1}
     rotation: 3
@@ -234,16 +160,8 @@ MonoBehaviour:
     cell: {x: 30, y: 10}
     size: {x: 1, y: 1}
     rotation: 0
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 26, y: 9}
-    size: {x: 1, y: 3}
-    rotation: 1
   - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
     cell: {x: 28, y: 7}
-    size: {x: 1, y: 2}
-    rotation: 1
-  - prefab: {fileID: 1571810674048646912, guid: 4288a94bc0c15a040a80c73b0142d069, type: 3}
-    cell: {x: 14, y: 11}
     size: {x: 1, y: 2}
     rotation: 1
   - prefab: {fileID: 1571810674048646912, guid: 4288a94bc0c15a040a80c73b0142d069, type: 3}
@@ -254,14 +172,6 @@ MonoBehaviour:
     cell: {x: 32, y: 9}
     size: {x: 1, y: 2}
     rotation: 3
-  - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
-    cell: {x: 26, y: 12}
-    size: {x: 1, y: 2}
-    rotation: 3
-  - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
-    cell: {x: 26, y: 14}
-    size: {x: 1, y: 2}
-    rotation: 1
   - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
     cell: {x: 31, y: 7}
     size: {x: 1, y: 2}
@@ -274,26 +184,6 @@ MonoBehaviour:
     cell: {x: 28, y: 0}
     size: {x: 1, y: 2}
     rotation: 1
-  - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
-    cell: {x: 16, y: 22}
-    size: {x: 1, y: 2}
-    rotation: 1
-  - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
-    cell: {x: 7, y: 20}
-    size: {x: 1, y: 2}
-    rotation: 1
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 7, y: 19}
-    size: {x: 1, y: 1}
-    rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 16, y: 16}
-    size: {x: 1, y: 1}
-    rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 16, y: 15}
-    size: {x: 1, y: 1}
-    rotation: 2
   - prefab: {fileID: 8046832385138047680, guid: e6b131b20991ff244a5f09fea293e94a, type: 3}
     cell: {x: 20, y: 11}
     size: {x: 1, y: 1}
@@ -327,23 +217,11 @@ MonoBehaviour:
     size: {x: 3, y: 1}
     rotation: 0
   - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 16, y: 8}
-    size: {x: 3, y: 1}
-    rotation: 0
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 3, y: 12}
-    size: {x: 3, y: 1}
-    rotation: 0
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
     cell: {x: 24, y: 27}
     size: {x: 1, y: 3}
     rotation: 1
   - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
     cell: {x: 24, y: 24}
-    size: {x: 1, y: 2}
-    rotation: 3
-  - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
-    cell: {x: 24, y: 22}
     size: {x: 1, y: 2}
     rotation: 3
   - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
@@ -354,40 +232,305 @@ MonoBehaviour:
     cell: {x: 0, y: 11}
     size: {x: 1, y: 3}
     rotation: 1
-  - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
-    cell: {x: 1, y: 14}
-    size: {x: 2, y: 1}
-    rotation: 2
-  - prefab: {fileID: 1571810674048646912, guid: 4288a94bc0c15a040a80c73b0142d069, type: 3}
-    cell: {x: 4, y: 15}
-    size: {x: 1, y: 2}
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 26, y: 14}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 26, y: 12}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 26, y: 13}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
+    cell: {x: 26, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 26, y: 10}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 26, y: 9}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
+    cell: {x: 18, y: 24}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 19, y: 24}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 6, y: 15}
+    size: {x: 1, y: 1}
     rotation: 3
-  - prefab: {fileID: 1571810674048646912, guid: 4288a94bc0c15a040a80c73b0142d069, type: 3}
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
     cell: {x: 6, y: 14}
-    size: {x: 1, y: 2}
+    size: {x: 1, y: 1}
     rotation: 3
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 6, y: 16}
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 4, y: 15}
     size: {x: 1, y: 1}
     rotation: 1
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 9, y: 10}
-    size: {x: 3, y: 1}
-    rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 12, y: 10}
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 4, y: 16}
     size: {x: 1, y: 1}
-    rotation: 2
-  - prefab: {fileID: 1400929600435998610, guid: 00f31b087c07faa43814c11bedc4cbce, type: 3}
-    cell: {x: 17, y: 16}
-    size: {x: 3, y: 1}
+    rotation: 1
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 13, y: 16}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 13, y: 15}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 15, y: 13}
+    size: {x: 1, y: 1}
     rotation: 0
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 14, y: 13}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 14, y: 12}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 14, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
+    cell: {x: 16, y: 13}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 17, y: 13}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
+    cell: {x: 16, y: 15}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 16, y: 16}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 17, y: 16}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 18, y: 16}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 19, y: 16}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
     cell: {x: 19, y: 12}
     size: {x: 1, y: 1}
-    rotation: 1
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
+    rotation: 3
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 18, y: 8}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 17, y: 8}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 16, y: 8}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 12, y: 8}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 12, y: 10}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 11, y: 10}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 10, y: 10}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 9, y: 10}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
     cell: {x: 10, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 4162362750405306708, guid: a5b1efeeeaf3e944e98576b5d68dce38, type: 3}
+    cell: {x: 8, y: 12}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 4162362750405306708, guid: a5b1efeeeaf3e944e98576b5d68dce38, type: 3}
+    cell: {x: 7, y: 12}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 4162362750405306708, guid: a5b1efeeeaf3e944e98576b5d68dce38, type: 3}
+    cell: {x: 6, y: 12}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 4162362750405306708, guid: a5b1efeeeaf3e944e98576b5d68dce38, type: 3}
+    cell: {x: 5, y: 12}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 11, y: 17}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 12, y: 17}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 10, y: 17}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7776835863901118049, guid: 4f321c7144696a4429abccb9f7de3970, type: 3}
+    cell: {x: 9, y: 17}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
+    cell: {x: 6, y: 16}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7607033892184037016, guid: b55823062ab4a044fa642fd53e0b41d3, type: 3}
+    cell: {x: 6, y: 17}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 2258531731285590627, guid: 21be65e68c9a80a478206fa8c9554330, type: 3}
+    cell: {x: 7, y: 21}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 2258531731285590627, guid: 21be65e68c9a80a478206fa8c9554330, type: 3}
+    cell: {x: 7, y: 20}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 2258531731285590627, guid: 21be65e68c9a80a478206fa8c9554330, type: 3}
+    cell: {x: 7, y: 19}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 2258531731285590627, guid: 21be65e68c9a80a478206fa8c9554330, type: 3}
+    cell: {x: 3, y: 22}
+    size: {x: 1, y: 1}
+    rotation: 2
+  - prefab: {fileID: 2258531731285590627, guid: 21be65e68c9a80a478206fa8c9554330, type: 3}
+    cell: {x: 4, y: 22}
+    size: {x: 1, y: 1}
+    rotation: 2
+  - prefab: {fileID: 2258531731285590627, guid: 21be65e68c9a80a478206fa8c9554330, type: 3}
+    cell: {x: 5, y: 22}
+    size: {x: 1, y: 1}
+    rotation: 2
+  - prefab: {fileID: 2258531731285590627, guid: 21be65e68c9a80a478206fa8c9554330, type: 3}
+    cell: {x: 6, y: 22}
+    size: {x: 1, y: 1}
+    rotation: 2
+  - prefab: {fileID: 7607033892184037016, guid: b55823062ab4a044fa642fd53e0b41d3, type: 3}
+    cell: {x: 9, y: 23}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 8, y: 23}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 7, y: 23}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 9, y: 25}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
+    cell: {x: 10, y: 23}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 16, y: 23}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7995316142290511094, guid: 7df8919d09de77543b9df9165b7599dc, type: 3}
+    cell: {x: 16, y: 22}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
+    cell: {x: 16, y: 24}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 15, y: 24}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 14, y: 24}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 5015050273851593003, guid: 116b0aa5941833f4d95f276e403e9c9e, type: 3}
+    cell: {x: 13, y: 24}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 7607033892184037016, guid: b55823062ab4a044fa642fd53e0b41d3, type: 3}
+    cell: {x: 16, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
+    cell: {x: 12, y: 26}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 3231036449927418673, guid: f5f9dc5e9575a3f479159af5ae57de20, type: 3}
+    cell: {x: 24, y: 23}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 2886205234672008521, guid: a7e38b67ee53d734097e3c4e4cd3efcc, type: 3}
+    cell: {x: 29, y: 19}
+    size: {x: 2, y: 2}
+    rotation: 1
+  - prefab: {fileID: 2886205234672008521, guid: a7e38b67ee53d734097e3c4e4cd3efcc, type: 3}
+    cell: {x: 3, y: 19}
+    size: {x: 2, y: 2}
+    rotation: 1
+  - prefab: {fileID: 2886205234672008521, guid: a7e38b67ee53d734097e3c4e4cd3efcc, type: 3}
+    cell: {x: 12, y: 5}
+    size: {x: 2, y: 2}
+    rotation: 1
+  - prefab: {fileID: 7607033892184037016, guid: b55823062ab4a044fa642fd53e0b41d3, type: 3}
+    cell: {x: 19, y: 23}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 0}
+    cell: {x: 8, y: 11}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 0}
+    cell: {x: 8, y: 17}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 0}
+    cell: {x: 7, y: 17}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 0}
+    cell: {x: 5, y: 13}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 0}
+    cell: {x: 13, y: 10}
     size: {x: 1, y: 1}
     rotation: 1
   waves: {fileID: 0}
+  reinforcementWaveLimit: 0
