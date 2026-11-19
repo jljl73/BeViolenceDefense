@@ -940,3 +940,116 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: "stage02"를 `Stage2_Temp.asset`으로 해석함(다른 후보 없음). Play Mode에서 마법을 쓴 실제 난이도 확인. 이전에 `Stage_GoldenMaple.asset.waves`를 Waves2로 바꾼 미커밋 변경은 그대로 둠.
+
+### [20261119-stage2-faction-retune] 2스테이지 진영 컨셉·1·2번 스킬 기준 재조정
+- 시각: 2026-11-19 09:04:40 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (데스크톱 앱) / Claude Opus 5.5, Unity Editor MCP
+- 목적 및 적용 위치: 고블린=약한 물량, 언데드=평균 능력치 컨셉과 1번(공격력 버프)·2번(힐)만 쓰는 전제로 `Waves2` 편성과 Waves2 전용 유닛 4종 능력치를 조정.
+- 사용 방식: AI가 유닛 ID 사용처를 조사해 Waves2에서만 쓰는 유닛(goblin-grunt, goblin-charger, goblin-chief, necromancer)만 수치를 바꾸고, 공용 언데드 유닛은 유지. 시뮬레이터에 1·2번 스킬 자동 시전 정책(MAGIC, RATIO)을 추가해 벽 없음·R5·R5+마법을 비교하며 편성 반복 조정.
+- 결과 및 확인 방법: 성공(시뮬레이션 기준). 코어 도달 합계 벽 없음 152 / R5 85 / R5+마법 86 (코어 120). Unity MCP로 Waves2 Validate OK·10웨이브·222명, 카탈로그 값 반영 확인. EditMode 106개 중 6개 실패: 실패 테스트는 카탈로그를 읽지 않고, Unity가 실행한 테스트 이름이 디스크 코드와 달라(Four→Five) 미컴파일 상태로 판단. 이번 변경과의 무관성은 재컴파일 후 재실행으로 확인 필요. Play Mode는 하지 않음.
+- 사람의 개입: 사용자가 스킬 제한·진영 컨셉·유닛 능력치 변경 허용을 지시.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `ProjectBeViolenceDefense/Assets/04_Data/03_Balance/EnemyCatalog.asset` | Claude Code | 수정 | goblin-grunt 50/8, goblin-charger 40/7, goblin-chief 140/14, necromancer 80/12. 사용 |
+| `ProjectBeViolenceDefense/Assets/04_Data/04_Stages/Waves2.asset` | Claude Code | 수정 | 10웨이브 고블린 물량형 재편성. 사용 |
+| `docs/stage2_balance.md` | Claude Code | 생성·수정 | 벽 배치·1차/2차 결과·재현 방법. 사용 |
+| `ai-use/evidence/20261119-stage2-waves/` | Claude Code | 생성 | 마법 정책 추가 시뮬레이터와 입력. 증거용 |
+
+#### 증거
+- `ai-use/evidence/20261119-stage2-waves/`
+
+#### 주요 프롬프트
+- 사용 도구: Claude Code
+- 프롬프트 원문: "1번 스킬 2번 스킬만 사용 가능하다고 가정한다. 또한 고블린은 능력치는 낮지만 물량이 많은 것이 컨셉이고, 언데드는 평균적인 능력치가 컨셉이다. 이를 고려해 다시 수치를 조절해봐. 또한 특정 유닛의 능력치 변경도 받고 있다."
+- 결과 및 실제 활용 방식: 유닛 4종 수치와 Waves2 편성에 반영.
+- 선정 이유: 진영 컨셉과 스킬 범위를 확정해 밸런스 방향을 정한 지시.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Play Mode에서 사람이 1·2번 스킬로 플레이한 난이도. Unity 재컴파일 후 EditMode 6개 실패 재확인. goblin-grunt와 goblin-grunt-1500 수치가 달라진 점.
+
+### [20261119-enemy-stat-revamp] 적 유닛 능력치 전면 개편 (둘러싸임 규칙)
+- 시각: 2026-11-19 09:24:56 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (데스크톱 앱) / Claude Opus 5.5, Unity Editor MCP, Claude 내장 브라우저(참고 링크 열람)
+- 목적 및 적용 위치: `EnemyCatalog.asset` 20종 능력치 개편. 기준은 "상위 적도 기본 해골 3명에게 둘러싸여 셋을 모두 잡으면 체력 5~15% 남음(버프 없음)". 팩션 성격(고블린 최약·야수 최속·언데드 평균·용족 소수 정예) 반영. 스킬 수치는 변경하지 않음.
+- 사용 방식: 사용자가 준 ChatGPT 공유 링크(밸런스 자료 조사)를 내장 브라우저로 읽어 참고(해골 기준 1대1 4~5초, 처치 타수 우선, 체력·방어·공격 동시 상승 주의). AI가 전투 규칙(피해=max(0, 공격−방어), 첫 공격 즉시, 표적당 3명)을 옮긴 틱 단위 계산기를 작성해 등급별 체력을 역산. T2(해골 2명 기준)는 AI의 임시 가정.
+- 결과 및 확인 방법: 성공(계산 기준). 개편 전에는 둘러싸임 규칙을 와이번만 충족했음(정예는 해골 3명에게 패배) → 개편 후 정예 체력↑·공격력↓. Waves2 재시뮬레이션 코어 도달 합계 벽 없음 148 / R5 85(개편 전 152 / 85). Unity에서 카탈로그 값 반영 확인. EditMode 106개 중 6개 실패, 개편 전과 같은 6개라 이번 변경과 무관. Play Mode 미실시, 1·3·4스테이지 씬 편성은 재검증하지 않음.
+- 사람의 개입: 사용자가 기준(5~15%)·팩션 성격·스킬 불변·참고 자료를 지시.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `ProjectBeViolenceDefense/Assets/04_Data/03_Balance/EnemyCatalog.asset` | Claude Code | 수정 | 20종 체력·공격·간격·방어·속도 개편, goblin-grunt-1500을 goblin-grunt와 통일. 사용 |
+| `docs/balance.md` | Claude Code | 수정 | 개편 기준과 유닛 수치 표 교체, 개편 전 타격 횟수 표 삭제. 사용 |
+| `docs/stage2_balance.md` | Claude Code | 수정 | 개편 후 재시뮬레이션 결과 안내. 사용 |
+| `ai-use/evidence/20261119-stage2-waves/surround.py`, `design.py` | Claude Code | 생성 | 둘러싸임 계산기와 역산 스크립트. 증거용 |
+
+#### 증거
+- `ai-use/evidence/20261119-stage2-waves/`
+
+#### 주요 프롬프트
+- 사용 도구: Claude Code
+- 프롬프트 원문: "스킬은 가능한 건드리지 않는다. (ChatGPT 공유 링크) 해당 링크속 자료를 참고한다. 게임에서 가장 스탯이 약한 적은 고블린이다. 가장 빠른 적은 야수이다. 평균적인 능력치는 언데드, 수는 적지만 강한 것은 용족이다. 내 생각엔 아무리 상위 적이라도 기본 스켈레톤 3명한테 둘러쌓이면, 기본 스켈레톤 셋을 전부 잡았을 때 체력이 약 5~15%만 남아야 한다. 아무 버프 없을 때 기준이다. 이러한 점을 기반으로 적의 스탯 데이터 수치를 전면 개편한다."
+- 결과 및 실제 활용 방식: 카탈로그 전면 개편의 기준으로 사용.
+- 선정 이유: 전 유닛 수치의 설계 기준을 정한 지시.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 실제 전투에서는 해골이 한꺼번에 둘러싸지 않고 차례로 도착하므로 계산보다 상위 적이 유리할 수 있음. 1·3·4스테이지와 StageTEST 웨이브 재검증. 야수 속도 상향(2.3~2.7)으로 교전을 지나치는지 Play Mode 확인.
+
+### [20261119-tier-redo-stage2-5waves] 등급 재분류·진영 간 1대1 순위 보정·2스테이지 5웨이브
+- 시각: 2026-11-19 09:42:14 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (데스크톱 앱) / Claude Opus 5.5, Unity Editor MCP
+- 목적 및 적용 위치: 사용자 지적(원거리는 원거리끼리, 언데드 T0=해골, 고블린 T0=고블린 전사, 같은 팩션끼리는 싸우지 않음)에 따라 등급을 다시 나누고 `EnemyCatalog.asset` 14종 수치 보정. `Waves2`를 5웨이브로 재작성.
+- 사용 방식: AI가 등급표·1대1 계산 스크립트(tiers.py)로 다른 진영 간 순위(고블린<야수<언데드<용족)와 보스 우위를 맞추고 와이번 수치를 격자 탐색. Waves2 5웨이브 초안을 시뮬레이터로 확인.
+- 결과 및 확인 방법: 성공(계산·시뮬레이션 기준). 다른 진영 1대1 순위 전 등급 충족, 와이번이 정예 전원을 15~31% 차로 이김. 5웨이브 코어 도달 합계 벽 없음 87 / R5 43. Unity에서 Waves2 Validate OK(5웨이브, 109명)와 카탈로그 반영 확인. EditMode는 이번에 다시 돌리지 않음. Play Mode 미실시.
+- 사람의 개입: 등급 기준과 팩션 간 전투만 고려하라는 지시.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `ProjectBeViolenceDefense/Assets/04_Data/03_Balance/EnemyCatalog.asset` | Claude Code | 수정 | 박쥐·늑대·해츨링·네크로맨서·족장·멧돼지·다이어울프·좀비·오크·늑대인간·사신·리빙 아머·악마·와이번 수치 보정. 사용 |
+| `ProjectBeViolenceDefense/Assets/04_Data/04_Stages/Waves2.asset` | Claude Code | 수정 | 5웨이브로 재작성. 사용 |
+| `docs/balance.md`, `docs/stage2_balance.md` | Claude Code | 수정 | 등급표·진영 간 1대1·5웨이브 결과. 사용 |
+| `ai-use/evidence/20261119-stage2-waves/tiers.py`, `w6.txt` | Claude Code | 생성 | 등급 계산과 5웨이브 입력. 증거용 |
+
+#### 증거
+- `ai-use/evidence/20261119-stage2-waves/`
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 코어 체력 120 공용 상수 때문에 5웨이브로는 벽 없이도 패배하지 않음(스테이지별 코어 체력 필요). T1·T2 1대1 교전이 10~30초로 김. 1·3·4스테이지 재검증 안 함.
+
+### [20261119-0948-compile-refresh] 콘솔 컴파일 오류 5건 해결
+- 시각: 2026-11-19 09:48:00 +09:00
+- 작업자: ppzepi
+- 사용 도구: OpenAI Codex / Unity MCP(Pipeline 1.0.0), PowerShell / Unity 6000.3.28f1
+- 목적 및 적용 위치: GameScene 프로젝트의 CS0246 컴파일 오류 해결.
+- 사용 방식: 콘솔 및 Bee 컴파일 목록과 소스 비교 후 Assets/Refresh 실행. BuffLightning, StageSpellUnlocks 파일은 존재했지만 이전 컴파일 목록에서 누락되어 있었고 autoRefresh는 disabled였음.
+- 결과 및 확인 방법: 성공 / Refresh 후 두 파일이 컴파일 목록에 포함됨. compilationFailed=false, consoleErrors=0. GameScene Play Mode 프레임 1→817, 시간 0→6.49초 진행 및 새 오류 0 확인. Play Mode 종료 및 백그라운드 실행·자동 틱 해제.
+- 사람의 개입: 컴파일 오류 해결 요청. 기존 사용자 변경은 유지. 최종 검토 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Library (로컬 생성 캐시) | Unity MCP / Unity Editor | 재생성 | 에셋 새로고침 및 재컴파일 적용. 소스 코드와 meta 수정 없음. |
+| ai-use/ppzepi.md | Codex | 추가 | 작업 기록 적용. |
+
+#### 증거
+- ProjectBeViolenceDefense/Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp.rsp (로컬 생성 파일): BuffLightning.cs, StageSpellUnlocks.cs 포함 확인.
+- Unity MCP console.status: compilationFailed=false, consoleErrors=0. 세션 26fd35e9343c4e4a99abe331c851fb92, 확인 cursor 10796.
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: CLI 버전·업데이트·상태 확인 시도.
+- 활용 방식: PowerShell에서 unity 실행 가능 여부 확인 후 실행 불가로 Unity MCP를 통해 실제 에디터 확인 및 Refresh·Play Mode 검증 수행.
+- 잘된 점: MCP 대체 경로로 실제 프로젝트와 컴파일 결과 확인.
+- 잘 안된 점 및 개선 필요: 셸 PATH에서 unity 명령을 찾지 못함. 도메인 재로드 중 MCP 연결 1회 끊긴 뒤 ready 복구 확인.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, PowerShell, Unity MCP.
+- 사용 방식: 오류 원인 조사, 에디터 Refresh 실행, 재컴파일 및 기본 실행 확인.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 전체 웨이브 및 빌드는 미검증. Play Mode에서 TMP 말줄임표 글리프 누락 경고 관찰(컴파일 오류와 별개). 자동 새로고침 disabled 설정은 유지했으므로 외부에서 새 파일을 추가한 뒤 필요시 Assets/Refresh 실행.

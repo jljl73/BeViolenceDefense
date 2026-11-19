@@ -1,0 +1,5 @@
+W1|goblin-grunt*9|skeleton*5
+W2|goblin-charger*8,goblin-grunt*4|zombie*3,skeleton*2
+W3|goblin-grunt*8,goblin-slinger*3|skeleton*4,skeleton-archer*3
+W4|goblin-chief*1,goblin-grunt*10,goblin-slinger*3|skeleton*4,living-armor*1,skeleton*2
+W5|orc*1,goblin-chief*1,goblin-grunt*14,goblin-slinger*4,goblin-charger*4|reaper*1,zombie*2,skeleton*8,skeleton-archer*3,necromancer*1

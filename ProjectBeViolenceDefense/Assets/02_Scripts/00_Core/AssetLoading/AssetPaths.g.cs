@@ -8,7 +8,6 @@ public static class AssetPaths
 {
     public static readonly IReadOnlyList<string> All = new string[]
     {
-        "BuffLightning",
         "Fonts & Materials/Netmarble Medium SDF",
         "GameText.ko",
         "LineBreaking Following Characters",
@@ -21,7 +20,6 @@ public static class AssetPaths
         "TMP Settings",
     };
 
-    public const string BuffLightning = "BuffLightning";
     public const string GameText_ko = "GameText.ko";
     public const string LineBreaking_Following_Characters = "LineBreaking Following Characters";
     public const string LineBreaking_Leading_Characters = "LineBreaking Leading Characters";

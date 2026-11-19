@@ -21,8 +21,8 @@ MonoBehaviour:
     skin: {fileID: 0}
     modelScale: 1
     bodyRadius: 0.34
-    maxHealth: 75
-    damage: 10
+    maxHealth: 50
+    damage: 8
     attackInterval: 0.65
     attackRange: 1.5
     awarenessRange: 3
@@ -36,7 +36,7 @@ MonoBehaviour:
     skin: {fileID: 2100000, guid: fc637a2448e415743b7c00a46b74d135, type: 2}
     modelScale: 1.3
     bodyRadius: 0.24
-    maxHealth: 135
+    maxHealth: 245
     damage: 15
     attackInterval: 1
     attackRange: 1.5
@@ -51,12 +51,12 @@ MonoBehaviour:
     skin: {fileID: 0}
     modelScale: 1
     bodyRadius: 0.23
-    maxHealth: 45
-    damage: 6
+    maxHealth: 50
+    damage: 7
     attackInterval: 0.5
     attackRange: 1.5
     awarenessRange: 3
-    moveSpeed: 2.4
+    moveSpeed: 2.6
     armor: 0
   - factionGroup: 3
     id: demon
@@ -66,13 +66,13 @@ MonoBehaviour:
     skin: {fileID: 2100000, guid: 9b7b9ea496f1d114e98e9120e0f9b578, type: 2}
     modelScale: 1.5
     bodyRadius: 0.3
-    maxHealth: 180
-    damage: 18
-    attackInterval: 0.9
+    maxHealth: 380
+    damage: 17
+    attackInterval: 0.85
     attackRange: 1.5
     awarenessRange: 3
     moveSpeed: 1.7
-    armor: 0
+    armor: 1
   - factionGroup: 0
     id: goblin-slinger
     displayNameKey: unit.goblin-slinger
@@ -81,8 +81,8 @@ MonoBehaviour:
     skin: {fileID: 2100000, guid: 24c4952b37de50d499781472544db53e, type: 2}
     modelScale: 1.2
     bodyRadius: 0.28
-    maxHealth: 55
-    damage: 8
+    maxHealth: 45
+    damage: 7
     attackInterval: 0.8
     attackRange: 3
     awarenessRange: 4.3
@@ -96,13 +96,13 @@ MonoBehaviour:
     skin: {fileID: 0}
     modelScale: 1
     bodyRadius: 0.38
-    maxHealth: 105
-    damage: 12
+    maxHealth: 125
+    damage: 14
     attackInterval: 0.9
     attackRange: 1.5
     awarenessRange: 3
     moveSpeed: 1.6
-    armor: 0
+    armor: 1
   - factionGroup: 1
     id: living-armor
     displayNameKey: unit.living-armor
@@ -111,13 +111,13 @@ MonoBehaviour:
     skin: {fileID: 0}
     modelScale: 1
     bodyRadius: 0.36
-    maxHealth: 270
-    damage: 14
-    attackInterval: 1.2
+    maxHealth: 530
+    damage: 13
+    attackInterval: 1.1
     attackRange: 1.5
     awarenessRange: 3
     moveSpeed: 1.1
-    armor: 3
+    armor: 2
   - factionGroup: 1
     id: necromancer
     displayNameKey: unit.necromancer
@@ -126,9 +126,9 @@ MonoBehaviour:
     skin: {fileID: 0}
     modelScale: 1
     bodyRadius: 0.29
-    maxHealth: 60
-    damage: 8
-    attackInterval: 1.2
+    maxHealth: 80
+    damage: 12
+    attackInterval: 1.1
     attackRange: 3
     awarenessRange: 4.3
     moveSpeed: 1.4
@@ -141,9 +141,9 @@ MonoBehaviour:
     skin: {fileID: 0}
     modelScale: 1
     bodyRadius: 0.4
-    maxHealth: 210
-    damage: 22
-    attackInterval: 1.1
+    maxHealth: 340
+    damage: 18
+    attackInterval: 1
     attackRange: 1.5
     awarenessRange: 3
     moveSpeed: 1.5
@@ -156,9 +156,9 @@ MonoBehaviour:
     skin: {fileID: 0}
     modelScale: 1
     bodyRadius: 0.35
-    maxHealth: 165
-    damage: 30
-    attackInterval: 1.3
+    maxHealth: 415
+    damage: 20
+    attackInterval: 1.1
     attackRange: 2
     awarenessRange: 3.3
     moveSpeed: 1.8
@@ -186,9 +186,9 @@ MonoBehaviour:
     skin: {fileID: 0}
     modelScale: 1
     bodyRadius: 0.5
-    maxHealth: 390
-    damage: 28
-    attackInterval: 1.4
+    maxHealth: 340
+    damage: 21
+    attackInterval: 0.8
     attackRange: 2
     awarenessRange: 3.3
     moveSpeed: 1.4
@@ -216,12 +216,12 @@ MonoBehaviour:
     skin: {fileID: 2100000, guid: c549a8a7d07a26c4698a9e8f8781c9ad, type: 2}
     modelScale: 1.7
     bodyRadius: 0.28
-    maxHealth: 225
-    damage: 20
-    attackInterval: 0.8
+    maxHealth: 335
+    damage: 13
+    attackInterval: 0.6
     attackRange: 1.5
     awarenessRange: 3
-    moveSpeed: 2.1
+    moveSpeed: 2.4
     armor: 0
   - factionGroup: 2
     id: wolf
@@ -236,7 +236,7 @@ MonoBehaviour:
     attackInterval: 0.5
     attackRange: 1.5
     awarenessRange: 3
-    moveSpeed: 2.6
+    moveSpeed: 2.7
     armor: 0
   - factionGroup: 0
     id: goblin-grunt
@@ -246,8 +246,8 @@ MonoBehaviour:
     skin: {fileID: 2100000, guid: e45168a647c3dfd4999443dbc29f0f03, type: 2}
     modelScale: 1
     bodyRadius: 0.28
-    maxHealth: 75
-    damage: 10
+    maxHealth: 50
+    damage: 8
     attackInterval: 0.65
     attackRange: 1.5
     awarenessRange: 3
@@ -255,64 +255,64 @@ MonoBehaviour:
     armor: 0
   - factionGroup: 0
     id: goblin-charger
-    displayName: Goblin Charger
+    displayNameKey: 
     model: {fileID: 5866971360491415691, guid: 62536fb208f23b54cbda7d70e8f6bd68, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1.1
     bodyRadius: 0.28
-    maxHealth: 60
-    damage: 10
+    maxHealth: 40
+    damage: 7
     attackInterval: 0.55
     attackRange: 1.5
     awarenessRange: 2.2
-    moveSpeed: 2.5
+    moveSpeed: 2.1
     armor: 0
   - factionGroup: 0
     id: goblin-chief
-    displayName: Goblin Chief
+    displayNameKey: 
     model: {fileID: 4855526941140657453, guid: 5a3330a05d022b24b9f3fedc8ba844c1, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1
     bodyRadius: 0.42
-    maxHealth: 180
-    damage: 16
+    maxHealth: 225
+    damage: 13
     attackInterval: 0.85
     attackRange: 1.5
     awarenessRange: 2.2
     moveSpeed: 1.4
-    armor: 1
+    armor: 0
   - factionGroup: 2
     id: boar
-    displayName: Boar
+    displayNameKey: 
     model: {fileID: 6850636267101244859, guid: 37473eb6f8696d44a88cdc1406735f2a, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1.5
     bodyRadius: 0.36
-    maxHealth: 190
-    damage: 16
-    attackInterval: 0.85
+    maxHealth: 210
+    damage: 13
+    attackInterval: 0.75
     attackRange: 1.5
     awarenessRange: 2.2
-    moveSpeed: 1.8
-    armor: 1
+    moveSpeed: 2.3
+    armor: 0
   - factionGroup: 2
     id: dire-wolf
-    displayName: Dire Wolf
+    displayNameKey: 
     model: {fileID: 5167787001671517620, guid: 858f7c44c6f7e5c419723a0e619732cd, type: 3}
     animations: {fileID: 0}
     skin: {fileID: 0}
     modelScale: 1.3
     bodyRadius: 0.38
-    maxHealth: 160
-    damage: 18
-    attackInterval: 0.65
+    maxHealth: 185
+    damage: 11
+    attackInterval: 0.55
     attackRange: 1.5
     awarenessRange: 2.6
-    moveSpeed: 2.3
-    armor: 1
+    moveSpeed: 2.5
+    armor: 0
   spawnStructures:
   - {fileID: 5146620418009421059, guid: 8910cbe359c91ff48b9d63182dcb63fd, type: 3}
   - {fileID: 4250034218901136042, guid: 859846051ad121e47a28b8a1b7d76500, type: 3}
