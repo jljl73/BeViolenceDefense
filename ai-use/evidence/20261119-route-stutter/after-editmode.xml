@@ -1,0 +1,826 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="117" result="Failed(Child)" total="117" passed="116" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:11:23Z" duration="23.5512409">
+  <test-suite type="TestSuite" id="1000" name="ProjectBeViolenceDefense" fullname="ProjectBeViolenceDefense" runstate="Runnable" testcasecount="117" result="Failed" site="Child" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:11:23Z" duration="23.551241" total="117" passed="116" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1147" name="Assembly-CSharp-Editor.dll" fullname="C:/Users/Choij/.codex/worktrees/d679/BeViolenceDefense/ProjectBeViolenceDefense/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="117" result="Failed" site="Child" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:11:23Z" duration="23.541419" total="117" passed="116" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="2804" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestFixture" id="1001" name="CombatPositioningTests" fullname="CombatPositioningTests" classname="CombatPositioningTests" runstate="Runnable" testcasecount="67" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:11:18Z" duration="18.950403" total="67" passed="67" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1059" name="AdjacentSpawnsDoNotOverlapLargeUnitsInTheSameTick" fullname="CombatPositioningTests.AdjacentSpawnsDoNotOverlapLargeUnitsInTheSameTick" methodname="AdjacentSpawnsDoNotOverlapLargeUnitsInTheSameTick" classname="CombatPositioningTests" runstate="Runnable" seed="2000314260" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.054545" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1016" name="AttackCooldownDoesNotCountAsApproachStall" fullname="CombatPositioningTests.AttackCooldownDoesNotCountAsApproachStall" methodname="AttackCooldownDoesNotCountAsApproachStall" classname="CombatPositioningTests" runstate="Runnable" seed="411140615" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.003548" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1043" name="AwarenessControlsFindingDistantEnemies" fullname="CombatPositioningTests.AwarenessControlsFindingDistantEnemies" classname="CombatPositioningTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.008981" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1041" name="AwarenessControlsFindingDistantEnemies(2.2f,False)" fullname="CombatPositioningTests.AwarenessControlsFindingDistantEnemies(2.2f,False)" methodname="AwarenessControlsFindingDistantEnemies" classname="CombatPositioningTests" runstate="Runnable" seed="638855451" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.005227" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1042" name="AwarenessControlsFindingDistantEnemies(3.2f,True)" fullname="CombatPositioningTests.AwarenessControlsFindingDistantEnemies(3.2f,True)" methodname="AwarenessControlsFindingDistantEnemies" classname="CombatPositioningTests" runstate="Runnable" seed="1258444049" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.000313" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1003" name="BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap" fullname="CombatPositioningTests.BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap" methodname="BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap" classname="CombatPositioningTests" runstate="Runnable" seed="1867964982" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.002980" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1027" name="CombatJoinRequiresNearbyVisibleActualFight" fullname="CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight" classname="CombatPositioningTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.004327" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1023" name="CombatJoinRequiresNearbyVisibleActualFight(4.0f,True,False,True)" fullname="CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(4.0f,True,False,True)" methodname="CombatJoinRequiresNearbyVisibleActualFight" classname="CombatPositioningTests" runstate="Runnable" seed="1827021828" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.001069" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1024" name="CombatJoinRequiresNearbyVisibleActualFight(4.0f,False,False,False)" fullname="CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(4.0f,False,False,False)" methodname="CombatJoinRequiresNearbyVisibleActualFight" classname="CombatPositioningTests" runstate="Runnable" seed="777356685" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.000257" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1025" name="CombatJoinRequiresNearbyVisibleActualFight(1.0f,True,False,False)" fullname="CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(1.0f,True,False,False)" methodname="CombatJoinRequiresNearbyVisibleActualFight" classname="CombatPositioningTests" runstate="Runnable" seed="975077993" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.000175" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1026" name="CombatJoinRequiresNearbyVisibleActualFight(4.0f,True,True,False)" fullname="CombatPositioningTests.CombatJoinRequiresNearbyVisibleActualFight(4.0f,True,True,False)" methodname="CombatJoinRequiresNearbyVisibleActualFight" classname="CombatPositioningTests" runstate="Runnable" seed="719882181" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.001862" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1078" name="CoreBlocksDetectionAndAttacksLikeAWall" fullname="CombatPositioningTests.CoreBlocksDetectionAndAttacksLikeAWall" methodname="CoreBlocksDetectionAndAttacksLikeAWall" classname="CombatPositioningTests" runstate="Runnable" seed="1646408589" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:10:59Z" duration="0.003017" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1070" name="CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets" fullname="CombatPositioningTests.CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets" classname="CombatPositioningTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:11:03Z" duration="4.026627" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1068" name="CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets(2)" fullname="CombatPositioningTests.CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets(2)" methodname="CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets" classname="CombatPositioningTests" runstate="Runnable" seed="1162686080" result="Passed" start-time="2026-11-19 02:10:59Z" end-time="2026-11-19 02:11:01Z" duration="2.274826" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1069" name="CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets(3)" fullname="CombatPositioningTests.CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets(3)" methodname="CorridorFightDoesNotShuffleSidewaysOrBounceBetweenTargets" classname="CombatPositioningTests" runstate="Runnable" seed="1334965066" result="Passed" start-time="2026-11-19 02:11:01Z" end-time="2026-11-19 02:11:03Z" duration="1.751053" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1080" name="CrowdArrivingOnBothSidesOfTheCoreFinishes" fullname="CombatPositioningTests.CrowdArrivingOnBothSidesOfTheCoreFinishes" methodname="CrowdArrivingOnBothSidesOfTheCoreFinishes" classname="CombatPositioningTests" runstate="Runnable" seed="1621686283" result="Passed" start-time="2026-11-19 02:11:03Z" end-time="2026-11-19 02:11:03Z" duration="0.059813" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1008" name="CrowdBarrierDetourKeepsTargetAndStartsAttacking" fullname="CombatPositioningTests.CrowdBarrierDetourKeepsTargetAndStartsAttacking" methodname="CrowdBarrierDetourKeepsTargetAndStartsAttacking" classname="CombatPositioningTests" runstate="Runnable" seed="124360102" result="Passed" start-time="2026-11-19 02:11:03Z" end-time="2026-11-19 02:11:03Z" duration="0.021319" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1035" name="CrowdedBattlesFinishWithoutOverlapOrWallPenetration" fullname="CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration" classname="CombatPositioningTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-19 02:11:03Z" end-time="2026-11-19 02:11:17Z" duration="13.726427" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1029" name="CrowdedBattlesFinishWithoutOverlapOrWallPenetration(9,False)" fullname="CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(9,False)" methodname="CrowdedBattlesFinishWithoutOverlapOrWallPenetration" classname="CombatPositioningTests" runstate="Runnable" seed="1144395734" result="Passed" start-time="2026-11-19 02:11:03Z" end-time="2026-11-19 02:11:04Z" duration="0.256147" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1030" name="CrowdedBattlesFinishWithoutOverlapOrWallPenetration(9,True)" fullname="CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(9,True)" methodname="CrowdedBattlesFinishWithoutOverlapOrWallPenetration" classname="CombatPositioningTests" runstate="Runnable" seed="1092189597" result="Passed" start-time="2026-11-19 02:11:04Z" end-time="2026-11-19 02:11:04Z" duration="0.651953" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1031" name="CrowdedBattlesFinishWithoutOverlapOrWallPenetration(20,False)" fullname="CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(20,False)" methodname="CrowdedBattlesFinishWithoutOverlapOrWallPenetration" classname="CombatPositioningTests" runstate="Runnable" seed="19537598" result="Passed" start-time="2026-11-19 02:11:04Z" end-time="2026-11-19 02:11:05Z" duration="0.760596" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1032" name="CrowdedBattlesFinishWithoutOverlapOrWallPenetration(20,True)" fullname="CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(20,True)" methodname="CrowdedBattlesFinishWithoutOverlapOrWallPenetration" classname="CombatPositioningTests" runstate="Runnable" seed="1872407827" result="Passed" start-time="2026-11-19 02:11:05Z" end-time="2026-11-19 02:11:07Z" duration="2.128878" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1033" name="CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,False)" fullname="CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,False)" methodname="CrowdedBattlesFinishWithoutOverlapOrWallPenetration" classname="CombatPositioningTests" runstate="Runnable" seed="1497101879" result="Passed" start-time="2026-11-19 02:11:07Z" end-time="2026-11-19 02:11:09Z" duration="1.789355" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1034" name="CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,True)" fullname="CombatPositioningTests.CrowdedBattlesFinishWithoutOverlapOrWallPenetration(40,True)" methodname="CrowdedBattlesFinishWithoutOverlapOrWallPenetration" classname="CombatPositioningTests" runstate="Runnable" seed="934130427" result="Passed" start-time="2026-11-19 02:11:09Z" end-time="2026-11-19 02:11:17Z" duration="8.136942" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1006" name="EquidistantTargetsUseSpawnOrderInsteadOfListOrder" fullname="CombatPositioningTests.EquidistantTargetsUseSpawnOrderInsteadOfListOrder" methodname="EquidistantTargetsUseSpawnOrderInsteadOfListOrder" classname="CombatPositioningTests" runstate="Runnable" seed="1737940150" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000595" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1017" name="FirstWaveRearUnitsDoNotRepeatedlyReverseWhileWithoutTarget" fullname="CombatPositioningTests.FirstWaveRearUnitsDoNotRepeatedlyReverseWhileWithoutTarget" methodname="FirstWaveRearUnitsDoNotRepeatedlyReverseWhileWithoutTarget" classname="CombatPositioningTests" runstate="Runnable" seed="1334703122" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.106708" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1022" name="FirstWaveRearUnitsSpreadAndJoinSeveralFights" fullname="CombatPositioningTests.FirstWaveRearUnitsSpreadAndJoinSeveralFights" methodname="FirstWaveRearUnitsSpreadAndJoinSeveralFights" classname="CombatPositioningTests" runstate="Runnable" seed="790610411" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.088605" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1028" name="FlankingSurvivorCanBypassTrafficUsingForwardRouteConnection" fullname="CombatPositioningTests.FlankingSurvivorCanBypassTrafficUsingForwardRouteConnection" methodname="FlankingSurvivorCanBypassTrafficUsingForwardRouteConnection" classname="CombatPositioningTests" runstate="Runnable" seed="1877648040" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.007085" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1021" name="ForwardRouteShortcutKeepsItsChosenWaypointUntilReached" fullname="CombatPositioningTests.ForwardRouteShortcutKeepsItsChosenWaypointUntilReached" methodname="ForwardRouteShortcutKeepsItsChosenWaypointUntilReached" classname="CombatPositioningTests" runstate="Runnable" seed="222686896" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001495" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1074" name="HiddenOpponentBehindACrowdIsGivenUpInsteadOfBlockingTheLane" fullname="CombatPositioningTests.HiddenOpponentBehindACrowdIsGivenUpInsteadOfBlockingTheLane" methodname="HiddenOpponentBehindACrowdIsGivenUpInsteadOfBlockingTheLane" classname="CombatPositioningTests" runstate="Runnable" seed="1167146084" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.018901" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1077" name="IdleUnitOffItsRouteStepsAwayOnlyFromATouchingNeighbor" fullname="CombatPositioningTests.IdleUnitOffItsRouteStepsAwayOnlyFromATouchingNeighbor" classname="CombatPositioningTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.002078" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1075" name="IdleUnitOffItsRouteStepsAwayOnlyFromATouchingNeighbor(4.5f,True)" fullname="CombatPositioningTests.IdleUnitOffItsRouteStepsAwayOnlyFromATouchingNeighbor(4.5f,True)" methodname="IdleUnitOffItsRouteStepsAwayOnlyFromATouchingNeighbor" classname="CombatPositioningTests" runstate="Runnable" seed="44743520" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000816" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1076" name="IdleUnitOffItsRouteStepsAwayOnlyFromATouchingNeighbor(5.0f,False)" fullname="CombatPositioningTests.IdleUnitOffItsRouteStepsAwayOnlyFromATouchingNeighbor(5.0f,False)" methodname="IdleUnitOffItsRouteStepsAwayOnlyFromATouchingNeighbor" classname="CombatPositioningTests" runstate="Runnable" seed="1893954237" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000270" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1062" name="KnownTargetBehindALongWallIsLeftAloneInsteadOfWalkingAllTheWayRound" fullname="CombatPositioningTests.KnownTargetBehindALongWallIsLeftAloneInsteadOfWalkingAllTheWayRound" methodname="KnownTargetBehindALongWallIsLeftAloneInsteadOfWalkingAllTheWayRound" classname="CombatPositioningTests" runstate="Runnable" seed="855873138" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.017087" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1063" name="KnownTargetBehindAPillarIsReachedByAShortWayRound" fullname="CombatPositioningTests.KnownTargetBehindAPillarIsReachedByAShortWayRound" methodname="KnownTargetBehindAPillarIsReachedByAShortWayRound" classname="CombatPositioningTests" runstate="Runnable" seed="689259839" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.006545" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1060" name="KnownTargetBeyondAwarenessIsKeptUntilReached" fullname="CombatPositioningTests.KnownTargetBeyondAwarenessIsKeptUntilReached" methodname="KnownTargetBeyondAwarenessIsKeptUntilReached" classname="CombatPositioningTests" runstate="Runnable" seed="657560317" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.006792" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1007" name="LocalSteeringGoesAroundUnitsWithoutCuttingThroughAWall" fullname="CombatPositioningTests.LocalSteeringGoesAroundUnitsWithoutCuttingThroughAWall" methodname="LocalSteeringGoesAroundUnitsWithoutCuttingThroughAWall" classname="CombatPositioningTests" runstate="Runnable" seed="1908876226" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001212" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1040" name="MovementUsesBothUnitsRadii" fullname="CombatPositioningTests.MovementUsesBothUnitsRadii" classname="CombatPositioningTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.002445" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1037" name="MovementUsesBothUnitsRadii(0.2f,0.2f)" fullname="CombatPositioningTests.MovementUsesBothUnitsRadii(0.2f,0.2f)" methodname="MovementUsesBothUnitsRadii" classname="CombatPositioningTests" runstate="Runnable" seed="954467461" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001104" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1038" name="MovementUsesBothUnitsRadii(0.2f,0.5f)" fullname="CombatPositioningTests.MovementUsesBothUnitsRadii(0.2f,0.5f)" methodname="MovementUsesBothUnitsRadii" classname="CombatPositioningTests" runstate="Runnable" seed="776397822" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000247" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1039" name="MovementUsesBothUnitsRadii(0.5f,0.5f)" fullname="CombatPositioningTests.MovementUsesBothUnitsRadii(0.5f,0.5f)" methodname="MovementUsesBothUnitsRadii" classname="CombatPositioningTests" runstate="Runnable" seed="1548282607" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000205" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1065" name="OccludedMovingTargetDoesNotUpdateItsLastSeenPosition" fullname="CombatPositioningTests.OccludedMovingTargetDoesNotUpdateItsLastSeenPosition" methodname="OccludedMovingTargetDoesNotUpdateItsLastSeenPosition" classname="CombatPositioningTests" runstate="Runnable" seed="5065231" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.015290" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1049" name="RangedAggroInterruptsPursuitButKeepsAnImmediateFight" fullname="CombatPositioningTests.RangedAggroInterruptsPursuitButKeepsAnImmediateFight" classname="CombatPositioningTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.002009" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1047" name="RangedAggroInterruptsPursuitButKeepsAnImmediateFight(False)" fullname="CombatPositioningTests.RangedAggroInterruptsPursuitButKeepsAnImmediateFight(False)" methodname="RangedAggroInterruptsPursuitButKeepsAnImmediateFight" classname="CombatPositioningTests" runstate="Runnable" seed="2014731441" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000782" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1048" name="RangedAggroInterruptsPursuitButKeepsAnImmediateFight(True)" fullname="CombatPositioningTests.RangedAggroInterruptsPursuitButKeepsAnImmediateFight(True)" methodname="RangedAggroInterruptsPursuitButKeepsAnImmediateFight" classname="CombatPositioningTests" runstate="Runnable" seed="1294359791" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000351" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1046" name="RangedHitRevealsAttackerAndStartsCounterattackInTheSameTick" fullname="CombatPositioningTests.RangedHitRevealsAttackerAndStartsCounterattackInTheSameTick" classname="CombatPositioningTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.004146" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1044" name="RangedHitRevealsAttackerAndStartsCounterattackInTheSameTick(3.0f,2.2f)" fullname="CombatPositioningTests.RangedHitRevealsAttackerAndStartsCounterattackInTheSameTick(3.0f,2.2f)" methodname="RangedHitRevealsAttackerAndStartsCounterattackInTheSameTick" classname="CombatPositioningTests" runstate="Runnable" seed="507060131" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001825" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1045" name="RangedHitRevealsAttackerAndStartsCounterattackInTheSameTick(6.0f,3.0f)" fullname="CombatPositioningTests.RangedHitRevealsAttackerAndStartsCounterattackInTheSameTick(6.0f,3.0f)" methodname="RangedHitRevealsAttackerAndStartsCounterattackInTheSameTick" classname="CombatPositioningTests" runstate="Runnable" seed="1797420642" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001626" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1002" name="ReadyAttackerTakesPriorityOverDistantReservations" fullname="CombatPositioningTests.ReadyAttackerTakesPriorityOverDistantReservations" methodname="ReadyAttackerTakesPriorityOverDistantReservations" classname="CombatPositioningTests" runstate="Runnable" seed="1552748708" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001253" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1005" name="ReadyFighterStaysPutAndAlternativeTargetIsUsedWhenFull" fullname="CombatPositioningTests.ReadyFighterStaysPutAndAlternativeTargetIsUsedWhenFull" methodname="ReadyFighterStaysPutAndAlternativeTargetIsUsedWhenFull" classname="CombatPositioningTests" runstate="Runnable" seed="167814136" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001519" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1057" name="RepeatedHitsDoNotUndoAReachableAlternativeOrCauseTargetOscillation" fullname="CombatPositioningTests.RepeatedHitsDoNotUndoAReachableAlternativeOrCauseTargetOscillation" methodname="RepeatedHitsDoNotUndoAReachableAlternativeOrCauseTargetOscillation" classname="CombatPositioningTests" runstate="Runnable" seed="1066399031" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000793" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1053" name="RetaliationRespectsWallsDeathAndMemoryExpiry" fullname="CombatPositioningTests.RetaliationRespectsWallsDeathAndMemoryExpiry" classname="CombatPositioningTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.002282" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1050" name="RetaliationRespectsWallsDeathAndMemoryExpiry(&quot;wall&quot;)" fullname="CombatPositioningTests.RetaliationRespectsWallsDeathAndMemoryExpiry(&quot;wall&quot;)" methodname="RetaliationRespectsWallsDeathAndMemoryExpiry" classname="CombatPositioningTests" runstate="Runnable" seed="251316217" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000916" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1051" name="RetaliationRespectsWallsDeathAndMemoryExpiry(&quot;expired&quot;)" fullname="CombatPositioningTests.RetaliationRespectsWallsDeathAndMemoryExpiry(&quot;expired&quot;)" methodname="RetaliationRespectsWallsDeathAndMemoryExpiry" classname="CombatPositioningTests" runstate="Runnable" seed="1520925515" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000348" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1052" name="RetaliationRespectsWallsDeathAndMemoryExpiry(&quot;dead&quot;)" fullname="CombatPositioningTests.RetaliationRespectsWallsDeathAndMemoryExpiry(&quot;dead&quot;)" methodname="RetaliationRespectsWallsDeathAndMemoryExpiry" classname="CombatPositioningTests" runstate="Runnable" seed="1126043334" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000277" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1020" name="RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears" fullname="CombatPositioningTests.RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears" classname="CombatPositioningTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.012991" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1018" name="RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears(False)" fullname="CombatPositioningTests.RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears(False)" methodname="RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears" classname="CombatPositioningTests" runstate="Runnable" seed="497569941" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.005745" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1019" name="RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears(True)" fullname="CombatPositioningTests.RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears(True)" methodname="RouteQueueBypassesAnOpenLaneOrWaitsUntilNarrowLaneClears" classname="CombatPositioningTests" runstate="Runnable" seed="494880295" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.006466" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1079" name="ShootersOnOppositeFacesOfTheCoreWalkInInsteadOfWaitingOnEachOther" fullname="CombatPositioningTests.ShootersOnOppositeFacesOfTheCoreWalkInInsteadOfWaitingOnEachOther" methodname="ShootersOnOppositeFacesOfTheCoreWalkInInsteadOfWaitingOnEachOther" classname="CombatPositioningTests" runstate="Runnable" seed="258924127" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.004573" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1036" name="ShortAttackRangeDoesNotAllowEnteringAnotherUnitsSpace" fullname="CombatPositioningTests.ShortAttackRangeDoesNotAllowEnteringAnotherUnitsSpace" methodname="ShortAttackRangeDoesNotAllowEnteringAnotherUnitsSpace" classname="CombatPositioningTests" runstate="Runnable" seed="525377854" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001338" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1061" name="SightAndMovementAgreeAlongWallEdges" fullname="CombatPositioningTests.SightAndMovementAgreeAlongWallEdges" methodname="SightAndMovementAgreeAlongWallEdges" classname="CombatPositioningTests" runstate="Runnable" seed="788669624" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001187" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1056" name="SimultaneousArmorBlockedHitsChooseStableAttacker" fullname="CombatPositioningTests.SimultaneousArmorBlockedHitsChooseStableAttacker" classname="CombatPositioningTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.002458" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1054" name="SimultaneousArmorBlockedHitsChooseStableAttacker(False)" fullname="CombatPositioningTests.SimultaneousArmorBlockedHitsChooseStableAttacker(False)" methodname="SimultaneousArmorBlockedHitsChooseStableAttacker" classname="CombatPositioningTests" runstate="Runnable" seed="1099229653" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001044" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1055" name="SimultaneousArmorBlockedHitsChooseStableAttacker(True)" fullname="CombatPositioningTests.SimultaneousArmorBlockedHitsChooseStableAttacker(True)" methodname="SimultaneousArmorBlockedHitsChooseStableAttacker" classname="CombatPositioningTests" runstate="Runnable" seed="1665374351" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.000548" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1058" name="SimultaneousLethalAttacksStillBothLandWithRetaliation" fullname="CombatPositioningTests.SimultaneousLethalAttacksStillBothLandWithRetaliation" methodname="SimultaneousLethalAttacksStillBothLandWithRetaliation" classname="CombatPositioningTests" runstate="Runnable" seed="964975890" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.001046" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1014" name="StalledRetargetStillRequiresVisibleReachableLivingEnemy" fullname="CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy" classname="CombatPositioningTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.031153" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1010" name="StalledRetargetStillRequiresVisibleReachableLivingEnemy(&quot;wall&quot;)" fullname="CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(&quot;wall&quot;)" methodname="StalledRetargetStillRequiresVisibleReachableLivingEnemy" classname="CombatPositioningTests" runstate="Runnable" seed="322313726" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.008108" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1011" name="StalledRetargetStillRequiresVisibleReachableLivingEnemy(&quot;range&quot;)" fullname="CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(&quot;range&quot;)" methodname="StalledRetargetStillRequiresVisibleReachableLivingEnemy" classname="CombatPositioningTests" runstate="Runnable" seed="1396220639" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.006192" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1012" name="StalledRetargetStillRequiresVisibleReachableLivingEnemy(&quot;dead&quot;)" fullname="CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(&quot;dead&quot;)" methodname="StalledRetargetStillRequiresVisibleReachableLivingEnemy" classname="CombatPositioningTests" runstate="Runnable" seed="409353055" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.007073" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1013" name="StalledRetargetStillRequiresVisibleReachableLivingEnemy(&quot;body&quot;)" fullname="CombatPositioningTests.StalledRetargetStillRequiresVisibleReachableLivingEnemy(&quot;body&quot;)" methodname="StalledRetargetStillRequiresVisibleReachableLivingEnemy" classname="CombatPositioningTests" runstate="Runnable" seed="1245746306" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.008542" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1009" name="StalledUnitWithoutAlternativeResumesWhenFrontLineClears" fullname="CombatPositioningTests.StalledUnitWithoutAlternativeResumesWhenFrontLineClears" methodname="StalledUnitWithoutAlternativeResumesWhenFrontLineClears" classname="CombatPositioningTests" runstate="Runnable" seed="1442480325" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.006052" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1015" name="SuccessfulDetourKeepsPreferredTarget" fullname="CombatPositioningTests.SuccessfulDetourKeepsPreferredTarget" methodname="SuccessfulDetourKeepsPreferredTarget" classname="CombatPositioningTests" runstate="Runnable" seed="1130514451" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.005050" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1066" name="TrulyUnreachableKnownTargetIsReplacedByReachableOpponent" fullname="CombatPositioningTests.TrulyUnreachableKnownTargetIsReplacedByReachableOpponent" methodname="TrulyUnreachableKnownTargetIsReplacedByReachableOpponent" classname="CombatPositioningTests" runstate="Runnable" seed="1763407324" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.011132" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1064" name="UnitBlockedByItsOwnFrontLineWaitsBehindInsteadOfWalkingAllTheWayRound" fullname="CombatPositioningTests.UnitBlockedByItsOwnFrontLineWaitsBehindInsteadOfWalkingAllTheWayRound" methodname="UnitBlockedByItsOwnFrontLineWaitsBehindInsteadOfWalkingAllTheWayRound" classname="CombatPositioningTests" runstate="Runnable" seed="1535771910" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.027694" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1067" name="UnitLeftOffItsRouteBehindALongWallStillReturnsToTheCoreRoute" fullname="CombatPositioningTests.UnitLeftOffItsRouteBehindALongWallStillReturnsToTheCoreRoute" methodname="UnitLeftOffItsRouteBehindALongWallStillReturnsToTheCoreRoute" classname="CombatPositioningTests" runstate="Runnable" seed="858864645" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:17Z" duration="0.022694" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1073" name="UnitsWaitingOnOpponentsNobodyFightsGiveUpInsteadOfFreezing" fullname="CombatPositioningTests.UnitsWaitingOnOpponentsNobodyFightsGiveUpInsteadOfFreezing" methodname="UnitsWaitingOnOpponentsNobodyFightsGiveUpInsteadOfFreezing" classname="CombatPositioningTests" runstate="Runnable" seed="1893043172" result="Passed" start-time="2026-11-19 02:11:17Z" end-time="2026-11-19 02:11:18Z" duration="0.589058" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1071" name="WaitingUnitHoldsItsPositionBehindAFullFight" fullname="CombatPositioningTests.WaitingUnitHoldsItsPositionBehindAFullFight" methodname="WaitingUnitHoldsItsPositionBehindAFullFight" classname="CombatPositioningTests" runstate="Runnable" seed="1917940605" result="Passed" start-time="2026-11-19 02:11:18Z" end-time="2026-11-19 02:11:18Z" duration="0.003289" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1072" name="WaitingUnitWalksUpBehindTheFightInsteadOfStandingFarAway" fullname="CombatPositioningTests.WaitingUnitWalksUpBehindTheFightInsteadOfStandingFarAway" methodname="WaitingUnitWalksUpBehindTheFightInsteadOfStandingFarAway" classname="CombatPositioningTests" runstate="Runnable" seed="377602458" result="Passed" start-time="2026-11-19 02:11:18Z" end-time="2026-11-19 02:11:18Z" duration="0.004672" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1004" name="WallStillBlocksDetectionAndAttacks" fullname="CombatPositioningTests.WallStillBlocksDetectionAndAttacks" methodname="WallStillBlocksDetectionAndAttacks" classname="CombatPositioningTests" runstate="Runnable" seed="881910482" result="Passed" start-time="2026-11-19 02:11:18Z" end-time="2026-11-19 02:11:18Z" duration="0.001308" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1081" name="FourFactionBattleTests" fullname="FourFactionBattleTests" classname="FourFactionBattleTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:11:18Z" end-time="2026-11-19 02:11:18Z" duration="0.100555" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1082" name="AllFourRacesSpawnAndFightEachOther" fullname="FourFactionBattleTests.AllFourRacesSpawnAndFightEachOther" methodname="AllFourRacesSpawnAndFightEachOther" classname="FourFactionBattleTests" runstate="Runnable" seed="449554704" result="Passed" start-time="2026-11-19 02:11:18Z" end-time="2026-11-19 02:11:18Z" duration="0.071004" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1083" name="RacesWithoutSpawnAreSkipped" fullname="FourFactionBattleTests.RacesWithoutSpawnAreSkipped" methodname="RacesWithoutSpawnAreSkipped" classname="FourFactionBattleTests" runstate="Runnable" seed="1117789271" result="Passed" start-time="2026-11-19 02:11:18Z" end-time="2026-11-19 02:11:18Z" duration="0.025741" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1084" name="MapScaleTests" fullname="MapScaleTests" classname="MapScaleTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-19 02:11:18Z" end-time="2026-11-19 02:11:20Z" duration="1.834970" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="ParameterizedMethod" id="1088" name="BattlesOnADoubledMapFinishWithoutCrossingWalls" fullname="MapScaleTests.BattlesOnADoubledMapFinishWithoutCrossingWalls" classname="MapScaleTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:11:18Z" end-time="2026-11-19 02:11:20Z" duration="1.830078" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1086" name="BattlesOnADoubledMapFinishWithoutCrossingWalls(9)" fullname="MapScaleTests.BattlesOnADoubledMapFinishWithoutCrossingWalls(9)" methodname="BattlesOnADoubledMapFinishWithoutCrossingWalls" classname="MapScaleTests" runstate="Runnable" seed="136719098" result="Passed" start-time="2026-11-19 02:11:18Z" end-time="2026-11-19 02:11:19Z" duration="0.454279" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1087" name="BattlesOnADoubledMapFinishWithoutCrossingWalls(20)" fullname="MapScaleTests.BattlesOnADoubledMapFinishWithoutCrossingWalls(20)" methodname="BattlesOnADoubledMapFinishWithoutCrossingWalls" classname="MapScaleTests" runstate="Runnable" seed="1243466518" result="Passed" start-time="2026-11-19 02:11:19Z" end-time="2026-11-19 02:11:20Z" duration="1.372890" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1085" name="DoubledCellsScaleTheMapButNotTheUnits" fullname="MapScaleTests.DoubledCellsScaleTheMapButNotTheUnits" methodname="DoubledCellsScaleTheMapButNotTheUnits" classname="MapScaleTests" runstate="Runnable" seed="1527136370" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.002056" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1089" name="RerouteAfterCombatTests" fullname="RerouteAfterCombatTests" classname="RerouteAfterCombatTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.034382" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1093" name="ReturningToFinalApproachDoesNotWaitForADistantAlly" fullname="RerouteAfterCombatTests.ReturningToFinalApproachDoesNotWaitForADistantAlly" methodname="ReturningToFinalApproachDoesNotWaitForADistantAlly" classname="RerouteAfterCombatTests" runstate="Runnable" seed="811409484" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.001322" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1092" name="ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment" fullname="RerouteAfterCombatTests.ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment" classname="RerouteAfterCombatTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.023302" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1090" name="ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment(1.0f)" fullname="RerouteAfterCombatTests.ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment(1.0f)" methodname="ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment" classname="RerouteAfterCombatTests" runstate="Runnable" seed="1344091401" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.010176" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1091" name="ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment(2.0f)" fullname="RerouteAfterCombatTests.ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment(2.0f)" methodname="ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment" classname="RerouteAfterCombatTests" runstate="Runnable" seed="1873275911" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.012499" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1094" name="RouteFromStartsHereAndStepsOnlyThroughOpenCells" fullname="RerouteAfterCombatTests.RouteFromStartsHereAndStepsOnlyThroughOpenCells" methodname="RouteFromStartsHereAndStepsOnlyThroughOpenCells" classname="RerouteAfterCombatTests" runstate="Runnable" seed="1248152023" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.003830" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1095" name="SurvivorHeadsToTheCoreFromWhereTheFightEnded" fullname="RerouteAfterCombatTests.SurvivorHeadsToTheCoreFromWhereTheFightEnded" methodname="SurvivorHeadsToTheCoreFromWhereTheFightEnded" classname="RerouteAfterCombatTests" runstate="Runnable" seed="1770972928" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.004512" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1096" name="RouteFlowPathTests" fullname="RouteFlowPathTests" classname="RouteFlowPathTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.011635" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1098" name="DistanceSamplingDoesNotSlowDownOrSnapHeadingAtBends" fullname="RouteFlowPathTests.DistanceSamplingDoesNotSlowDownOrSnapHeadingAtBends" methodname="DistanceSamplingDoesNotSlowDownOrSnapHeadingAtBends" classname="RouteFlowPathTests" runstate="Runnable" seed="1042093547" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.005946" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1100" name="DuplicateAndEmptyWaypointsDoNotProduceInvalidSamples" fullname="RouteFlowPathTests.DuplicateAndEmptyWaypointsDoNotProduceInvalidSamples" methodname="DuplicateAndEmptyWaypointsDoNotProduceInvalidSamples" classname="RouteFlowPathTests" runstate="Runnable" seed="1232607031" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.001093" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1097" name="RoundedCornerPreservesEndpointsAndStaysInsideWalkableCells" fullname="RouteFlowPathTests.RoundedCornerPreservesEndpointsAndStaysInsideWalkableCells" methodname="RoundedCornerPreservesEndpointsAndStaysInsideWalkableCells" classname="RouteFlowPathTests" runstate="Runnable" seed="94440131" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.001983" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1099" name="SharedLaneWidthChangesContinuouslyAcrossTheMerge" fullname="RouteFlowPathTests.SharedLaneWidthChangesContinuouslyAcrossTheMerge" methodname="SharedLaneWidthChangesContinuouslyAcrossTheMerge" classname="RouteFlowPathTests" runstate="Runnable" seed="779889615" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.001046" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1101" name="ShieldTests" fullname="ShieldTests" classname="ShieldTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.010519" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1112" name="QueuedShieldAppliesAtNextTickOnlyToUnitsInAreaAndCostsMana" fullname="ShieldTests.QueuedShieldAppliesAtNextTickOnlyToUnitsInAreaAndCostsMana" methodname="QueuedShieldAppliesAtNextTickOnlyToUnitsInAreaAndCostsMana" classname="ShieldTests" runstate="Runnable" seed="768813087" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.005853" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1110" name="RecastRefreshesDurationWithoutStackingAndExpiryRestoresBaseArmor" fullname="ShieldTests.RecastRefreshesDurationWithoutStackingAndExpiryRestoresBaseArmor" methodname="RecastRefreshesDurationWithoutStackingAndExpiryRestoresBaseArmor" classname="ShieldTests" runstate="Runnable" seed="449168512" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.000984" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1109" name="ShieldReducesDamageAfterBaseArmorAndRoundsUp" fullname="ShieldTests.ShieldReducesDamageAfterBaseArmorAndRoundsUp" classname="ShieldTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.001837" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1102" name="ShieldReducesDamageAfterBaseArmorAndRoundsUp(25,0,5)" fullname="ShieldTests.ShieldReducesDamageAfterBaseArmorAndRoundsUp(25,0,5)" methodname="ShieldReducesDamageAfterBaseArmorAndRoundsUp" classname="ShieldTests" runstate="Runnable" seed="2039664894" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.000441" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1103" name="ShieldReducesDamageAfterBaseArmorAndRoundsUp(25,5,4)" fullname="ShieldTests.ShieldReducesDamageAfterBaseArmorAndRoundsUp(25,5,4)" methodname="ShieldReducesDamageAfterBaseArmorAndRoundsUp" classname="ShieldTests" runstate="Runnable" seed="575053155" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.000107" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1104" name="ShieldReducesDamageAfterBaseArmorAndRoundsUp(26,5,5)" fullname="ShieldTests.ShieldReducesDamageAfterBaseArmorAndRoundsUp(26,5,5)" methodname="ShieldReducesDamageAfterBaseArmorAndRoundsUp" classname="ShieldTests" runstate="Runnable" seed="1709032915" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.000060" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1105" name="ShieldReducesDamageAfterBaseArmorAndRoundsUp(1,0,1)" fullname="ShieldTests.ShieldReducesDamageAfterBaseArmorAndRoundsUp(1,0,1)" methodname="ShieldReducesDamageAfterBaseArmorAndRoundsUp" classname="ShieldTests" runstate="Runnable" seed="853625361" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.000054" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1106" name="ShieldReducesDamageAfterBaseArmorAndRoundsUp(0,0,0)" fullname="ShieldTests.ShieldReducesDamageAfterBaseArmorAndRoundsUp(0,0,0)" methodname="ShieldReducesDamageAfterBaseArmorAndRoundsUp" classname="ShieldTests" runstate="Runnable" seed="575541056" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.000050" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1107" name="ShieldReducesDamageAfterBaseArmorAndRoundsUp(5,10,0)" fullname="ShieldTests.ShieldReducesDamageAfterBaseArmorAndRoundsUp(5,10,0)" methodname="ShieldReducesDamageAfterBaseArmorAndRoundsUp" classname="ShieldTests" runstate="Runnable" seed="1100904978" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.000052" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1108" name="ShieldReducesDamageAfterBaseArmorAndRoundsUp(int.MaxValue,0,429496730)" fullname="ShieldTests.ShieldReducesDamageAfterBaseArmorAndRoundsUp(int.MaxValue,0,429496730)" methodname="ShieldReducesDamageAfterBaseArmorAndRoundsUp" classname="ShieldTests" runstate="Runnable" seed="1455352962" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.000045" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1111" name="SimultaneousHitsAreReducedIndividuallyAndStillTriggerRetaliation" fullname="ShieldTests.SimultaneousHitsAreReducedIndividuallyAndStillTriggerRetaliation" methodname="SimultaneousHitsAreReducedIndividuallyAndStillTriggerRetaliation" classname="ShieldTests" runstate="Runnable" seed="1809132573" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.000324" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1113" name="SimulationDeterminismTests" fullname="SimulationDeterminismTests" classname="SimulationDeterminismTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:21Z" duration="0.667957" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1115" name="CommandHistoryReplaysTheSameBattle" fullname="SimulationDeterminismTests.CommandHistoryReplaysTheSameBattle" methodname="CommandHistoryReplaysTheSameBattle" classname="SimulationDeterminismTests" runstate="Runnable" seed="897571195" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:20Z" duration="0.188330" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1114" name="SameTicksAcrossFramePatterns" fullname="SimulationDeterminismTests.SameTicksAcrossFramePatterns" methodname="SameTicksAcrossFramePatterns" classname="SimulationDeterminismTests" runstate="Runnable" seed="842163777" result="Passed" start-time="2026-11-19 02:11:20Z" end-time="2026-11-19 02:11:21Z" duration="0.478476" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1116" name="SimulationPurityTests" fullname="SimulationPurityTests" classname="SimulationPurityTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-19 02:11:21Z" end-time="2026-11-19 02:11:21Z" duration="0.036831" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1117" name="SimulationFilesAvoidFrameAndSceneDependencies" fullname="SimulationPurityTests.SimulationFilesAvoidFrameAndSceneDependencies" methodname="SimulationFilesAvoidFrameAndSceneDependencies" classname="SimulationPurityTests" runstate="Runnable" seed="419275205" result="Passed" start-time="2026-11-19 02:11:21Z" end-time="2026-11-19 02:11:21Z" duration="0.035332" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1118" name="StageContentTests" fullname="StageContentTests" classname="StageContentTests" runstate="Runnable" testcasecount="5" result="Failed" site="Child" start-time="2026-11-19 02:11:21Z" end-time="2026-11-19 02:11:22Z" duration="1.405300" total="5" passed="4" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1119" name="EveryStageIsSelfContainedWithoutDuplicatingSharedGameplayOrUi" fullname="StageContentTests.EveryStageIsSelfContainedWithoutDuplicatingSharedGameplayOrUi" methodname="EveryStageIsSelfContainedWithoutDuplicatingSharedGameplayOrUi" classname="StageContentTests" runstate="Runnable" seed="1178565415" result="Passed" start-time="2026-11-19 02:11:21Z" end-time="2026-11-19 02:11:21Z" duration="0.143264" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1121" name="GraveyardLayoutKeepsTheSceneryFrameAndLengthensRoutesWhenItsGatesAreWalled" fullname="StageContentTests.GraveyardLayoutKeepsTheSceneryFrameAndLengthensRoutesWhenItsGatesAreWalled" classname="StageContentTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2026-11-19 02:11:21Z" end-time="2026-11-19 02:11:21Z" duration="0.005662" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1120" name="GraveyardLayoutKeepsTheSceneryFrameAndLengthensRoutesWhenItsGatesAreWalled(&quot;Graveyard&quot;,41,16,&quot;4,12 5,12 11,12 12,12&quot;,17,&quot;4,6 5,6 11,6 12,6&quot;,21)" fullname="StageContentTests.GraveyardLayoutKeepsTheSceneryFrameAndLengthensRoutesWhenItsGatesAreWalled(&quot;Graveyard&quot;,41,16,&quot;4,12 5,12 11,12 12,12&quot;,17,&quot;4,6 5,6 11,6 12,6&quot;,21)" methodname="GraveyardLayoutKeepsTheSceneryFrameAndLengthensRoutesWhenItsGatesAreWalled" classname="StageContentTests" runstate="Runnable" seed="350527321" result="Failed" start-time="2026-11-19 02:11:21Z" end-time="2026-11-19 02:11:21Z" duration="0.004450" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: 17
+  But was:  23
+]]></message>
+              <stack-trace><![CDATA[at StageContentTests.GraveyardLayoutKeepsTheSceneryFrameAndLengthensRoutesWhenItsGatesAreWalled (System.String name, System.Int32 fixedWalls, System.Int32 openRoute, System.String upperGates, System.Int32 upperRoute, System.String lowerGates, System.Int32 lowerRoute) [0x00023] in C:\Users\Choij\.codex\worktrees\d679\BeViolenceDefense\ProjectBeViolenceDefense\Assets\09_Tests\Editor\StageContentTests.cs:43
+]]></stack-trace>
+            </failure>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1124" name="HandmadeStagesLoadTheirStageData" fullname="StageContentTests.HandmadeStagesLoadTheirStageData" classname="StageContentTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-19 02:11:21Z" end-time="2026-11-19 02:11:21Z" duration="0.002928" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1122" name="HandmadeStagesLoadTheirStageData(&quot;GoldenMaple&quot;,&quot;Stage2_Temp&quot;)" fullname="StageContentTests.HandmadeStagesLoadTheirStageData(&quot;GoldenMaple&quot;,&quot;Stage2_Temp&quot;)" methodname="HandmadeStagesLoadTheirStageData" classname="StageContentTests" runstate="Runnable" seed="525147891" result="Passed" start-time="2026-11-19 02:11:21Z" end-time="2026-11-19 02:11:21Z" duration="0.001568" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1123" name="HandmadeStagesLoadTheirStageData(&quot;Snowfield&quot;,&quot;Stage3&quot;)" fullname="StageContentTests.HandmadeStagesLoadTheirStageData(&quot;Snowfield&quot;,&quot;Stage3&quot;)" methodname="HandmadeStagesLoadTheirStageData" classname="StageContentTests" runstate="Runnable" seed="553130699" result="Passed" start-time="2026-11-19 02:11:21Z" end-time="2026-11-19 02:11:21Z" duration="0.000587" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1125" name="SharedSceneHasOneSelectorWithFiveDistinctStageChoices" fullname="StageContentTests.SharedSceneHasOneSelectorWithFiveDistinctStageChoices" methodname="SharedSceneHasOneSelectorWithFiveDistinctStageChoices" classname="StageContentTests" runstate="Runnable" seed="581421093" result="Passed" start-time="2026-11-19 02:11:21Z" end-time="2026-11-19 02:11:22Z" duration="1.251929" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1126" name="StageWavesEditingTests" fullname="StageWavesEditingTests" classname="StageWavesEditingTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.065746" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1133" name="CatalogDuplicatesAndMissingSpawnsAreReported" fullname="StageWavesEditingTests.CatalogDuplicatesAndMissingSpawnsAreReported" methodname="CatalogDuplicatesAndMissingSpawnsAreReported" classname="StageWavesEditingTests" runstate="Runnable" seed="1217768792" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.018666" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1127" name="DuplicateWavePreservesValuesWithoutSharingNestedObjects" fullname="StageWavesEditingTests.DuplicateWavePreservesValuesWithoutSharingNestedObjects" methodname="DuplicateWavePreservesValuesWithoutSharingNestedObjects" classname="StageWavesEditingTests" runstate="Runnable" seed="975937286" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.003234" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1132" name="EmptyAndMalformedDataCanBeDiagnosed" fullname="StageWavesEditingTests.EmptyAndMalformedDataCanBeDiagnosed" methodname="EmptyAndMalformedDataCanBeDiagnosed" classname="StageWavesEditingTests" runstate="Runnable" seed="1775056045" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.003258" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1128" name="NewRowsDoNotInheritLastRowsData" fullname="StageWavesEditingTests.NewRowsDoNotInheritLastRowsData" methodname="NewRowsDoNotInheritLastRowsData" classname="StageWavesEditingTests" runstate="Runnable" seed="43685898" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.003778" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1130" name="RangeCountsOneCandidatePerFactionRatherThanAllCandidates" fullname="StageWavesEditingTests.RangeCountsOneCandidatePerFactionRatherThanAllCandidates" methodname="RangeCountsOneCandidatePerFactionRatherThanAllCandidates" classname="StageWavesEditingTests" runstate="Runnable" seed="1986640554" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.002549" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1129" name="SerializedReorderAndDeleteSupportUndoRedo" fullname="StageWavesEditingTests.SerializedReorderAndDeleteSupportUndoRedo" methodname="SerializedReorderAndDeleteSupportUndoRedo" classname="StageWavesEditingTests" runstate="Runnable" seed="265210365" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.026346" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1131" name="ValidationFindsAllProblemsWithoutMutatingData" fullname="StageWavesEditingTests.ValidationFindsAllProblemsWithoutMutatingData" methodname="ValidationFindsAllProblemsWithoutMutatingData" classname="StageWavesEditingTests" runstate="Runnable" seed="2034960923" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.002041" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1134" name="StageWavesTests" fullname="StageWavesTests" classname="StageWavesTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.094036" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1138" name="ClearingTheLastWaveWins" fullname="StageWavesTests.ClearingTheLastWaveWins" methodname="ClearingTheLastWaveWins" classname="StageWavesTests" runstate="Runnable" seed="2014670123" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.007196" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1139" name="FactionWithSeveralSpawnsUsesOnlyThePickedOne" fullname="StageWavesTests.FactionWithSeveralSpawnsUsesOnlyThePickedOne" methodname="FactionWithSeveralSpawnsUsesOnlyThePickedOne" classname="StageWavesTests" runstate="Runnable" seed="1732270391" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.006091" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1140" name="NoRoundLimitKeepsGoing" fullname="StageWavesTests.NoRoundLimitKeepsGoing" methodname="NoRoundLimitKeepsGoing" classname="StageWavesTests" runstate="Runnable" seed="1064439404" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.002858" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1137" name="PickGroupsChoosesOneGroupPerFaction" fullname="StageWavesTests.PickGroupsChoosesOneGroupPerFaction" methodname="PickGroupsChoosesOneGroupPerFaction" classname="StageWavesTests" runstate="Runnable" seed="192277453" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.003124" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1135" name="ValidateAcceptsTwoToFourFactions" fullname="StageWavesTests.ValidateAcceptsTwoToFourFactions" methodname="ValidateAcceptsTwoToFourFactions" classname="StageWavesTests" runstate="Runnable" seed="1732266524" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.001217" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1136" name="ValidateRejectsBadWaves" fullname="StageWavesTests.ValidateRejectsBadWaves" methodname="ValidateRejectsBadWaves" classname="StageWavesTests" runstate="Runnable" seed="1205891449" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:22Z" duration="0.001244" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1141" name="TauntTests" fullname="TauntTests" classname="TauntTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:23Z" duration="0.324142" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1146" name="SpellsHaveNoPerBattleCastLimit" fullname="TauntTests.SpellsHaveNoPerBattleCastLimit" methodname="SpellsHaveNoPerBattleCastLimit" classname="TauntTests" runstate="Runnable" seed="1594015803" result="Passed" start-time="2026-11-19 02:11:22Z" end-time="2026-11-19 02:11:23Z" duration="0.278959" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1145" name="TauntCastPullsOnlyOpponentsInRadiusAndCostsMana" fullname="TauntTests.TauntCastPullsOnlyOpponentsInRadiusAndCostsMana" methodname="TauntCastPullsOnlyOpponentsInRadiusAndCostsMana" classname="TauntTests" runstate="Runnable" seed="1848000053" result="Passed" start-time="2026-11-19 02:11:23Z" end-time="2026-11-19 02:11:23Z" duration="0.015637" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1143" name="TauntPullsAUnitOutOfAFightAlreadyUnderWay" fullname="TauntTests.TauntPullsAUnitOutOfAFightAlreadyUnderWay" methodname="TauntPullsAUnitOutOfAFightAlreadyUnderWay" classname="TauntTests" runstate="Runnable" seed="1416989533" result="Passed" start-time="2026-11-19 02:11:23Z" end-time="2026-11-19 02:11:23Z" duration="0.001247" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1142" name="TauntRaisesMaxHealthAndTakesTheBonusBackWhenItEnds" fullname="TauntTests.TauntRaisesMaxHealthAndTakesTheBonusBackWhenItEnds" methodname="TauntRaisesMaxHealthAndTakesTheBonusBackWhenItEnds" classname="TauntTests" runstate="Runnable" seed="352239427" result="Passed" start-time="2026-11-19 02:11:23Z" end-time="2026-11-19 02:11:23Z" duration="0.001077" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1144" name="TauntReachesThroughAWallAndTheUnitWalksAroundIt" fullname="TauntTests.TauntReachesThroughAWallAndTheUnitWalksAroundIt" methodname="TauntReachesThroughAWallAndTheUnitWalksAroundIt" classname="TauntTests" runstate="Runnable" seed="677304505" result="Passed" start-time="2026-11-19 02:11:23Z" end-time="2026-11-19 02:11:23Z" duration="0.025495" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: C:/Users/Choij/AppData/LocalLow/DefaultCompany/ProjectBeViolenceDefense\TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

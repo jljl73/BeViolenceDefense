@@ -1,0 +1,22 @@
+CASE resetBypass=False; naturally selected offset=10; position=(4.100,2.028)
+t=0.000 rear=(4.099,2.057) front=(4.000,6.020) gap=3.965 moving=True stepClear=True segmentClear=False bypass=10 blocked=0.000 target=null queue=null
+t=0.017 rear=(4.099,2.085) front=(4.000,6.040) gap=3.956 moving=True stepClear=True segmentClear=False bypass=10 blocked=0.000 target=null queue=null
+t=0.033 rear=(4.099,2.113) front=(4.000,6.060) gap=3.948 moving=True stepClear=True segmentClear=False bypass=10 blocked=0.000 target=null queue=null
+t=1.000 rear=(4.084,3.757) front=(4.000,7.200) gap=3.444 moving=True stepClear=True segmentClear=False bypass=10 blocked=0.000 target=null queue=null
+t=2.000 rear=(4.069,5.457) front=(4.000,8.380) gap=2.924 moving=True stepClear=True segmentClear=False bypass=10 blocked=0.000 target=null queue=null
+t=3.000 rear=(4.053,7.156) front=(4.000,9.580) gap=2.424 moving=True stepClear=True segmentClear=False bypass=10 blocked=0.000 target=null queue=null
+t=4.000 rear=(4.038,8.856) front=(4.000,10.780) gap=1.924 moving=True stepClear=True segmentClear=False bypass=10 blocked=0.000 target=null queue=null
+t=5.000 rear=(4.022,10.556) front=(4.000,11.980) gap=1.424 moving=True stepClear=True segmentClear=False bypass=10 blocked=0.000 target=null queue=null
+t=6.000 rear=(4.007,12.256) front=(4.000,13.180) gap=0.924 moving=True stepClear=True segmentClear=False bypass=10 blocked=0.000 target=null queue=null
+SUMMARY resetBypass=False; stoppedTicks=0; stoppedDespiteClearNextStep=0; movementTransitions=0; end=(4.000,13.500)
+CASE resetBypass=True; naturally selected offset=10; position=(4.100,2.028)
+t=0.000 rear=(4.099,2.057) front=(4.000,6.020) gap=3.965 moving=True stepClear=True segmentClear=True bypass=10 blocked=0.000 target=null queue=null
+t=0.017 rear=(4.099,2.085) front=(4.000,6.040) gap=3.956 moving=True stepClear=True segmentClear=True bypass=10 blocked=0.000 target=null queue=null
+t=0.033 rear=(4.099,2.113) front=(4.000,6.060) gap=3.948 moving=True stepClear=True segmentClear=True bypass=10 blocked=0.000 target=null queue=null
+t=1.000 rear=(4.084,3.757) front=(4.000,7.200) gap=3.444 moving=True stepClear=True segmentClear=True bypass=10 blocked=0.000 target=null queue=null
+t=2.000 rear=(4.069,5.457) front=(4.000,8.380) gap=2.924 moving=True stepClear=True segmentClear=True bypass=10 blocked=0.000 target=null queue=null
+t=3.000 rear=(4.053,7.156) front=(4.000,9.580) gap=2.424 moving=True stepClear=True segmentClear=True bypass=10 blocked=0.000 target=null queue=null
+t=4.000 rear=(4.038,8.856) front=(4.000,10.780) gap=1.924 moving=True stepClear=True segmentClear=True bypass=10 blocked=0.000 target=null queue=null
+t=5.000 rear=(4.022,10.556) front=(4.000,11.980) gap=1.424 moving=True stepClear=True segmentClear=True bypass=10 blocked=0.000 target=null queue=null
+t=6.000 rear=(4.007,12.256) front=(4.000,13.180) gap=0.924 moving=True stepClear=True segmentClear=True bypass=10 blocked=0.000 target=null queue=null
+SUMMARY resetBypass=True; stoppedTicks=0; stoppedDespiteClearNextStep=0; movementTransitions=0; end=(4.000,13.500)

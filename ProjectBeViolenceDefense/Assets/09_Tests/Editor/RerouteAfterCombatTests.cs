@@ -6,10 +6,90 @@ using UnityEngine;
 // 교전이 끝나 경로를 벗어난 유닛은 원래 경로로 되돌아가지 않고 지금 위치에서 코어로 곧장 간다.
 public sealed class RerouteAfterCombatTests
 {
+    [TestCase(1f)]
+    [TestCase(2f)]
+    public void ReturningUnitKeepsMovingWhenAnAllyEntersItsDistantRejoinSegment(float cellSize)
+    {
+        var walls = new List<Vector2Int>();
+        for (int z = 0; z < 14; z++)
+        {
+            walls.Add(new Vector2Int(3, z));
+            walls.Add(new Vector2Int(5, z));
+        }
+        var grid = new DefenseGrid(10, 17, new RectInt(3, 14, 3, 3),
+            new[] { new Vector2Int(4, 0) }, new[] { 0 }, walls, cellSize);
+        var mover = new EnemyFaction("Rear", Color.white, spawnCount: 0, moveSpeed: 1.7f, bodyRadius: 0.3f);
+        var leader = new EnemyFaction("Front", Color.white, spawnCount: 0, moveSpeed: 1.2f, bodyRadius: 0.3f);
+        var battle = new DefenseBattle(grid, new[] { mover });
+        battle.StartRound();
+        Vector3[] Route(int start) => Enumerable.Range(start, 14 - start)
+            .Select(z => new Vector3(4, 0, z) * cellSize)
+            .Append(new Vector3(4, 0, 13.5f) * cellSize).ToArray();
+        var rear = new EnemyUnit(mover, 0, Route(2), 0);
+        rear.MoveOffRoute(rear.Position + Vector3.right * 0.1f);
+        var units = (List<EnemyUnit>)battle.Enemies;
+        units.Add(rear);
+        battle.Tick(DefenseBattle.TickDuration, false);
+        Assert.That(rear.RouteBypassOffset, Is.GreaterThan(0), "The return must already have selected a distant waypoint.");
+
+        // Another survivor merges far ahead after the return waypoint has been chosen.
+        var front = new EnemyUnit(leader, 0, Route(6), 1);
+        units.Add(front);
+        var combat = new CombatPositioning(grid, units);
+        Assert.That(combat.CanFollowRoute(rear, rear.GetRouteWaypoint(rear.RouteBypassOffset)), Is.False);
+        Vector3 start = rear.Position;
+        for (int tick = 0; tick < 120; tick++)
+        {
+            battle.Tick(DefenseBattle.TickDuration, false);
+            Assert.That(rear.Position.z, Is.GreaterThan(rear.PreviousPosition.z),
+                "Distant traffic must not prevent a safe forward step.");
+            Assert.That(grid.CanPursue(rear.PreviousPosition, rear.Position), Is.True);
+            Assert.That(rear.Target, Is.Null);
+            Assert.That(rear.CombatQueue, Is.Null);
+        }
+        Assert.That(rear.Position.z - start.z, Is.GreaterThan(3f));
+
+        // Keep following until both reach the core, checking spacing even after catching up.
+        for (int tick = 0; tick < 2000 && rear.IsAlive; tick++)
+        {
+            battle.Tick(DefenseBattle.TickDuration, false);
+            if (front.IsAlive)
+                Assert.That(Vector3.Distance(rear.Position, front.Position),
+                    Is.GreaterThanOrEqualTo(CombatPositioning.RequiredSpacing(mover, leader) - 0.0001f));
+            Assert.That(rear.Position.z, Is.GreaterThanOrEqualTo(rear.PreviousPosition.z - 0.0001f),
+                "Resuming the return must not send the survivor backwards.");
+            if (rear.IsAlive) // The terminal step deliberately touches the core boundary.
+                Assert.That(grid.CanPursue(rear.PreviousPosition, rear.Position), Is.True);
+        }
+        Assert.That(rear.IsAlive, Is.False);
+        Assert.That(battle.CoreHealth, Is.EqualTo(DefenseBattle.CoreMaxHealth - 2));
+    }
+
     // 가운데 세로 벽(x=8)이 맵을 좌우로 나누고, z=3 한 칸만 뚫려 있다. 코어는 위쪽 가운데.
     private static DefenseGrid SplitGrid() => new(17, 17, new RectInt(8, 15, 2, 2),
         new[] { new Vector2Int(2, 2), new Vector2Int(14, 2) }, new[] { 0, 1 },
         Enumerable.Range(0, 13).Where(z => z != 3).Select(z => new Vector2Int(8, z)));
+
+    [Test]
+    public void ReturningToFinalApproachDoesNotWaitForADistantAlly()
+    {
+        var grid = new DefenseGrid(10, 17, new RectInt(3, 14, 3, 3),
+            new[] { new Vector2Int(4, 0) }, new[] { 0 }, null);
+        var faction = new EnemyFaction("Survivor", Color.white, spawnCount: 0);
+        var battle = new DefenseBattle(grid, new[] { faction });
+        battle.StartRound();
+        var rear = new EnemyUnit(faction, 0, new[] { new Vector3(4, 0, 13), new Vector3(4, 0, 13.5f) }, 0);
+        rear.MoveOffRoute(new Vector3(4, 0, 8));
+        var front = new EnemyUnit(faction, 0, new[] { new Vector3(4, 0, 11), new Vector3(4, 0, 13.5f) }, 1);
+        ((List<EnemyUnit>)battle.Enemies).AddRange(new[] { rear, front });
+        for (int tick = 0; tick < 60; tick++)
+        {
+            battle.Tick(DefenseBattle.TickDuration, false);
+            Assert.That(rear.Position.z, Is.GreaterThan(rear.PreviousPosition.z));
+            Assert.That(Vector3.Distance(rear.Position, front.Position),
+                Is.GreaterThanOrEqualTo(CombatPositioning.RequiredSpacing(faction, faction) - 0.0001f));
+        }
+    }
 
     [Test]
     public void RouteFromStartsHereAndStepsOnlyThroughOpenCells()
