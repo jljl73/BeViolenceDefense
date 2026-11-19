@@ -389,7 +389,6 @@ MonoBehaviour:
   speaker: {fileID: 7828507890961754936}
   line: {fileID: 8571002534627356223}
   lineGroup: {fileID: 6875808667749452320}
-  unlockedStages: 5
   currentScale: 1.04
 --- !u!1 &336958234191937782
 GameObject:

@@ -1,0 +1,37 @@
+using System;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
+using UnityEngine;
+public static class StageProgressBuild
+{
+    public static void Mac()=>Build(BuildTarget.StandaloneOSX,"mac/StageProgressCheck.app",true);
+    public static void Windows()=>Build(BuildTarget.StandaloneWindows64,"windows/BeViolenceDefense.exe",false);
+    static void Build(BuildTarget target,string path,bool isolate)
+    {
+        string company=PlayerSettings.companyName,product=PlayerSettings.productName;
+        string id=PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Standalone);
+        int code=1;
+        try
+        {
+            if(isolate)
+            {
+                PlayerSettings.companyName="CodexValidation";PlayerSettings.productName="StageProgressCheck";
+                PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Standalone,"com.codexvalidation.stageprogresscheck");
+            }
+            var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=EditorBuildSettings.scenes.Where(x=>x.enabled).Select(x=>x.path).ToArray(),target=target,locationPathName="/tmp/be-stage-progress-results/"+path,options=BuildOptions.None});
+            var s=report.summary;
+            File.WriteAllText("/tmp/be-stage-progress-results/build-"+target+".txt",$"result={s.result}\nerrors={s.totalErrors}\nwarnings={s.totalWarnings}\nsize={s.totalSize}\nidentityIsolated={isolate}\n");
+            Debug.Log("STAGE_PROGRESS_BUILD "+target+" "+s.result);
+            code=s.result==BuildResult.Succeeded?0:1;
+        }
+        finally
+        {
+            PlayerSettings.companyName=company;PlayerSettings.productName=product;
+            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Standalone,id);AssetDatabase.SaveAssets();
+        }
+        EditorApplication.Exit(code);
+    }
+}

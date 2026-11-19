@@ -109,6 +109,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private bool waitForStageSelection;
     private int stageNumber;
     private System.Action restartStage;
+    private System.Action returnToStageSelection;
 
     private void Awake()
     {
@@ -122,7 +123,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         InitializeBattle();
     }
 
-    public void InitializeStage(StageContent content, int stageNumber, System.Action retry)
+    public void InitializeStage(StageContent content, int stageNumber, System.Action retry, System.Action returnToSelection = null)
     {
         if (view != null)
             throw new System.InvalidOperationException("A stage has already been initialized.");
@@ -132,6 +133,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         stageAmbience = content.Ambience;
         this.stageNumber = stageNumber;
         restartStage = retry;
+        returnToStageSelection = returnToSelection;
         enabled = true;
         InitializeBattle();
         if (dialogueHud != null && stageDialogues != null && seenIntros.Add(stageNumber))
@@ -191,7 +193,11 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 fallenEnemies++;
         };
         if (victoryPanelHud != null)
-            victoryPanelHud.Bind(next: endingWipe != null && stageNumber == finalStage ? GoToEnding : (System.Action)null, retry: Restart);
+        {
+            victoryPanelHud.Bind(next: returnToStageSelection, retry: Restart);
+            if (returnToStageSelection != null)
+                victoryPanelHud.SetNextCaption("result.stage_select");
+        }
         battle.SpellResolved += OnSpellResolved;
         spellUnlocks = new StageSpellUnlocks();
         hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions, spellUnlocks);

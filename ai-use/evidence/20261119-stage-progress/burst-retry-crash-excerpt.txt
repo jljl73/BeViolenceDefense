@@ -1,0 +1,43 @@
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping application/grpc - - 200 - application/grpc 0.4145ms
+Starting: /Applications/Unity/Hub/Editor/6000.3.28f1/Unity.app/Contents/Resources/BuildPipeline/bee_backend --ipc --defer-dag-verification --dagfile="Library/Bee/200b0aEDbgSkipCompile.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssembliesAndTypeDB
+WorkingDir: /private/tmp/be-stage-progress-20261119
+Obtained 35 stack frames.
+#0  0x0000014a0b42d0 in (Unknown)
+#1  0x0000039ffb2460 in  Burst.Compiler.IL.Server.LibraryCompiler:CompileMethodGroupImpl (Burst.Compiler.IL.Server.CompilationJob,int,Burst.Compiler.IL.Server.SharedLibraryCompilationState) [{0x37f62a1b0} + 0xda0]  (0x39ffb16c0 0x39ffb2554) [0x3586897e0 - Burst Child Domain]
+#2  0x0000039ffb1234 in  Burst.Compiler.IL.Server.LibraryCompiler:CompileMethodGroup (Burst.Compiler.IL.Server.CompilationJob,int,Burst.Compiler.IL.Server.SharedLibraryCompilationState) [{0x37f62a100} + 0x1a4]  (0x39ffb1090 0x39ffb13ec) [0x3586897e0 - Burst Child Domain]
+#3  0x0000039ffb0c60 in  Burst.Compiler.IL.Server.CompilerServer:CompileMethodGroup (Burst.Compiler.IL.Server.CompileMethodGroupJob,Burst.Compiler.IL.Server.CompilationMessageStreamer,Burst.Compiler.IL.Server.ProgressMessageHelper) [{0x360bda858} + 0x3a0]  (0x39ffb08c0 0x39ffb0e20) [0x3586897e0 - Burst Child Domain]
+#4  0x0000039fcaca4c in  Burst.Compiler.IL.Server.CompilerServer/<CompileLibrary>d__19:MoveNext () [{0x361202d00} + 0x93c]  (0x39fcac110 0x39fcad378) [0x3586897e0 - Burst Child Domain]
+#5  0x0000039fcaaa54 in  System.Runtime.CompilerServices.AsyncTaskMethodBuilder:Start<Burst.Compiler.IL.Server.CompilerServer/<CompileLibrary>d__19> (Burst.Compiler.IL.Server.CompilerServer/<CompileLibrary>d__19&) [{0x3a0012c70} + 0x154]  (0x39fcaa900 0x39fcaaad8) [0x3586897e0 - Burst Child Domain]
+#6  0x0000039fcaa4d0 in  Burst.Compiler.IL.Server.CompilerServer:CompileLibrary (Burst.Compiler.IL.Server.CompileLibraryJob,Burst.Compiler.IL.Server.CompilationMessageStreamer,Burst.Compiler.IL.Server.ProgressMessageHelper,System.Threading.CancellationToken) [{0x3612025d0} + 0x1f0]  (0x39fcaa2e0 0x39fcaa534) [0x3586897e0 - Burst Child Domain]
+#7  0x0000039fca9b40 in  Burst.Compiler.IL.Server.CompilerServer/<>c__DisplayClass17_1:<Compile>b__1 (Burst.Compiler.IL.Server.Caching.CacheManager) [{0x158d6af20} + 0xb0]  (0x39fca9a90 0x39fca9b8c) [0x3586897e0 - Burst Child Domain]
+#8  0x0000034a0f5a98 in  Burst.Compiler.IL.Server.CompilerServer/<>c__DisplayClass25_0/<<RunTask>b__0>d:MoveNext () [{0x16a433570} + 0x200]  (0x34a0f5898 0x34a0f6038) [0x3586897e0 - Burst Child Domain]
+#9  0x0000034a0f5744 in  System.Runtime.CompilerServices.AsyncTaskMethodBuilder:Start<Burst.Compiler.IL.Server.CompilerServer/<>c__DisplayClass25_0/<<RunTask>b__0>d> (Burst.Compiler.IL.Server.CompilerServer/<>c__DisplayClass25_0/<<RunTask>b__0>d&) [{0x1496d3550} + 0x174]  (0x34a0f55d0 0x34a0f57c8) [0x3586897e0 - Burst Child Domain]
+#10 0x0000034a0f54d8 in  Burst.Compiler.IL.Server.CompilerServer/<>c__DisplayClass25_0:<RunTask>b__0 () [{0x16a6adbd8} + 0x120]  (0x34a0f53b8 0x34a0f553c) [0x3586897e0 - Burst Child Domain]
+#11 0x0000034a0f5238 in  System.Threading.Tasks.Task`1<TResult_REF>:InnerInvoke () [{0x14bbdb9d0} + 0xb8]  (0x34a0f5180 0x34a0f5358) [0x3586897e0 - Burst Child Domain]
+#12 0x0000034a0f5084 in  System.Threading.Tasks.Task:Execute () [{0x16b0a9b88} + 0x64]  (0x34a0f5020 0x34a0f5110) [0x3586897e0 - Burst Child Domain]
+#13 0x0000034a0f4fe8 in  System.Threading.Tasks.Task:ExecutionContextCallback (object) [{0x16b0a9bb0} + 0x98]  (0x34a0f4f50 0x34a0f5010) [0x3586897e0 - Burst Child Domain]
+#14 0x0000015a611c0c in  System.Threading.ExecutionContext:RunInternal (System.Threading.ExecutionContext,System.Threading.ContextCallback,object,bool) [{0x14f501668} + 0x3d4]  (0x15a611838 0x15a611c98) [0x3586897e0 - Burst Child Domain]
+#15 0x0000015a611334 in  System.Threading.ExecutionContext:Run (System.Threading.ExecutionContext,System.Threading.ContextCallback,object,bool) [{0x14f501610} + 0x6c]  (0x15a6112c8 0x15a611358) [0x3586897e0 - Burst Child Domain]
+#16 0x0000034a0f4ad4 in  System.Threading.Tasks.Task:ExecuteWithThreadLocal (System.Threading.Tasks.Task&) [{0x17c206fa0} + 0x224]  (0x34a0f48b0 0x34a0f4bf8) [0x3586897e0 - Burst Child Domain]
+#17 0x0000034a0f360c in  System.Threading.Tasks.Task:ExecuteEntry (bool) [{0x17c206ed8} + 0x1c4]  (0x34a0f3448 0x34a0f3744) [0x3586897e0 - Burst Child Domain]
+#18 0x0000034a0f32ec in  System.Threading.Tasks.TaskScheduler:TryExecuteTask (System.Threading.Tasks.Task) [{0x16a6c05b0} + 0xc4]  (0x34a0f3228 0x34a0f332c) [0x3586897e0 - Burst Child Domain]
+#19 0x0000034a0f3020 in  Burst.Compiler.IL.Server.CompilerServerTaskScheduler/TaskJob:Execute (Burst.Compiler.IL.Server.GlobalContext) [{0x16a432c38} + 0x70]  (0x34a0f2fb0 0x34a0f3048) [0x3586897e0 - Burst Child Domain]
+#20 0x0000015a613018 in  Burst.Compiler.IL.Server.CompilerThread:CompilerThreadLoop () [{0x35b647878} + 0x5e0]  (0x15a612a38 0x15a6135d0) [0x3586897e0 - Burst Child Domain]
+#21 0x0000015a612908 in  System.Threading.ThreadHelper:ThreadStart_Context (object) [{0x14f4f0950} + 0x120]  (0x15a6127e8 0x15a6129b0) [0x3586897e0 - Burst Child Domain]
+#22 0x0000015a611c0c in  System.Threading.ExecutionContext:RunInternal (System.Threading.ExecutionContext,System.Threading.ContextCallback,object,bool) [{0x14f501668} + 0x3d4]  (0x15a611838 0x15a611c98) [0x3586897e0 - Burst Child Domain]
+#23 0x0000015a611334 in  System.Threading.ExecutionContext:Run (System.Threading.ExecutionContext,System.Threading.ContextCallback,object,bool) [{0x14f501610} + 0x6c]  (0x15a6112c8 0x15a611358) [0x3586897e0 - Burst Child Domain]
+#24 0x0000015a610fa8 in  System.Threading.ExecutionContext:Run (System.Threading.ExecutionContext,System.Threading.ContextCallback,object) [{0x14f501580} + 0x118]  (0x15a610e90 0x15a610fd0) [0x3586897e0 - Burst Child Domain]
+#25 0x0000015a610c0c in  System.Threading.ThreadHelper:ThreadStart () [{0x14f4f05d0} + 0x84]  (0x15a610b88 0x15a610ca0) [0x3586897e0 - Burst Child Domain]
+#26 0x0000015a610ae8 in  (wrapper runtime-invoke) object:runtime_invoke_void__this__ (object,intptr,intptr,intptr) [{0x158a77d40} + 0x260]  (0x15a610888 0x15a610b38) [0x3586897e0 - Burst Child Domain]
+#27 0x0000014de96568 in mono_jit_runtime_invoke
+#28 0x0000014e01c980 in do_runtime_invoke
+#29 0x0000014e01e348 in mono_runtime_delegate_try_invoke
+#30 0x0000014e03e9ec in start_wrapper_internal
+#31 0x0000014e03e7a4 in start_wrapper
+#32 0x0000014e0bdea8 in GC_inner_start_routine
+#33 0x0000014e0bde30 in GC_start_routine
+#34 0x00000187cdf2e4 in _pthread_start
+[40m[32minfo[39m[22m[49m: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+[40m[32minfo[39m[22m[49m: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      ALC ILPP context 1 is unloading

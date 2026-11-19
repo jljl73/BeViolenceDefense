@@ -1,0 +1,18 @@
+ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+  at System.Collections.Generic.List`1[T].get_Item (System.Int32 index) [0x00009] in <63da8c8c2a89417b88fd57669622fa05>:0 
+  at UnityEditor.Search.SearchDatabase+<EnumerateAll>d__83.MoveNext () [0x00106] in /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/Indexing/SearchDatabase.cs:453 
+  at System.Linq.Enumerable.TryGetFirst[TSource] (System.Collections.Generic.IEnumerable`1[T] source, System.Boolean& found) [0x00045] in <8952576100d3486f990edce1eb1f8689>:0 
+  at System.Linq.Enumerable.First[TSource] (System.Collections.Generic.IEnumerable`1[T] source) [0x00000] in <8952576100d3486f990edce1eb1f8689>:0 
+  at UnityEditor.Search.SearchDatabase.GetDefaultSearchDatabase () [0x00001] in /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/Indexing/SearchDatabase.cs:428 
+  at UnityEditor.Search.SearchInit.IndexationOnStartup () [0x0000c] in /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/SearchInit.cs:109 
+  at UnityEditor.EditorApplication.Internal_CallDelayFunctions () [0x0002c] in /Users/bokken/build/output/unity/unity/Editor/Mono/EditorApplication.cs:407 
+
+PROGRESS_PASS Fresh start: one unlocked, no cleared cards; controller rejects locked capital.
+PROGRESS_PASS Stage 1 final-wave victory records clear through normal game Update.
+PROGRESS_PASS Victory selection return reloads saved clear; stage 2 unlocked, stage 3 locked.
+PROGRESS_PASS Stage 2 final-wave victory unlocks speed spell from the same saved clear record.
+PROGRESS_PASS Unlock all opens five stages without fabricating clears or skill unlocks.
+PROGRESS_PASS Reload preserves unlock-all and clears; cancel reset preserves both.
+PROGRESS_PASS Confirmed reset relocks stages and earned spells; reload preserves clean state.
+STAGE_PROGRESS_SMOKE_PASS
