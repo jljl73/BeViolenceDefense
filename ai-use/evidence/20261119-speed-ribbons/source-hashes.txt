@@ -1,0 +1,2 @@
+28b947063862dc68f724aa52256c815b7b3d62afa2062ea8f44872d0a9e8a810  ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Effects/UnitSpeedAura.cs
+f1a31d4e11bae3420f8bca7b51498d69acbb2158a475ffbbb7df7f01d1a4d9f6  ProjectBeViolenceDefense/Assets/Resources/UnitSpeedAura.shader

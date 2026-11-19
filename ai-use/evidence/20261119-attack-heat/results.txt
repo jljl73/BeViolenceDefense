@@ -1,0 +1,5 @@
+Unity 6000.3.28f1 / macOS Metal / CLI Play Mode / process exit 0
+ATTACK_HEAT_PLAY_PASS catalog=20, shared mesh, movement and giant scaling, original materials preserved, no attack particle plane, shield separation, independent expiry, stacking, pause including pulse, attack pulse, death cleanup and shader compilation
+C# compile errors: 0; attack aura shader supported, ShaderUtil errors: 0
+Observed editor startup issue: UnityEditor.Search.SearchDatabase ArgumentOutOfRangeException; validation proceeded and passed.
+Harness fixes during validation: Attack requires a valid target (offscreen dummy supplied); stacking size comparison uses shield-relative size to account for animated body bounds.

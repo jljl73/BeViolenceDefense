@@ -40,7 +40,6 @@ internal sealed class DefenseHud
     private const float SpellSlotSpacing = 124f;
     private const float FirstSpellSlotX = -3f;
     private static readonly Vector2 ActionsSize = new(600, 184);
-    private const float HealthBarThickness = 5f;
 
     private readonly UIManager ui;
     private readonly Art art;
@@ -60,6 +59,7 @@ internal sealed class DefenseHud
     private readonly RectTransform noticeArea;
     private readonly TextMeshProUGUI core;
     private readonly Image coreFill;
+    private readonly CoreShieldGlow coreShieldGlow;
     private readonly RectTransform wallSupply;
     private readonly Image[] wallIcons = new Image[DefenseGrid.WallLimit];
     private readonly TextMeshProUGUI wallCount;
@@ -84,10 +84,13 @@ internal sealed class DefenseHud
     private const float ActionTipMaxWidth = 640f;
     private readonly HudButton help;
     private readonly TextMeshProUGUI helpTip;
-    private readonly List<Image> healthMarkers = new();
+    private readonly Dictionary<EnemyUnit, UnitStatusMarker> healthMarkers = new();
+    private readonly Stack<UnitStatusMarker> freeHealthMarkers = new();
+    private readonly List<EnemyUnit> retiredMarkers = new();
+    private readonly List<Rect> unitBodyBounds = new();
+    private Sprite[] statusSprites;
     private readonly Texture2D encounterIcon;
     private readonly List<RawImage> encounterMarkers = new();
-    private int visibleMarkers;
     private bool helpPinned;
     private string noticeText = "";
     private float noticeUntil;
@@ -118,6 +121,12 @@ internal sealed class DefenseHud
         core = Label("Core", coreStatus, 62, 0, 142, 42, 31);
         coreFill = Bar("Core Health", coreStatus, Vector2.up, Vector2.up,
             new Vector2(62, -48), new Vector2(120, 5), UIPalette.ButtonPrimary);
+        var coreTrack = (RectTransform)coreFill.transform.parent;
+        var shieldGlow = Rect("Core Shield Glow", coreStatus, coreTrack.anchorMin, coreTrack.pivot,
+            coreTrack.anchoredPosition, coreTrack.sizeDelta);
+        coreShieldGlow = shieldGlow.gameObject.AddComponent<CoreShieldGlow>();
+        coreShieldGlow.raycastTarget = false;
+        coreShieldGlow.enabled = false;
 
         wallSupply = Rect("Wall Supply", ui.HudLayer, Vector2.one, Vector2.one,
             new Vector2(-55, -33), new Vector2(150, 84));
@@ -205,8 +214,9 @@ internal sealed class DefenseHud
     /// 별도 좌상단 코어 HUD(LeftCoreHud)를 쓰는 씬에서 호출한다. 기존 코어 패널을 숨기고,
     /// 알림이 새 패널과 겹치지 않도록 알림 위치를 오른쪽으로 옮긴다.
     /// </summary>
-    public void UseExternalCorePanel(Vector2 noticePosition)
+    public void UseExternalCorePanel(LeftCoreHud externalCore, Vector2 noticePosition)
     {
+        externalCore.PlaceShieldGlow(coreShieldGlow);
         coreStatus.gameObject.SetActive(false);
         noticeArea.anchoredPosition = noticePosition;
     }
@@ -308,7 +318,7 @@ internal sealed class DefenseHud
         bool won = battle.CurrentPhase == DefenseBattle.Phase.Victory;
         bool defeated = won || battle.CurrentPhase == DefenseBattle.Phase.Defeat;
         round.text = GameText.Format("hud.wave", battle.Round);
-        phase.text = won ? GameText.Get("hud.victory") : defeated ? GameText.Get("hud.defeat") : aimedSpell.HasValue ? GameText.Format("hud.aim_speed", BattleClock.AimSpeed) : inCombat ? GameText.Get("hud.combat") : GameText.Get("hud.preparation");
+        phase.text = won ? GameText.Get("hud.victory") : defeated ? GameText.Get("hud.defeat") : aimedSpell.HasValue ? GameText.Format("hud.aim_speed", BattleClock.AimSpeed) : inCombat && battle.OnlyOneSideRemains ? GameText.Format("hud.fast_forward", Mathf.Max(battleSpeed, BattleClock.FastForwardSpeed)) : inCombat ? GameText.Get("hud.combat") : GameText.Get("hud.preparation");
         phase.color = aimedSpell.HasValue ? UIPalette.TextPrimary : UIPalette.TextSecondary;
         combatBalance.Refresh(battle.Enemies, inCombat, ShownSides(battle));
         lineup.gameObject.SetActive(!inCombat && !defeated);
@@ -322,6 +332,7 @@ internal sealed class DefenseHud
         coreFill.color = displayedCoreHealth <= DefenseBattle.CoreMaxHealth / 4
             ? UIPalette.ButtonDanger : UIPalette.ButtonPrimary;
         SetBarFraction(coreFill, (float)displayedCoreHealth / DefenseBattle.CoreMaxHealth);
+        coreShieldGlow.Refresh(view.CoreShieldVisible, view.CoreShieldBreakCount, Time.unscaledDeltaTime);
         wallSupply.gameObject.SetActive(!inCombat && !defeated && !externalBuildPanel);
         if (!inCombat && !defeated)
         {
@@ -352,14 +363,44 @@ internal sealed class DefenseHud
 
         RefreshEncounterMarkers(battle, view);
 
-        visibleMarkers = 0;
+        foreach (UnitStatusMarker marker in healthMarkers.Values) marker.Seen = false;
+        unitBodyBounds.Clear();
         foreach (EnemyUnit enemy in battle.Enemies)
         {
-            if (ShowsUnitHealth(enemy))
-                AddHealthMarker(view.ScreenPoint(enemy, 0.76f), enemy);
+            Vector3 head = view.ScreenPoint(enemy, 0.76f);
+            Vector3 feet = view.ScreenPoint(view.ToBoard(enemy.Position));
+            if (head.z <= 0f) continue;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(markers, head, null, out Vector2 top);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(markers, feet, null, out Vector2 bottom);
+            float height = Mathf.Max(12f, top.y - bottom.y);
+            float width = Mathf.Max(12f, height * .8f);
+            unitBodyBounds.Add(new Rect(top.x - width * .5f, bottom.y, width, height));
+            if (ShowsUnitHealth(enemy)) AddHealthMarker(top, enemy);
         }
-        for (int i = visibleMarkers; i < healthMarkers.Count; i++)
-            healthMarkers[i].transform.parent.gameObject.SetActive(false);
+        retiredMarkers.Clear();
+        foreach (var entry in healthMarkers)
+        {
+            if (!entry.Value.Seen)
+            {
+                entry.Value.Root.gameObject.SetActive(false);
+                freeHealthMarkers.Push(entry.Value);
+                retiredMarkers.Add(entry.Key);
+                continue;
+            }
+            UnitStatusMarker marker = entry.Value;
+            bool showBuffs = marker.HasBuffs;
+            if (showBuffs)
+            {
+                foreach (Rect body in unitBodyBounds)
+                    if (body.Overlaps(marker.BuffBounds)) { showBuffs = false; break; }
+                if (showBuffs)
+                    foreach (var other in healthMarkers.Values)
+                        if (other != marker && other.Seen && (other.BarBounds.Overlaps(marker.BuffBounds) ||
+                            (other.HasBuffs && other.BuffBounds.Overlaps(marker.BuffBounds)))) { showBuffs = false; break; }
+            }
+            marker.BuffRow.gameObject.SetActive(showBuffs);
+        }
+        foreach (EnemyUnit unit in retiredMarkers) healthMarkers.Remove(unit);
     }
 
     public void ShowDefeat() => ui.ShowPopup(defeatPopup, dismissOnEscape: false);
@@ -821,27 +862,19 @@ internal sealed class DefenseHud
         }
     }
 
-    private static bool ShowsUnitHealth(EnemyUnit enemy) => enemy.Health < enemy.MaxHealth || enemy.HealFlash > 0f;
+    private static bool ShowsUnitHealth(EnemyUnit enemy) => enemy.Health < enemy.MaxHealth || enemy.HealFlash > 0f ||
+        enemy.Target != null || enemy.AttackBuffStacks > 0 || enemy.MoveSpeedBuffStacks > 0 || enemy.ArmorBuffStacks > 0 || enemy.IsTaunting;
 
-    private void AddHealthMarker(Vector3 screen, EnemyUnit enemy)
+    private void AddHealthMarker(Vector2 position, EnemyUnit enemy)
     {
-        if (screen.z <= 0 ||
-            !RectTransformUtility.ScreenPointToLocalPointInRectangle(markers, screen, null, out Vector2 position))
-            return;
-
-        if (visibleMarkers == healthMarkers.Count)
+        if (!healthMarkers.TryGetValue(enemy, out UnitStatusMarker marker))
         {
-            Vector2 center = Vector2.one * 0.5f;
-            healthMarkers.Add(Bar("Enemy Health", markers, center, center, Vector2.zero,
-                new Vector2(26, HealthBarThickness), UIPalette.TextPrimary));
+            statusSprites ??= new[] { art.AttackBuff, art.MoveSpeedBuff, art.ArmorBuff != null ? art.ArmorBuff : art.Wall, art.Taunt != null ? art.Taunt : art.Enemy };
+            marker = freeHealthMarkers.Count > 0 ? freeHealthMarkers.Pop() : new UnitStatusMarker(markers, statusSprites, art.ColoredSkillIcons);
+            marker.Bind(enemy);
+            healthMarkers.Add(enemy, marker);
         }
-
-        Image fill = healthMarkers[visibleMarkers++];
-        var track = (RectTransform)fill.transform.parent;
-        track.anchoredPosition = position;
-        track.gameObject.SetActive(true);
-        SetBarFraction(fill, (float)enemy.Health / enemy.MaxHealth);
-        fill.color = enemy.Faction.Color;
+        marker.Refresh(position, Time.unscaledDeltaTime, Time.unscaledTime);
     }
 
     private static RectTransform Rect(string name, RectTransform parent, Vector2 anchor, Vector2 pivot,

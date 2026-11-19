@@ -51,6 +51,7 @@ internal sealed class DefenseBoardView
     private const float DeathFadeDuration = 0.3f;
     private const int MaxDeathViews = 40;
     private const float CoreStrikeWindup = 0.24f;
+    private const float CoreShieldBreakDuration = 0.20f;
     private const float CoreStrikeFadeDuration = 0.25f;
     private const float CoreStrikeFlashScale = 1.50f;
     private const float CoreBodyFlashDuration = 0.17f;
@@ -58,18 +59,17 @@ internal sealed class DefenseBoardView
     private const float CoreShockwaveHeight = 0.44f;
     private const float SpellBodyFlashDuration = 0.26f;
     private const float SpellBodyFlashBrightness = 1.8f;
-    private const float BuffMarkSpacing = 0.20f;
     // 도발 중인 유닛의 화면 크기 배율과 커지고 줄어드는 속도(초당 배율 변화). 충돌 크기는 바꾸지 않는다.
     private const float TauntGiantScale = 2f;
     private const float TauntGrowSpeed = 4f;
     // 도발 조준 중 마우스에서 이 거리(칸) 안의 가장 가까운 유닛을 고른다.
     private const float TauntPickRadius = 0.7f;
-    private const float BuffMarkOffset = 0.32f;
-    private const float BuffMarkDarkeningPerStack = 0.14f;
-    private const float BuffMarkMinimumBrightness = 0.58f;
 
     private static readonly Plane BoardGround = new(Vector3.up, Vector3.zero);
     private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+    private static readonly int ShieldAge = Shader.PropertyToID("_ShieldAge");
+    private static readonly int ShieldCharge = Shader.PropertyToID("_ShieldCharge");
+    private static readonly int ShieldBurst = Shader.PropertyToID("_ShieldBurst");
     private static readonly int WalkState = Animator.StringToHash("Base Layer.Walk");
     private static readonly int IdleState = Animator.StringToHash("Base Layer.Idle");
     private static readonly int CoreHitState = Animator.StringToHash("Base Layer.Hit");
@@ -101,10 +101,7 @@ internal sealed class DefenseBoardView
         public int AttacksPlayed;
         public int HitsSeen;
         public (EnemyUnit Target, bool Boosted, bool TargetArmored) PendingHit;
-        public LineRenderer[] MoveSpeedTrails;
-        public Transform BuffMarks;
-        public MeshRenderer[] BuffMarkRenderers;
-        public int[] BuffMarkStacks;
+        public UnitBuffAura BuffAura;
         public float StoppedTime;
         public Material PreviewMaterial;
         public (Renderer Renderer, Material[] Original, Material[] Preview, int Order)[] PreviewSurfaces;
@@ -152,6 +149,7 @@ internal sealed class DefenseBoardView
         public float AttackLength;
         public float SampledPose;
         public int CoreDamage;
+        public bool BlockedByShield;
     }
 
     private readonly Transform root;
@@ -185,6 +183,13 @@ internal sealed class DefenseBoardView
     private readonly List<DeathView> deathViews = new();
     private readonly Dictionary<Material, Material> fadeMaterials = new();
     private readonly SpellEffects spellEffects;
+    private readonly Material buffAuraMaterial;
+    private readonly Material shieldSurfaceMaterial;
+    private readonly Material attackAuraMaterial;
+    private readonly Material speedAuraMaterial;
+    private readonly Mesh speedAuraMesh;
+    private readonly Mesh buffAuraMesh;
+    private readonly Mesh shieldSurfaceMesh;
     private readonly MaterialPropertyBlock tintBlock = new();
     private readonly Dictionary<EnemyFaction, Material> factionMaterials = new();
     private readonly MeshRenderer[,] floor;
@@ -201,9 +206,6 @@ internal sealed class DefenseBoardView
     private readonly Material healPreviewMaterial;
     private readonly Material armorBuffPreviewMaterial;
     private readonly Material tauntPreviewMaterial;
-    private readonly Material attackBuffMarkMaterial;
-    private readonly Material moveSpeedBuffMarkMaterial;
-    private readonly Material armorBuffMarkMaterial;
     private readonly Quaternion buffMarkRotation;
     private readonly Dictionary<(DefenseBattle.Spell Spell, int Faction), Material> targetSilhouettes = new();
     private readonly Dictionary<(Material Preview, Material Source), Material> texturedSilhouettes = new();
@@ -213,6 +215,12 @@ internal sealed class DefenseBoardView
     private readonly Mesh factionRingMesh;
     private int nextHitEffect;
     private int observedCoreHealth = DefenseBattle.CoreMaxHealth;
+    private MeshRenderer coreShield;
+    private Material coreShieldMaterial;
+    private Vector3 coreShieldSize;
+    private float coreShieldAge;
+    private float coreShieldBreakRemaining;
+    private int pendingShieldStrikes;
     private Animator coreAnimator;
     private (Renderer Renderer, int Slot, Color BaseColor)[] coreTintSlots;
     private float coreFlashRemaining;
@@ -228,6 +236,8 @@ internal sealed class DefenseBoardView
 
     public IReadOnlyCollection<Vector2Int> PlannedEncounters { get; private set; } = System.Array.Empty<Vector2Int>();
     public int PendingCoreDamage { get; private set; }
+    public bool CoreShieldVisible { get; private set; }
+    public int CoreShieldBreakCount { get; private set; }
 
     public DefenseBoardView(Transform root, Camera camera, Shader shader, DefenseGrid grid,
         IReadOnlyList<EnemyFaction> factions, Sprite routeChevron, BoardTheme theme, EnemyCatalog catalog,
@@ -335,9 +345,6 @@ internal sealed class DefenseBoardView
         healPreviewMaterial = Palette(UIPalette.Heal);
         armorBuffPreviewMaterial = Palette(UIPalette.Armor);
         tauntPreviewMaterial = Palette(UIPalette.Taunt);
-        attackBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.Attack, 0.72f));
-        moveSpeedBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.MoveSpeed, 0.72f));
-        armorBuffMarkMaterial = Palette(Color.Lerp(theme.tileA, UIPalette.Armor, 0.72f));
         Shader silhouetteShader = Resources.Load<Shader>("SpellTargetSilhouette");
         foreach (DefenseBattle.Spell spell in System.Enum.GetValues(typeof(DefenseBattle.Spell)))
         {
@@ -357,6 +364,31 @@ internal sealed class DefenseBoardView
         var spellStroke = new Material(Shader.Find("Sprites/Default")) { name = "Spell Effect Stroke" };
         materials.Add(spellStroke);
         spellEffects = new SpellEffects(root, camera, spellStroke, AimDimSortingOrder + 1);
+        buffAuraMaterial = new Material(Resources.Load<Shader>("UnitBuffAura")) { name = "Persistent Buff Aura" };
+        buffAuraMaterial.SetColor("_AttackColor", UIPalette.Attack);
+        buffAuraMaterial.SetColor("_SpeedColor", UIPalette.MoveSpeed);
+        buffAuraMaterial.SetColor("_ArmorColor", UIPalette.Armor);
+        buffAuraMaterial.SetColor("_TauntColor", UIPalette.Taunt);
+        buffAuraMaterial.SetColor("_HealColor", UIPalette.Heal);
+        materials.Add(buffAuraMaterial);
+        shieldSurfaceMaterial = new Material(Resources.Load<Shader>("UnitShieldSurface")) { name = "Unit Shield Surface" };
+        shieldSurfaceMaterial.SetColor("_ShieldColor", UIPalette.Armor);
+        materials.Add(shieldSurfaceMaterial);
+        attackAuraMaterial = new Material(Resources.Load<Shader>("UnitAttackAura")) { name = "Unit Attack Heat Aura" };
+        attackAuraMaterial.SetColor("_AttackColor", UIPalette.Attack);
+        materials.Add(attackAuraMaterial);
+        speedAuraMaterial = new Material(Resources.Load<Shader>("UnitSpeedAura")) { name = "Unit Speed Flow Aura" };
+        speedAuraMaterial.SetColor("_SpeedColor", UIPalette.MoveSpeed);
+        materials.Add(speedAuraMaterial);
+        speedAuraMesh = UnitSpeedAura.CreateMesh();
+        meshes.Add(speedAuraMesh);
+        shieldSurfaceMesh = UnitShieldSurface.CreateMesh();
+        meshes.Add(shieldSurfaceMesh);
+        buffAuraMesh = new Mesh { name = "Buff Aura Quad",
+            vertices = new[] { new Vector3(-.5f,-.5f,0), new Vector3(-.5f,.5f,0), new Vector3(.5f,.5f,0), new Vector3(.5f,-.5f,0) },
+            uv = new[] { Vector2.zero, Vector2.up, Vector2.one, Vector2.right }, triangles = new[] { 0,1,2,0,2,3 } };
+        buffAuraMesh.RecalculateBounds();
+        meshes.Add(buffAuraMesh);
         aimDim = CreateAimDim();
     }
 
@@ -498,6 +530,7 @@ internal sealed class DefenseBoardView
         else
             CreateCorePedestal(model, width, depth, rim, platformTop, platformThickness, foundation, wall);
 
+        CreateCoreShield(model, Mathf.Max(width, depth), platformTop);
         if (theme.coreCharacterPrefab != null)
         {
             CreateCoreCharacter(model, theme, platformTop);
@@ -508,6 +541,45 @@ internal sealed class DefenseBoardView
         Transform crown = Box("Core crown", model, Vector3.up * 0.94f, new Vector3(0.58f, 0.24f, 0.58f), core);
         crown.localRotation = Quaternion.Euler(0, 45, 0);
         coreTintSlots = CollectTintSlots(new Renderer[] { coreBody.GetComponent<Renderer>(), crown.GetComponent<Renderer>() });
+    }
+
+    private void CreateCoreShield(Transform core, float footprint, float platformTop)
+    {
+        var shell = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        shell.name = "Core Shield Shell";
+        var collider = shell.GetComponent<Collider>();
+        collider.enabled = false;
+        Release(collider);
+        shell.transform.SetParent(core, false);
+        shell.transform.localPosition = Vector3.up * Mathf.Max(0.55f, platformTop + 0.35f);
+        float diameter = footprint + 0.45f;
+        coreShieldSize = new Vector3(diameter, Mathf.Max(diameter * 0.76f, platformTop + 1.8f), diameter);
+        shell.transform.localScale = coreShieldSize;
+
+        coreShieldMaterial = new Material(Resources.Load<Shader>("CoreShield")) { name = "Core Shield" };
+        coreShieldMaterial.SetColor("_ShieldColor", UIPalette.Armor);
+        materials.Add(coreShieldMaterial);
+        coreShield = shell.GetComponent<MeshRenderer>();
+        coreShield.sharedMaterial = coreShieldMaterial;
+        coreShield.shadowCastingMode = ShadowCastingMode.Off;
+        coreShield.receiveShadows = false;
+        coreShield.enabled = false;
+    }
+
+    public void SyncCoreShield(bool charged)
+    {
+        // 도달 판정 뒤에도 적의 타격 모션이 닿는 순간까지 보호막을 유지한다.
+        CoreShieldVisible = charged || pendingShieldStrikes > 0;
+        float burst = coreShieldBreakRemaining / CoreShieldBreakDuration;
+        coreShield.enabled = CoreShieldVisible || burst > 0f;
+        if (!coreShield.enabled)
+            return;
+
+        float expansion = CoreShieldVisible ? 1f : Mathf.Lerp(1.24f, 1f, burst * burst);
+        coreShield.transform.localScale = coreShieldSize * expansion;
+        coreShieldMaterial.SetFloat(ShieldAge, coreShieldAge);
+        coreShieldMaterial.SetFloat(ShieldCharge, CoreShieldVisible ? 1f : 0f);
+        coreShieldMaterial.SetFloat(ShieldBurst, burst);
     }
 
     private void CreateCorePedestal(Transform model, float width, float depth, float rim, float platformTop,
@@ -1850,17 +1922,11 @@ internal sealed class DefenseBoardView
             view.PendingHit = enemy.LastAttack;
             PlayHit(view, enemy);
         }
-        if (view.MoveSpeedTrails != null)
-        {
-            foreach (LineRenderer trail in view.MoveSpeedTrails)
-                trail.enabled = false;
-        }
-        if (view.BuffMarks != null)
-            view.BuffMarks.gameObject.SetActive(false);
+        view.BuffAura?.Hide();
         if (enemy.ReachedCore)
         {
-            // 코어 피해를 처리한 적의 모델만 남겨 타격과 퇴장 연출을 재생한다.
-            BeginCoreStrike(enemy, view, coreDamage);
+            // 체력이 남아 있는데 도달 피해가 0이면 보호막이 흡수한 타격이다.
+            BeginCoreStrike(enemy, view, coreDamage, coreDamage == 0 && currentCoreHealth > 0);
             return;
         }
         BeginDeath(view);
@@ -1938,7 +2004,7 @@ internal sealed class DefenseBoardView
         }
     }
 
-    private void BeginCoreStrike(EnemyUnit enemy, EnemyView view, int coreDamage)
+    private void BeginCoreStrike(EnemyUnit enemy, EnemyView view, int coreDamage, bool blockedByShield)
     {
         SetEnemyPreviewMaterial(view, null);
         view.SpellFlashRemaining = 0f;
@@ -1959,7 +2025,8 @@ internal sealed class DefenseBoardView
                 Vector3.up * (animated ? 0.85f : 0.45f)),
             Heading = heading,
             Animated = animated,
-            CoreDamage = coreDamage
+            CoreDamage = coreDamage,
+            BlockedByShield = blockedByShield
         };
         if (animated)
         {
@@ -1973,6 +2040,8 @@ internal sealed class DefenseBoardView
             view.Animator.speed = 0f;
         PoseCoreStrike(strike, 0f);
         PendingCoreDamage += coreDamage;
+        if (blockedByShield)
+            pendingShieldStrikes++;
         coreStrikes.Add(strike);
     }
 
@@ -1991,9 +2060,19 @@ internal sealed class DefenseBoardView
             {
                 strike.HasHit = true;
                 PendingCoreDamage -= strike.CoreDamage;
-                coreImpacted = true;
-                NextHitEffect().Play(root.TransformPoint(strike.Impact), CoreDamageColor, CoreStrikeFlashScale * UnitScale,
-                    colorEmphasis: 0.85f);
+                if (strike.BlockedByShield)
+                {
+                    pendingShieldStrikes--;
+                    coreShieldBreakRemaining = CoreShieldBreakDuration;
+                    CoreShieldBreakCount++;
+                    spellEffects.PlayArmorImpact(strike.Impact);
+                }
+                else
+                {
+                    coreImpacted = true;
+                    NextHitEffect().Play(root.TransformPoint(strike.Impact), CoreDamageColor, CoreStrikeFlashScale * UnitScale,
+                        colorEmphasis: 0.85f);
+                }
                 PrepareEnemyFade(strike.View);
             }
             if (!strike.HasHit)
@@ -2092,6 +2171,8 @@ internal sealed class DefenseBoardView
         if (deltaTime <= 0f)
             return;
 
+        coreShieldAge = Mathf.Repeat(coreShieldAge + deltaTime, 4f);
+        coreShieldBreakRemaining = Mathf.Max(0f, coreShieldBreakRemaining - deltaTime);
         if (coreFlashRemaining > 0f)
         {
             coreFlashRemaining = Mathf.Max(0f, coreFlashRemaining - deltaTime);
@@ -2159,10 +2240,11 @@ internal sealed class DefenseBoardView
                 view.Head.localPosition = new Vector3(0, 0.62f, enemy.AttackFlash * 0.7f);
         }
         SyncHit(view, enemy);
-        SyncBuffMarks(view, enemy);
+        if (view.BuffAura == null && (enemy.AttackBuffStacks > 0 || enemy.MoveSpeedBuffStacks > 0 ||
+            enemy.ArmorBuffStacks > 0 || enemy.IsTaunting || enemy.HealFlash > 0f))
+            view.BuffAura = new UnitBuffAura(view.Root, camera, buffAuraMesh, buffAuraMaterial, shieldSurfaceMesh, shieldSurfaceMaterial, attackAuraMaterial, speedAuraMesh, speedAuraMaterial);
         SyncGiantScale(view, enemy, deltaTime);
-        bool movingWithBuff = enemy.MoveSpeedBuffStacks > 0 && IsMoving(step, deltaTime, playbackSpeed);
-        spellEffects.SyncMoveTrail(view.Root, step, movingWithBuff, ref view.MoveSpeedTrails);
+        view.BuffAura?.Sync(enemy, view.Renderers, deltaTime, view.HitRemaining, view.HitDirection);
     }
 
     // 도발 중이면 서서히 커지고, 끝나면 원래 크기로 돌아간다.
@@ -2173,70 +2255,6 @@ internal sealed class DefenseBoardView
             return;
         view.GiantScale = Mathf.MoveTowards(view.GiantScale, target, TauntGrowSpeed * deltaTime);
         view.Root.localScale = view.BaseScale * view.GiantScale;
-    }
-
-    private void SyncBuffMarks(EnemyView view, EnemyUnit enemy)
-    {
-        int attack = enemy.AttackBuffStacks;
-        int speed = enemy.MoveSpeedBuffStacks;
-        int armor = enemy.ArmorBuffStacks;
-        if (attack == 0 && speed == 0 && armor == 0)
-        {
-            if (view.BuffMarks != null)
-                view.BuffMarks.gameObject.SetActive(false);
-            return;
-        }
-
-        if (view.BuffMarks == null)
-        {
-            var marks = new GameObject("Buff Marks").transform;
-            marks.SetParent(view.Root, false);
-            view.BuffMarkRenderers = new[]
-            {
-                AddBuffMark("Attack", marks, -BuffMarkSpacing, attackBuffMarkMaterial),
-                AddBuffMark("Move Speed", marks, 0f, moveSpeedBuffMarkMaterial),
-                AddBuffMark("Armor", marks, BuffMarkSpacing, armorBuffMarkMaterial)
-            };
-            view.BuffMarkStacks = new int[3];
-            view.BuffMarks = marks;
-        }
-
-        view.BuffMarks.localRotation = Quaternion.Inverse(view.Root.localRotation) * buffMarkRotation;
-        SyncBuffMark(view, 0, attack);
-        SyncBuffMark(view, 1, speed);
-        SyncBuffMark(view, 2, armor);
-        view.BuffMarks.gameObject.SetActive(true);
-    }
-
-    private void SyncBuffMark(EnemyView view, int index, int stacks)
-    {
-        MeshRenderer mark = view.BuffMarkRenderers[index];
-        mark.gameObject.SetActive(stacks > 0);
-        if (view.BuffMarkStacks[index] == stacks)
-            return;
-
-        view.BuffMarkStacks[index] = stacks;
-        if (stacks <= 1)
-        {
-            mark.SetPropertyBlock(null);
-            return;
-        }
-
-        float brightness = Mathf.Max(BuffMarkMinimumBrightness, 1f - (stacks - 1) * BuffMarkDarkeningPerStack);
-        Color baseColor = mark.sharedMaterial.color;
-        tintBlock.SetColor(BaseColor, new Color(baseColor.r * brightness, baseColor.g * brightness,
-            baseColor.b * brightness, baseColor.a));
-        mark.SetPropertyBlock(tintBlock);
-    }
-
-    private static MeshRenderer AddBuffMark(string label, Transform marks, float x, Material material)
-    {
-        Transform mark = Box(label, marks, new Vector3(x, SpawnPadHeight + 0.02f, BuffMarkOffset),
-            new Vector3(0.095f, 0.012f, 0.055f), material);
-        var renderer = mark.GetComponent<MeshRenderer>();
-        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        renderer.receiveShadows = false;
-        return renderer;
     }
 
     // 공격 애니메이션이 타격 지점에 닿는 순간 대상 위치에 이펙트를 띄운다.

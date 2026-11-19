@@ -1,0 +1,59 @@
+# 수정 전: 대기하던 유닛 #15가 다른 적으로 바꾸며 왔던 길로 되돌아가 도는 경로를 탐 (Stage1, 고블린 전사 12 vs 좀비 8, 칸 크기 2)
+TR t1590 pos (21.56,22.00) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1602 pos (21.35,22.07) A tgt #16(17.1,21.5) q - slot 3 dest (20.8,22.6) steer (20.8,22.6) path 0 stall 0.0 lock 0.0 los True
+TR t1614 pos (21.18,22.24) A tgt #16(17.1,21.5) q - slot 3 dest (20.8,22.6) steer (20.8,22.6) path 0 stall 0.0 lock 0.0 los True
+TR t1626 pos (21.01,22.41) A tgt #16(17.1,21.5) q - slot 3 dest (20.8,22.6) steer (20.8,22.6) path 0 stall 0.0 lock 0.0 los True
+TR t1638 pos (20.84,22.58) A tgt #16(17.1,21.5) q - slot 3 dest (20.8,22.6) steer (20.8,22.6) path 0 stall 0.0 lock 0.0 los True
+TR t1650 pos (20.69,22.61) Q tgt - q #16 slot -1 dest (19.0,22.1) steer - path 0 stall 0.0 lock 0.0 los False
+TR t1662 pos (20.46,22.54) Q tgt - q #16 slot -1 dest (19.0,22.1) steer - path 0 stall 0.0 lock 0.0 los False
+TR t1674 pos (20.23,22.47) Q tgt - q #16 slot -1 dest (19.0,22.1) steer - path 0 stall 0.0 lock 0.0 los False
+TR t1686 pos (20.00,22.40) Q tgt - q #16 slot -1 dest (19.0,22.1) steer - path 0 stall 0.0 lock 0.0 los False
+TR t1698 pos (19.94,22.38) Q tgt - q #16 slot -1 dest (19.0,22.1) steer - path 0 stall 0.2 lock 0.0 los False
+TR t1710 pos (20.05,22.34) A tgt #19(18.0,20.1) q - slot 7 dest (21.0,22.0) steer - path 8 stall 0.0 lock 0.0 los True
+TR t1722 pos (20.28,22.26) A tgt #19(18.0,20.1) q - slot -1 dest (21.0,22.0) steer - path 8 stall 0.0 lock 0.0 los False
+TR t1734 pos (20.51,22.18) A tgt #19(18.0,20.1) q - slot -1 dest (21.0,22.0) steer - path 8 stall 0.0 lock 0.0 los False
+TR t1746 pos (20.72,22.08) A tgt #19(18.0,20.1) q - slot -1 dest (22.0,21.0) steer - path 8 stall 0.0 lock 0.0 los False
+TR t1758 pos (20.91,21.92) A tgt #19(18.0,20.1) q - slot -1 dest (22.0,21.0) steer - path 8 stall 0.0 lock 0.0 los False
+TR t1770 pos (21.07,21.75) A tgt #19(18.0,20.1) q - slot -1 dest (22.0,20.0) steer - path 8 stall 0.0 lock 0.0 los False
+TR t1782 pos (21.16,21.53) A tgt #19(18.0,20.1) q - slot -1 dest (22.0,19.0) steer - path 8 stall 0.0 lock 0.0 los False
+TR t1794 pos (21.17,21.29) A tgt #19(18.0,20.1) q - slot -1 dest (21.0,18.0) steer - path 8 stall 0.0 lock 0.0 los False
+TR t1806 pos (21.15,21.05) A tgt #19(18.0,20.1) q - slot -1 dest (21.0,18.0) steer - path 8 stall 0.0 lock 0.0 los False
+
+# 수정 후: 같은 유닛
+TR t1590 pos (22.00,21.36) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1602 pos (22.00,21.36) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1614 pos (22.00,21.36) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1626 pos (22.00,21.36) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1638 pos (22.00,21.36) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1650 pos (22.00,21.36) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1662 pos (22.00,21.36) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1674 pos (22.00,21.44) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1686 pos (22.00,21.66) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1698 pos (22.00,21.90) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1710 pos (21.88,22.00) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1722 pos (21.64,22.00) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1734 pos (21.64,22.00) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1746 pos (21.64,22.00) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1758 pos (21.64,22.00) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1770 pos (21.64,22.00) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1782 pos (21.64,22.00) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1794 pos (21.64,22.00) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+TR t1806 pos (21.64,22.00) R tgt - q - slot -1 dest - steer - path 0 stall 0.0 lock 0.0 los False
+
+# 수정 전(한도만 줄인 판): 옆걸음이 이어지는 유닛 #17 (기본 지형, 진영당 20명)
+TR t1380 pos (21.45,11.05) A tgt #16(18.4,8.9) q - slot 4 dest (20.0,7.3) steer - path 0 stall 0.0 lock 0.9 los True
+TR t1392 pos (21.36,10.83) A tgt #16(18.4,8.9) q - slot 4 dest (20.1,7.3) steer - path 0 stall 0.0 lock 0.7 los True
+TR t1404 pos (21.28,10.60) A tgt #16(18.4,8.9) q - slot 4 dest (20.1,7.3) steer - path 0 stall 0.0 lock 0.5 los True
+TR t1416 pos (21.20,10.37) A tgt #16(18.4,8.9) q - slot 4 dest (20.1,7.3) steer - path 0 stall 0.0 lock 0.3 los True
+TR t1428 pos (21.10,10.22) A tgt #16(18.4,8.9) q - slot 4 dest (20.5,10.8) steer (20.5,10.8) path 0 stall 0.0 lock 0.1 los True
+TR t1440 pos (20.93,10.38) A tgt #16(18.4,8.9) q - slot 4 dest (20.5,10.8) steer (20.5,10.8) path 0 stall 0.0 lock 0.0 los True
+TR t1452 pos (20.76,10.55) A tgt #16(18.4,8.9) q - slot 6 dest (20.7,8.9) steer (20.5,10.8) path 0 stall 0.1 lock 0.0 los True
+TR t1464 pos (20.59,10.72) A tgt #16(18.4,8.9) q - slot 6 dest (20.5,10.8) steer (20.5,10.8) path 0 stall 0.0 lock 0.0 los True
+TR t1476 pos (20.51,10.78) A tgt #16(18.4,8.9) q - slot 6 dest (21.0,9.0) steer - path 4 stall 0.0 lock 0.0 los True
+TR t1488 pos (20.57,10.55) A tgt #16(18.4,8.9) q - slot 6 dest (21.0,9.0) steer - path 4 stall 0.0 lock 0.0 los True
+TR t1500 pos (20.55,10.35) Q tgt - q #16 slot -1 dest (20.3,10.2) steer - path 4 stall 0.0 lock 0.0 los False
+TR t1512 pos (20.50,10.32) Q tgt - q #16 slot -1 dest - steer - path 4 stall 0.1 lock 0.0 los False
+TR t1524 pos (20.55,10.26) A tgt #16(18.4,8.9) q - slot 6 dest (21.1,9.7) steer (21.1,9.7) path 0 stall 0.3 lock 0.0 los True
+TR t1536 pos (20.72,10.09) A tgt #16(18.4,8.9) q - slot 6 dest (21.1,9.7) steer - path 0 stall 0.5 lock 0.0 los True
+TR t1548 pos (20.76,9.87) A tgt #16(18.4,8.9) q - slot 6 dest (21.0,9.0) steer - path 4 stall 0.0 lock 0.0 los True
+TR t1560 pos (20.79,9.64) A tgt #16(18.4,8.9) q - slot 6 dest (20.0,7.0) steer - path 4 stall 0.0 lock 0.0 los True

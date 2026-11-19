@@ -1,0 +1,6 @@
+Validated clone SHA-256; all listed files matched workspace at final verification:
+9344a7ee32d61927409db3c975aba2b825ef855a7515e6611ffb5f15b8c4ad97  Assets/02_Scripts/00_Core/Effects/UnitBuffAura.cs
+e4fa880cfce1b0a03e8e92598a91034a2e74031dac3bf027a173aabda2301ae0  Assets/02_Scripts/06_UI/UnitStatusMarker.cs
+5c98fdf8c65294d68171311e88bc969dc3c3dd6c521f1c622c3cab6b8af5ccee  Assets/Resources/UnitBuffAura.shader
+ab041e1d8233e34a04eaf42f46f8ea21919e1307930b05aaf49a9c67353027a8  Assets/02_Scripts/05_World/DefenseBoardView.cs
+9a0aa126fe22cae5cc62daf4072223bcafa1c2b9b1956d9600cccb1e7adae656  Assets/02_Scripts/06_UI/DefenseHud.cs

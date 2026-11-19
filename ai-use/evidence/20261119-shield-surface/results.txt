@@ -1,0 +1,3 @@
+Unity 6000.3.28f1 CLI; actual GameScene Play Mode; exit code 0.
+SHIELD_SURFACE_PLAY_PASS catalog=20, shared mesh/bones, original materials preserved, no shield particle plane, pause, expiry, death cleanup, directional hit and shader compilation
+UnityEditor.Search.SearchDatabase startup exception also observed; functional validation passed.

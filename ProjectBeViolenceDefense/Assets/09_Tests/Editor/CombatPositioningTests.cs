@@ -31,21 +31,43 @@ public sealed class CombatPositioningTests
     }
 
     [Test]
-    public void BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap()
+    public void BlockedApproachGoesAroundTheBlockerAndReachesAttackRangeWithoutOverlap()
     {
         var attacker = Unit(0, 0, 4, 4);
-        var blocker = Unit(0, 1, 4.45f, 4);
+        var blocker = Unit(0, 1, 4.45f, 4, range: 0.1f);
         var target = Unit(1, 2, 6, 4);
         var units = new[] { attacker, blocker, target };
         var combat = new CombatPositioning(OpenGrid(), units);
         attacker.Target = target;
-        attacker.CombatDestination = new Vector3(4.725f, 0, 4);
+        for (int i = 0; i < 240 && !combat.CanAttack(attacker, target); i++)
+        {
+            StepApproach(combat, attacker, i);
+            attacker.TickTimers(DefenseBattle.TickDuration);
+            Assert.That(Vector3.Distance(attacker.Position, blocker.Position), Is.GreaterThanOrEqualTo(FixtureSpacing - 0.0001f));
+        }
+        Assert.That(combat.CanAttack(attacker, target), Is.True, "The unit should get around the temporary blocker instead of waiting indefinitely.");
+    }
+
+    // 옆걸음은 비켜선 자리에서 목표까지 길이 열릴 때만 뗀다. 열리지 않으면 제자리에 선다.
+    [TestCase(5f, 4.9f, true)]
+    [TestCase(4.725f, 4f, false)]
+    public void SidestepIsTakenOnlyWhenItOpensALaneToTheDestination(float x, float z, bool opens)
+    {
+        var attacker = Unit(0, 0, 4, 4);
+        var blocker = Unit(0, 1, 4.45f, 4);
+        var target = Unit(1, 2, 6, 4);
+        var combat = new CombatPositioning(OpenGrid(), new[] { attacker, blocker, target });
+        attacker.Target = target;
+        attacker.CombatDestination = new Vector3(x, 0, z);
+        Vector3 start = attacker.Position;
         for (int i = 0; i < 120 && !combat.CanAttack(attacker, target); i++)
         {
             combat.Move(attacker, target, DefenseBattle.TickDuration);
             Assert.That(Vector3.Distance(attacker.Position, blocker.Position), Is.GreaterThanOrEqualTo(FixtureSpacing - 0.0001f));
         }
-        Assert.That(combat.CanAttack(attacker, target), Is.True, "The unit should step around the temporary blocker instead of waiting indefinitely.");
+        Assert.That(combat.CanAttack(attacker, target), Is.EqualTo(opens));
+        if (!opens)
+            Assert.That(attacker.Position, Is.EqualTo(start), "A sidestep that opens no lane only makes the unit wander.");
     }
 
     [Test]
@@ -88,19 +110,19 @@ public sealed class CombatPositioningTests
     }
 
     [Test]
-    public void LocalSteeringGoesAroundUnitsWithoutCuttingThroughAWall()
+    public void ApproachGoesAroundUnitsWithoutCuttingThroughAWall()
     {
         var attacker = Unit(0, 0, 4, 4);
-        var blocker = Unit(0, 1, 4.45f, 4);
+        var blocker = Unit(0, 1, 4.45f, 4, range: 0.1f);
         var target = Unit(1, 2, 6, 4);
         var grid = OpenGrid(new Vector2Int(4, 5));
         var combat = new CombatPositioning(grid, new[] { attacker, blocker, target });
         attacker.Target = target;
-        attacker.CombatDestination = new Vector3(4.725f, 0, 4);
-        for (int i = 0; i < 120 && !combat.CanAttack(attacker, target); i++)
+        for (int i = 0; i < 240 && !combat.CanAttack(attacker, target); i++)
         {
             Vector3 previous = attacker.Position;
-            combat.Move(attacker, target, DefenseBattle.TickDuration);
+            StepApproach(combat, attacker, i);
+            attacker.TickTimers(DefenseBattle.TickDuration);
             Assert.That(grid.CanPursue(previous, attacker.Position), Is.True);
         }
         Assert.That(combat.CanAttack(attacker, target), Is.True);
@@ -128,26 +150,31 @@ public sealed class CombatPositioningTests
             combat.Move(attacker, target, DefenseBattle.TickDuration);
     }
 
+    // 아군 줄 너머의 적에게 가려면 줄 끝을 돌아 MaxPursuitDetour 넘게 걸어야 한다. 돌아가지 않고,
+    // 곧장 갈 수 있는 다른 적으로 바꿔 싸운다.
     [Test]
-    public void CrowdBarrierDetourKeepsTargetAndStartsAttacking()
+    public void CrowdBarrierSendsTheUnitToAReachableOpponentInsteadOfALongWayRound()
     {
         var units = BlockedFrontLine(out var attacker, out var preferred);
-        units.Insert(2, Unit(1, 2, 4, 7, radius: 0.3f));
+        var neighbor = Unit(1, 2, 4, 7, radius: 0.3f);
+        units.Insert(2, neighbor);
         var combat = new CombatPositioning(OpenGrid(), units);
-        bool usedPath = false;
+        float travelled = 0f;
         for (int tick = 0; tick < 600; tick++)
         {
+            Vector3 before = attacker.Position;
             StepApproach(combat, attacker, tick);
-            Assert.That(attacker.Target ?? attacker.CombatQueue?.Target, Is.SameAs(preferred));
-            usedPath |= attacker.CombatPath.Count > 0;
-            if (combat.CanAttack(attacker, preferred) && attacker.CanAttack) attacker.Attack(preferred);
+            travelled += Vector3.Distance(before, attacker.Position);
+            Assert.That(combat.CanAttack(attacker, preferred), Is.False);
+            if (combat.CanAttack(attacker, neighbor) && attacker.CanAttack) attacker.Attack(neighbor);
             foreach (var other in units.Where(u => u != attacker))
                 Assert.That(Vector3.Distance(attacker.Position, other.Position),
                     Is.GreaterThanOrEqualTo(CombatPositioning.RequiredSpacing(attacker.Faction, other.Faction) - 0.0001f));
             attacker.TickTimers(DefenseBattle.TickDuration);
         }
-        Assert.That(usedPath, Is.True, "A long clear approach should replace oscillating local sidesteps.");
+        Assert.That(attacker.Target, Is.SameAs(neighbor));
         Assert.That(attacker.AttacksPerformed, Is.GreaterThan(1));
+        Assert.That(travelled, Is.LessThan(3f), "The neighbour is three tiles away in a straight line.");
     }
 
     [Test]
@@ -155,12 +182,13 @@ public sealed class CombatPositioningTests
     {
         var units = BlockedFrontLine(out var attacker, out var preferred);
         var combat = new CombatPositioning(OpenGrid(), units);
-        for (int tick = 0; tick < 120; tick++)
+        for (int tick = 0; tick < 90; tick++)
             StepApproach(combat, attacker, tick);
-        Assert.That(attacker.Target, Is.SameAs(preferred));
+        // 줄 끝을 돌아가는 길은 MaxPursuitDetour를 넘는다. 돌아가지 않고 적을 정한 채 뒤에서 기다린다.
+        Assert.That(attacker.Target ?? attacker.CombatQueue?.Target, Is.SameAs(preferred));
         Assert.That(combat.CanAttack(attacker, preferred), Is.False);
         units.RemoveAll(u => u != attacker && u != preferred);
-        for (int tick = 120; tick < 240 && !combat.CanAttack(attacker, preferred); tick++)
+        for (int tick = 90; tick < 210 && !combat.CanAttack(attacker, preferred); tick++)
             StepApproach(combat, attacker, tick);
         Assert.That(combat.CanAttack(attacker, preferred), Is.True, "A failed retarget probe must not blacklist the only opponent.");
     }
@@ -796,7 +824,7 @@ public sealed class CombatPositioningTests
                 Assert.That(grid.CanPursue(attacker.PreviousPosition, attacker.Position), Is.True);
         }
         Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Preparation));
-        Assert.That(battle.CoreHealth, Is.EqualTo(119));
+        Assert.That(attacker.ReachedCore, Is.True);
     }
 
     // 폭이 width 칸인 가로 복도. 양 끝에서 들어와 가운데에서 만나고, 가운데 위쪽 문으로 코어에 간다.
@@ -875,6 +903,38 @@ public sealed class CombatPositioningTests
         }
         Assert.That(fighters.All(f => combat.CanAttack(f, target)), Is.True);
         Assert.That(waiting.CombatQueue?.Target, Is.SameAs(target));
+    }
+
+    // 한 진영만 남고 다른 진영은 더 나올 유닛도 없을 때만 참이다. 화면이 이때 자동으로 빨리 감는다.
+    [Test]
+    public void OnlyOneSideRemainsOnceTheOtherSideIsGoneAndHasNothingLeftToSpawn()
+    {
+        var grid = new DefenseGrid();
+        var battle = new DefenseBattle(grid, new[]
+        {
+            new EnemyFaction("A", Color.white, spawnCount: 2),
+            new EnemyFaction("B", Color.white, spawnCount: 1)
+        });
+        Assert.That(battle.OnlyOneSideRemains, Is.False, "Not in combat yet.");
+        battle.StartRound();
+        Assert.That(battle.OnlyOneSideRemains, Is.False, "Nobody has spawned yet.");
+        for (int tick = 0; tick < 600 && battle.SpawnCount < 3; tick++)
+        {
+            battle.Tick(DefenseBattle.TickDuration, false);
+            Assert.That(battle.OnlyOneSideRemains, Is.False, "The other side is on the board or still has units to spawn.");
+        }
+        Assert.That(battle.SpawnCount, Is.EqualTo(3));
+
+        battle.Enemies.First(enemy => enemy.FactionIndex == 1).Die();
+        battle.Tick(DefenseBattle.TickDuration, false);
+        Assert.That(battle.Enemies.All(enemy => enemy.FactionIndex == 0), Is.True);
+        Assert.That(battle.OnlyOneSideRemains, Is.True);
+        Assert.That(BattleClock.FastForwardSpeed, Is.LessThanOrEqualTo(BattleClock.MaxTicksPerFrame),
+            "At 60 frames per second the fast-forward speed must fit in one frame's tick budget.");
+
+        while (battle.CurrentPhase == DefenseBattle.Phase.Combat && battle.TickIndex < 6000)
+            battle.Tick(DefenseBattle.TickDuration, false);
+        Assert.That(battle.OnlyOneSideRemains, Is.False, "The round is over.");
     }
 
     [Test]

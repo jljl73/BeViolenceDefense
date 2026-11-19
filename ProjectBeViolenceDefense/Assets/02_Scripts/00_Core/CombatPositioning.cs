@@ -9,10 +9,10 @@ internal sealed class CombatPositioning
     internal const float LostTargetSearchDuration = 4f;
     // 보이지 않는 적을 쫓다가 이 시간 동안 조금도 가까워지지 못하면 추격을 그만두고 원래 경로로 돌아간다.
     internal const float HiddenPursuitStallLimit = 2f;
-    // 적에게 가는 길이 직선 거리보다 이 칸 수 넘게 길면 돌아가지 않는다. 길은 있는데 유닛에 막힌
-    // 경우에는 뒤에서 기다리고, 지형 때문에 이만큼 돌아야 하는 적은 그 자리에서는 상대하지 않는다.
-    // 첫 테스트용 임시 값.
-    internal const float MaxPursuitDetour = 3f;
+    // 적에게 가는 길이 직선 거리보다 이 거리(유닛 사거리·인지와 같은 단위) 넘게 길면 돌아가지 않는다.
+    // 길은 있는데 유닛에 막힌 경우에는 뒤에서 기다리고, 지형 때문에 이만큼 돌아야 하는 적은 그 자리에서는
+    // 상대하지 않는다. 칸 크기에 곱하지 않는다: 칸이 커져도 유닛이 감수할 우회는 그대로다. 첫 테스트용 임시 값.
+    internal const float MaxPursuitDetour = 2f;
     // 옆걸음 직후 이 시간 동안은 방금 온 쪽으로 되돌아가는 옆걸음을 고르지 않는다.
     internal const float SidestepMemoryDuration = 2.5f;
     // 스스로 다른 적으로 바꾼 뒤 이 시간 동안은 다시 바꾸지 않는다.
@@ -431,7 +431,8 @@ internal sealed class CombatPositioning
     private EnemyUnit FindTarget(EnemyUnit enemy)
     {
         // Taunt overrides awareness, walls, retaliation and a fight already under way.
-        // Only a taunter proven unreachable from here falls back to the usual choice.
+        // Only a taunter proven unreachable from here falls back to the usual choice. 도발도 우회 한도를
+        // 따른다: 벽 너머의 도발 유닛에게 가는 길이 MaxPursuitDetour 넘게 돌아야 하면 끌려가지 않는다.
         if (enemy.ActiveTaunter is { } taunter && !IsKnownUnreachable(enemy, taunter))
         {
             enemy.ConsumeRetaliationRequest();
@@ -692,7 +693,7 @@ internal sealed class CombatPositioning
         pathGoals.Clear(); pathSlots.Clear();
         for (int i = 0; i < SlotCount; i++)
             if (SlotAvailable(enemy, target, i)) { pathGoals.Add(SlotPosition(enemy, target, i)); pathSlots.Add(i); }
-        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int goal, maxDetour: PursuitDetourLimit(enemy, target)))
+        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int goal, maxDetour: MaxPursuitDetour))
             slot = pathSlots[goal];
         else
         {
@@ -701,7 +702,7 @@ internal sealed class CombatPositioning
             // reachable spot with a clear strike.
             pathGoals.Clear(); pathGoals.Add(target.Position);
             if (!allowOpenPosition ||
-                !pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, strikeTarget: target, maxDetour: PursuitDetourLimit(enemy, target)))
+                !pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, strikeTarget: target, maxDetour: MaxPursuitDetour))
             {
                 enemy.PathRetryRemaining = StalledRetargetDelay;
                 CheckStaticReachability(enemy, target, hidden: false);
@@ -770,7 +771,7 @@ internal sealed class CombatPositioning
             if (grid.IsWalkable(grid.WorldToCell(point)) && grid.HasLineOfSight(point, goal))
                 pathGoals.Add(point);
         }
-        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, maxDetour: PursuitDetourLimit(enemy, target)))
+        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, maxDetour: MaxPursuitDetour))
         {
             enemy.CombatPathIndex = 0; enemy.CombatPathTarget = target; enemy.CombatPathAnchor = goal;
             enemy.CombatPathSearch = true;
@@ -809,7 +810,7 @@ internal sealed class CombatPositioning
             }
         // A temporary crowd is not an unreachable target. Only reject if even a route
         // ignoring every unit fails or is a long way round, or no valid striking position exists.
-        if (pathfinder.Find(enemy, pathGoals, staticPath, out _, ignoreUnits: true, maxDetour: PursuitDetourLimit(enemy, target))) return;
+        if (pathfinder.Find(enemy, pathGoals, staticPath, out _, ignoreUnits: true, maxDetour: MaxPursuitDetour)) return;
         enemy.UnreachableTarget = target;
         enemy.UnreachableTargetPosition = enemy.LastKnownTargetPosition;
         enemy.UnreachableFromPosition = enemy.Position;
@@ -819,23 +820,33 @@ internal sealed class CombatPositioning
     public bool IsReturningAlongPath(EnemyUnit enemy) =>
         enemy.CombatPathTarget == null && enemy.CombatPath.Count > 0;
 
-    public bool TryReturnAlongPath(EnemyUnit enemy, float deltaTime)
+    // firstOffset: 이 번호부터의 경로 점만 목표로 삼는다(지나온 쪽으로 되돌아가지 않게).
+    // shortOnly: 유닛을 돌아가는 짧은 길(MaxPursuitDetour 이내)만 받아들인다.
+    // continueOnly: 이미 따라가던 복귀 경로만 이어 가고 새로 찾지 않는다.
+    public bool TryReturnAlongPath(EnemyUnit enemy, float deltaTime, int firstOffset = 0, bool shortOnly = false,
+        bool continueOnly = false)
     {
         if (enemy.CombatPathTarget != null) enemy.CombatPath.Clear();
         if (!TryUsePath(enemy, null, out Vector3 waypoint, out _))
         {
+            if (continueOnly)
+            {
+                enemy.CombatPath.Clear();
+                return false;
+            }
             if (enemy.PathRetryRemaining > 0f) return false;
             pathGoals.Clear();
             if (enemy.RemainingRouteWaypoints == 1) pathGoals.Add(enemy.RoutePosition);
             else
-                for (int i = 0; i < enemy.RemainingRouteWaypoints - 1; i++) pathGoals.Add(enemy.GetRouteWaypoint(i));
-            if (!pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int offset))
+                for (int i = firstOffset; i < enemy.RemainingRouteWaypoints - 1; i++) pathGoals.Add(enemy.GetRouteWaypoint(i));
+            if (!pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int offset,
+                    maxDetour: shortOnly ? MaxPursuitDetour : float.PositiveInfinity))
             {
                 enemy.PathRetryRemaining = StalledRetargetDelay;
                 return false;
             }
             enemy.CombatPathTarget = null; enemy.CombatPathIndex = 0;
-            enemy.ReturnRouteOffset = enemy.RemainingRouteWaypoints == 1 ? -1 : offset;
+            enemy.ReturnRouteOffset = enemy.RemainingRouteWaypoints == 1 ? -1 : offset + firstOffset;
             if (!TryUsePath(enemy, null, out waypoint, out _)) return false;
         }
         Vector3 next = enemy.StepToward(waypoint, deltaTime);
@@ -943,7 +954,10 @@ internal sealed class CombatPositioning
                 continue;
             Vector3 point = enemy.Position + direction * Mathf.Clamp(enemy.Faction.BodyRadius * 3f, 0.4f, 0.9f);
             float cost = Vector3.Distance(point, goal);
-            if (cost >= shortest || !CanMove(enemy, target, enemy.Position, point))
+            // 비켜선 자리에서 목표까지 길이 열려 있을 때만 옆걸음을 뗀다. 열리지 않는 옆걸음을 이어 가면
+            // 싸움터 둘레를 옆으로, 뒤로 맴돈다. 그럴 때는 제자리에서 기다린다.
+            if (cost >= shortest || !CanMove(enemy, target, enemy.Position, point) ||
+                !CanMove(enemy, target, point, goal))
                 continue;
             shortest = cost;
             waypoint = point;
@@ -976,10 +990,6 @@ internal sealed class CombatPositioning
                 return true;
         return false;
     }
-
-    // 도발은 벽 너머의 유닛을 끌어오는 주문이라, 도발한 유닛에게 가는 길에는 한도를 두지 않는다.
-    private float PursuitDetourLimit(EnemyUnit enemy, EnemyUnit target) =>
-        enemy.ActiveTaunter == target ? float.PositiveInfinity : MaxPursuitDetour * grid.CellSize;
 
     private bool ClearOfUnits(EnemyUnit enemy, EnemyUnit target, Vector3 from, Vector3 to, bool attacking)
     {

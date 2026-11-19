@@ -29,6 +29,8 @@ internal sealed class DefenseBattle
     private const int RouteRejoinWaypoints = 3;
     // 교전 뒤 원래 경로 대신 지금 위치에서 새 경로를 잡으려면 줄어야 하는 최소 거리(칸). 첫 테스트용 임시 값.
     private const float RerouteMinimumSaving = 2f;
+    // 경로로 돌아갈 때, 코어까지 가장 짧게 이어지는 점보다 이 칸 수 넘게 손해인 점(지나온 쪽)은 고르지 않는다.
+    private const float RejoinSlack = 0.5f;
     private const int ReinforcementsPerFaction = 1;
     private const int ExtraReinforcements = 3;
 
@@ -94,6 +96,7 @@ internal sealed class DefenseBattle
     public Phase CurrentPhase { get; private set; }
     public int Round { get; private set; } = 1;
     public int CoreHealth { get; private set; } = CoreMaxHealth;
+    public bool HasCoreShield { get; private set; }
     public int SpawnCount { get; private set; }
     public int EnemiesPerRound { get; private set; }
     public float Mana { get; private set; }
@@ -181,6 +184,7 @@ internal sealed class DefenseBattle
             return;
 
         CurrentPhase = Phase.Combat;
+        HasCoreShield = true;
         TickIndex = 0;
         pendingSpells.Clear();
         commandHistory.Clear();
@@ -543,8 +547,13 @@ internal sealed class DefenseBattle
                 if (!enemy.ReachedCore)
                     continue;
 
-                CoreHealth = Mathf.Max(0, CoreHealth - 1);
-                CoreHit?.Invoke();
+                if (HasCoreShield)
+                    HasCoreShield = false;
+                else
+                {
+                    CoreHealth = Mathf.Max(0, CoreHealth - 1);
+                    CoreHit?.Invoke();
+                }
                 enemy.Die();
                 RemoveEnemyAt(i);
             }
@@ -577,6 +586,25 @@ internal sealed class DefenseBattle
     public int RoundSpawnCount(int side) => roundSpawnCounts[side];
 
     public int FactionCount => factions.Length;
+
+    // 살아 있는 유닛이 한 진영뿐이고 다른 진영은 이번 라운드에 더 나올 유닛도 없다. 더는 교전이 없으므로
+    // 화면에서 빨리 감는 데 쓴다. 전투 진행에는 쓰지 않는 조회다.
+    public bool OnlyOneSideRemains
+    {
+        get
+        {
+            if (CurrentPhase != Phase.Combat || enemies.Count == 0)
+                return false;
+            int side = enemies[0].FactionIndex;
+            foreach (EnemyUnit enemy in enemies)
+                if (enemy.FactionIndex != side)
+                    return false;
+            for (int other = 0; other < factions.Length; other++)
+                if (other != side && spawnedPerFaction[other] < roundSpawnCounts[other])
+                    return false;
+            return true;
+        }
+    }
 
     private void SpawnNext()
     {
@@ -669,14 +697,14 @@ internal sealed class DefenseBattle
         // Finish a return path already under way. Choosing between it and a direct line to
         // the route on every tick zigzags along the edge of where that line is clear.
         bool offRoute = !enemy.Position.Equals(enemy.RoutePosition);
-        if (offRoute && combat.IsReturningAlongPath(enemy) && combat.TryReturnAlongPath(enemy, deltaTime))
+        if (offRoute && combat.IsReturningAlongPath(enemy) && combat.TryReturnAlongPath(enemy, deltaTime, continueOnly: true))
             return;
-        bool routeInSight = false;
-        if (offRoute && TryRejoinRoute(enemy, deltaTime, out routeInSight))
+        int firstForward = -1;
+        if (offRoute && TryRejoinRoute(enemy, deltaTime, out firstForward))
             return;
-        // 앞쪽 경로 점이 보이는데 다른 유닛에 가려 못 가는 것이면 길이 날 때까지 기다린다. 경로 탐색으로
-        // 닿을 수 있는 아무 점(뒤쪽일 수 있다)으로 돌아가면 뒤로 갔다 앞으로 오며 여러 번 돌아선다.
-        if (offRoute && !routeInSight && combat.TryReturnAlongPath(enemy, deltaTime))
+        // 보이는 경로 점이 하나도 없으면(벽 뒤) 경로 탐색으로 돌아간다. 보이는데 다른 유닛에 가려 못 가는
+        // 것이면 일단 기다린다: 여기서 바로 다른 점이나 우회로를 고르면 틱마다 방향이 바뀐다.
+        if (offRoute && firstForward < 0 && combat.TryReturnAlongPath(enemy, deltaTime))
             return;
 
         // Off-route units wait for their forward connection, rather than walking back
@@ -697,7 +725,12 @@ internal sealed class DefenseBattle
         if (enemy.BlockedRouteTime < RouteYieldDelay)
             return;
         enemy.BlockedRouteTime = 0f;
-        if (TryRejoinRoute(enemy, deltaTime, out _))
+        // RouteYieldDelay 동안 막혀 있었다. 향하던 점을 고집하지 않고 앞쪽 경로 점 아무 데나 곧장 갈 수
+        // 있으면 그리로 가고, 없으면 그 점들로 막은 유닛을 짧게 돌아가는 길을 찾는다. 지나온 쪽 점은
+        // 여전히 고르지 않는다. 기다리기만 하면 앞의 아군이 비킬 때까지 몇 초씩 서 있게 된다.
+        if (TryRejoinRoute(enemy, deltaTime, out firstForward, anyForwardPoint: true))
+            return;
+        if (offRoute && firstForward >= 0 && combat.TryReturnAlongPath(enemy, deltaTime, firstForward, shortOnly: true))
             return;
         if (combat.TryFindRouteYield(enemy, RouteRejoinWaypoints, out Vector3 destination, out int offset))
         {
@@ -736,17 +769,21 @@ internal sealed class DefenseBattle
             enemy.Reroute(route);
     }
 
-    // routeInSight: 벽에 가리지 않은 앞쪽 경로 점이 하나라도 있는지(유닛에 막혔는지와 무관).
-    private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime, out bool routeInSight)
+    // firstForward: 벽에 가리지 않고, 코어까지의 길이 가장 짧은 점보다 RejoinSlack 칸 넘게 손해가 아닌 경로 점 중
+    // 가장 앞 번호(유닛에 막혔는지와 무관). 보이는 경로 점이 없으면 -1.
+    // anyForwardPoint: 향하던 점(RouteBypassOffset)보다 앞 번호만 보는 제한을 풀고, 길이 조건만으로 고른다.
+    private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime, out int firstForward, bool anyForwardPoint = false)
     {
-        routeInSight = false;
+        firstForward = -1;
         // The final point is on the core boundary, not a navigation waypoint. Return
         // to its approach tile; the normal route step then handles core contact.
         if (enemy.RemainingRouteWaypoints == 1)
         {
             Vector3 approach = enemy.RoutePosition;
-            routeInSight = grid.CanPursue(enemy.Position, approach);
-            if (!routeInSight || !combat.CanFollowRoute(enemy, approach))
+            if (!grid.CanPursue(enemy.Position, approach))
+                return false;
+            firstForward = 0;
+            if (!combat.CanFollowRoute(enemy, approach))
                 return false;
             Vector3 step = enemy.StepToward(approach, deltaTime);
             enemy.Face(step);
@@ -757,8 +794,8 @@ internal sealed class DefenseBattle
         }
 
         // 보이는 경로 점 가운데 코어까지 가장 짧게 이어지는 길. 그 점이 유닛에 막혀 있어도, 그보다
-        // 한 칸 넘게 손해인 점(지나온 쪽)으로 되돌아가지는 않는다.
-        int first = Mathf.Max(0, enemy.RouteBypassOffset);
+        // RejoinSlack 칸 넘게 손해인 점(지나온 쪽)으로 되돌아가지는 않는다.
+        int first = anyForwardPoint ? 0 : Mathf.Max(0, enemy.RouteBypassOffset);
         float shortest = float.PositiveInfinity;
         for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= first; offset--)
         {
@@ -766,7 +803,13 @@ internal sealed class DefenseBattle
             if (grid.CanPursue(enemy.Position, waypoint))
                 shortest = Mathf.Min(shortest, Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset));
         }
-        routeInSight = !float.IsPositiveInfinity(shortest);
+        for (int offset = first; offset <= enemy.RemainingRouteWaypoints - 2 && firstForward < 0; offset++)
+        {
+            Vector3 waypoint = enemy.GetRouteWaypoint(offset);
+            if (grid.CanPursue(enemy.Position, waypoint) &&
+                Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset) <= shortest + RejoinSlack * grid.CellSize)
+                firstForward = offset;
+        }
 
         // A fighter may have moved well beyond its old route index. Rejoin the furthest
         // visible, unobstructed point ahead instead of walking backwards through the army.
@@ -774,7 +817,7 @@ internal sealed class DefenseBattle
         {
             Vector3 waypoint = enemy.GetRouteWaypoint(offset);
             if (!grid.CanPursue(enemy.Position, waypoint) ||
-                Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset) > shortest + grid.CellSize ||
+                Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset) > shortest + RejoinSlack * grid.CellSize ||
                 !combat.CanFollowRoute(enemy, waypoint))
                 continue;
 

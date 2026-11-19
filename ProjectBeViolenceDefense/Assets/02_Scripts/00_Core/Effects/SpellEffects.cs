@@ -117,49 +117,6 @@ internal sealed class SpellEffects
         Play(ShieldRight, point, Vector3.zero, UIPalette.Armor, ImpactDuration, 0.080f);
     }
 
-    public void SyncMoveTrail(Transform unit, Vector3 step, bool moving, ref LineRenderer[] trails)
-    {
-        if (!moving)
-        {
-            if (trails != null)
-            {
-                foreach (LineRenderer trail in trails)
-                    trail.enabled = false;
-            }
-            return;
-        }
-
-        if (trails == null)
-        {
-            trails = new[] { CreateStroke("Move Speed Trail", unit), CreateStroke("Move Speed Trail", unit) };
-            Color head = UIPalette.MoveSpeed;
-            head.a = 0.45f;
-            Color tail = head;
-            tail.a = 0f;
-            foreach (LineRenderer trail in trails)
-            {
-                trail.useWorldSpace = true;
-                trail.positionCount = 2;
-                trail.startWidth = 0.055f;
-                trail.endWidth = 0.012f;
-                trail.startColor = head;
-                trail.endColor = tail;
-            }
-        }
-
-        Vector3 direction = board.TransformDirection(step.normalized);
-        Vector3 side = Vector3.Cross(board.up, direction) * 0.15f;
-        Vector3 back = unit.position + board.up * 0.08f - direction * 0.26f;
-        for (int i = 0; i < trails.Length; i++)
-        {
-            LineRenderer trail = trails[i];
-            Vector3 start = back + (i == 0 ? side : -side);
-            trail.SetPosition(0, start);
-            trail.SetPosition(1, start - direction * 0.30f);
-            trail.enabled = true;
-        }
-    }
-
     public void Advance(float deltaTime)
     {
         for (int i = lightning.Count - 1; i >= 0; i--)

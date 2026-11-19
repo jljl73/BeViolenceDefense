@@ -92,6 +92,40 @@ public sealed class StageWavesTests
         Assert.That(battle.Enemies, Is.Empty);
     }
 
+    [TestCase(0)]
+    [TestCase(1)]
+    public void CoreShieldAbsorbsOneArrivalPerWave(int firstWaveCount)
+    {
+        var invader = new EnemyFaction("Invader", Color.white);
+        var grid = new DefenseGrid(7, 7, new RectInt(3, 5, 1, 1), new[] { new Vector2Int(3, 1) }, new[] { 0 }, null);
+        var battle = new DefenseBattle(grid, new[] { invader }, round => new IReadOnlyList<EnemyFaction>[]
+        {
+            Enumerable.Repeat(invader, round == 1 ? firstWaveCount : 2).ToArray()
+        }, roundLimit: 2);
+        int arrivals = 0;
+        int hits = 0;
+        battle.EnemyRemoved += enemy => { if (enemy.ReachedCore) arrivals++; };
+        battle.CoreHit += () => hits++;
+
+        Assert.That(battle.HasCoreShield, Is.False);
+        battle.StartRound();
+        Assert.That(battle.HasCoreShield, Is.True);
+        PlayRound(battle);
+        Assert.That(arrivals, Is.EqualTo(firstWaveCount));
+        Assert.That(hits, Is.Zero);
+        Assert.That(battle.CoreHealth, Is.EqualTo(DefenseBattle.CoreMaxHealth));
+        Assert.That(battle.HasCoreShield, Is.EqualTo(firstWaveCount == 0));
+
+        battle.StartRound();
+        Assert.That(battle.HasCoreShield, Is.True);
+        PlayRound(battle);
+        Assert.That(battle.CurrentPhase, Is.EqualTo(DefenseBattle.Phase.Victory));
+        Assert.That(battle.HasCoreShield, Is.False);
+        Assert.That(arrivals, Is.EqualTo(firstWaveCount + 2));
+        Assert.That(hits, Is.EqualTo(1));
+        Assert.That(battle.CoreHealth, Is.EqualTo(DefenseBattle.CoreMaxHealth - 1));
+    }
+
     [Test]
     public void FactionWithSeveralSpawnsUsesOnlyThePickedOne()
     {

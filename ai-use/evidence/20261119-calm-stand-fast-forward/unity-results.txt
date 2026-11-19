@@ -1,0 +1,13 @@
+Unity 6000.3.28f1, 프로젝트 복사본(세션 임시 폴더). 실행 전 복사본의 Library/ilpp.pid 삭제.
+
+[EditMode 최종: 복귀 수정 + 빨리감기] testcasecount="120" result="Failed(Child)" total="120" passed="119" failed="1"
+  FAILED StageContentTests.GraveyardLayoutKeepsTheSceneryFrameAndLengthensRoutesWhenItsGatesAreWalled("Graveyard",41,16,"4,12 5,12 11,12 12,12",17,"4,
+  -> 묘지 지형 에셋이 교체된 탓(커밋 6e06e54). 이 변경과 무관.
+
+[EditMode 중간: 복귀 손해 폭 1칸] 119개 중 117 통과. 실패 = FirstWaveRearUnitsDoNotRepeatedlyReverseWhileWithoutTarget (Expected <= 2, was 3), 묘지 지형 검사
+
+[Play Mode] GameScene, FastForwardValidation.cs.txt (-executeMethod)
+  FF_BOTH_SIDES units=2 speed=1 tick=21
+  FF_PLAY_PASS stage=Stage_Coast kept=0 units=4 speed=4 frames=60 ticks=9
+  해안가 스테이지에서 두 진영이 나온 뒤 한 진영만 남기고 나머지를 없앴다. 그 전에는 1배속, 그 뒤 60프레임 동안 fastForwarding 참·재생 속도 4.
+  로그의 ArgumentOutOfRangeException 1건은 UnityEditor.Search.SearchDatabase 시작 색인에서 난 것.

@@ -54,6 +54,7 @@ public static class UIPalette
     public static readonly Color Heal = Hex("#99F5A0");
     public static readonly Color MoveSpeed = Hex("#66DAFF");
     public static readonly Color Armor = Hex("#C5A7FF");
+    public static readonly Color CoreShield = Hex("#92B7FF");
     public static readonly Color Taunt = Hex("#FF7FD1");
 
     private static Color Hex(string hex) => ColorUtility.TryParseHtmlString(hex, out var color) ? color : Color.magenta;

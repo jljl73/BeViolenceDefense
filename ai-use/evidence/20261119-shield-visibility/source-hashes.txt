@@ -1,0 +1,2 @@
+5312746eb0184cd39791332f4112f8e4fd359ccdf5a92bfdcaabdddb23bffb6e  Assets/02_Scripts/00_Core/Effects/UnitShieldSurface.cs
+fa23625ebfd50b3d0d006e63b8486df43f6556e910c713c15a7ecd7f22a3796f  Assets/Resources/UnitShieldSurface.shader

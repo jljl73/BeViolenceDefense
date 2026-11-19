@@ -1,0 +1,129 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using Object=UnityEngine.Object;
+
+[InitializeOnLoad]
+public static class ShieldSurfaceValidation
+{
+    const string Key="ShieldSurfaceValidation.Running";
+    const string Folder="/tmp/shield-surface-captures";
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static DefenseGrid grid;
+    static DefenseBoardView view;
+    static DefenseHud hud;
+    static Camera camera;
+    static EnemyCatalog catalog;
+    static EnemyUnit[] units;
+    static int phase,frame;
+    static double started;
+    static object Field(object o,string n)=>o.GetType().GetField(n,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).GetValue(o);
+    static IDictionary Views=>(IDictionary)Field(view,"enemyViews");
+    static object Aura(EnemyUnit unit)=>Field(Views[unit],"BuffAura");
+    static IList Surfaces(EnemyUnit unit)=>(IList)Field(Field(Aura(unit),"shield"),"surfaces");
+    static void Check(bool value,string message){if(!value)throw new Exception(message);}
+    static ShieldSurfaceValidation(){EditorApplication.update+=Update;}
+    public static void Run(){EditorSceneManager.OpenScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");Directory.CreateDirectory(Folder);SessionState.SetBool(Key,true);EditorApplication.EnterPlaymode();}
+    static void Refresh(float dt)
+    {
+        foreach(var unit in units){unit.TickTimers(dt);view.SyncEnemy(unit,dt,0f);}
+        view.AdvanceEffects(dt);hud.Refresh(battle,grid,view,null,null,0,1);Canvas.ForceUpdateCanvases();
+    }
+    static EnemyUnit Unit(string id,Vector3 pos,int order)=>new(catalog.GetUnit(id,UIPalette.Attack,"surface validation"),0,new[]{pos,pos+Vector3.forward},order);
+    static void CheckSurface(EnemyUnit unit,bool active)
+    {
+        IList surfaces=Surfaces(unit);Check(surfaces.Count>0,"No mesh overlay: "+unit.Faction.UnitId);
+        foreach(var entry in surfaces)
+        {
+            var source=(Renderer)Field(entry,"Item1");var overlay=(Renderer)Field(entry,"Item2");
+            Check(overlay.enabled==active,"Surface visibility mismatch");
+            Check(overlay.transform.parent==source.transform,"Surface does not follow source transform");
+            if(source is SkinnedMeshRenderer skin)
+            {
+                var copy=(SkinnedMeshRenderer)overlay;Check(copy.sharedMesh==skin.sharedMesh&&copy.rootBone==skin.rootBone,"Skin geometry detached");
+                Check(copy.bones.Length==skin.bones.Length,"Bone count differs");
+            }
+            foreach(var material in source.sharedMaterials)Check(material.shader.name!="BeViolenceDefense/Unit Shield Surface","Original material replaced");
+        }
+        Check(!((MeshRenderer)Field(Aura(unit),"renderer")).enabled,"Shield still uses particle billboard");
+    }
+    static void Update()
+    {
+        if(!SessionState.GetBool(Key,false)||!EditorApplication.isPlaying||EditorApplication.isCompiling)return;
+        try
+        {
+            if(started==0)started=EditorApplication.timeSinceStartup;
+            Check(EditorApplication.timeSinceStartup-started<180,"Validation timeout");
+            if(phase==0)
+            {
+                var selection=Object.FindFirstObjectByType<StageSelectionController>();if(selection==null)return;
+                if(selection.CurrentStage==null){var ui=Object.FindFirstObjectByType<UIManager>();if(ui!=null&&ui.HasOpenPopup)selection.SelectStage(1);return;}
+                var transition=Object.FindFirstObjectByType<StageTransition>();if(transition!=null&&transition.IsPlaying)return;
+                game=Object.FindFirstObjectByType<VoxelDefensePrototype>();battle=(DefenseBattle)Field(game,"battle");if(battle==null)return;
+                game.enabled=false;grid=(DefenseGrid)Field(game,"grid");view=(DefenseBoardView)Field(game,"view");hud=(DefenseHud)Field(game,"hud");camera=(Camera)Field(game,"boardCamera");catalog=(EnemyCatalog)Field(game,"enemyCatalog");battle.StartRound();
+                Vector3 place=new(8,0,10);float best=float.PositiveInfinity;
+                for(int z=2;z<grid.Depth-3;z++)for(int x=2;x<grid.Width-3;x++)
+                {
+                    bool open=true;for(int dx=0;dx<2;dx++)for(int dz=0;dz<2;dz++)open&=grid.IsWalkable(new Vector2Int(x+dx,z+dz));
+                    float score=(new Vector2(x,z)-new Vector2(8,10)).sqrMagnitude;
+                    if(open&&score<best){best=score;place=new Vector3(x+.5f,0,z+.5f);}
+                }
+                Vector3 right=Vector3.ProjectOnPlane(camera.transform.right,Vector3.up).normalized;
+                units=new EnemyUnit[3];
+                for(int i=0;i<3;i++)
+                {
+                    units[i]=Unit("zombie",view.ToWorld(place+right*((i-1)*.55f)),100+i);
+                    ((List<EnemyUnit>)battle.Enemies).Add(units[i]);view.AddEnemy(units[i]);
+                }
+                camera.orthographicSize=1.65f;camera.transform.position=game.transform.TransformPoint(place+Vector3.up*.3f)-camera.transform.forward*18;
+                Refresh(.1f);Capture("before.png");
+                units[1].ApplyArmorBuff(6);units[2].ApplyArmorBuff(6);Refresh(0);
+                CheckSurface(units[1],true);CheckSurface(units[2],true);
+                float age=(float)Field(Aura(units[1]),"phase");Refresh(0);Check((float)Field(Aura(units[1]),"phase")==age,"Pause advanced shield flow");
+                phase=1;return;
+            }
+            if(phase==1)
+            {
+                if(frame==24||frame==55)
+                    typeof(DefenseBoardView).GetMethod("ReactToHit",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(view,new object[]{units[2],Vector3.right,false,true});
+                Refresh(1f/30f);Capture($"frame-{frame:D2}.png");
+                if(frame==24)
+                {
+                    var overlay=(Renderer)Field(Surfaces(units[2])[0],"Item2");var block=new MaterialPropertyBlock();overlay.GetPropertyBlock(block);
+                    Check(block.GetFloat("_Impact")>.5f,"Hit did not brighten shield");
+                }
+                if(++frame<75)return;
+                units[1].TickTimers(8);Refresh(.3f);CheckSurface(units[1],false);
+                units[2].Die();var shield=Field(Aura(units[2]),"shield");view.RemoveEnemy(units[2],battle.CoreHealth);
+                foreach(var entry in (IList)Field(shield,"surfaces"))Check(!((Renderer)Field(entry,"Item2")).enabled,"Dead unit kept shield");
+                var entries=new SerializedObject(catalog).FindProperty("entries");
+                for(int i=0;i<entries.arraySize;i++)
+                {
+                    string id=entries.GetArrayElementAtIndex(i).FindPropertyRelative("id").stringValue;
+                    var unit=Unit(id,new Vector3(100+i,0,100),200+i);unit.ApplyArmorBuff(6);view.AddEnemy(unit);view.SyncEnemy(unit,.1f,0f);CheckSurface(unit,true);
+                    unit.Die();view.RemoveEnemy(unit,battle.CoreHealth);
+                }
+                var shader=Resources.Load<Shader>("UnitShieldSurface");Check(shader!=null&&shader.isSupported&&!ShaderUtil.ShaderHasError(shader),"Surface shader failed");
+                Debug.Log($"SHIELD_SURFACE_PLAY_PASS catalog={entries.arraySize}, shared mesh/bones, original materials preserved, no shield particle plane, pause, expiry, death cleanup, directional hit and shader compilation");
+                SessionState.SetBool(Key,false);EditorApplication.Exit(0);
+            }
+        }
+        catch(Exception e){Debug.LogException(e);SessionState.SetBool(Key,false);EditorApplication.Exit(1);}
+    }
+    static void Capture(string name)
+    {
+        var canvas=((RectTransform)Field(hud,"markers")).GetComponentInParent<Canvas>().rootCanvas;
+        var mode=canvas.renderMode;var oldCamera=canvas.worldCamera;float distance=canvas.planeDistance;int order=canvas.sortingOrder;
+        int width=Screen.width*2,height=Screen.height*2;var rt=new RenderTexture(width,height,24);var previous=camera.targetTexture;var active=RenderTexture.active;
+        camera.targetTexture=rt;canvas.renderMode=RenderMode.ScreenSpaceCamera;canvas.worldCamera=camera;canvas.planeDistance=1;canvas.sortingOrder=300;Canvas.ForceUpdateCanvases();camera.Render();RenderTexture.active=rt;
+        var texture=new Texture2D(width,height,TextureFormat.RGB24,false);texture.ReadPixels(new Rect(0,0,width,height),0,0);texture.Apply();File.WriteAllBytes(Path.Combine(Folder,name),texture.EncodeToPNG());
+        canvas.renderMode=mode;canvas.worldCamera=oldCamera;canvas.planeDistance=distance;canvas.sortingOrder=order;camera.targetTexture=previous;RenderTexture.active=active;
+        Object.Destroy(texture);rt.Release();Object.Destroy(rt);Canvas.ForceUpdateCanvases();
+    }
+}

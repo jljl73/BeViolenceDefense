@@ -76,6 +76,23 @@ public sealed class LeftCoreHud : MonoBehaviour
     private bool bubbleShown;
     private MotionHandle bubblePop, bubbleFade;
 
+    internal void PlaceShieldGlow(CoreShieldGlow shieldGlow)
+    {
+        RectTransform glow = shieldGlow.rectTransform;
+        // 체력 타일의 사각 받침이 둥근 빛을 가리지 않도록 채움과 잔상 바로 위에 그린다.
+        int gaugeIndex = fillClip.GetSiblingIndex();
+        if (trailClip != null && trailClip.parent == fillClip.parent)
+            gaugeIndex = Mathf.Max(gaugeIndex, trailClip.GetSiblingIndex());
+        glow.SetParent(fillClip.parent, false);
+        glow.SetSiblingIndex(gaugeIndex + 1);
+        glow.anchorMin = fillClip.anchorMin;
+        glow.anchorMax = fillClip.anchorMax;
+        glow.pivot = fillClip.pivot;
+        glow.anchoredPosition = fillClip.anchoredPosition;
+        glow.sizeDelta = new Vector2(clipWidth, fillClip.sizeDelta.y);
+        shieldGlow.UseGaugeArt(fillTiles);
+    }
+
     private void Awake()
     {
         if (body != null)

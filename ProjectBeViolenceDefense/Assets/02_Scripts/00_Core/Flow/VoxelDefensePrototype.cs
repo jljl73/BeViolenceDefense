@@ -81,6 +81,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private DefenseBattle.Spell? aimedSpell;
     private float aimedRangeScroll;
     private int battleSpeed = 1;
+    // 한 진영만 남아 자동 빨리감기 중인지. 들어갈 때 한 번 알린다.
+    private bool fastForwarding;
     private bool buildMode;
     private BuildModeHud.Tool buildTool;
     private bool trackingRightButton;
@@ -89,6 +91,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private Vector2? rightClickPointer;
     private StageData usedStage;
     private int fallenEnemies;
+    private int leakedEnemies;
 
     private int SpellRangeStep => Mathf.RoundToInt(aimedRangeScroll);
 
@@ -156,7 +159,9 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         battle.EnemyRemoved += enemy => view.RemoveEnemy(enemy, battle.CoreHealth);
         battle.EnemyRemoved += enemy =>
         {
-            if (!enemy.ReachedCore)
+            if (enemy.ReachedCore)
+                leakedEnemies++;
+            else
                 fallenEnemies++;
         };
         if (victoryPanelHud != null)
@@ -165,7 +170,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         spellUnlocks = new StageSpellUnlocks();
         hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions, spellUnlocks);
         if (leftCoreHud != null)
-            hud.UseExternalCorePanel(new Vector2(320, -236));
+            hud.UseExternalCorePanel(leftCoreHud, new Vector2(320, -236));
         if (manaBarHud != null)
             hud.UseExternalManaBar((RectTransform)manaBarHud.transform, new Vector2(33, hudArt.SlotFrame != null ? -146 : -130));
         if (buildModeHud != null)
@@ -304,7 +309,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             ResetRightButton();
         }
 
-        battleClock.BeginFrame(Time.deltaTime, battleSpeed, aimedSpell.HasValue);
+        // 한 진영만 남으면 더는 교전이 없다. 남은 유닛이 코어까지 걷는 동안 자동으로 빨리 감는다.
+        // 배속은 틱이 도는 속도만 바꾸므로 전투 결과는 같다. 조준 슬로우가 우선한다.
+        bool onlyOneSide = battle.OnlyOneSideRemains;
+        if (onlyOneSide && !fastForwarding)
+            hud.Notify(GameText.Get("notice.fast_forward"));
+        fastForwarding = onlyOneSide;
+        battleClock.BeginFrame(Time.deltaTime, PlaybackSpeed, aimedSpell.HasValue);
         switch (battle.CurrentPhase)
         {
             case DefenseBattle.Phase.Preparation:
@@ -344,7 +355,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                     {
                         int coreMax = DefenseBattle.CoreMaxHealth;
                         defeatPanel.Show(usedStage != null ? GameText.Get(usedStage.displayNameKey) : null, battle.CoreHealth,
-                            coreMax, coreMax - battle.CoreHealth, fallenEnemies);
+                            coreMax, leakedEnemies, fallenEnemies);
                     }
                     else
                     {
@@ -371,8 +382,11 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         }
         int coreMax = DefenseBattle.CoreMaxHealth;
         victoryPanelHud.Show(usedStage != null ? GameText.Get(usedStage.displayNameKey) : null, battle.CoreHealth, coreMax,
-            coreMax - battle.CoreHealth, fallenEnemies);
+            leakedEnemies, fallenEnemies);
     }
+
+    // 지금 전투가 도는 배속. 고른 배속과 자동 빨리감기 중 빠른 쪽.
+    private int PlaybackSpeed => fastForwarding ? Mathf.Max(battleSpeed, BattleClock.FastForwardSpeed) : battleSpeed;
 
     private void SetBattleSpeed(int speed)
     {
@@ -822,6 +836,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             _ => 0f
         });
         view.AdvanceEffects(battleClock.DeltaTime);
+        view.SyncCoreShield(battle.HasCoreShield);
         UpdateSpawnForecast();
         view.AdvanceCoreAnimation(battleClock.DeltaTime, battleClock.PlaybackSpeed);
         Vector3? spellCenter = aimedSpell.HasValue && TryPickAreaSpellCenter(Mouse.current, out Vector3 center)
@@ -859,7 +874,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             bool inCombat = battle.CurrentPhase == DefenseBattle.Phase.Combat;
             bool canCallWave = !ui.HasOpenPopup && battle.CurrentPhase == DefenseBattle.Phase.Preparation;
             battleInfoHud.Refresh(battle.Round, inCombat, canCallWave, left, right, Slot(leftSide).Color,
-                Slot(rightSide).Color, battleSpeed);
+                Slot(rightSide).Color, battleSpeed, PlaybackSpeed);
         }
     }
 

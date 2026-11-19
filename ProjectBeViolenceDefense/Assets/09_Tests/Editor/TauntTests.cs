@@ -71,10 +71,9 @@ public sealed class TauntTests
     }
 
     [Test]
-    public void TauntReachesThroughAWallAndTheUnitWalksAroundIt()
+    public void TauntReachesThroughAWallAndTheUnitWalksAShortWayRoundIt()
     {
-        var wall = Enumerable.Range(0, 11).Select(x => new Vector2Int(x, 7)).ToArray();
-        DefenseGrid grid = OpenGrid(wall);
+        DefenseGrid grid = OpenGrid(new Vector2Int(4, 7));
         EnemyUnit pulled = Unit(0, 0, 4, 5);
         EnemyUnit taunter = Unit(1, 1, 4, 9);
         Assert.That(grid.HasLineOfSight(pulled.Position, taunter.Position), Is.False, "The wall must hide the taunter.");
@@ -86,13 +85,34 @@ public sealed class TauntTests
         taunter.ApplyTaunt(DefenseBattle.TauntDuration);
         pulled.ApplyTauntedBy(taunter, DefenseBattle.TauntDuration);
         bool reached = false;
-        for (int tick = 0; tick < 1800 && !reached; tick++)
+        for (int tick = 0; tick < 600 && !reached; tick++)
         {
             StepApproach(combat, pulled, tick);
             reached = combat.CanAttack(pulled, taunter);
         }
         Assert.That(reached, Is.True, "The taunted unit must find the way around the wall and start attacking.");
         Assert.That(grid.IsWalkable(DefenseGrid.PositionToCell(pulled.Position)), Is.True);
+    }
+
+    // 도발도 우회 한도를 따른다. 긴 벽을 끝까지 돌아야 닿는 도발 유닛에게는 끌려가지 않는다.
+    [Test]
+    public void TauntDoesNotMakeAUnitWalkAllTheWayRoundALongWall()
+    {
+        var wall = Enumerable.Range(0, 11).Select(x => new Vector2Int(x, 7)).ToArray();
+        DefenseGrid grid = OpenGrid(wall);
+        EnemyUnit pulled = Unit(0, 0, 4, 5);
+        EnemyUnit taunter = Unit(1, 1, 4, 9);
+        var combat = new CombatPositioning(grid, new[] { pulled, taunter });
+        taunter.ApplyTaunt(DefenseBattle.TauntDuration);
+        pulled.ApplyTauntedBy(taunter, DefenseBattle.TauntDuration);
+        Vector3 start = pulled.Position;
+        for (int tick = 0; tick < 300; tick++)
+        {
+            StepApproach(combat, pulled, tick);
+            Assert.That(Vector3.Distance(pulled.Position, start), Is.LessThan(1f), $"tick {tick}");
+        }
+        Assert.That(pulled.Target ?? pulled.CombatQueue?.Target, Is.Null);
+        Assert.That(combat.CanAttack(pulled, taunter), Is.False);
     }
 
     [Test]

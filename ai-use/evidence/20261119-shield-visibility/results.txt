@@ -1,0 +1,4 @@
+Unity 6000.3.28f1 CLI; exit code 0.
+SHIELD_SURFACE_PLAY_PASS catalog=20, shared mesh/bones, original materials preserved, no shield particle plane, pause, expiry, death cleanup, directional hit and shader compilation
+Runner: ../20261119-shield-surface/ShieldSurfaceValidation.cs.txt (capture directory changed).
+UnityEditor.Search.SearchDatabase startup exception observed.

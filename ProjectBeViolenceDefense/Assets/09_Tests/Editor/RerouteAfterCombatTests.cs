@@ -46,13 +46,12 @@ public sealed class RerouteAfterCombatTests
             battle.Tick(DefenseBattle.TickDuration, false);
         Assert.That(survivor.Target, Is.SameAs(target), "The fixture must start with the survivor fighting.");
 
-        int coreHealth = battle.CoreHealth;
         target.Die();
         bool reached = false;
         for (int tick = 0; tick < 3000 && !reached; tick++)
         {
             battle.Tick(DefenseBattle.TickDuration, false);
-            reached = battle.CoreHealth < coreHealth;
+            reached = survivor.ReachedCore;
             if (reached)
                 break;
             Assert.That(survivor.Position.x, Is.GreaterThan(8.5f),

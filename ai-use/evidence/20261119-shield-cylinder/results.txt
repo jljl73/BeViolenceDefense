@@ -1,0 +1,7 @@
+Unity 6000.3.28f1 / macOS Metal / CLI Play Mode / process exit 0
+SHIELD_CYLINDER_PLAY_PASS catalog=20, shared cylinder mesh, size margin, movement and giant scaling, original materials preserved, no shield particle plane, pause, expiry, death cleanup, directional hit and shader compilation
+C# compile errors: 0; Shield shader supported, ShaderUtil errors: 0
+Observed editor startup issue: UnityEditor.Search.SearchDatabase ArgumentOutOfRangeException (validation proceeded and passed).
+Intermediate test harness correction: taunt enables its own particle billboard; shield-only assertion now excludes taunt.
+Final capture rerun: process exit 0; same 20 catalog checks passed. Foreground Falling Leaves disabled only in validation clone for readable close-up.
+Final clean capture: process exit 0; same 20 catalog checks passed. Route arrows also hidden in validation scene; original game unchanged.

@@ -1,0 +1,142 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using TMPro;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
+using Object=UnityEngine.Object;
+
+[InitializeOnLoad]
+public static class UnitStatusValidation
+{
+    const string Key="UnitStatusValidation.Run";
+    const string Folder="/tmp/unit-status-captures";
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static DefenseGrid grid;
+    static DefenseBoardView view;
+    static DefenseHud hud;
+    static Camera camera;
+    static EnemyUnit[] units;
+    static int phase, frame;
+    static double started;
+    static object Field(object owner,string name)=>owner.GetType().GetField(name,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).GetValue(owner);
+    static IDictionary Markers=>(IDictionary)Field(hud,"healthMarkers");
+    static IDictionary Views=>(IDictionary)Field(view,"enemyViews");
+    static void Check(bool value,string message){if(!value)throw new Exception(message);}
+    static UnitStatusValidation(){EditorApplication.update+=Update;}
+    public static void Run(){EditorSceneManager.OpenScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");Directory.CreateDirectory(Folder);SessionState.SetBool(Key,true);EditorApplication.EnterPlaymode();}
+    static void Refresh(float dt)
+    {
+        foreach(var unit in units){unit.TickTimers(dt);view.SyncEnemy(unit,dt,0f);}
+        view.AdvanceEffects(dt);
+        hud.Refresh(battle,grid,view,null,null,0,1);
+        Canvas.ForceUpdateCanvases();
+    }
+    static void Update()
+    {
+        if(!SessionState.GetBool(Key,false)||!EditorApplication.isPlaying||EditorApplication.isCompiling)return;
+        try
+        {
+            if(started==0)started=EditorApplication.timeSinceStartup;
+            Check(EditorApplication.timeSinceStartup-started<180,"Status validation timeout");
+            if(phase==0)
+            {
+                var selection=Object.FindFirstObjectByType<StageSelectionController>();if(selection==null)return;
+                if(selection.CurrentStage==null){var ui=Object.FindFirstObjectByType<UIManager>();if(ui!=null&&ui.HasOpenPopup)selection.SelectStage(1);return;}
+                var transition=Object.FindFirstObjectByType<StageTransition>(); if(transition!=null&&transition.IsPlaying)return;
+                game=Object.FindFirstObjectByType<VoxelDefensePrototype>();battle=(DefenseBattle)Field(game,"battle");if(battle==null)return;
+                game.enabled=false;grid=(DefenseGrid)Field(game,"grid");view=(DefenseBoardView)Field(game,"view");hud=(DefenseHud)Field(game,"hud");camera=(Camera)Field(game,"boardCamera");
+                battle.StartRound();
+                var catalog=(EnemyCatalog)Field(game,"enemyCatalog");
+                Vector3 place=new(8,0,10);float best=float.PositiveInfinity;
+                for(int z=2;z<grid.Depth-3;z++)for(int x=2;x<grid.Width-3;x++)
+                {
+                    bool open=true;for(int dx=0;dx<2;dx++)for(int dz=0;dz<2;dz++)open&=grid.IsWalkable(new Vector2Int(x+dx,z+dz));
+                    float score=(new Vector2(x,z)-new Vector2(8,10)).sqrMagnitude;
+                    if(open&&score<best){best=score;place=new Vector3(x+.5f,0,z+.5f);}
+                }
+                var offsets=new[]{new Vector3(-.55f,0,-.3f),new Vector3(.55f,0,-.3f),new Vector3(0,0,.6f)};
+                units=new EnemyUnit[3];
+                for(int i=0;i<3;i++)
+                {
+                    Vector3 pos=view.ToWorld(place+offsets[i]);
+                    units[i]=new EnemyUnit(catalog.GetUnit("zombie",i==1?UIPalette.MoveSpeed:UIPalette.Attack,"status validation"),i%2,new[]{pos,pos+Vector3.forward},100+i);
+                    ((List<EnemyUnit>)battle.Enemies).Add(units[i]);view.AddEnemy(units[i]);
+                }
+                units[0].QueueDamage(20);units[0].ResolveDamage();
+                units[1].QueueDamage(units[1].MaxHealth*4/5);units[1].ResolveDamage();
+                units[0].Heal(1);units[0].ApplyAttackBuff(6);units[0].ApplyAttackBuff(5);units[0].ApplyAttackBuff(4);units[0].ApplyMoveSpeedBuff(6);
+                units[1].ApplyArmorBuff(6);units[2].ApplyTaunt(5);
+                camera.orthographicSize=2.6f;camera.transform.position=game.transform.TransformPoint(place+Vector3.up*.5f)-camera.transform.forward*18;
+                Refresh(.25f);
+                Check(Markers.Count==3,"Buffed full-health unit did not receive a bar");
+                foreach(var unit in units)
+                {
+                    var marker=(UnitStatusMarker)Markers[unit];
+                    Check(((Image)Field(marker,"fill")).rectTransform.sizeDelta.y==8,"Health bar height incorrect");
+                    foreach(var graphic in marker.Root.GetComponentsInChildren<Graphic>(true))Check(!graphic.raycastTarget,"Status marker blocks input");
+                    foreach(var count in marker.Root.GetComponentsInChildren<TextMeshProUGUI>(true))Check(count.fontSize==8,"Stack count too large");
+                    Check(Field(Views[unit],"BuffAura")!=null,"Persistent aura missing");
+                }
+                var aura=Field(Views[units[0]],"BuffAura");float age=(float)Field(aura,"phase");Refresh(0);Check((float)Field(aura,"phase")==age,"Pause advanced aura");
+                Check(((Image)Field((UnitStatusMarker)Markers[units[1]],"border")).color!=UIPalette.Background,"No critical health border");
+                Capture("initial.png");phase=1;return;
+            }
+            if(phase==1)
+            {
+                if(frame==8){units[0].QueueDamage(20);units[0].ResolveDamage();}
+                Refresh(1f/30f);
+                if(frame==8)
+                {
+                    var marker=(UnitStatusMarker)Markers[units[0]];
+                    Check((float)Field(marker,"trailing")>(float)units[0].Health/units[0].MaxHealth,"No damage trail");
+                }
+                Capture($"frame-{frame:D2}.png");
+                if(++frame<30)return;
+                // Overlapping units must not pile up icons or stack numbers on their bodies.
+                units[1].MoveOffRoute(units[0].Position);Refresh(0);
+                var first=(UnitStatusMarker)Markers[units[0]];var second=(UnitStatusMarker)Markers[units[1]];
+                Check(!first.BuffRow.gameObject.activeSelf&&!second.BuffRow.gameObject.activeSelf,"Crowded buff rows were not suppressed");
+                Capture("crowded.png");
+                units[1].MoveOffRoute(units[1].Position+grid.CellSize*Vector3.right);
+                units[0].ApplyArmorBuff(6);units[0].ApplyTaunt(5);Refresh(.25f);
+                var combo=(UnitStatusMarker)Markers[units[0]];
+                Check(combo.HasBuffs,"Combined buff row missing");
+                // Combined-state lifecycle is checked here; visual capture uses stable animated frames above.
+                foreach(var unit in units)unit.TickTimers(8);
+                Refresh(.3f);
+                foreach(var unit in units)
+                {
+                    var aura=Field(Views[unit],"BuffAura");
+                    Check(!((MeshRenderer)Field(aura,"renderer")).enabled,"Expired aura stayed visible");
+                    if(Markers.Contains(unit))Check(!((UnitStatusMarker)Markers[unit]).BuffRow.gameObject.activeSelf,"Expired icon remained");
+                }
+                var shader=Resources.Load<Shader>("UnitBuffAura");Check(shader!=null&&shader.isSupported&&!ShaderUtil.ShaderHasError(shader),"Aura shader failed");
+                units[0].ApplyArmorBuff(6);Refresh(.1f);units[0].Die();view.RemoveEnemy(units[0],battle.CoreHealth);
+                ((List<EnemyUnit>)battle.Enemies).Remove(units[0]);hud.Refresh(battle,grid,view,null,null,0,1);
+                Check(!Markers.Contains(units[0]),"Dead unit marker leaked");
+                Debug.Log("UNIT_STATUS_PLAY_PASS 48x8 health, damage trail, critical border, tiny nonblocking icons/stacks, full-health buff visibility, aura pause/expiry, crowd suppression, death cleanup, shader compilation");
+                SessionState.SetBool(Key,false);EditorApplication.Exit(0);
+            }
+        }
+        catch(Exception e){Debug.LogException(e);SessionState.SetBool(Key,false);EditorApplication.Exit(1);}
+    }
+    static void Capture(string name)
+    {
+        int width=Screen.width*2,height=Screen.height*2;
+        var canvas=((RectTransform)Field(hud,"markers")).GetComponentInParent<Canvas>().rootCanvas;
+        var oldMode=canvas.renderMode;var oldCamera=canvas.worldCamera;float distance=canvas.planeDistance;int order=canvas.sortingOrder;
+        var rt=new RenderTexture(width,height,24);var previous=camera.targetTexture;var active=RenderTexture.active;
+        camera.targetTexture=rt;canvas.renderMode=RenderMode.ScreenSpaceCamera;canvas.worldCamera=camera;canvas.planeDistance=1;canvas.sortingOrder=300;
+        Canvas.ForceUpdateCanvases();camera.Render();RenderTexture.active=rt;
+        var texture=new Texture2D(width,height,TextureFormat.RGB24,false);texture.ReadPixels(new Rect(0,0,width,height),0,0);texture.Apply();
+        File.WriteAllBytes(Path.Combine(Folder,name),texture.EncodeToPNG());
+        canvas.renderMode=oldMode;canvas.worldCamera=oldCamera;canvas.planeDistance=distance;canvas.sortingOrder=order;camera.targetTexture=previous;RenderTexture.active=active;
+        Object.Destroy(texture);rt.Release();Object.Destroy(rt);Canvas.ForceUpdateCanvases();
+    }
+}
