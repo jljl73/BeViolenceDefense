@@ -12724,9 +12724,9 @@ MonoBehaviour:
     corePlatformPrefab: {fileID: 2181583076233016362, guid: 12c81491b31c8bc40b7f621d4e4b674e, type: 3}
     corePlatformScale: 1
     corePlatformTop: 0.36
-    tileGap: 0.05
-    tileBevel: 0.04
-    tileTexture: {fileID: 2800000, guid: e76d130c89cdce2468b48b54e5b1614c, type: 3}
+    tileGap: 0.025
+    tileBevel: 0.018
+    tileTexture: {fileID: 2800000, guid: bd07e901226e40e8aeecabe89ac0f41a, type: 3}
     borderWidth: 0.3
     border: {r: 0.47843137, g: 0.41960785, b: 0.3529412, a: 1}
   boardCamera: {fileID: 5574416741067408975}
