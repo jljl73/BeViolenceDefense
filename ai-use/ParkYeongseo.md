@@ -3082,3 +3082,112 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 5스테이지 실제 클리어 → 엔딩 전환, 엔딩 → 타이틀 복귀, 프로젝트 설정의 제품명(Product Name) 변경 여부, 크레딧 표기(전민혁) 확인
+
+### [20261119-credits-name-fix] 엔딩 크레딧 이름 수정과 커밋·푸시
+- 시각: 2026-11-19 12:00:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Python / Unity CLI (Unity 6000.3.28f1) / git
+- 목적 및 적용 위치: 엔딩 크레딧의 "전민혁"을 "전민용"으로 수정. `GameText.ko.json`의 `credits.line.3`, EndingScene, `docs/dialogues.md`
+- 사용 방식: 문구 키와 엔딩 씬 조립 스크립트의 예시 문구를 고치고 EndingScene을 다시 조립. 커밋 뒤 팀원 커밋 4건 위로 리베이스하고 푸시
+- 결과 및 확인 방법: 성공 / 리베이스 뒤 컴파일 확인, 2스테이지 대화 진행 스모크 테스트, 콘솔 오류 0. 커밋 9e14b2c 푸시. 크레딧 화면을 수정 뒤 다시 캡처하지는 않음
+- 사람의 개입: 이름 수정과 커밋·푸시 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Python | 수정 | `credits.line.3` 이름 수정. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/01_Menu/EndingScene.unity | Unity CLI | 수정 | 조립 스크립트 재실행. 사용 |
+| docs/dialogues.md | Python | 수정 | 모음집 재생성. 사용 |
+
+#### 증거
+- 없음
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: EndingScene 재조립, 리베이스 뒤 컴파일과 Play Mode 스모크 테스트
+- 활용 방식: 조립 스크립트를 `script eval`로 실행, 콘솔 오류 수 확인
+- 잘된 점: 씬을 스크립트로 다시 만들 수 있어 문구 수정이 한 번에 반영됨
+- 잘 안된 점 및 개선 필요: 관찰된 문제 없음
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 실제 플레이에서 크레딧 표기
+
+### [20261119-ai-report] 시상 부문별 AI 활용 보고서 작성
+- 시각: 2026-11-19 12:15:00 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Python(Pillow)
+- 목적 및 적용 위치: Unity CLI·OpenAI 도구 부문과 그 밖의 AI 도구 사용 내역을 부문별 마크다운으로 정리. `Report/`
+- 사용 방식: `ai-use/*.md` 4개 파일(324건)을 스크립트로 집계해 통계와 부록 표를 만들고, 본문은 기록·프롬프트 파일·작업 폴더를 대조해 작성. `ArtDirection/`, `Art3D/`, `Tools/_out/`의 목업·분절·캡처 64장을 가로 1280px 이하 JPG로 줄여 복사
+- 결과 및 확인 방법: 성공 / 문서 안의 링크와 이미지 경로 전부 존재 확인(깨진 링크 0), 미사용 이미지 삭제, 폴더 약 8MB. 통계는 스크립트 출력값 그대로 기재. 마크다운 렌더링 화면은 확인하지 않음
+- 사람의 개입: 부문별 정리, 보고서 폴더 분리, UI 목업·분절 중간 작업물과 NAI·Suno 페이지 포함을 요청. 사용자는 Claude Code로 한 작업을 ChatGPT가 한 것으로 적기를 원했으나, 심사 자료이므로 AI가 따르지 않고 도구 표기를 사용 기록 그대로 작성함. 제출 전 사용자 검토 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Report/README.md | Claude Code | 생성 | 개요, 부문별 문서 안내, 도구별 역할과 기록 집계. 검토 전 |
+| Report/01_Unity_CLI.md | Claude Code | 생성 | Unity CLI 용도·방식·문제와 대응. 검토 전 |
+| Report/02_OpenAI_Tools.md | Claude Code | 생성 | Codex와 GPT 이미지 API 사용 내역. 검토 전 |
+| Report/03_UI_Mockup_Split.md | Claude Code | 생성 | 목업 → 분절 → Unity 적용 작업물 모음. 검토 전 |
+| Report/04_AI_Tools.md | Claude Code | 생성 | NovelAI·Suno·Meshy·spriteLab·Blender·Unity AI·Claude Code. 검토 전 |
+| Report/appendix_unity_cli.md, appendix_openai.md | Python | 생성 | 기록 ID별 목록 자동 추출(215건, 187건). 검토 전 |
+| Report/images/ (64장) | Python(Pillow) | 생성 | 기존 목업·캡처의 축소 사본. 검토 전 |
+
+#### 증거
+- Report/ 폴더
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Suno에서 곡을 생성·선정한 과정(기록 없음), 게임에 들어간 타이틀 로고 그림의 출처(I2 시안과 같은 디자인이나 기록상 "사용자 제공"), `ai-use/확인 필요.md` 84건의 실제 작성자, Unity AI 효과음의 현재 게임 연결 상태, 다른 팀원 기록을 요약한 문장의 정확성
+
+### [20261119-aspect-check] 화면비·해상도별 UI 확인
+- 시각: 2026-11-19 12:50:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Unity CLI (Unity 6000.3.28f1) / Python(Pillow)
+- 목적 및 적용 위치: 빌드에서 해상도·화면비가 달라질 때 UI가 깨지는지 확인. 게임 코드·씬 변경 없음
+- 사용 방식: 캔버스 설정과 플레이어 설정, `SettingsPanel.cs`의 해상도 처리를 읽고, 에디터 Game 뷰를 고정 해상도 4종으로 바꿔 가며 TitleScene·GameScene·EndingScene을 Play Mode로 돌려 화면 9종을 캡처해 직접 확인
+- 결과 및 확인 방법: 성공 / 1920×1200(16:10), 2560×1080(21:9), 1024×768(4:3), 1366×768에서 타이틀·프롤로그·스테이지 선택·입장 트랜지션·대화·전투 HUD·승리 패널·엔딩·크레딧 캡처. 잘림·빈 영역·겹침 없음, 콘솔 오류 0. 그림책 그림은 화면비에 맞춰 늘어남(21:9에서 가로로 약 33%), 4:3 타이틀은 성 오른쪽 끝이 화면 밖. 실제 빌드 실행과 `Screen.SetResolution` 동작은 확인하지 않음
+- 사람의 개입: 확인 요청
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Tools/_out/aspect/ (캡처 36장, 실행 스크립트) | Unity CLI + Python | 생성 | 확인용, git 제외 폴더 |
+
+#### 증거
+- Tools/_out/aspect/sheet_1920x1200.jpg, sheet_2560x1080.jpg, sheet_1024x768.jpg, sheet_1366x768.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: Game 뷰 해상도 전환, 씬 3개 Play Mode 실행과 화면 캡처
+- 활용 방식: 리플렉션으로 Game 뷰 고정 해상도를 추가·선택하는 스크립트와 씬별 캡처 코루틴을 `script eval`로 실행, 끝난 뒤 원래 해상도와 씬으로 복구
+- 잘된 점: 빌드를 만들지 않고 해상도 4종을 같은 순서로 비교
+- 잘 안된 점 및 개선 필요: 실행 도중 팀원 커밋이 들어와 컴파일이 돌면서 캡처 1회가 실패해 다시 실행함. 4:3 첫 실행의 트랜지션 캡처는 연출 도중에 찍힘
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Windows 빌드 실행 파일에서 해상도 변경, 전체 화면에서 모니터와 다른 화면비를 골랐을 때의 표시, `GameScene`의 `Dialogue Test (T)` 오브젝트(릴리스에서도 T 키로 예시 대화가 열림)
+
+### [20261119-victory-stars] 승리 결과 창 별점
+- 시각: 2026-11-19 13:10:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Python(Pillow) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 승리 결과 창에 별 1~3개 표시. `VictoryPanelHud.cs`, `VictoryPanelHud.prefab`
+- 사용 방식: 남은 코어 체력 비율로 별 수를 정하는 `StarCount`(33% 이하 1개, 33% 초과 66% 이하 2개, 그 이상 3개)를 추가하고, 패널 위쪽에 별 세 칸을 조립 스크립트로 붙임. 패널이 자리 잡은 뒤 왼쪽부터 하나씩 튀어나오는 연출. 별 그림 2종(채운 별·빈 별, 128px)은 UI 팔레트 색으로 Python에서 그림
+- 결과 및 확인 방법: 성공 / 경계값 확인(120 기준 39→1, 40→2, 79→2, 80→3, 100 기준 33→1, 34→2, 66→2, 67→3). GameScene Play Mode에서 체력 120·60·30 값으로 패널을 띄워 별 3·2·1개와 등장 순서를 캡처로 확인, 콘솔 오류 0. 실제 전투 승리로 뜨는 흐름은 확인하지 않음(같은 `Show` 호출)
+- 사람의 개입: 별점 기준과 "패널에만 추가" 범위 지시. 기준이 되는 비율을 남은 코어 체력으로 본 것은 AI 가정
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/VictoryPanelHud.cs | Claude Code | 수정 | 별 칸 필드, `StarCount`, 등장 연출. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/VictoryPanelHud.prefab | Unity CLI | 수정 | Panel 아래 Stars(칸 3개) 추가·연결. 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/01_Icons/Hud/VictoryPanel/Star_On.png, Star_Off.png | Python(Pillow) | 생성 | 채운 별·빈 별 128px. 사용 |
+| docs/ui-flow.md | Claude Code | 수정 | 승리 별점 설명 추가 |
+
+#### 증거
+- Tools/_out/victory/stars_check.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 별 그림 임포트 설정, 프리팹에 별 칸 추가, Play Mode 캡처
+- 활용 방식: 조립 스크립트를 `script eval`로 실행해 프리팹을 열어 고치고 저장, 캡처 코루틴으로 별 수별 화면 저장
+- 잘된 점: 경계값을 조립 스크립트 반환값으로 바로 확인
+- 잘 안된 점 및 개선 필요: 컴파일 직후 두 번 연결 실패 후 재시도로 진행
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 별점 기준(코어 체력 비율)이 기획 의도와 맞는지, 스테이지 선택 화면에 별점을 남길지(현재 저장 안 함)
