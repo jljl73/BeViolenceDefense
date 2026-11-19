@@ -38,6 +38,9 @@ public sealed class StageSelectionPopup : MonoBehaviour
     }
 
     [SerializeField] private TextMeshProUGUI title;
+    [Tooltip("선택. 상단 바의 환경설정 버튼과 창")]
+    [SerializeField] private Button settingsButton;
+    [SerializeField] private SettingsPanel settingsPanel;
     [SerializeField] private Card[] cards = Array.Empty<Card>();
     [SerializeField] private Texture2D[] thumbnails = Array.Empty<Texture2D>();
     [SerializeField] private Sprite checkIcon;
@@ -73,6 +76,14 @@ public sealed class StageSelectionPopup : MonoBehaviour
         this.stages = stages;
         this.select = select;
         title.text = GameText.Get("stage_select.title");
+        if (settingsButton != null && settingsPanel != null)
+        {
+            settingsButton.onClick.RemoveAllListeners();
+            settingsButton.onClick.AddListener(settingsPanel.Open);
+            var settingsLabel = settingsButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (settingsLabel != null)
+                settingsLabel.text = GameText.Get("settings.button");
+        }
         speaker.text = GameText.Get("stage_select.speaker");
         cardHome = new Vector2[cards.Length];
         for (int i = 0; i < cards.Length; i++)

@@ -1,0 +1,253 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 408019b806a43514d838c2be27a56931, type: 3}
+  m_Name: StageDialogues
+  m_EditorClassIdentifier: Assembly-CSharp::StageDialogueSet
+  stages:
+  - intro:
+    - speakerKey: speaker.dark_elf
+      expression: 0
+      textKey: dialogue.stage1.intro.1
+      portrait: {fileID: 2800000, guid: 9a1351595da284f4585a1c2c2162a052, type: 3}
+    - speakerKey: speaker.noah
+      expression: 4
+      textKey: dialogue.stage1.intro.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.dark_elf
+      expression: 0
+      textKey: dialogue.stage1.intro.3
+      portrait: {fileID: 2800000, guid: 9a1351595da284f4585a1c2c2162a052, type: 3}
+    - speakerKey: speaker.noah
+      expression: 5
+      textKey: dialogue.stage1.intro.4
+      portrait: {fileID: 0}
+    - speakerKey: speaker.noah
+      expression: 2
+      textKey: dialogue.stage1.intro.5
+      portrait: {fileID: 0}
+    outro:
+    - speakerKey: speaker.dark_elf
+      expression: 0
+      textKey: dialogue.stage1.outro.1
+      portrait: {fileID: 2800000, guid: 303e8e4c71179ee49b6cb5be774a4600, type: 3}
+    - speakerKey: speaker.noah
+      expression: 1
+      textKey: dialogue.stage1.outro.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.dark_elf
+      expression: 0
+      textKey: dialogue.stage1.outro.3
+      portrait: {fileID: 2800000, guid: 303e8e4c71179ee49b6cb5be774a4600, type: 3}
+    - speakerKey: speaker.dark_elf
+      expression: 0
+      textKey: dialogue.stage1.outro.4
+      portrait: {fileID: 2800000, guid: 303e8e4c71179ee49b6cb5be774a4600, type: 3}
+    - speakerKey: speaker.noah
+      expression: 4
+      textKey: dialogue.stage1.outro.5
+      portrait: {fileID: 0}
+  - intro:
+    - speakerKey: speaker.lich
+      expression: 0
+      textKey: dialogue.stage2.intro.1
+      portrait: {fileID: 2800000, guid: 7a6c39f9be5bb96459dcc538e8fc6274, type: 3}
+    - speakerKey: speaker.noah
+      expression: 7
+      textKey: dialogue.stage2.intro.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.lich
+      expression: 0
+      textKey: dialogue.stage2.intro.3
+      portrait: {fileID: 2800000, guid: 7a6c39f9be5bb96459dcc538e8fc6274, type: 3}
+    - speakerKey: speaker.lich
+      expression: 0
+      textKey: dialogue.stage2.intro.4
+      portrait: {fileID: 2800000, guid: 7a6c39f9be5bb96459dcc538e8fc6274, type: 3}
+    - speakerKey: speaker.noah
+      expression: 5
+      textKey: dialogue.stage2.intro.5
+      portrait: {fileID: 0}
+    - speakerKey: speaker.lich
+      expression: 0
+      textKey: dialogue.stage2.intro.6
+      portrait: {fileID: 2800000, guid: 7a6c39f9be5bb96459dcc538e8fc6274, type: 3}
+    outro:
+    - speakerKey: speaker.lich
+      expression: 0
+      textKey: dialogue.stage2.outro.1
+      portrait: {fileID: 2800000, guid: bbb836cf07d03134e9cb72276e1792e2, type: 3}
+    - speakerKey: speaker.noah
+      expression: 0
+      textKey: dialogue.stage2.outro.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.lich
+      expression: 0
+      textKey: dialogue.stage2.outro.3
+      portrait: {fileID: 2800000, guid: bbb836cf07d03134e9cb72276e1792e2, type: 3}
+    - speakerKey: speaker.lich
+      expression: 0
+      textKey: dialogue.stage2.outro.4
+      portrait: {fileID: 2800000, guid: bbb836cf07d03134e9cb72276e1792e2, type: 3}
+    - speakerKey: speaker.noah
+      expression: 3
+      textKey: dialogue.stage2.outro.5
+      portrait: {fileID: 0}
+  - intro:
+    - speakerKey: speaker.wolf_girl
+      expression: 0
+      textKey: dialogue.stage3.intro.1
+      portrait: {fileID: 2800000, guid: d9f19b9c63f481c4683c22f40e6e5952, type: 3}
+    - speakerKey: speaker.noah
+      expression: 0
+      textKey: dialogue.stage3.intro.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.wolf_girl
+      expression: 0
+      textKey: dialogue.stage3.intro.3
+      portrait: {fileID: 2800000, guid: d9f19b9c63f481c4683c22f40e6e5952, type: 3}
+    - speakerKey: speaker.noah
+      expression: 4
+      textKey: dialogue.stage3.intro.4
+      portrait: {fileID: 0}
+    - speakerKey: speaker.wolf_girl
+      expression: 0
+      textKey: dialogue.stage3.intro.5
+      portrait: {fileID: 2800000, guid: d9f19b9c63f481c4683c22f40e6e5952, type: 3}
+    - speakerKey: speaker.noah
+      expression: 3
+      textKey: dialogue.stage3.intro.6
+      portrait: {fileID: 0}
+    outro:
+    - speakerKey: speaker.wolf_girl
+      expression: 0
+      textKey: dialogue.stage3.outro.1
+      portrait: {fileID: 2800000, guid: a022bec1d79371e4eb4cc2c2881b3e69, type: 3}
+    - speakerKey: speaker.noah
+      expression: 1
+      textKey: dialogue.stage3.outro.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.wolf_girl
+      expression: 0
+      textKey: dialogue.stage3.outro.3
+      portrait: {fileID: 2800000, guid: a022bec1d79371e4eb4cc2c2881b3e69, type: 3}
+    - speakerKey: speaker.wolf_girl
+      expression: 0
+      textKey: dialogue.stage3.outro.4
+      portrait: {fileID: 2800000, guid: a022bec1d79371e4eb4cc2c2881b3e69, type: 3}
+    - speakerKey: speaker.noah
+      expression: 2
+      textKey: dialogue.stage3.outro.5
+      portrait: {fileID: 0}
+  - intro:
+    - speakerKey: speaker.dark_knight
+      expression: 0
+      textKey: dialogue.stage4.intro.1
+      portrait: {fileID: 2800000, guid: 875269b9799f3204eb73929cc67ee144, type: 3}
+    - speakerKey: speaker.noah
+      expression: 3
+      textKey: dialogue.stage4.intro.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.dark_knight
+      expression: 0
+      textKey: dialogue.stage4.intro.3
+      portrait: {fileID: 2800000, guid: 875269b9799f3204eb73929cc67ee144, type: 3}
+    - speakerKey: speaker.noah
+      expression: 5
+      textKey: dialogue.stage4.intro.4
+      portrait: {fileID: 0}
+    - speakerKey: speaker.dark_knight
+      expression: 0
+      textKey: dialogue.stage4.intro.5
+      portrait: {fileID: 2800000, guid: 875269b9799f3204eb73929cc67ee144, type: 3}
+    - speakerKey: speaker.noah
+      expression: 6
+      textKey: dialogue.stage4.intro.6
+      portrait: {fileID: 0}
+    outro:
+    - speakerKey: speaker.dark_knight
+      expression: 0
+      textKey: dialogue.stage4.outro.1
+      portrait: {fileID: 2800000, guid: 875269b9799f3204eb73929cc67ee144, type: 3}
+    - speakerKey: speaker.noah
+      expression: 3
+      textKey: dialogue.stage4.outro.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.dark_knight
+      expression: 0
+      textKey: dialogue.stage4.outro.3
+      portrait: {fileID: 2800000, guid: 875269b9799f3204eb73929cc67ee144, type: 3}
+    - speakerKey: speaker.noah
+      expression: 7
+      textKey: dialogue.stage4.outro.4
+      portrait: {fileID: 0}
+    - speakerKey: speaker.dark_knight
+      expression: 0
+      textKey: dialogue.stage4.outro.5
+      portrait: {fileID: 2800000, guid: 875269b9799f3204eb73929cc67ee144, type: 3}
+    - speakerKey: speaker.noah
+      expression: 5
+      textKey: dialogue.stage4.outro.6
+      portrait: {fileID: 0}
+  - intro:
+    - speakerKey: speaker.dragon
+      expression: 0
+      textKey: dialogue.stage5.intro.1
+      portrait: {fileID: 2800000, guid: 2b61f663659a32b449e4a95eb7391556, type: 3}
+    - speakerKey: speaker.dragon
+      expression: 0
+      textKey: dialogue.stage5.intro.2
+      portrait: {fileID: 2800000, guid: 2b61f663659a32b449e4a95eb7391556, type: 3}
+    - speakerKey: speaker.noah
+      expression: 7
+      textKey: dialogue.stage5.intro.3
+      portrait: {fileID: 0}
+    - speakerKey: speaker.dragon
+      expression: 0
+      textKey: dialogue.stage5.intro.4
+      portrait: {fileID: 2800000, guid: 2b61f663659a32b449e4a95eb7391556, type: 3}
+    - speakerKey: speaker.noah
+      expression: 5
+      textKey: dialogue.stage5.intro.5
+      portrait: {fileID: 0}
+    - speakerKey: speaker.dragon
+      expression: 0
+      textKey: dialogue.stage5.intro.6
+      portrait: {fileID: 2800000, guid: 2b61f663659a32b449e4a95eb7391556, type: 3}
+    - speakerKey: speaker.noah
+      expression: 6
+      textKey: dialogue.stage5.intro.7
+      portrait: {fileID: 0}
+    outro:
+    - speakerKey: speaker.dragon
+      expression: 0
+      textKey: dialogue.stage5.outro.1
+      portrait: {fileID: 2800000, guid: 2b61f663659a32b449e4a95eb7391556, type: 3}
+    - speakerKey: speaker.noah
+      expression: 3
+      textKey: dialogue.stage5.outro.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.dragon
+      expression: 0
+      textKey: dialogue.stage5.outro.3
+      portrait: {fileID: 2800000, guid: 2b61f663659a32b449e4a95eb7391556, type: 3}
+    - speakerKey: speaker.dragon
+      expression: 0
+      textKey: dialogue.stage5.outro.4
+      portrait: {fileID: 2800000, guid: 2b61f663659a32b449e4a95eb7391556, type: 3}
+    - speakerKey: speaker.noah
+      expression: 2
+      textKey: dialogue.stage5.outro.5
+      portrait: {fileID: 0}
+    - speakerKey: speaker.noah
+      expression: 1
+      textKey: dialogue.stage5.outro.6
+      portrait: {fileID: 0}

@@ -2646,3 +2646,439 @@
 
 #### 증거
 - Tools/_out/stageselect/ribbon_check_transition.jpg, Tools/_out/title/ribbon_check_wipe.jpg (git 제외)
+
+### [20261119-elite-darkelf-concept] 정예 유닛 1번 — 다크엘프(고블린 지휘관) 전신 컨셉
+- 시각: 2026-11-19 10:06:39 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (1024x1536 투명 배경, Anlas — 고화질 캐릭터 사용 허용 범위)
+- 목적 및 적용 위치: 스테이지마다 다이얼로그에 나오는 정예(일반 유닛 바꿔 입힌 판) 기획에 따라 1스테이지 고블린 지휘관 다크엘프 컨셉. Art Prompts/[Enemies] 01_Enemies.txt 에 "5. 정예" 장과 5-A 추가
+- 사용 방식: 누님 타입, 한쪽 눈을 가린 은발, 활·화살통, 고블린 진영색(초록) 가죽 갑옷과 뼈·깃털 장식 망토, 노출 없음. 4장 생성
+- 결과 및 확인 방법: 성공 / 4장 직접 확인(Tools/_nai_out/elite/_darkelf.jpg). 선택은 사용자 몫
+- 사람의 개입: 기획·외형 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Enemies] 01_Enemies.txt | Claude Code | 수정 | 5-A 추가. 사용 |
+| Tools/_nai_out/elite/01_5-A/*.png | NAI V5 | 생성 | 시드 1158424993, 1159813157, 160092924, 4062944956. 검토 중 (git 제외) |
+
+#### 증거
+- Tools/_nai_out/elite/_darkelf.jpg (git 제외)
+
+### [20261119-light-novel-title-ideas] 라이트노벨풍 게임 제목 후보
+- 시각: 2026-11-19 10:12:26 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex
+- 목적 및 적용 위치: 게임의 적군 버프·힐·팩션 간 교전 유도 메커니즘을 드러내는 제목 브레인스토밍.
+- 사용 방식: 라이트노벨식 상황 설명·반전·능청스러운 화자 어조로 제목8종 작성.
+- 결과 및 확인 방법: 후보 작성 성공. 대표 후보는 “공격 스킬이 없어서 적들끼리 싸우게 했습니다”, “힐러인데 아군이 없습니다”, “적의 적은 아군이라길래 양쪽 다 치료했습니다”. 상표·기존 작품명 중복 검색은 수행하지 않음.
+- 사람의 개입: 사용자가 라노벨풍 작명을 요청. 제목 채택은 미정.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| 현재 대화 응답 | Codex | 생성 | 제목 후보8종과 추천. 프로젝트명·코드·문서의 공식 명칭 변경 없음 |
+
+#### 증거
+- 현재 대화. 별도 결과 파일 없음.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex 대화에서 창작 제목 제안.
+- 사용 방식: 기존 게임 콘셉트를 언어유희와 라이트노벨식 제목으로 변환.
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문: “게임 이름 라노벨처럼 작명해볼래? ㅋㅋ”
+- 결과 및 실제 활용 방식: 제목 후보 브레인스토밍. 공식 채택 아님.
+- 선정 이유: 명칭과 어조를 직접 지정한 요청.
+
+### [20261119-darkelf-3d] 정예 다크엘프 3D 유닛 — 해골 궁수 동작 재활용
+- 시각: 2026-11-19 10:19:42 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / OpenAI 이미지 API(턴어라운드) / Meshy(멀티뷰 메시 3k, 오토리그) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 사용자 선택 컨셉 1안(1158424993)을 전투 유닛으로. 해골 궁수의 바꿔 입힌 판(동작·활 재활용). Art3D/DarkElf/, Assets/05_Art/05_Meshes/Enemies/DarkElf/, Assets/03_Prefabs/02_Enemies/DarkElf.prefab, UprightHeldProp.cs(신규)
+- 사용 방식: GPT 턴어라운드(빈손 A자세, 화살통 유지) → Meshy 메시 2,935 삼각형(30크레딧) → Meshy 오토리그 1.0m(5크레딧, 궁수와 같은 높이). 1차로 궁수의 Codex 수정 FBX(손목 보정 포함) 클립을 Generic 경로로 옮겼으나 Blender 재출력으로 뼈 축이 달라 팔다리가 꼬여 폐기. 2차로 궁수의 Meshy 원본 동작(222 활 쏘기, 179 피격, 189 사망)을 Humanoid 리타깃(다크엘프 아바타를 복사해 매핑)하고, 걷기는 다크엘프 자기 걷기 클립. 컨트롤러는 궁수 컨트롤러 복사 후 상태별 클립 교체. 활은 궁수 활 메시·재질 재사용, 0.75m, 손 위치를 따르되 UprightHeldProp 이 항상 세우고(사망 중에는 손을 따름)
+- 결과 및 확인 방법: 성공 / 필름스트립(Tools/_out/darkelf3d/strip.png)으로 4동작 측면·70° 확인. 실제 전투 배치·카탈로그 연결은 하지 않음(수치·등장 위치는 팀원 몫)
+- 사람의 개입: 컨셉 선택, 궁수 동작 재활용 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art3D/DarkElf/ (컨셉, 턴어라운드, GLB, 리그) | NAI·GPT·Meshy | 생성 | 원본 보관 (git 제외) |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Enemies/DarkElf/DarkElf.fbx, DarkElf_Walk.fbx, DarkElf_ArcherAnim.fbx, DarkElf_Color.png, DarkElf.mat, DarkElf.controller | Meshy + Unity CLI | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/02_Enemies/DarkElf.prefab | Unity CLI | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/UprightHeldProp.cs | Claude Code | 생성 | 들고 있는 소품 세우기. 사용 |
+
+#### 증거
+- Tools/_out/darkelf3d/strip.png, views.jpg (git 제외)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: FBX 가져오기(Humanoid, 아바타 복사), 컨트롤러·재질·프리팹 생성, 필름스트립 렌더
+- 활용 방식: script eval --file
+- 잘된 점: 같은 Meshy 뼈 이름이라 아바타 복사(CopyFromOther)로 궁수 동작 리타깃 성공
+- 잘 안된 점 및 개선 필요: Blender 재출력 FBX 는 Humanoid 자동 매핑(LeftFoot 누락)·Generic 재사용 모두 실패 — 동작 재활용은 Meshy 원본 동작 파일을 쓸 것
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 정예 유닛 카탈로그 등록(진영 고블린, 능력치, 1스테이지 등장 웨이브), 정예 크기 배율
+
+### [20261119-elite-lich-concept] 정예 유닛 2번 — 리치(언데드 지휘관) 전신 컨셉
+- 시각: 2026-11-19 10:23:43 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (1024x1536 투명 배경, Anlas — 고화질 캐릭터 사용 허용 범위)
+- 목적 및 적용 위치: 2스테이지 정예, 네크로맨서 바꿔 입힌 판. [Enemies] 01_Enemies.txt 에 5-B 추가. 다이얼로그 표정은 사용자 지시로 보류
+- 사용 방식: 네크로맨서와 같은 카툰 해골 계열, 뾰족 모자 대신 보라 보석 뼈 왕관, 보라·검정 왕족 로브와 금테, 높은 깃, 뼈 견갑, 영혼 불꽃, 뿔 해골 지팡이. 4장 생성
+- 결과 및 확인 방법: 성공 / 4장 직접 확인(Tools/_nai_out/elite/_lich.jpg). 선택은 사용자 몫
+- 사람의 개입: 기획 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Enemies] 01_Enemies.txt | Claude Code | 수정 | 5-B 추가. 사용 |
+| Tools/_nai_out/elite/01_5-B/*.png | NAI V5 | 생성 | 시드 1989039741, 2389669409, 2801188508, 4068016465. 검토 중 (git 제외) |
+
+#### 증거
+- Tools/_nai_out/elite/_lich.jpg (git 제외)
+
+### [20261119-lich-3d] 정예 리치 3D 유닛 — 네크로맨서 동작·지팡이 재활용
+- 시각: 2026-11-19 10:29:10 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / OpenAI 이미지 API(턴어라운드) / Meshy(메시 3k 30크레딧, 오토리그 5크레딧) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 사용자 선택 1안(1989039741). Art3D/Lich/, Assets/05_Art/05_Meshes/Enemies/Lich/, Assets/03_Prefabs/02_Enemies/Lich.prefab
+- 사용 방식: 다크엘프와 같은 절차. 설정 스크립트를 유닛·원본 동작·소품·손·길이·손잡이 위치를 상수로 받는 템플릿(Tools/_out/elite_setup_template.cs)으로 일반화. 네크로맨서 Meshy 원본 동작(129 주문 시전, 179 피격, 189 사망) Humanoid 리타깃 + 리치 자기 걷기, 네크로맨서 지팡이(1.0m, 오른손, 무거운 끝이 위로 자동 판정, 손잡이 중앙 아래 12%)를 UprightHeldProp 으로 세움
+- 결과 및 확인 방법: 성공 / 메시 2,967 삼각형, 필름스트립(Tools/_out/lich3d/strip.png)으로 4동작 확인. 카탈로그 연결은 하지 않음
+- 사람의 개입: 컨셉 선택
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art3D/Lich/ | NAI·GPT·Meshy | 생성 | 원본 보관 (git 제외) |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Enemies/Lich/ (fbx 3, png, mat, controller) | Meshy + Unity CLI | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/02_Enemies/Lich.prefab | Unity CLI | 생성 | 사용 |
+
+#### 증거
+- Tools/_out/lich3d/strip.png, views.jpg (git 제외)
+
+### [20261119-elite-wolfgirl-concept] 정예 유닛 3번 — 하얀 늑대 수인 소녀(짐승 지휘관) 전신 컨셉
+- 시각: 2026-11-19 10:30:38 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (1024x1536 투명 배경, Anlas — 고화질 캐릭터 사용 허용 범위)
+- 목적 및 적용 위치: 3스테이지(설원) 정예, 늑대인간 바꿔 입힌 판(맨손 할퀴기 동작 재활용 예정). [Enemies] 01_Enemies.txt 에 5-C 추가
+- 사용 방식: 흰 늑대 귀·꼬리, 은백 땋은 머리, 얼음빛 눈·송곳니, 러시아풍 겨울 복장(진홍·흰 털 코트, 금색 민속 자수, 털 깃·소매, 펠트 부츠), 짐승 진영색 노란 허리띠, 발톱 달린 털 장갑, 노출 없음. 4장 생성
+- 결과 및 확인 방법: 성공 / 4장 직접 확인(Tools/_nai_out/elite/_wolfgirl.jpg). 선택은 사용자 몫
+- 사람의 개입: 기획(하얀 늑대 수인 소녀, 러시아풍)
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Enemies] 01_Enemies.txt | Claude Code | 수정 | 5-C 추가. 사용 |
+| Tools/_nai_out/elite/01_5-C/*.png | NAI V5 | 생성 | 시드 1455643309, 3633145830, 684445478, 859132085. 검토 중 (git 제외) |
+
+#### 증거
+- Tools/_nai_out/elite/_wolfgirl.jpg (git 제외)
+
+### [20261119-elite-wolfgirl-concept-v2] 하얀 늑대 수인 컨셉 v2 — 판타지 수인 전사 복장
+- 시각: 2026-11-19 10:39:27 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (1024x1536 투명 배경, Anlas)
+- 목적 및 적용 위치: v1 러시아풍 민속 복장이 다른 민족 의상처럼 보인다는 피드백. [Enemies] 01_Enemies.txt 5-C 를 v2 로 교체(민속 자수·전통 의상 태그를 네거티브로)
+- 사용 방식: 털 안감 짧은 가죽 재킷, 흰 털 망토, 긴 노란 목도리(진영색), 가죽 벨트, 반바지+검은 타이츠, 털 레그워머·부츠, 발톱 달린 핑거리스 장갑, 송곳니 목걸이. 4장 생성. v1 결과는 Tools/_nai_out/elite/01_5-C_v1 로 보관
+- 결과 및 확인 방법: 성공 / 4장 직접 확인(Tools/_nai_out/elite/_wolfgirl_v2.jpg). 선택은 사용자 몫
+- 사람의 개입: 복장 방향 피드백
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Enemies] 01_Enemies.txt | Claude Code | 수정 | 5-C v2. 사용 |
+| Tools/_nai_out/elite/01_5-C/*.png | NAI V5 | 생성 | 시드 2990773549, 3049637030, 3888101117, 489480928. 검토 중 (git 제외) |
+
+#### 증거
+- Tools/_nai_out/elite/_wolfgirl_v2.jpg (git 제외)
+
+### [20261119-elite-wolfgirl-concept-v3] 하얀 늑대 수인 컨셉 v3 — 작은 털모자, 더 어리고 시크하게
+- 시각: 2026-11-19 10:40:48 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (1024x1536 투명 배경, Anlas)
+- 목적 및 적용 위치: v2(수인 전사 차림) 별로라는 피드백. 5-C 를 v3 로 교체: 귀가 튀어나오는 작은 흰 털모자 비스듬히, 무심한 반쯤 감긴 눈, 작은 체구, 흰 털 더플코트, 노란 리본 목도리(진영색), 검은 주름치마·니삭스, 털 부츠, 손가락 끝 검은 발톱, 주머니에 손. v2 결과는 01_5-C_v2 로 보관
+- 결과 및 확인 방법: 성공 / 4장 직접 확인(Tools/_nai_out/elite/_wolfgirl_v3.jpg). 2장은 발밑 눈 그림자가 같이 그려짐. 선택은 사용자 몫
+- 사람의 개입: 방향 피드백
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Enemies] 01_Enemies.txt | Claude Code | 수정 | 5-C v3. 사용 |
+| Tools/_nai_out/elite/01_5-C/*.png | NAI V5 | 생성 | 시드 1515894945, 3119597779, 3386863788, 3994117918. 검토 중 (git 제외) |
+
+#### 증거
+- Tools/_nai_out/elite/_wolfgirl_v3.jpg (git 제외)
+
+### [20261119-wolfgirl-3d] 정예 하얀 늑대 수인 3D 유닛 — 늑대인간 동작 재활용
+- 시각: 2026-11-19 10:45:36 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / OpenAI 이미지 API(턴어라운드) / Meshy(메시 3k 30크레딧, 오토리그 5크레딧) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 사용자 선택 v3 2안(3119597779). Art3D/WolfGirl/, Assets/05_Art/05_Meshes/Enemies/WolfGirl/, Assets/03_Prefabs/02_Enemies/WolfGirl.prefab
+- 사용 방식: 턴어라운드에서 꼬리가 옆 칸을 넘어 자동 자르기 실패 → 손으로 열 범위를 지정해 자르는 스크립트(scratchpad cut_by_hand.py)로 4면 분리. 메시 3,124 삼각형, 리그 1.0m. 정예 템플릿에서 소품 부분을 뺀 설정으로 늑대인간 Meshy 원본 동작(4 공격, 179 피격, 189 사망) Humanoid 리타깃 + 자기 걷기, 컨트롤러는 늑대인간 것 복사
+- 결과 및 확인 방법: 성공 / 필름스트립(Tools/_out/wolfgirl3d/strip.png)으로 4동작 확인. 꼬리가 다리 뒤에 붙어 걸을 때 조금 끌려감(위 카메라에서는 작음). 카탈로그 연결은 하지 않음
+- 사람의 개입: 컨셉 선택(v1→v3 방향 수정)
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art3D/WolfGirl/ | NAI·GPT·Meshy | 생성 | 원본 보관 (git 제외) |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Enemies/WolfGirl/ (fbx 3, png, mat, controller) | Meshy + Unity CLI | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/02_Enemies/WolfGirl.prefab | Unity CLI | 생성 | 사용 |
+
+#### 증거
+- Tools/_out/wolfgirl3d/strip.png, views.jpg (git 제외)
+
+### [20261119-title-typography-i1] 웹소설·라노벨풍 타이틀 로고 시안
+- 시각: 2026-11-19 10:49:12 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / OpenAI 이미지 API `gpt-image-2.6-sunburst`(번들 image_gen.py CLI) / Python·Pillow·NumPy·SciPy
+- 목적 및 적용 위치: 사용자 지정 제목 “아무도 때리지 않았는데 흑막으로 오해받고 있습니다”의 새 로고와 기존 타이틀 화면 배치 목업.
+- 사용 방식: 기존 타이틀 아트·씬·팔레트 확인, 요청서 및 실제 생성 프롬프트 작성, 이미지 API 1회 생성, 네이티브 알파 정리·크롭 후 기존 화면 합성.
+- 결과 및 확인 방법: 성공 / 한글 전체 문구와 밝고 어두운 바탕의 외곽선 시각 확인. 투명 PNG 1295×837, 알파 0–255, 바깥 테두리 알파 0. 지정된 제목 복원·배치 영역 밖 변경 픽셀 0.
+- 사람의 개입: 사용자가 제목과 여성향 웹소설/일본 라노벨 방향 및 초안 화면 제공. 최종 채택·검토 결과는 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/I1_TitleTypography_20261119/Title_I1_Generated.png | OpenAI 이미지 API | 생성 | 자두색·장밋빛 명조형 타이틀 원본. 검토용, 미적용 |
+| ArtDirection/Mockups/I1_TitleTypography_20261119/Title_I1_Logo_Transparent.png | Python/Pillow | 생성 | 원본 알파 0–2만 제거, 크롭 및 20px 여백. 검토용, 미적용 |
+| ArtDirection/Mockups/I1_TitleTypography_20261119/Title_I1_ScreenMockup.png | Python/Pillow | 생성 | 기존 간판 영역 배경 복원 후 로고 배치. 캐릭터·몬스터·성·버튼 유지. 미적용 |
+| ArtDirection/Mockups/I1_TitleTypography_20261119/README.md | Codex | 생성 | 전체 산출물 명세. 프롬프트·배치·검증 파일 포함 |
+| ArtDirection/Mockups/I1_TitleTypography_20261119/Title_I1_Package.zip | Python/zipfile | 생성 | 로고·목업·원본·프롬프트·검증 자료 묶음 |
+| ai-use/prompts/20261119-title-typography-i1-01.md | Codex | 생성 | 현재 사용자 요청 원문 보존 |
+
+#### 증거
+- ArtDirection/Mockups/I1_TitleTypography_20261119/api-generation.log
+- ArtDirection/Mockups/I1_TitleTypography_20261119/validation.json
+- ArtDirection/Mockups/I1_TitleTypography_20261119/layout.json
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex 요청서 작성·검토·픽셀 합성, OpenAI 이미지 API 로고 아트 생성.
+- 사용 방식: 기존 화면은 색·분위기 참조로 제공하고 로고만 새로 생성. 실제 입력은 PROMPTS.txt, 출력 원본은 변경 없이 보존.
+- 특별히 활용한 점: 장문 한글의 크기 대비와 곡선 끝획을 이미지 아트로 생성하고, 모델이 반환한 네이티브 알파로 기존 화면에 합성.
+
+#### 주요 프롬프트
+- 사용 도구: Codex / OpenAI 이미지 API
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: ai-use/prompts/20261119-title-typography-i1-01.md 및 ArtDirection/Mockups/I1_TitleTypography_20261119/PROMPTS.txt
+- 결과 및 실제 활용 방식: 사용자가 선택한 정확한 제목으로 새 로고·배치 목업 생성. 게임에는 미적용.
+- 선정 이유: 제목 문구와 타이포그래피 장르를 결정한 직접 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 시안 채택, 실제 타이틀 화면 배치 및 임포트 설정. Unity 씬·코드는 수정하지 않았으며 실행 검증은 수행하지 않음.
+
+### [20261119-elite-portraits-dragon] 정예 4종 대화 초상, 재앙룡 컨셉
+- 시각: 2026-11-19 10:51:55 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (초상 1024x1536, 용 1536x1024 투명 배경, Anlas)
+- 목적 및 적용 위치: 다크엘프·리치·하얀 늑대 수인·마갑기사 상반신 대화 초상(각 3장), 5스테이지 왕도 정예 재앙룡(서구식 4족 흑룡, 각 4장). [Enemies] 01_Enemies.txt 에 5-D, 6-A~6-D 추가
+- 사용 방식: 초상은 노아 대화 초상 형식, 외형 줄은 선택된 전신 원화 프롬프트에서 그대로 옮김. 용은 특정 게임 몬스터를 따라 그리지 않고 "전설의 흑룡" 분위기만(검은 비늘, 진홍 균열 빛·날개막, 뒤로 뻗은 뿔 왕관, 가시 꼬리)
+- 결과 및 확인 방법: 성공 / 직접 확인(Tools/_nai_out/elite_portrait/_portraits.jpg, Tools/_nai_out/elite/_dragon.jpg). 용 2장은 날개 일부가 투명화 과정에서 푸르게 비침. 선택은 사용자 몫
+- 사람의 개입: 기획 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Enemies] 01_Enemies.txt | Claude Code | 수정 | 5-D, 6-A~6-D. 사용 |
+| Tools/_nai_out/elite_portrait/01_6-*/ | NAI V5 | 생성 | 12장, 검토 중 (git 제외) |
+| Tools/_nai_out/elite/01_5-D/ | NAI V5 | 생성 | 4장, 검토 중 (git 제외) |
+
+#### 증거
+- Tools/_nai_out/elite_portrait/_portraits.jpg, Tools/_nai_out/elite/_dragon.jpg (git 제외)
+
+### [20261119-title-typography-i2] 응원(물리공격력 +50%) 타이틀 시안
+- 시각: 2026-11-19 10:54:34 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex / OpenAI 이미지 API `gpt-image-2.6-sunburst`(번들 image_gen.py CLI) / Python·Pillow·NumPy
+- 목적 및 적용 위치: 새 후보 제목 “폭력은 나쁜 거니까 저는 뒤에서 응원(물리공격력 +50%)만 하겠습니다!”의 타이포그래피 및 타이틀 화면 목업.
+- 사용 방식: 기존 I1 로고와 사용자 타이틀 화면을 참조로 이미지 1회 생성. 네이티브 알파 정리·크롭 후 기존 배경에 배치.
+- 결과 및 확인 방법: 성공 / 제목 전체, 물리공격력 +50%, 괄호·느낌표 및 밝고 짙은 바탕 외곽선 시각 확인. 투명 PNG 1479×919, 알파 범위 0–255, 테두리 알파 0. 로고 영역 밖 변경 픽셀 0(제목 제거 화면 기준).
+- 사람의 개입: 사용자가 정확한 후보 제목과 추가 시안 생성 요청 제공. 채택 여부는 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/I2_CheeringTypography_20261119/Title_I2_Generated.png | OpenAI 이미지 API | 생성 | 응원과 공격력 증가를 강조한 래스터 로고. 검토용, 미적용 |
+| ArtDirection/Mockups/I2_CheeringTypography_20261119/Title_I2_Logo_Transparent.png | Python/Pillow | 생성 | 원본 알파 0–2 정리, 크롭·20px 여백. 미적용 |
+| ArtDirection/Mockups/I2_CheeringTypography_20261119/Title_I2_ScreenMockup.png | Python/Pillow | 생성 | 기존 캐릭터·성·몬스터·버튼을 유지한 배치 목업. 미적용 |
+| ArtDirection/Mockups/I2_CheeringTypography_20261119/README.md | Codex | 생성 | 전체 결과물 명세, 생성·검증·채택 상태 |
+| ArtDirection/Mockups/I2_CheeringTypography_20261119/Title_I2_Package.zip | Python/zipfile | 생성 | 원본·투명 로고·프리뷰·목업·프롬프트·검증 파일 묶음 |
+| ai-use/prompts/20261119-title-typography-i2-01.md | Codex | 생성 | 사용자 주요 요청 원문 |
+
+#### 증거
+- ArtDirection/Mockups/I2_CheeringTypography_20261119/api-generation.log
+- ArtDirection/Mockups/I2_CheeringTypography_20261119/layout.json
+- ArtDirection/Mockups/I2_CheeringTypography_20261119/validation.json
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex 요청서 작성·검토·로컬 합성 / OpenAI 이미지 API 로고 생성.
+- 사용 방식: 기존 I1 타이포그래피 및 화면을 참조하고 새 제목만 생성. 실제 프롬프트와 생성 원본 보존.
+- 특별히 활용한 점: 긴 한글 문장 속 응원과 괄호 속 스탯의 시각적 대비를 생성. 네이티브 알파로 기존 화면에 합성.
+
+#### 주요 프롬프트
+- 사용 도구: Codex / OpenAI 이미지 API
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: ai-use/prompts/20261119-title-typography-i2-01.md, ArtDirection/Mockups/I2_CheeringTypography_20261119/PROMPTS.txt
+- 결과 및 실제 활용 방식: 새 제목 시안과 투명 PNG·목업 생성. 게임에는 미적용.
+- 선정 이유: 문구와 반전 요소를 결정한 직접 요청.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 시안 채택 및 실제 화면 배치. Unity 씬·코드 변경과 실행 확인은 하지 않음.
+
+### [20261119-dragon-3d-start] 재앙룡 초상·턴어라운드·메시, Blender 리깅 착수
+- 시각: 2026-11-19 10:56:35 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 / OpenAI 이미지 API(4족 턴어라운드) / Meshy(메시 10k, 30크레딧) / Codex CLI + Blender MCP(리깅·동작, 진행 중)
+- 목적 및 적용 위치: 5스테이지 정예 재앙룡(컨셉 2298886008, 추천안으로 진행). 대화 초상 6-E 3장, Art3D/Dragon/ 턴어라운드·메시, Art3D/Dragon/Blender/REQUEST.md(4족+날개 보스 리그, Walk/Attack/Hit/Death, 코끝~꼬리 3.0m)
+- 사용 방식: 4족 2x2 턴어라운드 → 자동 분리 → Meshy 10,251 삼각형. 사람 뼈대 오토리그가 불가해 Codex 가 사용자의 실행 중인 Blender 에서 리깅·키프레임 작업
+- 결과 및 확인 방법: 진행 중 / 메시 views.jpg 확인
+- 사람의 개입: Blender 실행, 작업 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Enemies] 01_Enemies.txt | Claude Code | 수정 | 6-E 추가 |
+| Art3D/Dragon/ | NAI·GPT·Meshy | 생성 | 원본 (git 제외) |
+| Art3D/Dragon/Blender/REQUEST.md | Claude Code | 생성 | Codex 요청서 |
+
+#### 증거
+- Tools/_out/dragon3d/views.jpg, Tools/_nai_out/elite_portrait/_dragon_portrait.jpg (git 제외)
+
+### [20261119-elite-portraits-pick] 정예 5종 대화 초상 확정·프로젝트 반영
+- 시각: 2026-11-19 11:00:02 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 사용자 선택 초상을 Assets/05_Art/00_Sprites/Portraits/Elites/ 로 복사, 노아 대화 초상과 같은 가져오기 설정
+- 사용 방식: 다크엘프 1안(130809881), 리치 2안(2420166535), 수인 2안(2097877953), 마갑기사 3안(2600624921), 재앙룡 3안(639148773). 대화 HUD 연결(화자·표정 배열)은 대사가 생길 때 진행
+- 결과 및 확인 방법: 성공 / 5장 확인(Tools/_out/elite_portraits_final.jpg)
+- 사람의 개입: 초상 선택
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/Elites/Portrait_{DarkElf,Lich,WolfGirl,DarkKnight,Dragon}.png | NAI V5 | 생성 | 사용 |
+
+#### 증거
+- Tools/_out/elite_portraits_final.jpg (git 제외)
+
+### [20261119-title-bgm-prompt] 타이틀 BGM Suno 프롬프트
+- 시각: 2026-11-19 11:03:38 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Codex
+- 목적 및 적용 위치: 응원(물리공격력 +50%) 후보 제목과 기존 타이틀 일러스트에 맞는 메뉴 음악 프롬프트.
+- 사용 방식: 기존 스테이지 BGM 프롬프트와 대화의 아트·음악 방향을 확인하고 영문 Suno 프롬프트 및 한글 설명 작성.
+- 결과 및 확인 방법: 성공(문안 작성) / 피아노·클라리넷·피치카토·하프, 104 BPM 3/4 F major, 16마디 루프 구조를 제안. 음악 생성·청취·루프 검증은 하지 않음.
+- 사람의 개입: 사용자가 타이틀 BGM 프롬프트 작성 요청. 채택 및 음악 생성 여부 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[BGM] Title_Suno.md | Codex | 생성 | 동화풍 실내악 왈츠의 Suno 프롬프트, 의도와 제안 수치 기록. 검토용, 실제 음악 미생성 |
+
+#### 증거
+- Art Prompts/[BGM] Title_Suno.md
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 음악 생성용 프롬프트 문안 작성.
+- 사용 방식: 사용자가 선택한 제목의 반전을 악기 간 응답과 선율 성격으로 표현하고 기존 BGM 문안 형식에 맞춤.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 생성한 곡의 분위기·장시간 청취 적합성 및 실제 루프 연결. Unity 변경 없음.
+
+### [20261119-settings-panel] 환경설정 창(해상도·통합/BGM/SFX 볼륨), 타이틀·게임 씬 버튼
+- 시각: 2026-11-19 11:10:35 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: SettingsPanel.cs·SettingsPanel.prefab(신규), TitleScreen·StageSelectionPopup·VoxelDefensePrototype 연결(기존 "설정 준비 중" 안내 대체), TitleScene·GameScene 배치, GameText settings.* 7키
+- 사용 방식: 팀원의 SoundManager(SetMasterVolume/SetVolume/SaveSettings) 사용, SFX 슬라이더는 Sfx·Ui 채널 함께. 해상도는 Screen.resolutions(1024 이상, 중복 제거)를 ◀ ▶로 고르고 적용(현재 창 모드 유지). 짙은 자주 카드, 꿀색 슬라이더·사선 버튼, 톱니는 기존 BattleInfo 아이콘
+- 결과 및 확인 방법: 성공 / Play Mode 에서 타이틀·스테이지 선택 톱니로 열기, BGM 1→0.4 반영 후 복원, 닫기 확인, 콘솔 오류 0(Tools/_out/title/settings_*.jpg). 실제 해상도 변경은 에디터에서 의미가 없어 미확인(빌드 확인 필요). 주의: title_build.cs 로 타이틀 씬을 다시 만들면 settings_build.cs 를 다시 실행해야 함
+- 사람의 개입: 기능 요청
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/SettingsPanel.cs | Claude Code | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/SettingsPanel.prefab | Unity CLI | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/TitleScreen.cs, StageSelectionPopup.cs, 00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 설정 버튼 연결. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/01_Menu/TitleScene.unity, 02_Gameplay/GameScene.unity | Unity CLI | 수정 | 창·톱니 배치. 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json, docs/ui-flow.md | Claude Code | 수정 | 문구·설명. 사용 |
+
+#### 증거
+- Tools/_out/title/settings_TitleScene.jpg, settings_GameScene.jpg (git 제외)
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 빌드에서 해상도 적용 동작, 창 모드(전체 화면/창) 선택 필요 여부
+
+### [20261119-dialogues-settings-button-dragon] 설정 버튼 개선, 정예 당황 표정·스테이지 대화·모음집, 재앙룡 리깅 반영
+- 시각: 2026-11-19 11:37:43 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5 → Fable 5.2) / OpenAI 이미지 편집 API(표정 3종) / Codex CLI + Blender MCP(재앙룡 리그·동작) / Unity CLI (Unity 6000.3.28f1) / Python
+- 목적 및 적용 위치: (1) 톱니만 있던 설정 버튼이 설정으로 안 읽힌다는 피드백 → 글자 붙은 "⚙ 설정" 버튼(타이틀은 시작하기 아래 [설정][종료], 스테이지 선택 상단 바). (2) 정예 대화: 다크엘프(털털한 누님)·리치(사악)·하얀 늑대(쿨)는 얕보다가 지면 당황해 "두고 보자", 마갑기사는 끝까지 "…", 재앙룡은 왕도를 불태우러 온 종말의 흑룡. 당황 표정 3종 생성, 대사 57줄 작성·게임 연결, docs/dialogues.md 모음집. (3) Codex 가 만든 재앙룡 리그를 Unity 로 가져와 프리팹화
+- 사용 방식: 표정은 선택된 초상을 회색 바탕에 올려 GPT 로 얼굴만 수정 → 원본 실루엣에 맞춰 투명 추출(실루엣이 줄어든 부분은 바깥 배경과 이어진 영역을 잘라내도록 추출 스크립트 보완). 대사는 Tools/_out/dialogue_data.py 한 곳에 적고 GameText 키·StageDialogues.asset·모음집을 함께 생성. DialogueHud.Line 에 화자 초상(portrait) 추가, VoxelDefensePrototype 에 입장(연출 종료 후, 실행당 1회)·승리(결과 창 전) 대화 연결. 재앙룡은 Codex 가 실행 중인 Blender 에서 뼈 49개·동작 4개(Walk 1.2s, Attack 1.0s, Hit 0.5s, Death 1.5s) 제작(자동 가중치 실패 → 부위별 직접 가중치), Generic 임포트·박쥐 컨트롤러 복사
+- 결과 및 확인 방법: 성공 / Play Mode 에서 1·5스테이지 입장 대화 열림, 승리 대화 끝까지 재생, 콘솔 오류 0(Tools/_out/dialogue/check.jpg). 설정 버튼 캡처(title_buttons.jpg, dialogue/select_btn.jpg). 재앙룡 필름스트립(Tools/_out/dragon3d/strip.png), Codex 캡처 8장 직접 확인. 실제 승리 판정을 거친 승리 대화 → 결과 창 순서는 미확인(클리어 기록이 저장되므로 대화만 직접 재생해 확인)
+- 사람의 개입: 설정 버튼 피드백, 정예별 성격·대화 방향 지시, 초상 선택, Blender 실행
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Portraits/Elites/Portrait_{DarkElf,Lich,WolfGirl}_Flustered.png | GPT 이미지 + Python | 생성 | 당황 표정. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/StageDialogueSet.cs | Claude Code | 생성 | 스테이지 대화 데이터 형식. 사용 |
+| ProjectBeViolenceDefense/Assets/04_Data/05_Dialogue/StageDialogues.asset | Unity CLI | 생성 | 5스테이지 입장·승리 대화. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DialogueHud.cs | Claude Code | 수정 | 대사별 화자 초상. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 입장·승리 대화 재생. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/TitleScreen.cs, StageSelectionPopup.cs | Claude Code | 수정 | 설정 버튼 문구. 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Python | 수정 | dialogue.stageN.*, speaker.*, settings.button. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/01_Menu/TitleScene.unity, 02_Gameplay/GameScene.unity | Unity CLI | 수정 | 설정 버튼, 대화 연결. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/05_Meshes/Enemies/Dragon/ (fbx, png, mat, controller), 03_Prefabs/02_Enemies/Dragon.prefab | Codex+Blender, Meshy, Unity CLI | 생성 | 재앙룡. 사용 |
+| Art3D/Dragon/Blender/ | Codex | 생성 | 리그 원본·검증 기록 (git 제외) |
+| docs/dialogues.md, docs/ui-flow.md | Python / Claude Code | 생성·수정 | 다이얼로그 모음집, 흐름 설명. 사용 |
+
+#### 증거
+- Tools/_out/dialogue/check.jpg, Tools/_out/elite_faces/_compare.jpg, Tools/_out/dragon3d/strip.png (git 제외), Art3D/Dragon/Blender/README.md·validation.json
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 설정 버튼·대화 에셋 조립, Play Mode 대화 재생 확인, 재앙룡 임포트·프리팹·필름스트립
+- 활용 방식: script eval --file, 코루틴 캡처
+- 잘된 점: 대사 한 곳에서 문구 테이블·에셋·문서를 같이 생성
+- 잘 안된 점 및 개선 필요: 씬을 열면 방금 만든 에셋 참조가 풀려 연결이 비었음(씬을 연 뒤 다시 불러와 해결). 에디터에서 조립할 때 문구 테이블의 새 키가 안 읽혀 버튼에 키 이름이 찍힘(JSON 직접 읽기 + 실행 시 문구 설정). 새 TMP 글자 폭 첫 측정값이 작게 나옴
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: 이미지 편집 API(gpt-image-2.6-sunburst) — 정예 당황 표정 3장 / Codex CLI — 재앙룡 Blender 리깅(sandbox workspace-write, Blender MCP 도구만 사전 승인)
+- 사용 방식: 표정은 "얼굴만 바꾸고 나머지는 그대로" 편집 요청 1회씩. 리깅은 REQUEST.md 로 요청, 결과 README·캡처 검토 후 반영
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 대사 문안·정예 이름, 정예 5종의 카탈로그 등록과 등장 웨이브, 실제 승리 흐름에서 승리 대화 → 결과 창 순서
+
+### [20261119-title-logo-ending-credits] 새 게임 제목 로고, 엔딩 그림책·엔딩 크레딧
+- 시각: 2026-11-19 11:53:14 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / NovelAI Diffusion V5 (엔딩 5장면: 1920x1088 5장 후 Anlas 소진 → 무료 크기 1344x768 로 7장) / Python(numpy, OpenCV) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: (1) 사용자가 제공한 제목 로고 그림("폭력은 나쁜 거니까 저는 뒤에서 응원(물리공격력 +50%)만 하겠습니다!")으로 타이틀 교체. (2) 5스테이지 클리어 뒤 엔딩: 프롤로그와 같은 책장 넘김으로 5장(왕도 수호 → 돌아온 공주·책사가 노아를 두려워함 → 몬스터도 두려워함 → 공포의 전설 → 노아 "말도 안 돼요!"), 책이 덮이고 "끝". (3) 엔딩 크레딧 → 타이틀. EndingScene·EndingScreen.cs(신규), StorybookPrologue(끝 표시), PageCurl.shader(색 곱), VoxelDefensePrototype(마지막 스테이지 결과 창 다음 → 엔딩), TitleScreen(로고 그림)
+- 사용 방식: 로고는 제공 PNG 의 크림 배경을 색 거리로 키잉하고 글자 둘레에 크림 스티커 테두리를 다시 입혀 밝은·어두운 배경 모두에서 읽히게 함. 엔딩 그림은 노아 외형 줄을 프롤로그 v3 와 같은 문구로 고정, 공주·책사는 1-B 외형 줄, 장면당 2~3장 중 선택(시드 01:3973248926, 02:1334435644, 03:3566475002, 04:236497760, 05:356457120). 엔딩 씬은 타이틀 조립 스크립트에서 파생. 크레딧 문구는 사용자 지정 그대로
+- 결과 및 확인 방법: 성공 / Play Mode 에서 타이틀 캡처, 엔딩 씬 5장 넘김 → 끝 → 크레딧·타이틀로 버튼 활성까지 확인, 콘솔 오류 0(Tools/_out/title/title.jpg, Tools/_out/ending/check.jpg, end.jpg). 실제 5스테이지 승리 → 결과 창 → 엔딩 전환과 엔딩 → 타이틀 복귀는 미확인
+- 사람의 개입: 로고 그림·목업 제공, 엔딩 줄거리·크레딧 문구 지시. 엔딩 내레이션 문안은 AI 초안
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/Title_Logo.png | 사용자 제공 그림 + Python | 생성 | 투명 로고. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/Ending_01~05.png | NAI V5 | 생성 | 엔딩 그림책. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/Title_Cover·Title_Background·Title_Noah·TitleV2_Dashes.png | — | 삭제 | 이전 타이틀 시안(미사용) |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/EndingScreen.cs | Claude Code | 생성 | 엔딩 흐름·크레딧. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/StorybookPrologue.cs, TitleScreen.cs, 00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 끝 표시, 로고 그림, 엔딩 연결. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/02_Materials/PageCurl.shader | Claude Code | 수정 | Graphic 색 곱(뒤표지 색). 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/01_Menu/EndingScene.unity, TitleScene.unity, 02_Gameplay/GameScene.unity, ProjectSettings/EditorBuildSettings.asset | Unity CLI | 생성·수정 | 엔딩 씬, 타이틀 로고, 엔딩 와이프 연결, 빌드 목록(Title, Game, Ending). 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Python | 수정 | title.name, ending.*, credits.*, wipe.ending/title.*, story.end. 사용 |
+| Art Prompts/[Story] 06_Prologue.txt, docs/dialogues.md, docs/ui-flow.md | Claude Code / Python | 수정 | 엔딩 프롬프트·모음집·흐름 설명. 사용 |
+
+#### 증거
+- Tools/_out/title/title.jpg, Tools/_out/ending/check.jpg, end.jpg, Tools/_nai_out/ending/_06_4-*.jpg (git 제외)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 타이틀·설정·엔딩 씬 재조립, 빌드 목록 갱신, Play Mode 캡처
+- 활용 방식: script eval --file, 코루틴 캡처(실시간 대기로 책장 넘김 완료를 기다림)
+- 잘된 점: 엔딩 씬을 타이틀 조립 스크립트에서 파생해 같은 책 구성 재사용
+- 잘 안된 점 및 개선 필요: 그림 없는 RawImage 에 색만 주면 커스텀 셰이더가 흰색으로 그림 → 셰이더에서 Graphic 색을 곱하도록 수정
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 5스테이지 실제 클리어 → 엔딩 전환, 엔딩 → 타이틀 복귀, 프로젝트 설정의 제품명(Product Name) 변경 여부, 크레딧 표기(전민혁) 확인

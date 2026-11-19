@@ -1,0 +1,4 @@
+PASS: original Ground_Cobble.png matches HEAD
+PASS: camera angle, zoom, probe placement and enemy count match
+PASS: loaded after theme uses .025 gap / .018 bevel / Ground_Cobble_Board
+Original texture SHA256: 39210855d36beb60f347905120e312d94eef4247434bc7d55bf0325900fe8969
