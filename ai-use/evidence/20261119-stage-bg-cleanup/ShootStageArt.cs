@@ -1,0 +1,20 @@
+using UnityEngine; using System.Linq; using System.IO;
+var ctrl = Object.FindFirstObjectByType<StageSelectionController>();
+if (ctrl == null || ctrl.CurrentStage == null) return "stage not ready";
+int n = ctrl.SelectedStage + 1;
+var cam = ctrl.CurrentStage.BoardCamera;
+var off = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+    .Where(c => c.isRootCanvas && c.renderMode != RenderMode.WorldSpace && c.enabled).ToList();
+foreach (var c in off) c.enabled = false;
+var rt = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32) { antiAliasing = 8 };
+var prev = cam.targetTexture;
+cam.targetTexture = rt; cam.Render(); cam.targetTexture = prev;
+RenderTexture.active = rt;
+var tex = new Texture2D(1280, 720, TextureFormat.RGB24, false);
+tex.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0); tex.Apply();
+RenderTexture.active = null;
+foreach (var c in off) c.enabled = true;
+var path = Path.GetFullPath($"Assets/07_UI/03_StageSelect/ST_Art_{n}.jpg");
+File.WriteAllBytes(path, tex.EncodeToJPG(90));
+Object.Destroy(rt); Object.Destroy(tex);
+return $"stage {n} -> {path}, hid {off.Count} canvases";

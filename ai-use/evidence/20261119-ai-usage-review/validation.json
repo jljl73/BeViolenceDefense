@@ -1,0 +1,17 @@
+{
+  "source_sha256": "5ddda7d10479cf3c4ed379b39bb56693f968aa3ead6895f40a52be8d242fd2df",
+  "output": "C:\\Users\\Choij\\Documents\\Projects\\Unity\\BeViolenceDefense\\outputs\\ai-usage-review\\[Unity AI Game Jam] AI 사용 내역서_Be폭력 디펜스_보강본.docx",
+  "referenced_record_ids": 60,
+  "verified_evidence_files": 25,
+  "source_log_entries": 341,
+  "tables": 8,
+  "manual_pages": 10,
+  "game_tests_rerun": false,
+  "output_sha256": "d9d7920621ae75cbd297a02a72656a9290b9921edde35606a754e3edde198a75",
+  "rendered_pages": 10,
+  "all_pages_visually_reviewed": true,
+  "renderer": "Microsoft Word PDF export + bundled Python pdf2image",
+  "renderer_fallback_reason": "render_docx.py: LibreOffice soffice.exe not found on PATH",
+  "source_unchanged": true,
+  "verbatim_prompts_verified": 6
+}

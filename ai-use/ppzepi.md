@@ -1458,3 +1458,63 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 평균 도달이 코어 체력을 넘으므로 마법 사용 시 난이도를 Play Mode로 확인.
+
+### [20261119-ai-usage-document-review] AI 사용 내역서 누락 검토 및 보강
+- 시각: 2026-11-19 12:30:18 +09:00
+- 작업자: ppzepi (git config user.name)
+- 사용 도구: OpenAI Codex / GPT-6, 번들 Python·python-docx·pdf2image·pypdf, Microsoft Word PDF 내보내기
+- 목적 및 적용 위치: 사용자 제공 AI 사용 내역서 초안을 ai-use 기록에 근거해 보강
+- 사용 방식: 작성자 로그의 항목 목록과 관련 본문·매니페스트·프롬프트·증거를 대조. 누락 작업, 도구 역할, 사람의 개입, 적용·검증 상태와 원문 프롬프트 추가. 현재 제목·팀원은 GameText를 보조 근거로 사용
+- 결과 및 확인 방법: 성공 / 10페이지 수정본 생성. 인용 기록 ID 60개·증거 파일 25개 확인, 프롬프트 6건 원문 일치, 원본 SHA256 보존, 최종 모든 페이지 이미지 검수. Unity·게임 테스트는 이번 작업에서 실행하지 않음
+- 사람의 개입: 사용자가 문서와 ai-use를 근거로 검토·보강 요청. 수정본의 최종 검토·채택 여부 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| outputs/ai-usage-review/[Unity AI Game Jam] AI 사용 내역서_Be폭력 디펜스_보강본.docx | Codex·python-docx | 생성 | 원본을 보존한 보강본. 최신 누락 작업·프롬프트·근거·확인 사항 반영 / 사용자 검토용 |
+| ai-use/evidence/20261119-ai-usage-review/README.md, validation.json | Codex·Python | 생성 | 변경 요약, 출처·문서 검사 결과·해시 / 증거 보존 |
+
+#### 증거
+- ai-use/evidence/20261119-ai-usage-review/README.md
+- ai-use/evidence/20261119-ai-usage-review/validation.json
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 사용자 지정 DOCX와 현재 저장소 ai-use
+- 사용 방식: 기록 대조·사실 구분·문서 보강·레이아웃 검토. LibreOffice 부재로 기본 렌더 실패 후 Word PDF 내보내기로 대체
+
+#### 주요 프롬프트
+- 사용 도구: Codex
+- 프롬프트 원문 또는 저장소 내 원문 파일 경로: 이 문서를 검토하고 빠진 부분이 보강할 부분이 있는지 확인하고 있다면 보강해, 주요 근거는 현재 디렉토리의 ai-use 폴더야.
+- 결과 및 실제 활용 방식: 원본 보존, 기록 기반 보강본 작성
+- 선정 이유: 검토 범위와 핵심 근거를 지정한 요청
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 팀명·팀장 및 제출용 크레딧, BGM 출처·신규 SFX 연결, 로컬 전용 원본 확보, 실제 제출 빌드 검증, 상충하는 제출 동의 문구. 업로드·제출·동의 체크 미실행
+
+### [20261119-stage-bg-cleanup] 스테이지 배경의 그리드 침범 정리와 입장 컷씬 미리보기 교체
+- 시각: 2026-11-19 12:33:10 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (Claude Opus 5.5) / Unity Editor 6000.3.28f1 + Unity Pipeline(MCP)
+- 목적 및 적용 위치: 그리드가 커진 스테이지 2~5(GoldenMaple·Snowfield·Graveyard·Capital) 프리팹의 `Stage Environment/Props` 장식 중 그리드를 침범하거나 카메라 시점에서 가리는 것 정리. `StageTransition`이 쓰는 입장 컷씬 이미지 ST_Art_1~5를 현재 스테이지 화면으로 교체
+- 사용 방식: AI가 장식 메시 정점을 바닥과 카메라 시선(55°/315°) 방향으로 투영해, 그리드 안으로 0.1칸 넘게 들어오거나 시선 투영이 0.45칸 넘게 들어오는 장식을 찾음. 가장 가까운 바깥 방향으로 최대 3칸까지 밀어 해결되면 이동하고, 안 되면(중심이 그리드 안이거나 방해물 칸과 겹치면) 삭제. 미리보기는 Play Mode에서 각 스테이지에 들어가 화면 공간 캔버스를 잠시 끈 상태로 보드 카메라를 1280×720으로 렌더한 뒤, 기존 jpg에 덮어써 GUID를 유지
+- 결과 및 확인 방법: 성공. 이동 47개(GoldenMaple 11, Snowfield 16, Graveyard 15, Capital 5), 삭제 18개(Graveyard, 방해물 칸과 겹친 중복 장식 4개 포함). 같은 검사를 다시 돌려 4개 스테이지 모두 침범 0 확인. 새 캡처 5장을 직접 보고 그리드가 깨끗하게 보이는 것 확인, AssetDatabase.Refresh 뒤 1280×720 텍스처로 로드 확인
+- 사람의 개입: 요청만 함. 결과 미검토(확인 필요)
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_Stages/Stage_GoldenMaple.prefab, Stage_Snowfield.prefab, Stage_Graveyard.prefab, Stage_Capital.prefab | Claude Code + Unity | 수정 | 장식 이동·삭제. 사용 중 |
+| ProjectBeViolenceDefense/Assets/07_UI/03_StageSelect/ST_Art_1~5.jpg | Unity 카메라 렌더 | 교체 | 현재 스테이지 준비 단계 화면. 사용 중 |
+| ai-use/evidence/20261119-stage-bg-cleanup/ | Claude Code | 생성 | 정리·캡처 스크립트 |
+
+#### 증거
+- ai-use/evidence/20261119-stage-bg-cleanup/CleanStageProps.cs, ShootStageArt.cs
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 프리팹 장식 검사·수정, Play Mode 스테이지 진입, 카메라 캡처
+- 활용 방식: Pipeline script_eval로 검사 스크립트를 보고 전용 모드로 먼저 돌린 뒤 적용. Play Mode에서 retryStage를 설정하고 씬을 다시 로드해 각 스테이지에 진입
+- 잘된 점: 정점 기반 측정이라 AABB보다 과잉 판정이 적었고, 같은 스크립트로 재검사할 수 있음
+- 잘 안된 점 및 개선 필요: 첫 적용 때 삭제한 오브젝트의 이름을 참조해 예외 발생(Graveyard 저장 전 중단, 수정 뒤 재실행). Play Mode 진입 중 Pipeline 연결이 잠시 끊김. capture game_view의 camera 소스에 HUD가 같이 찍혀 직접 렌더로 대체
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 바깥으로 민 장식이 다른 장식과 겹치는지 눈으로 확인. Stage1(해안) 장식은 요청 범위 밖이라 손대지 않음(ST_Art_1만 다시 캡처)
