@@ -55,6 +55,36 @@ MonoBehaviour:
       expression: 4
       textKey: dialogue.stage1.outro.5
       portrait: {fileID: 0}
+    firstWave:
+    - speakerKey: speaker.noah
+      expression: 7
+      textKey: dialogue.stage1.first_wave.1
+      portrait: {fileID: 0}
+    - speakerKey: speaker.noah
+      expression: 5
+      textKey: dialogue.stage1.first_wave.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.noah
+      expression: 3
+      textKey: dialogue.stage1.first_wave.3
+      portrait: {fileID: 0}
+    shieldBreak:
+    - speakerKey: speaker.noah
+      expression: 1
+      textKey: dialogue.stage1.shield_break.1
+      portrait: {fileID: 0}
+    - speakerKey: speaker.noah
+      expression: 7
+      textKey: dialogue.stage1.shield_break.2
+      portrait: {fileID: 0}
+    - speakerKey: speaker.noah
+      expression: 3
+      textKey: dialogue.stage1.shield_break.3
+      portrait: {fileID: 0}
+    - speakerKey: speaker.noah
+      expression: 6
+      textKey: dialogue.stage1.shield_break.4
+      portrait: {fileID: 0}
   - intro:
     - speakerKey: speaker.lich
       expression: 0

@@ -136,8 +136,20 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         returnToStageSelection = returnToSelection;
         enabled = true;
         InitializeBattle();
-        if (dialogueHud != null && stageDialogues != null && seenIntros.Add(stageNumber))
+        // 첫 입장일 때만 입장 대화와 첫 웨이브 안내 대사를 보여 준다.
+        firstVisit = seenIntros.Add(stageNumber);
+        if (dialogueHud != null && stageDialogues != null && firstVisit)
             StartCoroutine(PlayIntroDialogue(stageDialogues.Intro(stageNumber)));
+    }
+
+    private bool firstVisit;
+
+    // 첫 웨이브 안내 대사. 전투를 멈추지 않고 대화창이 저절로 넘어간다.
+    private void PlayFirstWaveLines(bool shieldBreak)
+    {
+        if (!firstVisit || dialogueHud == null || stageDialogues == null || ui.HasOpenPopup)
+            return;
+        dialogueHud.PlayAmbient(shieldBreak ? stageDialogues.ShieldBreak(stageNumber) : stageDialogues.FirstWave(stageNumber));
     }
 
     // 입장 연출(막)이 걷힌 뒤에 대화를 시작한다.
@@ -363,8 +375,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 break;
             case DefenseBattle.Phase.Combat:
                 // 고정 틱만 돌린다. 마나 회복과 큐에 넣은 마법도 틱 안에서 처리된다.
+                // 마지막 적이 보호막에 막히면 같은 틱에 웨이브가 끝나 라운드가 바뀌므로 틱 전 값을 본다.
+                bool hadShield = battle.HasCoreShield;
+                int round = battle.Round;
                 for (int tick = 0; tick < battleClock.StepCount && battle.CurrentPhase == DefenseBattle.Phase.Combat; tick++)
                     battle.Tick(battleClock.StepDeltaTime, pauseMovement: false);
+                if (round == 1 && hadShield && !battle.HasCoreShield)
+                    PlayFirstWaveLines(shieldBreak: true);
 
                 if (battleClock.DeltaTime > 0f)
                     foreach (EnemyUnit enemy in battle.Enemies)
@@ -458,6 +475,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         battleClock.Reset();
         PlayWaveStartForecast();
         hud.Notify("");
+        if (battle.Round == 1)
+            PlayFirstWaveLines(shieldBreak: false);
     }
 
     private void ReadCameraInput(Keyboard keyboard)

@@ -1544,3 +1544,34 @@
 - 활용 방식: 변경 후 전체 실행, git stash 후 재실행으로 기존 실패 여부 확인
 - 잘된 점: 기존 실패와 신규 실패 구분이 빠름
 - 잘 안된 점 및 개선 필요: 기존 실패 테스트 4개 존재
+
+### [20261119-stage1-first-wave-lines] 스테이지 1 첫 웨이브 보호막 안내 대사(전투 진행 중 자동 대화창)
+- 시각: 2026-11-19 13:18:00 +09:00
+- 작업자: ppzepi
+- 사용 도구: Claude Code (Claude desktop 앱) / claude-opus-5-5, Unity Editor MCP(Unity Pipeline)
+- 목적 및 적용 위치: 스테이지 1 첫 웨이브(적 1마리)에서 노아가 겁먹는 대사와, 보호막이 라운드마다 한 마리만 막는다는 규칙을 대화창으로 자연스럽게 알린다. 대사가 나오는 동안 전투는 계속 진행된다.
+- 사용 방식: 대사 초안 작성 → 사용자 피드백(보호막은 노아가 직접 친 것, 보호막에 막히는 순간까지만) 반영 → 대화창에 비모달 자동 진행 모드(`PlayAmbient`) 추가, 1웨이브 시작·보호막 파괴 시점에 재생.
+- 결과 및 확인 방법: 성공. Unity 재컴파일 오류 없음. Play Mode에서 스테이지 1 진입 → 입장 대화 닫기 → 1웨이브 시작: 팝업 없이 대사 표시, 전투 타이머 진행, 대사 자동 넘김 확인. 적이 보호막에 막힌 뒤(코어 30/30 유지) 보호막 대사가 이어지고 끝나면 대화창이 닫히며 HUD 투명도 1로 복귀. 새 콘솔 오류 없음. 전투 로직은 바꾸지 않아 EditMode 테스트는 돌리지 않음.
+- 사람의 개입: 대사 방향 지시(노아가 직접 친 보호막, 범위를 보호막에 막히는 순간까지로 축소, 전투 진행 유지). 최종 대사 검토는 확인 필요.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| `ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DialogueHud.cs` | Claude Code | 수정 | `PlayAmbient`: 팝업·HUD 숨김·클릭 차단 없이 대사마다 자동으로 넘어가는 모드. 사용 |
+| `ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/StageDialogueSet.cs` | Claude Code | 수정 | 스테이지별 `firstWave`·`shieldBreak` 대사 배열 추가. 사용 |
+| `ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs` | Claude Code | 수정 | 첫 입장 시 1웨이브 시작·보호막 파괴 때 자동 대사 재생. 사용 |
+| `ProjectBeViolenceDefense/Assets/04_Data/05_Dialogue/StageDialogues.asset` | Claude Code | 수정 | 스테이지 1 대사 7줄 연결. 사용 |
+| `ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json` | Claude Code | 수정 | `dialogue.stage1.first_wave.*`, `dialogue.stage1.shield_break.*` 문구 추가. 사용 |
+| `docs/dialogues.md` | Claude Code | 수정 | 스테이지 1 첫 웨이브 안내 표 추가. 사용 |
+
+#### 증거
+- `ai-use/evidence/20261119-first-wave-lines/first-wave.png`, `ai-use/evidence/20261119-first-wave-lines/shield-break.png`
+
+#### Unity CLI 사용 — 사용한 경우에만 작성
+- 구현하거나 수행한 작업: 에셋 새로고침·컴파일 확인, Play Mode 진입 후 스테이지 1 선택·전투 시작, 대화창·전투 상태 조회, 게임 화면 캡처.
+- 활용 방식: Unity Editor MCP의 script_eval로 `SelectStage(0)`, `StartBattle` 호출과 상태 확인. `unity pipeline editors`로 도메인 리로드 후 재연결 확인.
+- 잘된 점: 실제 씬에서 대사 자동 진행과 보호막 시점을 바로 확인함.
+- 잘 안된 점 및 개선 필요: 자동 새로고침이 꺼져 있어 수동 Refresh가 필요했고, 도메인 리로드마다 연결이 끊겨 재연결을 기다려야 했음. 첫 캡처가 프로젝트 폴더 기준 경로에 저장되어 옮김.
+
+#### 미확인 및 후속 확인 — 필요한 경우에만 작성
+- 팀원이 확인할 내용: 자동 대화창이 하단 마나 바를 가림(클릭은 통과). 기존 입장 대사 4번("고블린이 저렇게나 많다니")이 적 1마리 첫 웨이브와 어긋남. 다시 도전할 때는 안내 대사를 건너뜀.

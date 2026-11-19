@@ -62,6 +62,8 @@ public sealed class DialogueHud : MonoBehaviour
     [SerializeField] private float charactersPerSecond = 45f;
     [SerializeField] private float boxOffset = 320f;
     [SerializeField] private float portraitOffset = 360f;
+    [Tooltip("자동 진행(전투 중) 대사: 글자가 다 나온 뒤 다음 대사로 넘어가기까지 기다리는 시간")]
+    [SerializeField] private float ambientHold = 1.6f;
 
     private UIManager ui;
     private CanvasGroup hudGroup;
@@ -78,6 +80,9 @@ public sealed class DialogueHud : MonoBehaviour
     private int shownFace = -1;
     private Texture shownPortrait;
     private Vector2 portraitImageSize;
+    private CanvasGroup rootGroup;
+    private bool ambient;
+    private float holdUntil;
     private MotionHandle boxMove, boxFade, portraitMove, portraitFade, portraitHop, nextBob, tabPop, hudFade;
 
     public bool IsOpen => gameObject.activeSelf;
@@ -91,6 +96,9 @@ public sealed class DialogueHud : MonoBehaviour
         hudGroup = ui.HudLayer.GetComponent<CanvasGroup>();
         if (hudGroup == null)
             hudGroup = ui.HudLayer.gameObject.AddComponent<CanvasGroup>();
+        rootGroup = GetComponent<CanvasGroup>();
+        if (rootGroup == null)
+            rootGroup = gameObject.AddComponent<CanvasGroup>();
         boxShown = box.anchoredPosition;
         portraitShown = portrait.anchoredPosition;
         portraitImageSize = portraitImage.rectTransform.rect.size;
@@ -102,7 +110,14 @@ public sealed class DialogueHud : MonoBehaviour
     }
 
     /// <summary>대사 묶음을 재생한다. 끝나거나 건너뛰면 <paramref name="onFinished"/>를 부른다.</summary>
-    public void Play(Line[] dialogue, Action onFinished = null)
+    public void Play(Line[] dialogue, Action onFinished = null) => Begin(dialogue, onFinished, false);
+
+    /// <summary>
+    /// 전투를 멈추지 않는 대사: 팝업으로 열지 않아 보드 입력과 HUD가 그대로 살아 있고, 클릭을 받지 않으며 대사마다 자동으로 넘어간다.
+    /// </summary>
+    public void PlayAmbient(Line[] dialogue, Action onFinished = null) => Begin(dialogue, onFinished, true);
+
+    private void Begin(Line[] dialogue, Action onFinished, bool ambientMode)
     {
         if (dialogue == null || dialogue.Length == 0)
         {
@@ -117,9 +132,20 @@ public sealed class DialogueHud : MonoBehaviour
         index = 0;
         shownFace = -1;
         shownPortrait = null;
-        ui.ShowPopup((RectTransform)transform, dismissOnEscape: false);
+        ambient = ambientMode;
+        rootGroup.blocksRaycasts = !ambient;
+        skipButton.gameObject.SetActive(!ambient);
+        if (ambient)
+        {
+            transform.SetAsLastSibling();
+            gameObject.SetActive(true);
+        }
+        else
+        {
+            ui.ShowPopup((RectTransform)transform, dismissOnEscape: false);
+            hudFade = Fade(hudGroup, 0f, 0.2f, 0f);
+        }
 
-        hudFade = Fade(hudGroup, 0f, 0.2f, 0f);
         box.anchoredPosition = boxShown + Vector2.down * boxOffset;
         boxGroup.alpha = 0f;
         boxMove = LMotion.Create(box.anchoredPosition.y, boxShown.y, 0.35f)
@@ -215,7 +241,18 @@ public sealed class DialogueHud : MonoBehaviour
             shownCharacters = Mathf.Min(totalCharacters, shownCharacters + charactersPerSecond * Time.unscaledDeltaTime);
             bodyText.maxVisibleCharacters = Mathf.FloorToInt(shownCharacters);
             if (!Typing)
+            {
                 nextMark.gameObject.SetActive(true);
+                holdUntil = Time.unscaledTime + ambientHold;
+            }
+        }
+
+        if (ambient)
+        {
+            // S는 카메라 이동 키라 자동 진행 중에는 건너뛰기로 쓰지 않는다.
+            if (!Typing && Time.unscaledTime >= holdUntil)
+                Advance();
+            return;
         }
 
         // Enter·Space는 선택된 넘김 버튼의 Submit으로 들어온다. 여기서는 건너뛰기 키만 본다.
@@ -246,10 +283,15 @@ public sealed class DialogueHud : MonoBehaviour
         if (!IsOpen)
             return;
         Cancel();
-        hudGroup.alpha = 1f;
         portrait.localScale = Vector3.one;
         nameTab.localScale = Vector3.one;
-        ui.CloseTopPopup();
+        if (ambient)
+            gameObject.SetActive(false);
+        else
+        {
+            hudGroup.alpha = 1f;
+            ui.CloseTopPopup();
+        }
         Action done = finished;
         finished = null;
         done?.Invoke();
