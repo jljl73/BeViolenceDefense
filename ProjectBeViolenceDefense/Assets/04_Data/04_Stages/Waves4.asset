@@ -1,0 +1,161 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 595c939316e1d03479642f44f3bd1ae1, type: 3}
+  m_Name: Waves4
+  m_EditorClassIdentifier: Assembly-CSharp::StageWaves
+  waves:
+  - note: "W1 \uACE0\uBE14\uB9B0 vs \uC57C\uC218 - \uACE0\uBE14\uB9B0 \uC6B0\uC138"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-grunt
+          count: 11
+        - unitId: goblin-slinger
+          count: 1
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: wolf
+          count: 6
+        - unitId: bat
+          count: 1
+  - note: "W2 \uC5B8\uB370\uB4DC vs \uC6A9\uC871 - \uC6A9\uC871 \uC6B0\uC138, \uC545\uB9C8
+      \uCCAB \uB4F1\uC7A5"
+    factions:
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: skeleton
+          count: 6
+        - unitId: skeleton-archer
+          count: 2
+        - unitId: zombie
+          count: 1
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: hatchling
+          count: 4
+        - unitId: demon
+          count: 1
+  - note: "W3 \uC5B8\uB370\uB4DC vs \uC57C\uC218 - \uC57C\uC218 \uC6B0\uC138"
+    factions:
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: skeleton
+          count: 6
+        - unitId: zombie
+          count: 1
+        - unitId: skeleton-archer
+          count: 2
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: boar
+          count: 1
+        - unitId: dire-wolf
+          count: 1
+        - unitId: wolf
+          count: 8
+        - unitId: bat
+          count: 2
+  - note: "W4 \uC0BC\uD30C\uC804 - \uC5B8\uB370\uB4DC \uC6B0\uC138"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 1
+        - unitId: goblin-chief
+          count: 1
+        - unitId: goblin-grunt
+          count: 12
+        - unitId: goblin-slinger
+          count: 2
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: living-armor
+          count: 1
+        - unitId: skeleton
+          count: 4
+        - unitId: skeleton-archer
+          count: 2
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: hatchling
+          count: 4
+        - unitId: demon
+          count: 1
+  - note: "W5 \uC0AC\uD30C\uC804 - \uC5B8\uB370\uB4DC \uC6B0\uC138(\uC2A4\uD3F0 \uC870\uD569\uC5D0
+      \uB530\uB77C \uD754\uB4E4\uB9BC), \uC640\uC774\uBC88 \uB4F1\uC7A5"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 1
+        - unitId: goblin-chief
+          count: 1
+        - unitId: goblin-grunt
+          count: 11
+        - unitId: goblin-slinger
+          count: 3
+        - unitId: goblin-charger
+          count: 3
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: reaper
+          count: 1
+        - unitId: living-armor
+          count: 1
+        - unitId: skeleton
+          count: 5
+        - unitId: skeleton-archer
+          count: 3
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: werewolf
+          count: 1
+        - unitId: dire-wolf
+          count: 1
+        - unitId: wolf
+          count: 11
+        - unitId: bat
+          count: 2
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: hatchling
+          count: 2
+        - unitId: wyvern
+          count: 1
+        - unitId: hatchling
+          count: 2

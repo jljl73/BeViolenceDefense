@@ -74,7 +74,10 @@ internal static class StageCheck
             queues[s] = q;
         }
         var reps = Enumerable.Range(0, sides).Select(i => new EnemyFaction("F" + i, new Color(1, 1, 1))).ToArray();
-        var battle = new DefenseBattle(grid, reps, _ => queues);
+        // PICK="a,b": 스폰이 여러 개인 진영(진영 번호 순)마다 고를 스폰 순번. 게임은 라운드마다 무작위로 하나를 고른다.
+        var pick = (Environment.GetEnvironmentVariable("PICK") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+        int pickCall = 0;
+        var battle = new DefenseBattle(grid, reps, _ => queues, 0, pick.Length == 0 ? null : n => Math.Min(n - 1, pick[pickCall++ % pick.Length]));
         var all = new List<EnemyUnit>();
         battle.EnemySpawned += e => all.Add(e);
         battle.StartRound();

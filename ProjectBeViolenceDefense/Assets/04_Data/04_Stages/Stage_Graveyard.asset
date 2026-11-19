@@ -38,26 +38,6 @@ MonoBehaviour:
   - cell: {x: 3, y: 5}
     faction: 2
   obstacles:
-  - prefab: {fileID: 0}
-    cell: {x: 15, y: 8}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 0}
-    cell: {x: 14, y: 8}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 0}
-    cell: {x: 9, y: 6}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 0}
-    cell: {x: 17, y: 7}
-    size: {x: 1, y: 1}
-    rotation: 0
-  - prefab: {fileID: 0}
-    cell: {x: 17, y: 6}
-    size: {x: 1, y: 1}
-    rotation: 0
   - prefab: {fileID: 1971219254228477664, guid: 013c5b158554ce04a9139735721cdf38, type: 3}
     cell: {x: 3, y: 22}
     size: {x: 1, y: 1}
@@ -294,4 +274,53 @@ MonoBehaviour:
     cell: {x: 13, y: 15}
     size: {x: 1, y: 1}
     rotation: 0
-  waves: {fileID: 11400000, guid: e575b5104fe545d4f9caeba1cd994cc9, type: 2}
+  - prefab: {fileID: 0}
+    cell: {x: 5, y: 22}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 0}
+    cell: {x: 6, y: 19}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 2258531731285590627, guid: 21be65e68c9a80a478206fa8c9554330, type: 3}
+    cell: {x: 14, y: 19}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 2258531731285590627, guid: 21be65e68c9a80a478206fa8c9554330, type: 3}
+    cell: {x: 14, y: 18}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 2258531731285590627, guid: 21be65e68c9a80a478206fa8c9554330, type: 3}
+    cell: {x: 14, y: 17}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 0}
+    cell: {x: 15, y: 19}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 0}
+    cell: {x: 15, y: 16}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 0}
+    cell: {x: 8, y: 14}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 6973855405646236960, guid: 2189108455045214398cbc44495a564d, type: 3}
+    cell: {x: 9, y: 6}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 4162362750405306708, guid: a5b1efeeeaf3e944e98576b5d68dce38, type: 3}
+    cell: {x: 14, y: 8}
+    size: {x: 1, y: 1}
+    rotation: 1
+  - prefab: {fileID: 4162362750405306708, guid: a5b1efeeeaf3e944e98576b5d68dce38, type: 3}
+    cell: {x: 15, y: 8}
+    size: {x: 1, y: 1}
+    rotation: 3
+  - prefab: {fileID: 1571810674048646912, guid: 4288a94bc0c15a040a80c73b0142d069, type: 3}
+    cell: {x: 17, y: 6}
+    size: {x: 1, y: 2}
+    rotation: 3
+  waves: {fileID: 11400000, guid: 071e467f3c6c4734c95d8b71f9a31aeb, type: 2}
+  reinforcementWaveLimit: 0

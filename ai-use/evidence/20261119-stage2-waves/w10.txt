@@ -1,0 +1,5 @@
+W1|goblin-grunt*11,goblin-slinger*1||wolf*6,bat*1|
+W2||skeleton*7,skeleton-archer*2,zombie*1||hatchling*4,demon*1
+W3||skeleton*8,zombie*1,skeleton-archer*2|boar*1,wolf*6,bat*2|
+W4|orc*1,goblin-chief*1,goblin-grunt*10,goblin-slinger*3|skeleton*6,living-armor*1,skeleton-archer*2||hatchling*3,demon*1
+W5|orc*1,goblin-chief*1,goblin-grunt*12,goblin-slinger*3,goblin-charger*3|reaper*1,skeleton*4,living-armor*1,skeleton*2,skeleton-archer*3|werewolf*1,dire-wolf*1,wolf*8,bat*2|hatchling*3,wyvern*1,demon*1,hatchling*2

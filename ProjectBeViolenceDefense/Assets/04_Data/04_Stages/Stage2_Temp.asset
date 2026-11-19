@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2073990d430741046825d63736970c68, type: 3}
   m_Name: Stage2_Temp
   m_EditorClassIdentifier: Assembly-CSharp::StageData
-  displayNameKey: stage.2
+  displayNameKey: stage_select.maple
   width: 19
   depth: 18
   core:
@@ -235,3 +235,4 @@ MonoBehaviour:
     size: {x: 1, y: 1}
     rotation: 3
   waves: {fileID: 11400000, guid: b6d6c31391c19a94998d71011f13b3c5, type: 2}
+  reinforcementWaveLimit: 0
