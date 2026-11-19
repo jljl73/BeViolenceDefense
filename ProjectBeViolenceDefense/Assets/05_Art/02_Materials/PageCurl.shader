@@ -2,6 +2,7 @@
 // 페이지가 오른쪽 아래 모서리부터 원통에 감기듯 말려 올라가 왼쪽으로 넘어가고, 넘어간 자리는 투명해져 아래 페이지가 보인다.
 // 말린 부분의 안쪽은 종이 뒷면(그림이 희미하게 비친다), 바깥쪽은 그림이 감겨 어두워진다. 말린 곳 앞쪽에는 그림자가 진다.
 // _Wear 를 올리면 낡은 그림책처럼 가장자리가 그을리고 얼룩이 지며, _Gutter 는 가운데 책등 그림자를 만든다.
+// 그림 색에는 Graphic 의 색을 곱한다(그림 없이 색만 주면 그 색의 종이·표지가 된다).
 // 좌표 단위는 RectTransform 의 세로 길이 = 1 (가로는 _Aspect 배).
 Shader "BeViolenceDefense/UI/Page Curl"
 {
@@ -123,7 +124,7 @@ Shader "BeViolenceDefense/UI/Page Curl"
                         }
                         else
                             shade = lerp(0.88, 1.0, saturate(-d / (R * 2.5)));
-                        return float4(Back(uv) * shade, i.color.a);
+                        return float4(Back(uv) * shade * i.color.rgb, i.color.a);
                     }
                 }
                 // 2) 원통 아래쪽 면 = 그림이 감겨 넘어가는 부분
@@ -134,14 +135,14 @@ Shader "BeViolenceDefense/UI/Page Curl"
                     if (OnPage(uv))
                     {
                         float c = sqrt(saturate(1 - (d / R) * (d / R)));
-                        return float4(Front(uv) * lerp(0.5, 1.0, c), i.color.a);
+                        return float4(Front(uv) * lerp(0.5, 1.0, c) * i.color.rgb, i.color.a);
                     }
                 }
                 // 3) 아직 평평한 페이지
                 if (d < 0)
                 {
                     float sh = _Shadow * 0.45 * smoothstep(-R * 1.4, 0, d);
-                    return float4(Front(i.uv) * (1 - sh), i.color.a);
+                    return float4(Front(i.uv) * (1 - sh) * i.color.rgb, i.color.a);
                 }
                 // 4) 넘어간 자리: 아래 페이지 위에 말린 종이의 그림자만
                 float shadow = _Shadow * smoothstep(R * 2.6, R, d);

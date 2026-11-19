@@ -46,6 +46,17 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     [SerializeField] private DefenseHud.Art hudArt = new();
     [Tooltip("선택. 연결하면 기존 코어 패널 대신 초상이 있는 좌상단 코어 HUD를 쓴다.")]
     [SerializeField] private LeftCoreHud leftCoreHud;
+    [Tooltip("선택. 환경설정 창(해상도·볼륨)")]
+    [SerializeField] private SettingsPanel settingsPanel;
+    [Tooltip("선택. 스테이지 입장·승리 대화")]
+    [SerializeField] private DialogueHud dialogueHud;
+    [SerializeField] private StageDialogueSet stageDialogues;
+    [Header("Ending (마지막 스테이지를 깨면 결과 창의 다음 버튼이 엔딩으로 간다)")]
+    [SerializeField] private int finalStage = 5;
+    [SerializeField] private string endingScene = "EndingScene";
+    [SerializeField] private SceneWipe endingWipe;
+    // 같은 실행에서 이미 본 입장 대화(다시 도전할 때는 건너뛴다).
+    private static readonly System.Collections.Generic.HashSet<int> seenIntros = new();
     [Tooltip("선택. 연결하면 기존 마나 게이지 대신 하단 마나 바 아트를 쓴다.")]
     [SerializeField] private ManaBarHud manaBarHud;
     [Tooltip("선택. 연결하면 상단 중앙 정보·우상단 설정/배속·우하단 웨이브 호출 버튼을 새 HUD로 쓴다.")]
@@ -123,6 +134,21 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         restartStage = retry;
         enabled = true;
         InitializeBattle();
+        if (dialogueHud != null && stageDialogues != null && seenIntros.Add(stageNumber))
+            StartCoroutine(PlayIntroDialogue(stageDialogues.Intro(stageNumber)));
+    }
+
+    // 입장 연출(막)이 걷힌 뒤에 대화를 시작한다.
+    private System.Collections.IEnumerator PlayIntroDialogue(DialogueHud.Line[] lines)
+    {
+        if (lines == null || lines.Length == 0)
+            yield break;
+        var transition = FindFirstObjectByType<StageTransition>(FindObjectsInactive.Include);
+        yield return null;
+        while (transition != null && transition.IsPlaying)
+            yield return null;
+        if (!ui.HasOpenPopup)
+            dialogueHud.Play(lines);
     }
 
     private void InitializeBattle()
@@ -165,7 +191,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 fallenEnemies++;
         };
         if (victoryPanelHud != null)
-            victoryPanelHud.Bind(next: null, retry: Restart);
+            victoryPanelHud.Bind(next: endingWipe != null && stageNumber == finalStage ? GoToEnding : (System.Action)null, retry: Restart);
         battle.SpellResolved += OnSpellResolved;
         spellUnlocks = new StageSpellUnlocks();
         hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions, spellUnlocks);
@@ -185,7 +211,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (battleInfoHud != null)
         {
             hud.UseExternalBattleInfo();
-            battleInfoHud.Bind(StartBattle, SetBattleSpeed, () => Hint("settings_pending", LeftCoreHud.Expression.Pout));
+            battleInfoHud.Bind(StartBattle, SetBattleSpeed, OpenSettings);
         }
         RefreshPlanningTiles();
     }
@@ -377,6 +403,16 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         spellUnlocks.RecordClear(stageNumber);
         if (leftCoreHud != null)
             leftCoreHud.Cheer();
+        // 승리 대화가 있으면 먼저 보여 주고, 끝난 뒤 결과 창을 띄운다.
+        DialogueHud.Line[] outro = dialogueHud != null && stageDialogues != null ? stageDialogues.Outro(stageNumber) : null;
+        if (outro != null && outro.Length > 0 && !ui.HasOpenPopup)
+            dialogueHud.Play(outro, ShowVictoryPanel);
+        else
+            ShowVictoryPanel();
+    }
+
+    private void ShowVictoryPanel()
+    {
         if (victoryPanelHud == null)
         {
             hud.Notify(GameText.Get("notice.victory_restart"));
@@ -761,6 +797,16 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             return;
         }
         view.PlayAreaSpell(command.Spell, command.Center, DefenseBattle.AreaSpellRadius(command.RangeStep), recipients);
+    }
+
+    private void GoToEnding() => SceneWipe.Go(endingWipe, endingScene, "wipe.ending.label", "wipe.ending.caption");
+
+    private void OpenSettings()
+    {
+        if (settingsPanel != null)
+            settingsPanel.Open();
+        else
+            Hint("settings_pending", LeftCoreHud.Expression.Pout);
     }
 
     private static string SpellLineKey(DefenseBattle.Spell spell) => spell switch

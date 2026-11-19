@@ -22,6 +22,8 @@ public sealed class DialogueHud : MonoBehaviour
         public string speakerKey;
         public Expression expression;
         public string textKey;
+        [Tooltip("선택. 주인공이 아닌 화자의 초상. 넣으면 표정 대신 이 그림을 쓴다.")]
+        public Texture2D portrait;
     }
 
     /// <summary>표정 하나의 움직이는 초상. 프레임을 격자로 이어 붙인 텍스처 한 장.</summary>
@@ -74,6 +76,8 @@ public sealed class DialogueHud : MonoBehaviour
     private float sheetStart;
     private int shownSheetFrame = -1;
     private int shownFace = -1;
+    private Texture shownPortrait;
+    private Vector2 portraitImageSize;
     private MotionHandle boxMove, boxFade, portraitMove, portraitFade, portraitHop, nextBob, tabPop, hudFade;
 
     public bool IsOpen => gameObject.activeSelf;
@@ -89,6 +93,7 @@ public sealed class DialogueHud : MonoBehaviour
             hudGroup = ui.HudLayer.gameObject.AddComponent<CanvasGroup>();
         boxShown = box.anchoredPosition;
         portraitShown = portrait.anchoredPosition;
+        portraitImageSize = portraitImage.rectTransform.rect.size;
         nextShown = nextMark.anchoredPosition;
         skipCaption.text = GameText.Get("dialogue.skip");
         advanceButton.onClick.AddListener(Advance);
@@ -111,6 +116,7 @@ public sealed class DialogueHud : MonoBehaviour
         finished = onFinished;
         index = 0;
         shownFace = -1;
+        shownPortrait = null;
         ui.ShowPopup((RectTransform)transform, dismissOnEscape: false);
 
         hudFade = Fade(hudGroup, 0f, 0.2f, 0f);
@@ -140,13 +146,21 @@ public sealed class DialogueHud : MonoBehaviour
         nameText.text = speaker;
         nameTab.gameObject.SetActive(!string.IsNullOrEmpty(speaker));
         int face = (int)line.expression;
-        bool hasSheet = face < portraitSheets.Length && portraitSheets[face].texture != null && portraitSheets[face].frames > 0;
-        Texture2D next = hasSheet ? portraitSheets[face].texture : face < portraits.Length ? portraits[face] : null;
-        bool faceChanged = next != null && face != shownFace;
+        bool custom = line.portrait != null;
+        bool hasSheet = !custom && face < portraitSheets.Length && portraitSheets[face].texture != null && portraitSheets[face].frames > 0;
+        Texture2D next = custom ? line.portrait : hasSheet ? portraitSheets[face].texture : face < portraits.Length ? portraits[face] : null;
+        bool faceChanged = next != null && next != shownPortrait;
         if (faceChanged)
         {
             shownFace = face;
+            shownPortrait = next;
             portraitImage.texture = next;
+            // 다른 화자의 그림은 높이를 맞추고 그림 비율대로 폭을 정한다.
+            RectTransform imageRect = portraitImage.rectTransform;
+            if (imageRect.anchorMin == imageRect.anchorMax)
+                imageRect.sizeDelta = custom
+                    ? new Vector2(portraitImageSize.y * next.width / next.height, portraitImageSize.y)
+                    : portraitImageSize;
             portraitImage.uvRect = new Rect(0f, 0f, 1f, 1f);
             playingSheet = hasSheet ? portraitSheets[face] : default;
             sheetStart = Time.unscaledTime;
