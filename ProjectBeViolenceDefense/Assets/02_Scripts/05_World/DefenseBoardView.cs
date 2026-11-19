@@ -171,6 +171,8 @@ internal sealed class DefenseBoardView
     private readonly List<(MeshRenderer Renderer, Vector3[] Path, float Length, int Dash)> routeTracers = new();
     private float routeTracerElapsed;
     private float routeTracerPeriod;
+    private bool routeTracerLoop = true;
+    private readonly List<GameObject> encounterBeacons = new();
     private float routeMarkerPhase = RouteMarkerSpacing * 0.5f;
     private int activeRouteMarkerCount;
     private readonly Mesh routeMarkerMesh;
@@ -1166,8 +1168,12 @@ internal sealed class DefenseBoardView
     }
 
     // ── 웨이브 시작 연출 ──
-    /// <summary>활성 스폰의 경로를 선분들이 일정 간격으로 훑는다.</summary>
-    public void StartRouteTracers(IReadOnlyList<Vector3[]> routes, IReadOnlyList<int> countsPerFaction)
+    /// <summary>
+    /// 활성 스폰의 경로를 선분들이 훑는다. <paramref name="loop"/>가 켜져 있으면 일정 간격으로 되풀이하고,
+    /// 꺼져 있으면 한 번만 훑는다(준비 단계 예고는 호출부가 간격을 정해 다시 부른다).
+    /// </summary>
+    /// <returns>가장 긴 길을 끝까지 훑는 데 걸리는 시간(초). 훑을 길이 없으면 0.</returns>
+    public float StartRouteTracers(IReadOnlyList<Vector3[]> routes, IReadOnlyList<int> countsPerFaction, bool loop = true)
     {
         StopRouteTracers();
         routes = ToBoard(routes);
@@ -1199,8 +1205,10 @@ internal sealed class DefenseBoardView
             }
         }
         routeTracerElapsed = 0f;
-        routeTracerPeriod = longestRoute / RouteTracerSpeed +
-            (RouteTracerDashes - 1) * RouteTracerStagger + RouteTracerRepeatGap;
+        routeTracerLoop = loop;
+        float sweep = longestRoute / RouteTracerSpeed + (RouteTracerDashes - 1) * RouteTracerStagger;
+        routeTracerPeriod = sweep + RouteTracerRepeatGap;
+        return routeTracers.Count > 0 ? sweep : 0f;
     }
 
     public void AdvanceRouteTracers(float deltaTime)
@@ -1208,7 +1216,9 @@ internal sealed class DefenseBoardView
         if (routeTracers.Count == 0)
             return;
 
-        routeTracerElapsed = Mathf.Repeat(routeTracerElapsed + deltaTime, routeTracerPeriod);
+        routeTracerElapsed = routeTracerLoop
+            ? Mathf.Repeat(routeTracerElapsed + deltaTime, routeTracerPeriod)
+            : routeTracerElapsed + deltaTime;
         foreach (var (renderer, path, length, dash) in routeTracers)
         {
             float distance = (routeTracerElapsed - dash * RouteTracerStagger) * RouteTracerSpeed;
@@ -1256,6 +1266,7 @@ internal sealed class DefenseBoardView
                 ring.transform.localPosition = DefenseGrid.CellPosition(cell) + Vector3.up * (0.05f + i * 0.004f);
                 ring.transform.localScale = Vector3.zero;
                 ring.GetComponent<MeshFilter>().sharedMesh = spawnBeaconRing;
+                encounterBeacons.Add(ring);
                 var renderer = ring.GetComponent<MeshRenderer>();
                 renderer.sharedMaterial = routeMarkerMaterial;
                 renderer.shadowCastingMode = ShadowCastingMode.Off;
@@ -1277,6 +1288,15 @@ internal sealed class DefenseBoardView
                     .AddTo(ring);
             }
         }
+    }
+
+    /// <summary>아직 남아 있는 교전 표지를 지운다. 길이 바뀌어 예전 교전 칸이 틀려졌을 때 쓴다.</summary>
+    public void StopEncounterBeacons()
+    {
+        foreach (GameObject ring in encounterBeacons)
+            if (ring != null)
+                Object.Destroy(ring);
+        encounterBeacons.Clear();
     }
 
     private static Vector3 PointAlongRoute(Vector3[] path, float distance, out Vector3 heading)

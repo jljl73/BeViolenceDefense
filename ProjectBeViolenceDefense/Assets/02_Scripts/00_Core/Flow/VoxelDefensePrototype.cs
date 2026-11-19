@@ -651,6 +651,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private void RefreshPlanningTiles(bool highlightChanges = false)
     {
         encounterWarningAcknowledged = false;
+        // 길이 바뀌었으니 예고를 지우고, 새 길 기준으로 곧 다시 보여 준다.
+        view.StopRouteTracers();
+        view.StopEncounterBeacons();
+        prepForecastWait = PrepForecastAfterChange;
         // 이번 라운드에 쓰지 않는 스폰의 경로는 null 이다.
         Vector3[][] routes = battle.RoundRoutes();
         view.ShowPlanningTiles(routes, battle.ForecastEncounterCells());
@@ -676,15 +680,43 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private readonly int[] forecastCounts = new int[StageData.FactionCount];
     private float encounterHintRemaining;
 
-    private void PlayWaveStartForecast()
+    // 준비 단계 예고: 전투 시작 때와 같은 선분과 교전 표지를 일정 간격으로 되풀이해, 벽을 놓는 동안에도 어디서 만날지 보여 준다.
+    private const float PrepForecastInterval = 4f;
+    private const float PrepForecastAfterChange = 0.8f;
+    private const float EncounterBeaconDelay = 0.7f;
+    private float prepForecastWait = PrepForecastAfterChange;
+
+    private void FillForecastCounts()
     {
         for (int side = 0; side < forecastCounts.Length; side++)
             forecastCounts[side] = side < battle.FactionCount ? battle.RoundSpawnCount(side) : 0;
+    }
+
+    private void AdvancePrepForecast(float deltaTime)
+    {
+        view.AdvanceRouteTracers(deltaTime);
+        if (ui.HasOpenPopup)
+            return;
+        prepForecastWait -= deltaTime;
+        if (prepForecastWait > 0f)
+            return;
+
+        FillForecastCounts();
+        float sweep = view.StartRouteTracers(battle.RoundRoutes(), forecastCounts, loop: false);
+        view.PlayEncounterBeacons(battle.ForecastEncounterCells(), EncounterBeaconDelay);
+        // 길이 길어 4초 안에 다 훑지 못하면 끝까지 훑은 뒤에 다시 쏜다.
+        prepForecastWait = Mathf.Max(PrepForecastInterval, sweep + 0.4f);
+    }
+
+    private void PlayWaveStartForecast()
+    {
+        FillForecastCounts();
         IReadOnlyCollection<Vector2Int> encounters = battle.ForecastEncounterCells();
         Vector3[][] routes = battle.RoundRoutes();
         view.ShowBattleForecast(routes, encounters);
         view.StartRouteTracers(routes, forecastCounts);
-        view.PlayEncounterBeacons(encounters, 0.7f);
+        view.StopEncounterBeacons();
+        view.PlayEncounterBeacons(encounters, EncounterBeaconDelay);
         encounterHintRemaining = encounters.Count > 0 ? EncounterHintSeconds : 0f;
     }
 
@@ -914,7 +946,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             SetAimedSpell(null);
 
         if (battle.CurrentPhase == DefenseBattle.Phase.Preparation)
+        {
             view.AdvanceRouteMarkers(Time.unscaledDeltaTime);
+            AdvancePrepForecast(Time.unscaledDeltaTime);
+        }
         else if (battle.CurrentPhase == DefenseBattle.Phase.Combat)
             // 전투 배속을 올려도 선분의 방향을 읽을 수 있도록 최대 1배속을 적용한다.
             view.AdvanceRouteTracers(battleClock.DeltaTime / Mathf.Max(1f, battleClock.PlaybackSpeed));

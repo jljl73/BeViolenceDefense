@@ -7,9 +7,9 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// 환경설정 창: 해상도(◀ ▶로 고르고 적용), 통합·BGM·SFX 볼륨(슬라이더, 바로 반영·저장).
+/// 환경설정 창: 해상도(◀ ▶로 고르고 적용), 화면 모드(전체 화면·창 모드, 바로 반영), 통합·BGM·SFX 볼륨(슬라이더, 바로 반영·저장).
 /// 게임 씬에서는 UIManager 팝업으로 열어 보드 입력을 막고 Esc로 닫는다. 타이틀처럼 UIManager가 없는 씬에서는 스스로 열고 닫는다.
-/// 볼륨은 SoundManager 가 PlayerPrefs 에 저장하고, 해상도는 Unity 가 기억한다. 배치는 SettingsPanel.prefab에 있다.
+/// 볼륨은 SoundManager 가 PlayerPrefs 에 저장하고, 해상도와 화면 모드는 Unity 가 기억한다. 배치는 SettingsPanel.prefab에 있다.
 /// </summary>
 public sealed class SettingsPanel : MonoBehaviour
 {
@@ -22,6 +22,10 @@ public sealed class SettingsPanel : MonoBehaviour
     [SerializeField] private Button resolutionNext;
     [SerializeField] private Button resolutionApply;
     [SerializeField] private TextMeshProUGUI resolutionApplyLabel;
+    [SerializeField] private TextMeshProUGUI displayCaption;
+    [SerializeField] private TextMeshProUGUI displayValue;
+    [SerializeField] private Button displayPrev;
+    [SerializeField] private Button displayNext;
     [SerializeField] private TextMeshProUGUI masterCaption;
     [SerializeField] private Slider master;
     [SerializeField] private TextMeshProUGUI masterValue;
@@ -38,6 +42,9 @@ public sealed class SettingsPanel : MonoBehaviour
 
     private readonly List<Vector2Int> resolutions = new();
     private int resolutionIndex;
+    // 마지막으로 요청한 화면 크기와 모드. Screen 값은 다음 프레임에야 바뀌므로 따로 기억한다.
+    private Vector2Int applied;
+    private bool windowed;
     private bool open;
     // 다른 팝업(스테이지 선택 등)이 떠 있으면 그 화면을 가리지 않도록 팝업 스택에 넣지 않고 위에 겹쳐 연다.
     private bool asPopup;
@@ -56,6 +63,12 @@ public sealed class SettingsPanel : MonoBehaviour
         resolutionPrev.onClick.AddListener(() => StepResolution(-1));
         resolutionNext.onClick.AddListener(() => StepResolution(1));
         resolutionApply.onClick.AddListener(ApplyResolution);
+        if (displayCaption != null)
+            displayCaption.text = GameText.Get("settings.display");
+        if (displayPrev != null)
+            displayPrev.onClick.AddListener(ToggleDisplayMode);
+        if (displayNext != null)
+            displayNext.onClick.AddListener(ToggleDisplayMode);
         close.onClick.AddListener(Close);
         master.onValueChanged.AddListener(v => { SoundManager.Instance?.SetMasterVolume(v); ShowPercent(masterValue, v); });
         bgm.onValueChanged.AddListener(v => { SoundManager.Instance?.SetVolume(SoundChannel.Bgm, v); ShowPercent(bgmValue, v); });
@@ -143,11 +156,19 @@ public sealed class SettingsPanel : MonoBehaviour
             if (size.x >= 1024 && !resolutions.Contains(size))
                 resolutions.Add(size);
         }
-        var current = new Vector2Int(Screen.width, Screen.height);
-        if (!resolutions.Contains(current))
-            resolutions.Add(current);
+        applied = new Vector2Int(Screen.width, Screen.height);
+        windowed = Screen.fullScreenMode == FullScreenMode.Windowed;
+        Select(applied);
+        ShowDisplayMode();
+    }
+
+    // 목록에 없는 크기면 넣고, 그 크기를 가리킨다.
+    private void Select(Vector2Int size)
+    {
+        if (!resolutions.Contains(size))
+            resolutions.Add(size);
         resolutions.Sort((a, b) => a.x != b.x ? a.x.CompareTo(b.x) : a.y.CompareTo(b.y));
-        resolutionIndex = resolutions.IndexOf(current);
+        resolutionIndex = resolutions.IndexOf(size);
         ShowResolution();
     }
 
@@ -162,15 +183,50 @@ public sealed class SettingsPanel : MonoBehaviour
     private void ShowResolution()
     {
         Vector2Int r = resolutions[resolutionIndex];
-        bool current = r.x == Screen.width && r.y == Screen.height;
+        bool current = r == applied;
         resolutionValue.text = $"{r.x} × {r.y}";
         resolutionApply.interactable = !current;
     }
 
-    private void ApplyResolution()
+    private void ApplyResolution() => Apply(resolutions[resolutionIndex]);
+
+    private void Apply(Vector2Int size)
     {
-        Vector2Int r = resolutions[resolutionIndex];
-        Screen.SetResolution(r.x, r.y, Screen.fullScreenMode);
-        resolutionApply.interactable = false;
+        Screen.SetResolution(size.x, size.y, windowed ? FullScreenMode.Windowed : FullScreenMode.FullScreenWindow);
+        applied = size;
+        Select(size);
+    }
+
+    private void ShowDisplayMode()
+    {
+        if (displayValue != null)
+            displayValue.text = GameText.Get(windowed ? "settings.windowed" : "settings.fullscreen");
+    }
+
+    // 전체 화면으로 갈 때는 모니터 크기에 맞추고, 창으로 갈 때는 모니터보다 작은 크기를 골라 창이 화면 밖으로 나가지 않게 한다.
+    private void ToggleDisplayMode()
+    {
+        windowed = !windowed;
+        var display = new Vector2Int(Display.main.systemWidth, Display.main.systemHeight);
+        Apply(windowed ? LargestWindowSize(display) : display);
+        ShowDisplayMode();
+    }
+
+    // 모니터보다 작은 해상도 중 가장 큰 것. 모니터와 화면비가 같은 것을 먼저 고른다.
+    private Vector2Int LargestWindowSize(Vector2Int display)
+    {
+        Vector2Int best = default, bestSameAspect = default;
+        float aspect = (float)display.x / display.y;
+        foreach (Vector2Int r in resolutions)
+        {
+            if (r.x >= display.x || r.y >= display.y)
+                continue;
+            best = r;
+            if (Mathf.Abs((float)r.x / r.y - aspect) < 0.01f)
+                bestSameAspect = r;
+        }
+        if (bestSameAspect.x > 0)
+            return bestSameAspect;
+        return best.x > 0 ? best : new Vector2Int(1280, 720);
     }
 }

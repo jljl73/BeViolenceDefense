@@ -3191,3 +3191,60 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 별점 기준(코어 체력 비율)이 기획 의도와 맞는지, 스테이지 선택 화면에 별점을 남길지(현재 저장 안 함)
+
+### [20261119-settings-display-mode] 환경설정 창에 화면 모드(전체 화면·창 모드) 추가
+- 시각: 2026-11-19 13:40:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Unity CLI (Unity 6000.3.28f1) / Python
+- 목적 및 적용 위치: 환경설정 창에서 전체 화면과 창 모드를 전환. `SettingsPanel.cs`, `SettingsPanel.prefab`, `GameText.ko.json`
+- 사용 방식: 해상도 줄 아래에 화면 모드 줄을 추가(◀ ▶로 전환, 바로 반영). 창 모드로 갈 때는 모니터보다 작은 해상도 중 가장 큰 것(같은 화면비 우선)을, 전체 화면으로 갈 때는 모니터 크기를 적용. 해상도 적용 버튼은 고른 화면 모드를 유지. 프리팹은 해상도 줄을 복제해 붙이는 스크립트로 수정하고 카드 높이와 아래 줄 위치를 한 칸씩 내림
+- 결과 및 확인 방법: 부분 성공 / 컴파일 통과, TitleScene Play Mode에서 창을 열어 표시와 전환(창 모드 ↔ 전체 화면, 해상도 표시 갱신, 적용 버튼 활성 상태)을 값과 캡처로 확인, 콘솔 오류 0. 에디터에서는 실제 창 전환이 일어나지 않으므로 빌드 실행 파일에서의 전환·저장은 확인하지 못함
+- 사람의 개입: 창 모드가 빠졌다는 지적
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/SettingsPanel.cs | Claude Code | 수정 | 화면 모드 전환, 적용 크기 기억. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/SettingsPanel.prefab | Unity CLI | 수정 | Display 줄 추가, 카드 높이 640→736. 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Python | 수정 | `settings.display/fullscreen/windowed`. 사용 |
+| docs/ui-flow.md | Python | 수정 | 환경설정 설명에 화면 모드 추가 |
+
+#### 증거
+- Tools/_out/title/settings_display_check.jpg (git 제외 폴더)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, 프리팹에 줄 추가, Play Mode에서 버튼 이벤트 호출과 캡처
+- 활용 방식: 프리팹을 열어 해상도 줄을 복제·연결하는 스크립트와 확인용 코루틴을 `script eval`로 실행
+- 잘된 점: 전환 뒤 표시 값과 적용 버튼 상태를 로그로 확인
+- 잘 안된 점 및 개선 필요: 에디터 Game 뷰에서는 `Screen.SetResolution`이 반영되지 않아 실제 창 전환은 볼 수 없음
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Windows 빌드에서 창 모드 전환, 창 크기, 재실행 후 유지 여부
+
+### [20261119-prep-forecast] 준비 단계에서도 경로 선분·교전 표지 예고 반복
+- 시각: 2026-11-19 13:55:00 +09:00 (대략)
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Fable 5.2) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 전투 시작 때 한 번 나오던 경로 선분과 예상 교전 칸 표지를 준비(벽 건설) 단계에서도 4초 간격으로 반복. `VoxelDefensePrototype.cs`, `DefenseBoardView.cs`
+- 사용 방식: 경로 선분에 한 번만 훑는 모드를 추가하고, 준비 단계 동안 타이머로 4초마다 선분과 교전 표지를 다시 재생. 벽을 놓거나 치우면 진행 중이던 예고를 지우고 0.8초 뒤 새 길로 재생. 팝업이 열려 있으면 멈춤. 전투 중 반복 선분 동작은 그대로
+- 결과 및 확인 방법: 부분 성공 / 컴파일 통과, GameScene 해안가 준비 단계 11초 관찰에서 선분이 0.0초·3.2초·7.2초에 나오는 것을 확인(첫 발은 입장 0.8초 뒤, 이후 4초 간격), 콘솔 오류 0. 해안가 1웨이브는 한 진영만 나와 예상 교전이 0곳이라 교전 표지는 준비 단계에서 직접 보지 못함(전투 시작 때와 같은 호출). 벽 배치 뒤 재생도 직접 확인하지 않음
+- 사람의 개입: 4초 간격과 교전 표지 동반 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 준비 단계 예고 타이머, 길 변경 시 초기화. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Claude Code | 수정 | 선분 1회 훑기 모드, 교전 표지 지우기. 사용 |
+| docs/ui-flow.md | Python | 수정 | 준비 단계 예고 설명 추가 |
+
+#### 증거
+- 없음 (Play Mode 로그로 확인)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일 확인, Play Mode에서 준비 단계의 선분·표지 수를 시간대별로 기록
+- 활용 방식: 확인용 코루틴을 `script eval`로 실행해 표시 중인 선분 수가 바뀌는 시각을 로그로 남김
+- 잘된 점: 재생 간격을 시각으로 확인
+- 잘 안된 점 및 개선 필요: 잠긴 스테이지는 선택이 막혀 첫 실행이 헛돌았고, 전투 클래스가 internal이라 확인 스크립트를 리플렉션으로 고쳐 다시 실행
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 두 진영이 만나는 웨이브의 준비 단계에서 교전 표지가 뜨는지, 벽을 바꾼 직후 예고가 새 길로 나오는지, 4초 간격이 플레이 중 거슬리지 않는지
