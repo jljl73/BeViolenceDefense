@@ -340,8 +340,10 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 {
                     encounterHintRemaining -= battleClock.DeltaTime;
                     if (encounterHintRemaining <= 0f)
-                        view.ShowBattleRoutes(battle.RoundRoutes());   // 교전 예고 칸을 지우고 평소의 전투 경로 표시로
+                        view.ShowBattleForecast();
                 }
+                if (battle.CurrentPhase != DefenseBattle.Phase.Combat)
+                    view.StopRouteTracers();
                 if (battle.CurrentPhase == DefenseBattle.Phase.Preparation)
                 {
                     RefreshPlanningTiles();
@@ -608,8 +610,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             forecastCounts[side] = side < battle.FactionCount ? battle.RoundSpawnCount(side) : 0;
         IReadOnlyCollection<Vector2Int> encounters = battle.ForecastEncounterCells();
         Vector3[][] routes = battle.RoundRoutes();
-        view.ShowBattleRoutes(routes, encounters);
-        view.PlayRouteTracers(routes, forecastCounts);
+        view.ShowBattleForecast(routes, encounters);
+        view.StartRouteTracers(routes, forecastCounts);
         view.PlayEncounterBeacons(encounters, 0.7f);
         encounterHintRemaining = encounters.Count > 0 ? EncounterHintSeconds : 0f;
     }
@@ -829,12 +831,11 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Combat)
             SetAimedSpell(null);
 
-        view.AdvanceRouteMarkers(battle.CurrentPhase switch
-        {
-            DefenseBattle.Phase.Preparation => Time.unscaledDeltaTime,
-            DefenseBattle.Phase.Combat => battleClock.DeltaTime,
-            _ => 0f
-        });
+        if (battle.CurrentPhase == DefenseBattle.Phase.Preparation)
+            view.AdvanceRouteMarkers(Time.unscaledDeltaTime);
+        else if (battle.CurrentPhase == DefenseBattle.Phase.Combat)
+            // 전투 배속을 올려도 선분의 방향을 읽을 수 있도록 최대 1배속을 적용한다.
+            view.AdvanceRouteTracers(battleClock.DeltaTime / Mathf.Max(1f, battleClock.PlaybackSpeed));
         view.AdvanceEffects(battleClock.DeltaTime);
         view.SyncCoreShield(battle.HasCoreShield);
         UpdateSpawnForecast();

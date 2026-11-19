@@ -23,8 +23,10 @@ internal sealed class DefenseBoardView
     private const float RouteMarkerSpeed = 0.55f;
     private const float RouteEndpointTaper = 0.24f;
     private const float SingleLaneRouteMargin = 0.04f;
-    private const float BattleRouteTileTint = 0.3f;
-    private const float BattleRouteMarkerTint = 0.6f;
+    private const int RouteTracerDashes = 5;
+    private const float RouteTracerSpeed = 7f;
+    private const float RouteTracerStagger = 0.085f;
+    private const float RouteTracerRepeatGap = 2f;
     private const float SpawnPadHeight = 0.09f;
     private const float GoblinTurnSpeed = 1440f;
     private const float RunStopGrace = 0.08f;
@@ -166,6 +168,9 @@ internal sealed class DefenseBoardView
     private readonly int boardDepth;
     private readonly List<MeshRenderer> routeMarkers = new();
     private readonly List<RouteMarkerMotion> routeMarkerMotions = new();
+    private readonly List<(MeshRenderer Renderer, Vector3[] Path, float Length, int Dash)> routeTracers = new();
+    private float routeTracerElapsed;
+    private float routeTracerPeriod;
     private float routeMarkerPhase = RouteMarkerSpacing * 0.5f;
     private int activeRouteMarkerCount;
     private readonly Mesh routeMarkerMesh;
@@ -195,7 +200,6 @@ internal sealed class DefenseBoardView
     private readonly MeshRenderer[,] floor;
     private readonly Material[] tiles;
     private readonly Material routeTile;
-    private readonly Material[] battleRouteTiles;
     private readonly Material encounterTile;
     private readonly Material buildWall;
     private readonly Material trim;
@@ -270,11 +274,6 @@ internal sealed class DefenseBoardView
         Material foundation = Palette(theme.foundation);
         tiles = new[] { Palette(theme.tileA, theme.tileTexture), Palette(theme.tileB, theme.tileTexture) };
         routeTile = Palette(theme.routeTile, theme.tileTexture);
-        battleRouteTiles = new[]
-        {
-            Palette(Color.Lerp(theme.tileA, theme.routeTile, BattleRouteTileTint), theme.tileTexture),
-            Palette(Color.Lerp(theme.tileB, theme.routeTile, BattleRouteTileTint), theme.tileTexture)
-        };
         routeMarkerMesh = CreateRouteMarkerMesh();
         meshes.Add(routeMarkerMesh);
         routeMarkerMaterial = Palette(Color.white);
@@ -736,14 +735,14 @@ internal sealed class DefenseBoardView
 
     public void ShowPlanningTiles(IReadOnlyList<Vector3[]> routes = null,
         IReadOnlyCollection<Vector2Int> encounters = null)
-        => ShowRoutes(routes, encounters, false);
+        => ShowRoutes(routes, encounters, showPlanningRoutes: true);
 
-    /// <summary>전투 중 경로 표시. <paramref name="encounters"/>를 주면 웨이브 시작 직후의 교전 예고 칸도 함께 남긴다.</summary>
-    public void ShowBattleRoutes(IReadOnlyList<Vector3[]> routes, IReadOnlyCollection<Vector2Int> encounters = null)
-        => ShowRoutes(routes, encounters, true);
+    /// <summary>전투 중에는 준비 경로를 숨기고 웨이브 시작 직후 교전 예고 칸만 표시한다.</summary>
+    public void ShowBattleForecast(IReadOnlyList<Vector3[]> routes = null, IReadOnlyCollection<Vector2Int> encounters = null)
+        => ShowRoutes(routes, encounters, showPlanningRoutes: false);
 
     private void ShowRoutes(IReadOnlyList<Vector3[]> routes,
-        IReadOnlyCollection<Vector2Int> encounters, bool subdued)
+        IReadOnlyCollection<Vector2Int> encounters, bool showPlanningRoutes)
     {
         routes = ToBoard(routes);
         PlannedEncounters = encounters ?? System.Array.Empty<Vector2Int>();
@@ -762,7 +761,7 @@ internal sealed class DefenseBoardView
             for (int z = 0; z < boardDepth; z++)
                 floor[x, z].sharedMaterial = tiles[(x + z) % tiles.Length];
 
-        activeRouteMarkerCount = routes == null ? 0 : DrawRoutes(routes, subdued);
+        activeRouteMarkerCount = showPlanningRoutes && routes != null ? DrawPlanningRoutes(routes) : 0;
         for (int i = activeRouteMarkerCount; i < routeMarkers.Count; i++)
             routeMarkers[i].enabled = false;
 
@@ -795,7 +794,7 @@ internal sealed class DefenseBoardView
         }
     }
 
-    private int DrawRoutes(IReadOnlyList<Vector3[]> routes, bool subdued)
+    private int DrawPlanningRoutes(IReadOnlyList<Vector3[]> routes)
     {
         var stepsByCell = new Dictionary<Vector2Int, List<(int Route, Vector3 Direction)>>();
         for (int route = 0; route < routes.Count; route++)
@@ -820,9 +819,7 @@ internal sealed class DefenseBoardView
         }
 
         foreach (var cell in stepsByCell.Keys)
-            floor[cell.x, cell.y].sharedMaterial = subdued
-                ? battleRouteTiles[(cell.x + cell.y) % battleRouteTiles.Length]
-                : routeTile;
+            floor[cell.x, cell.y].sharedMaterial = routeTile;
         if (routeChevron == null)
             return 0;
 
@@ -854,8 +851,6 @@ internal sealed class DefenseBoardView
             if (flowPath.Length <= 0f)
                 continue;
             Color color = factions[spawnFactions[route]].Color;
-            if (subdued)
-                color = Color.Lerp(battleRouteTiles[0].color, color, BattleRouteMarkerTint);
             int count = Mathf.CeilToInt(flowPath.Length / RouteMarkerSpacing);
             for (int i = 0; i < count; i++)
             {
@@ -1170,13 +1165,12 @@ internal sealed class DefenseBoardView
     }
 
     // ── 웨이브 시작 연출 ──
-    /// <summary>웨이브가 시작되면 각 스폰의 선두가 갈 길을 짧은 선분들이 먼저 달려 보여 준다.</summary>
-    public void PlayRouteTracers(IReadOnlyList<Vector3[]> routes, IReadOnlyList<int> countsPerFaction)
+    /// <summary>활성 스폰의 경로를 선분들이 일정 간격으로 훑는다.</summary>
+    public void StartRouteTracers(IReadOnlyList<Vector3[]> routes, IReadOnlyList<int> countsPerFaction)
     {
-        const int dashes = 5;
-        const float speed = 10f;      // 칸/초. 유닛보다 훨씬 빨라서 길을 먼저 훑는다.
-        const float spacing = 0.085f; // 선분 사이의 출발 간격(초)
+        StopRouteTracers();
         routes = ToBoard(routes);
+        float longestRoute = 0f;
         for (int spawn = 0; spawn < routes.Count; spawn++)
         {
             Vector3[] path = routes[spawn];
@@ -1189,35 +1183,56 @@ internal sealed class DefenseBoardView
             if (length <= 0.01f)
                 continue;
 
+            longestRoute = Mathf.Max(longestRoute, length);
             Color color = factions[spawnFactions[spawn]].Color * 1.45f;
-            float duration = length / speed;
-            for (int dash = 0; dash < dashes; dash++)
+            for (int dash = 0; dash < RouteTracerDashes; dash++)
             {
                 Transform segment = Box("Route tracer", root, path[0], new Vector3(0.24f, 0.07f, 0.75f), routeMarkerMaterial);
                 var renderer = segment.GetComponent<MeshRenderer>();
                 renderer.shadowCastingMode = ShadowCastingMode.Off;
                 renderer.receiveShadows = false;
-                var block = new MaterialPropertyBlock();
-                block.SetColor(BaseColor, color);
-                renderer.SetPropertyBlock(block);
-                segment.localScale = Vector3.zero;
-                GameObject segmentObject = segment.gameObject;
-                float tail = 1f - dash / (float)dashes * 0.55f;   // 뒤따르는 선분일수록 짧다
-                LMotion.Create(0f, length, duration)
-                    .WithDelay(dash * spacing)
-                    .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
-                    .WithOnComplete(() => Object.Destroy(segmentObject))
-                    .Bind(distance =>
-                    {
-                        Vector3 point = PointAlongRoute(path, distance, out Vector3 heading);
-                        float fade = Mathf.Clamp01(Mathf.Min(distance, length - distance) / 0.8f);
-                        segment.localPosition = point + Vector3.up * (RouteMarkerHeight + 0.09f);
-                        segment.localRotation = Quaternion.LookRotation(heading, Vector3.up);
-                        segment.localScale = new Vector3(0.24f * fade, 0.07f, 0.75f * tail * fade);
-                    })
-                    .AddTo(segmentObject);
+                tintBlock.SetColor(BaseColor, color);
+                renderer.SetPropertyBlock(tintBlock);
+                renderer.enabled = false;
+                routeTracers.Add((renderer, path, length, dash));
             }
         }
+        routeTracerElapsed = 0f;
+        routeTracerPeriod = longestRoute / RouteTracerSpeed +
+            (RouteTracerDashes - 1) * RouteTracerStagger + RouteTracerRepeatGap;
+    }
+
+    public void AdvanceRouteTracers(float deltaTime)
+    {
+        if (routeTracers.Count == 0)
+            return;
+
+        routeTracerElapsed = Mathf.Repeat(routeTracerElapsed + deltaTime, routeTracerPeriod);
+        foreach (var (renderer, path, length, dash) in routeTracers)
+        {
+            float distance = (routeTracerElapsed - dash * RouteTracerStagger) * RouteTracerSpeed;
+            renderer.enabled = distance > 0f && distance < length;
+            if (!renderer.enabled)
+                continue;
+
+            Vector3 point = PointAlongRoute(path, distance, out Vector3 heading);
+            float fade = Mathf.Clamp01(Mathf.Min(distance, length - distance) / 0.8f);
+            float tail = 1f - dash / (float)RouteTracerDashes * 0.55f;
+            Transform segment = renderer.transform;
+            segment.SetLocalPositionAndRotation(point + Vector3.up * (RouteMarkerHeight + 0.09f),
+                Quaternion.LookRotation(heading, Vector3.up));
+            segment.localScale = new Vector3(0.24f * fade, 0.07f, 0.75f * tail * fade);
+        }
+    }
+
+    public void StopRouteTracers()
+    {
+        foreach (var tracer in routeTracers)
+        {
+            tracer.Renderer.enabled = false;
+            Release(tracer.Renderer.gameObject);
+        }
+        routeTracers.Clear();
     }
 
     /// <summary>예상 교전 칸에 고리가 퍼지는 표지를 잠깐 띄운다. <paramref name="delay"/>는 선두가 닿을 길을 선분이 훑는 시간만큼 준다.</summary>
