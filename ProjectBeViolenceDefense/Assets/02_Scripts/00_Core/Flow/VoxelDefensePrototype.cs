@@ -180,7 +180,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (battleInfoHud != null)
         {
             hud.UseExternalBattleInfo();
-            battleInfoHud.Bind(StartBattle, SetBattleSpeed, () => hud.Notify(GameText.Get("notice.settings_pending")));
+            battleInfoHud.Bind(StartBattle, SetBattleSpeed, () => Hint("settings_pending", LeftCoreHud.Expression.Pout));
         }
         RefreshPlanningTiles();
     }
@@ -334,7 +334,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 if (battle.CurrentPhase == DefenseBattle.Phase.Preparation)
                 {
                     RefreshPlanningTiles();
-                    hud.Notify(GameText.Get("notice.wave_cleared"));
+                    Hint("wave_cleared", LeftCoreHud.Expression.Happy);
                     if (leftCoreHud != null)
                         leftCoreHud.Cheer();
                 }
@@ -545,13 +545,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 hud.Notify("");
                 break;
             case DefenseGrid.BuildResult.Occupied:
-                hud.Notify(GameText.Get("notice.cell_occupied"));
+                Hint("cell_occupied", LeftCoreHud.Expression.Troubled);
                 break;
             case DefenseGrid.BuildResult.LimitReached:
-                hud.Notify(GameText.Get("notice.no_walls"));
+                Hint("no_walls", LeftCoreHud.Expression.Troubled);
                 break;
             case DefenseGrid.BuildResult.BlocksRoute:
-                hud.Notify(GameText.Get("notice.keep_routes"));
+                Hint("keep_routes", LeftCoreHud.Expression.Surprised);
                 break;
         }
     }
@@ -598,6 +598,18 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         view.PlayRouteTracers(routes, forecastCounts);
         view.PlayEncounterBeacons(encounters, 0.7f);
         encounterHintRemaining = encounters.Count > 0 ? EncounterHintSeconds : 0f;
+    }
+
+    /// <summary>
+    /// 안내·경고. 좌상단 주인공 HUD가 있으면 주인공이 말풍선으로 짧게 말하고(hint.{key}.title/body),
+    /// 없으면 예전처럼 화면 알림(notice.{key})을 띄운다.
+    /// </summary>
+    private void Hint(string key, LeftCoreHud.Expression face)
+    {
+        if (leftCoreHud != null)
+            leftCoreHud.Say(GameText.Get($"hint.{key}.title"), GameText.Get($"hint.{key}.body"), face);
+        else
+            hud.Notify(GameText.Get($"notice.{key}"));
     }
 
     private void UpdateSpawnForecast()
@@ -666,7 +678,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             if (view.TryPickEnemy(pointer, battle.Enemies, out EnemyUnit target))
                 CastTaunt(target);
             else
-                hud.Notify(GameText.Get("notice.pick_taunt_target"));
+                Hint("pick_taunt_target", LeftCoreHud.Expression.Neutral);
             return;
         }
         if (TryPickAreaSpellCenter(mouse, out Vector3 center))
@@ -678,7 +690,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         string blocked = battle.SpellBlockReason(DefenseBattle.Spell.Taunt, 0);
         if (blocked != null)
         {
-            hud.Notify(blocked);
+            SayBlocked(blocked);
             return;
         }
 
@@ -704,7 +716,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         string blocked = battle.SpellBlockReason(spell, rangeStep);
         if (blocked != null)
         {
-            hud.Notify(blocked);
+            SayBlocked(blocked);
             return;
         }
 
@@ -716,7 +728,15 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
     private void OnSpellResolved(DefenseBattle.SpellCommand command, string message,
         IReadOnlyList<EnemyUnit> recipients)
     {
-        hud.Notify(message);
+        // 주인공이 스킬마다 짧은 대사를 외치고, 결과(몇 명에게 걸렸는지)는 말풍선 둘째 줄에 붙는다.
+        if (leftCoreHud != null)
+        {
+            bool worked = recipients.Count > 0;
+            string line = worked ? GameText.Get(SpellLineKey(command.Spell)) : GameText.Get("hint.cast_missed.title");
+            leftCoreHud.Say(line, message, worked ? LeftCoreHud.Expression.Happy : LeftCoreHud.Expression.Troubled, 1.8f);
+        }
+        else
+            hud.Notify(message);
         // 도발의 첫 수신자는 도발 유닛이다. 시전 시점의 위치를 둘레로 반경을 보여준다.
         if (command.Spell == DefenseBattle.Spell.Taunt)
         {
@@ -725,6 +745,23 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             return;
         }
         view.PlayAreaSpell(command.Spell, command.Center, DefenseBattle.AreaSpellRadius(command.RangeStep), recipients);
+    }
+
+    private static string SpellLineKey(DefenseBattle.Spell spell) => spell switch
+    {
+        DefenseBattle.Spell.AttackBuff => "line.cast.attack",
+        DefenseBattle.Spell.Heal => "line.cast.heal",
+        DefenseBattle.Spell.MoveSpeedBuff => "line.cast.move_speed",
+        DefenseBattle.Spell.ArmorBuff => "line.cast.armor",
+        _ => "line.cast.taunt",
+    };
+
+    private void SayBlocked(string reason)
+    {
+        if (leftCoreHud != null)
+            leftCoreHud.Say(GameText.Get("hint.cast_blocked.title"), reason, LeftCoreHud.Expression.Troubled);
+        else
+            hud.Notify(reason);
     }
 
     private bool TryPickAreaSpellCenter(Mouse mouse, out Vector3 center)

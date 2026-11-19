@@ -1155,6 +1155,8 @@ MonoBehaviour:
   popup: {fileID: 722400307}
   selectionCamera: {fileID: 1769180717}
   transition: {fileID: 382806253}
+  selectionMusic: {fileID: 8300000, guid: 0c74dce29a028e646891889ad8aa6a53, type: 3}
+  selectionMusicVolume: 0.7
 --- !u!4 &1647034800
 Transform:
   m_ObjectHideFlags: 0

@@ -1,3 +1,5 @@
+using LitMotion;
+using LitMotion.Extensions;
 using System;
 using TMPro;
 using UnityEngine;
@@ -50,6 +52,13 @@ public sealed class LeftCoreHud : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float troubledBelow = 0.5f;
     [SerializeField, Range(0f, 1f)] private float dangerBelow = 0.25f;
 
+    [Header("Hint bubble (주인공이 짧게 설명하는 말풍선)")]
+    [SerializeField] private RectTransform bubble;
+    [SerializeField] private CanvasGroup bubbleGroup;
+    [SerializeField] private TextMeshProUGUI bubbleTitle;
+    [SerializeField] private TextMeshProUGUI bubbleBody;
+    [SerializeField] private float bubbleTime = 2.8f;
+
     private int lastHealth = -1;
     private int maxHealth = 1;
     private float trailRatio = 1f;
@@ -62,6 +71,10 @@ public sealed class LeftCoreHud : MonoBehaviour
     private int shownIdleFrame = -1;
     private Color[] flashBase = Array.Empty<Color>();
     private string secondaryHex;
+    private float talkUntil;
+    private Expression talkFace;
+    private bool bubbleShown;
+    private MotionHandle bubblePop, bubbleFade;
 
     private void Awake()
     {
@@ -72,6 +85,41 @@ public sealed class LeftCoreHud : MonoBehaviour
             flashBase[i] = flashTargets[i] != null ? flashTargets[i].color : Color.white;
         secondaryHex = ColorUtility.ToHtmlStringRGB(UIPalette.TextSecondary);
         SetExpression(Expression.Neutral);
+        if (bubble != null)
+            bubble.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// 주인공이 초상 옆 말풍선으로 짧게 말한다(경고·안내). 말하는 동안 face 표정을 짓는다.
+    /// 같은 말을 다시 하면 시간만 늘리고 말풍선이 한 번 더 튄다.
+    /// </summary>
+    public void Say(string title, string body, Expression face = Expression.Troubled, float duration = -1f)
+    {
+        if (bubble == null)
+            return;
+        bubbleTitle.text = title;
+        bubbleBody.text = body;
+        bubbleBody.gameObject.SetActive(!string.IsNullOrEmpty(body));
+        talkUntil = Time.unscaledTime + (duration > 0f ? duration : bubbleTime);
+        talkFace = face;
+        bubbleShown = true;
+        bubble.gameObject.SetActive(true);
+        if (bubblePop.IsActive()) bubblePop.Cancel();
+        if (bubbleFade.IsActive()) bubbleFade.Cancel();
+        bubbleGroup.alpha = 1f;
+        bubblePop = LMotion.Create(Vector3.one * 0.7f, Vector3.one, 0.28f).WithEase(Ease.OutBack)
+            .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale).BindToLocalScale(bubble);
+    }
+
+    private void UpdateBubble(float now)
+    {
+        if (!bubbleShown || now < talkUntil)
+            return;
+        bubbleShown = false;
+        if (bubblePop.IsActive()) bubblePop.Cancel();
+        bubbleFade = LMotion.Create(1f, 0f, 0.22f).WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+            .WithOnComplete(() => { if (!bubbleShown) bubble.gameObject.SetActive(false); })
+            .BindToAlpha(bubbleGroup);
     }
 
     /// <summary>매 프레임 현재 코어 체력을 넘긴다. 값이 줄어들면 피격 반응을 재생한다.</summary>
@@ -126,8 +174,10 @@ public sealed class LeftCoreHud : MonoBehaviour
             if (flashTargets[i] != null)
                 flashTargets[i].color = Color.Lerp(flashBase[i], UIPalette.ButtonDanger, shake * flashStrength);
 
+        UpdateBubble(now);
         Expression want =
             now < hitUntil ? Expression.Surprised :
+            now < talkUntil ? talkFace :
             now < cheerUntil ? Expression.Happy :
             lastHealth == 0 || ratio <= troubledBelow ? Expression.Troubled :
             Expression.Neutral;

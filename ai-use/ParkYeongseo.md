@@ -2382,3 +2382,248 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 빌드에서 첫 재생 시 셰이더 깜빡임 여부, 연출 길이(약 2.7초)가 반복 플레이에 부담되는지
+
+### [20261119-stage-bgm] 스테이지별 배경 음악 연결
+- 시각: 2026-11-19 06:48:36 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 사용자가 지정한 곡 배정대로 BGM 연결. StageContent.cs(music·musicVolume), StageSelectionController.cs(선택 화면 곡, 입장 시 스테이지 곡), 스테이지 프리팹 5개, GameScene
+- 사용 방식: 기존 SoundManager.PlayBgm 사용. 곡 파일 5개를 Streaming·Vorbis(품질 0.7)로 가져오기 설정. 볼륨 기본 0.7(임시)
+- 결과 및 확인 방법: 성공 / Play Mode에서 선택 화면 BGM=Groovy Fantasy Battle, 묘지 입장 후 BGM=Esqueleto dançante 확인, 콘솔 오류 0. 실제 음량 균형은 미확인
+- 사람의 개입: 곡 배정 지시(해안가 Sunny, 단풍 Groovy, 설원 Winny, 묘지 Esqueleto, 왕도 Final Royal, 선택 화면 단풍 곡). 곡 파일은 팀원/사용자 제공 — 출처 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/StageContent.cs | Claude Code | 수정 | 스테이지 곡·볼륨 필드. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/StageSelectionController.cs | Claude Code | 수정 | 선택 화면·스테이지 BGM 재생. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_Stages/Stage_*.prefab (5) | Unity CLI | 수정 | 곡 연결. 사용 |
+| ProjectBeViolenceDefense/Assets/06_Audio/00_Music/*.mp3.meta (5) | Unity CLI | 수정 | Streaming·Vorbis 가져오기. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity | Unity CLI | 수정 | 선택 화면 곡 연결. 사용 |
+| docs/ui-flow.md | Claude Code | 수정 | BGM 규칙. 사용 |
+
+#### 증거
+- 없음
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 오디오 가져오기 설정, 프리팹·씬 연결, Play Mode 재생 곡 확인
+- 활용 방식: script eval --file, playmode start/stop
+- 잘된 점: SoundManager.CurrentBgm 으로 재생 곡을 바로 확인
+- 잘 안된 점 및 개선 필요: 콘솔에 내용을 읽을 수 없는 이전 오류 2건이 남아 있었음(지운 뒤 재현 안 됨)
+
+### [20261119-title-prologue] 간이 타이틀 씬 + 프롤로그 그림책(책장 넘김)
+- 시각: 2026-11-19 07:03:20 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (nai_gen.py, 무료 범위 1344x768) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 사용자 스토리(사방에서 몬스터 침공 → 공주·책사 도주 → 견습 궁정 마술사 노아에게 성을 맡김 → 버프만 쓸 줄 앎)를 타이틀 뒤 그림책으로 보여 줌. TitleScene(신규, 빌드 첫 씬), TitleScreen.cs·StorybookPrologue.cs·PageCurl.shader(신규)
+- 사용 방식: 프롤로그 5장 + 타이틀 그림 프롬프트를 [Story] 06_Prologue.txt 에 프로젝트 화풍 그대로 추가해 장면당 3장 생성 후 1장씩 선택(시드는 아래 표). 책장 넘김은 참고 저장소(digital8150/AIGameHackaton)의 원통 말림 방식을 참고해 컬러 그림용 셰이더를 새로 작성(코드 복사 없음). 씬은 에디터 스크립트로 조립하고 빌드 목록 맨 앞에 넣음
+- 결과 및 확인 방법: 성공 / Play Mode에서 타이틀·1장·말림 2단계·넘김 중 캡처, 건너뛰기 후 GameScene 로드와 BGM 유지(Groovy) 확인, 콘솔 오류 0. 실시간 넘김 속도는 미확인
+- 사람의 개입: 스토리·인물 설정, 동화책 넘김 연출 참고 자료 제공. 내레이션 5문장·부제는 AI 초안 — 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Story] 06_Prologue.txt | Claude Code | 생성 | 프롤로그·타이틀 NAI 프롬프트. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/Prologue_01~05.png, Title_Cover.png | NAI V5 | 생성 | 시드 01:2899376436, 02:930522935, 03:3549955713, 04:2322795535, 05:1593869133, 표지:2175766651. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/02_Materials/PageCurl.shader, PageCurl.mat | Claude Code | 생성 | 책장 넘김. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/StorybookPrologue.cs, TitleScreen.cs | Claude Code | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/01_Menu/TitleScene.unity | Unity CLI | 생성 | 사용 |
+| ProjectBeViolenceDefense/ProjectSettings/EditorBuildSettings.asset | Unity CLI | 수정 | TitleScene 을 첫 씬으로. 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Claude Code | 수정 | title.*, story.* 키. 사용 |
+| docs/ui-flow.md | Claude Code | 수정 | 타이틀·프롤로그 흐름. 사용 |
+
+#### 증거
+- Tools/_out/title/*.jpg, Tools/_nai_out/prologue/_06_*.jpg (git 제외)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 씬 조립·빌드 목록 변경, Play Mode 캡처, 씬 전환·BGM 확인
+- 활용 방식: script eval --file, 코루틴에서 CaptureScreenshotAsTexture
+- 잘된 점: 셰이더 진행값을 고정해 말림 단계를 정확히 캡처
+- 잘 안된 점 및 개선 필요: 이 씬에서는 ScreenCapture.CaptureScreenshot 파일 저장이 동작하지 않아 CaptureScreenshotAsTexture 로 바꿈
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 내레이션 문구, 대화창·선택 화면의 화자 이름("견습 마법사")을 "노아"로 바꿀지, 책장 넘김 효과음
+
+### [20261119-prologue-v3] 프롤로그 그림책 레퍼런스 연출 적용, 컬러 고화질 재생성(복슬머리 보정)
+- 시각: 2026-11-19 07:23:43 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (1920x1088, Anlas — 사용자 승인) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 사용자가 이전 해커톤 그림책(세피아 연필, 펼친 책 전체 화면, 손글씨 문구)을 레퍼런스로 제시. 세피아 연필 화풍 시안(v2, 별도 Base)을 12장 생성해 적용했으나 사용자 판단으로 게임 톤과 맞지 않아 폐기하고, 본편 컬러 화풍 + 레퍼런스의 넘김 연출만 채택. 노아의 복슬머리가 안 나오던 문제를 프롬프트 가중치로 보정
+- 사용 방식: [Story] 06_Prologue.txt 를 컬러 화풍으로 되돌리고 노아 외형에 2.0::very fluffy hair... 와 곱슬 억제(-1.5::curly hair, afro...)를 추가, 6장면 x 2장 고화질 생성 후 선택. PageCurl 셰이더에 낡은 가장자리(_Wear)·책등 그림자(_Gutter) 추가(컬러용으로 약하게). 문구는 손글씨체(온글잎 류류체, 레퍼런스와 같은 글꼴·라이선스 문구 동봉) + 크림 띠
+- 결과 및 확인 방법: 성공 / Play Mode 캡처(Tools/_out/title/), 콘솔 오류 0. 세피아 시안은 Tools/_nai_out/prologue_v2 에 보관(미사용)
+- 사람의 개입: 레퍼런스 제공, 세피아 톤 폐기 결정, 고화질 승인
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Story] 06_Prologue.txt | Claude Code | 수정 | 컬러 v3, 노아 복슬머리 보정. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/Prologue_01~05.png, Title_Cover.png | NAI V5 | 교체 | 1920x1088. 시드 01:304538589, 02:2364021763, 03:1418817828, 04:289650227, 05:20432752, 표지:136684527. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/02_Materials/PageCurl.shader | Claude Code | 수정 | _Wear, _Gutter. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/StorybookPrologue.cs | Claude Code | 수정 | 아래 페이지도 같은 종이 재질, 뒤표지 색. 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/00_Fonts/OwnglyphRyuryu.ttf, OwnglyphRyuryu SDF.asset, OwnglyphRyuryu SDF - Story.mat, Licenses/Ownglyph_Ryuryu_License.txt | 레퍼런스 프로젝트 + Unity CLI | 추가 | 손글씨 글꼴(눈누 온글잎 라이선스). 사용 |
+| ProjectBeViolenceDefense/Assets/07_UI/03_StageSelect/ST_Triangle.png | Python | 생성 | 다음·건너뛰기 화살표. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/01_Menu/TitleScene.unity | Unity CLI | 수정 | 전체 화면 책 레이아웃. 사용 |
+| docs/ui-flow.md | Claude Code | 수정 | 그림책 모양 설명. 사용 |
+
+#### 증거
+- Tools/_out/title/*.jpg, Tools/_nai_out/prologue_v3/_06_*.jpg (git 제외)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: TMP 손글씨 글꼴 에셋 생성, 씬 재조립, Play Mode 캡처
+- 활용 방식: script eval --file
+- 잘된 점: 조립 스크립트 재실행으로 레이아웃·재질 반복 수정
+- 잘 안된 점 및 개선 필요: TMP 외곽선이 얇은 손글씨 획을 덮어 글자가 흐려짐 → 외곽선 대신 언더레이 후광으로 해결
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: 온글잎 류류체 라이선스 조건(프로모션 활용 문구) 수용 여부
+
+### [20261119-title-layers-spawn-badge] 타이틀 배경·캐릭터 분리, 스폰 숫자 배지
+- 시각: 2026-11-19 07:31:55 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (배경 1920x1088·캐릭터 1024x1536, Anlas — 사용자 승인) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: (1) 사용자 제안대로 타이틀을 배경 + 따로 생성한 캐릭터 컷아웃으로 구성. (2) 전투 중 스폰 지점 위 "×N" 숫자가 모래 바닥 등에서 거의 안 보이던 문제 해결(DefenseBoardView 스폰 예고)
+- 사용 방식: [Story] 06 에 2-B(인물 없는 배경), 2-C(노아 전신, 투명 배경) 추가 → 배경 3장·캐릭터 4장 생성 후 1장씩 선택(배경 3665166247, 캐릭터 4270691627). TitleScreen 에 캐릭터가 오른쪽에서 들어와 위아래로 떠 있는 동작 추가. 스폰 숫자: 연한 글자+얇은 외곽선 → 진영 색 테두리가 있는 짙은 둥근 배지 메시 위에 큰 진영 색 숫자, 항상 맨 위에 그림(ZTest Always). TMP <mark> 배지는 색이 제대로 안 나와 메시로 교체
+- 결과 및 확인 방법: 성공 / Play Mode 캡처(Tools/_out/title/title.jpg, Tools/_out/stageselect/spawn_badge_crop.jpg), 콘솔 오류 0
+- 사람의 개입: 타이틀 구성 방식 제안, 스폰 숫자 가독성 문제 제기
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Story] 06_Prologue.txt | Claude Code | 수정 | 2-B, 2-C 추가. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/Title_Background.png, Title_Noah.png | NAI V5 | 생성 | 사용 (Title_Cover.png 는 미사용) |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/TitleScreen.cs | Claude Code | 수정 | 캐릭터 등장·플로팅. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/01_Menu/TitleScene.unity | Unity CLI | 수정 | 배경 + 캐릭터 레이어. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/05_World/DefenseBoardView.cs | Claude Code | 수정 | 스폰 숫자 배지(둥근 사각형 메시, 진영 색 테두리), 크기 8.5→11. 사용 |
+
+#### 증거
+- Tools/_out/title/title.jpg, Tools/_out/stageselect/spawn_badge_crop.jpg (git 제외)
+
+#### Unity CLI 사용
+- 구현하거나 수행한 작업: 컴파일, 씬 재조립, Play Mode 캡처(입장 연출 종료를 기다린 뒤 촬영)
+- 활용 방식: script eval --file, 코루틴 캡처
+- 잘된 점: 연출 상태(IsPlaying)를 기다려 정확한 장면을 캡처
+- 잘 안된 점 및 개선 필요: 고정 프레임 대기로는 백그라운드 에디터에서 연출 중간이 찍힘 → 상태 대기로 바꿈
+
+### [20261119-scene-wipe] 그림책 → 스테이지 선택 모션그래픽 와이프
+- 시각: 2026-11-19 08:06:36 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 프롤로그 그림책이 끝나고 GameScene(스테이지 선택)으로 넘어갈 때 스테이지 입장 연출과 같은 언어의 와이프. SceneWipe.cs·SceneWipe.prefab(신규), TitleScreen·StorybookPrologue·StageSelectionPopup 연결
+- 사용 방식: 자기 캔버스를 가진 DontDestroyOnLoad 오브젝트가 금·크림·자주 사선 띠로 덮고, 리본("성을 지켜라!")·STAGE SELECT 자간 연출·반짝이를 띄운 뒤 LoadSceneAsync, 로드 후 띠가 왼쪽으로 빠지며 선택 화면 카드 등장 연출(ReplayIntro)을 맞춰 다시 튼다. 그림책은 페이드 없이 바로 와이프에 넘김(fadeOnFinish=false). 문구는 GameText wipe.select.*
+- 결과 및 확인 방법: 성공 / Play Mode에서 매 프레임 캡처로 덮기→리본→GameScene 로드→걷기→카드 등장 순서 확인, 콘솔 오류 0. 실시간 속도감은 미확인
+- 사람의 개입: 연출 방향 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/SceneWipe.cs | Claude Code | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/SceneWipe.prefab | Unity CLI | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/TitleScreen.cs, StorybookPrologue.cs, StageSelectionPopup.cs | Claude Code | 수정 | 와이프 연결, fadeOnFinish, ReplayIntro. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/01_Menu/TitleScene.unity | Unity CLI | 수정 | 와이프 프리팹 연결. 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Claude Code | 수정 | wipe.select.label/caption. 사용 |
+
+#### 증거
+- Tools/_out/title/wipe_seq.jpg, wipe_end.jpg (git 제외)
+
+### [20261119-title-v2] 타이틀 개편 — 흰 바탕+도형, 손 뻗으며 도망치는 노아와 쫓아오는 몬스터
+- 시각: 2026-11-19 08:54:23 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (1536x1024 투명 배경, Anlas — 사용자 승인) / Python(Pillow) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 사용자가 제시한 레퍼런스 구도(자체 검열본, 외부 작품 — 구도·배경 처리 방식만 참고)대로 타이틀 개편. 공격 마법을 못 쓰는 노아가 화면 쪽으로 손을 뻗으며 도망쳐 오고, 뒤에서 화난 몬스터들이 쫓아옴. 배경은 흰 바탕 + 도형
+- 사용 방식: [Story] 06 에 3-A(노아, 투명), 3-B(몬스터 무리, 투명) 추가, 4장·3장 생성 후 선택(노아 4215071725, 몬스터 390956994). 배경(분홍 원·하트·마름모·점 무리·자주 모서리 띠)과 속도선·충격선은 Python으로 그림. TitleScreen 에 달리기 들썩임(노아 상하+기울기, 몬스터 엇박자 상하+좌우), 속도선 떨림, 제목 판 톡 튀어나옴. 게임 이름은 미정이라 기존 이름을 자리 표시로 유지
+- 결과 및 확인 방법: 성공 / Play Mode 캡처 Tools/_out/title/title.jpg, 콘솔 오류 0. 배치는 3회 조정(몬스터가 노아 뒤에 가려지는 문제)
+- 사람의 개입: 레퍼런스·구도·배경 방향 지시
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Story] 06_Prologue.txt | Claude Code | 수정 | 3-A, 3-B 추가. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/TitleV2_Noah.png, TitleV2_Monsters.png | NAI V5 | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/TitleV2_Base.png, TitleV2_SpeedLines.png, TitleV2_Dashes.png | Python | 생성 | 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/TitleScreen.cs | Claude Code | 수정 | 달리기 들썩임·속도선 연출. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/01_Menu/TitleScene.unity | Unity CLI | 수정 | 타이틀 레이아웃 교체. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/Title_Cover.png, Title_Background.png, Title_Noah.png | NAI V5 | — | 이전 시안, 현재 미사용(삭제 여부 확인 필요) |
+
+#### 증거
+- Tools/_out/title/title.jpg (git 제외)
+
+### [20261119-title-v3] 타이틀 방향 수정 — 오른쪽으로 도망치는 노아, 같은 방향으로 쫓는 몬스터, 흰 바탕+성
+- 시각: 2026-11-19 09:00:39 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / NovelAI Diffusion V5 (Anlas — 사용자 승인) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 사용자 피드백 — 노아는 화면 쪽이 아니라 자기 진행 방향으로 손을 뻗어야 하고, 몬스터와 진행 방향이 같아야 하며, 도형은 빼고 성을 넣을 것
+- 사용 방식: [Story] 06 에 3-C(오른쪽으로 달리며 앞으로 손을 뻗는 노아, 투명), 3-D(흰 바탕 + 성) 추가, 4장·3장 생성 후 선택(노아 440207890, 배경 4065081224). 몬스터(오른쪽 돌진)는 왼쪽 아래, 노아는 가운데에서 오른쪽 성을 향해 손을 뻗음. 도형·속도선 레이어 제거, 버튼은 제목 아래로 이동, 노아 등장 방향을 왼쪽→오른쪽으로
+- 결과 및 확인 방법: 성공 / Play Mode 캡처 Tools/_out/title/title.jpg, 콘솔 오류 0
+- 사람의 개입: 방향·배경 피드백
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| Art Prompts/[Story] 06_Prologue.txt | Claude Code | 수정 | 3-C, 3-D 추가. 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/TitleV2_Noah.png, TitleV2_Base.png | NAI V5 | 교체 | 사용 |
+| ProjectBeViolenceDefense/Assets/05_Art/00_Sprites/Story/TitleV2_SpeedLines.png | Python | 삭제 | 도형 제거 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/TitleScreen.cs | Claude Code | 수정 | 등장 방향. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/01_Menu/TitleScene.unity | Unity CLI | 수정 | 배치. 사용 |
+
+#### 증거
+- Tools/_out/title/title.jpg (git 제외)
+
+### [20261119-hint-bubble-mockup] 안내 문구 → 주인공 말풍선 목업
+- 시각: 2026-11-19 09:12:55 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / OpenAI 이미지 편집 API (gpt-image-2.6-sunburst)
+- 목적 및 적용 위치: 전투 화면 가운데 흰 글자 안내("벽을 모두 사용했습니다…")가 보드 위에서 묻히는 문제. 왼쪽 위 초상 HUD의 주인공이 짧은 말풍선으로 설명하는 안. ArtDirection/Mockups/G15_HintBubble_20261119/ (git 제외)
+- 사용 방식: 실제 전투 캡처, 현재 안내 문구 캡처, 곤란 표정 초상을 참조로 넣고 말풍선만 추가하도록 요청, 1장 생성
+- 결과 및 확인 방법: 성공 / PNG 직접 확인. 초상 오른쪽·마나 바 아래 크림 말풍선, 꿀색 "!" 배지, 두 줄 문구(굵은 첫 줄), 초상 곤란 표정
+- 사람의 개입: 아이디어 제시. 채택 여부 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ArtDirection/Mockups/G15_HintBubble_20261119/HintBubble_Mockup_A.png | GPT 이미지 | 생성 | 검토 중 |
+| ArtDirection/Mockups/G15_HintBubble_20261119/PROMPTS.txt | Claude Code | 생성 | 프롬프트 |
+
+#### 증거
+- 없음 (목업 폴더는 git 제외)
+
+### [20261119-hint-bubble] 안내 문구를 주인공 말풍선으로 구현
+- 시각: 2026-11-19 09:23:18 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 목업 A(G15) 채택. 화면 가운데 흰 글자 알림을 좌상단 주인공 HUD 말풍선으로. LeftCoreHud.cs(Say, 말풍선 연출, 말하는 동안 표정), VoxelDefensePrototype.cs(Hint 로 6종 안내 전환), LeftCoreHud.prefab(말풍선 조립), GameText(hint.* 12키)
+- 사용 방식: 크림 면 + 자주 테두리 + 그림자 + 초상을 가리키는 꼬리 + 꿀색 "!" 배지, 굵은 제목·작은 본문. LitMotion 으로 톡 튀어나오고 2.8초 뒤 사라짐. 표정 우선순위: 피격 > 말풍선 > 기쁨 > 체력 낮음 > 평상시. 주인공 HUD 가 없는 씬은 기존 알림으로 대체
+- 결과 및 확인 방법: 성공 / Play Mode 에서 벽 소진 안내를 띄워 캡처(Tools/_out/stageselect/hint_bubble.png), 플레이 중 콘솔 오류 0. 프리팹 재저장 때 에디터에서 TMP_SubMeshUI.OnValidate NRE 5건(TMP 에디터 내부, 플레이와 무관 — 깨끗한 콘솔로 재실행 시 0건)
+- 사람의 개입: 목업 채택. 안내 문구 6종은 AI 초안 — 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/LeftCoreHud.cs | Claude Code | 수정 | Say 말풍선. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | Hint 경로. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/LeftCoreHud.prefab | Unity CLI | 수정 | Hint Bubble 추가. 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Claude Code | 수정 | hint.* 키. 사용 |
+| docs/ui-flow.md | Claude Code | 수정 | 말풍선 규칙. 사용 |
+
+#### 증거
+- Tools/_out/stageselect/hint_bubble.png (git 제외)
+
+### [20261119-skill-tip-lines] 스킬 설명 카드 패널, 스킬 사용 대사
+- 시각: 2026-11-19 09:28:36 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: (1) 스킬 슬롯 위 설명 글자가 보드에 묻혀 안 보이는 문제 → 짙은 카드 패널. (2) 스킬 사용 시 주인공이 짧은 대사를 말풍선으로. DefenseHud.cs(actionTip 카드·자동 크기, 슬롯 설명 서식), VoxelDefensePrototype.cs(시전 결과·불가 사유를 말풍선으로), LeftCoreHud.cs(Say 지속 시간 인자), GameText(line.cast.* 5, hint.cast_* 2)
+- 사용 방식: 카드는 PanelRaised 96% + 테두리, 글자 크기에 맞춰 늘어나고 최대 640px에서 줄바꿈. 첫 줄 스킬 색 굵은 이름 + 단축키·마나 비용(마나 색), 다음 줄 설명, 불가 사유는 산호색. 대사는 1.8초, 성공 시 기쁜 표정, 대상 없음·불가 시 곤란 표정
+- 결과 및 확인 방법: 성공 / Play Mode 에서 전투 시작 후 힐 슬롯 선택 + 힐 대사 캡처(Tools/_out/stageselect/skill_tip.jpg), 콘솔 오류 0
+- 사람의 개입: 문제 제기·대사 예시("힐! 건강해지세요!"). 나머지 대사는 AI 초안 — 확인 필요
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs | Claude Code | 수정 | 설명 카드. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Claude Code | 수정 | 시전 대사·불가 사유 말풍선. 사용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/LeftCoreHud.cs | Claude Code | 수정 | Say 지속 시간. 사용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Claude Code | 수정 | 대사 키. 사용 |
+| docs/ui-flow.md | Claude Code | 수정 | 설명. 사용 |
+
+#### 증거
+- Tools/_out/stageselect/skill_tip.jpg (git 제외)

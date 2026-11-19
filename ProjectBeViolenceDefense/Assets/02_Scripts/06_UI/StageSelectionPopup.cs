@@ -149,6 +149,13 @@ public sealed class StageSelectionPopup : MonoBehaviour
             heroine.texture = mood.portrait;
     }
 
+    /// 씬 와이프가 걷힐 때처럼, 이미 열린 화면의 등장 연출을 다시 튼다.
+    public void ReplayIntro()
+    {
+        if (isActiveAndEnabled)
+            PlayIntro();
+    }
+
     private void OnEnable()
     {
         PlayIntro();

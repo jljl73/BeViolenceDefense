@@ -12159,6 +12159,8 @@ MonoBehaviour:
     border: {r: 0.5764706, g: 0.6392157, b: 0.7372549, a: 1}
   boardCamera: {fileID: 7044577048721244496}
   ambience: {fileID: 5375218403254293553}
+  music: {fileID: 8300000, guid: 8a633776e7f581c418e4eab9f0908849, type: 3}
+  musicVolume: 0.7
   sun: {fileID: 1235944421642412782}
   skybox: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   ambientMode: 1
