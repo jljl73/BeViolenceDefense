@@ -98,10 +98,11 @@ internal static class VerifyEnemyGroupsOnce
         Require(pursued, "Default groups must pursue enemies beyond attack range.");
         Require(minimumSpacing >= CombatPositioning.RequiredSpacing(factions[0], factions[1]) - 0.001f, "Units must keep their spacing through turns and merges.");
         Require(kills > 0 && forecast == 1, "Default groups must fight and forecast a single first encounter.");
+        int hits = Mathf.Max(0, contacts - 1);
         Require(battle.CurrentPhase == DefenseBattle.Phase.Preparation && kills + contacts == expectedEnemies &&
-            battle.CoreHealth == DefenseBattle.CoreMaxHealth - contacts,
+            battle.CoreHealth == DefenseBattle.CoreMaxHealth - hits,
             "The round must resolve every unit and count contacts correctly.");
-        Require(coreHitNotifications == contacts, "Each core contact must notify the caster hit animation.");
+        Require(coreHitNotifications == hits, "Only unshielded contacts should report a hit.");
         Require(battle.EnemiesPerRound == expectedEnemies + 5, "The next round must gain five reinforcements.");
         Debug.Log($"ENEMY_GROUPS_PASS: contacts={contacts}, kills={kills}, forecast={forecast}");
     }

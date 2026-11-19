@@ -1,0 +1,5 @@
+Unity 6000.3.28f1 / macOS Metal / CLI Play Mode / exit 0
+SPEED_RIBBON_PLAY_PASS catalog=20, shared ribbon mesh, ankle placement and culling bounds, movement and curved turn history, stop retraction, paused shape, giant scaling, original materials preserved, no speed particles or line trails, independent expiry with other buffs, stacking, death cleanup and shader compilation
+C# compile errors: 0; shader supported, ShaderUtil errors: 0.
+Known editor startup issue: UnityEditor.Search.SearchDatabase ArgumentOutOfRangeException; validation proceeded and passed.
+Visual refinement: raised flow and increased continuous base illumination to prevent detached bright spots.

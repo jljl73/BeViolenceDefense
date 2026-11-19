@@ -61,8 +61,10 @@ public sealed class BattleInfoHud : MonoBehaviour
     }
 
     /// <summary>매 프레임 전투 상태를 넘긴다.</summary>
+    /// <param name="battleSpeed">플레이어가 고른 배속. 배속 버튼 표시에 쓴다.</param>
+    /// <param name="playbackSpeed">지금 전투가 도는 배속(자동 빨리감기 포함). 타이머에 쓴다. 0이면 battleSpeed.</param>
     public void Refresh(int stage, bool inCombat, bool canCallWave, int left, int right,
-        Color leftColor, Color rightColor, int battleSpeed)
+        Color leftColor, Color rightColor, int battleSpeed, int playbackSpeed = 0)
     {
         if (stage != shownStage)
         {
@@ -73,7 +75,7 @@ public sealed class BattleInfoHud : MonoBehaviour
         if (inCombat && !wasInCombat)
             combatSeconds = 0f;
         if (inCombat)
-            combatSeconds += Time.unscaledDeltaTime * Mathf.Max(1, battleSpeed);
+            combatSeconds += Time.unscaledDeltaTime * Mathf.Max(1, playbackSpeed > 0 ? playbackSpeed : battleSpeed);
         wasInCombat = inCombat;
         int seconds = Mathf.FloorToInt(combatSeconds);
         if (seconds != shownSeconds)

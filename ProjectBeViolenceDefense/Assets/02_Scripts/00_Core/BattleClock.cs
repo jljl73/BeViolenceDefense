@@ -6,6 +6,8 @@ using UnityEngine;
 internal sealed class BattleClock
 {
     public const float AimSpeed = 0.1f;
+    // 한 진영만 남아 더는 교전이 없을 때 자동으로 쓰는 배속. 첫 테스트용 임시 값.
+    public const int FastForwardSpeed = 4;
     // 프레임이 크게 밀려도 한 프레임에 이 이상 틱을 돌리지 않는다. 넘치는 시간은 버려서 게임이 잠시 느려진다.
     public const int MaxTicksPerFrame = 8;
 

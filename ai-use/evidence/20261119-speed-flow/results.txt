@@ -1,0 +1,6 @@
+Unity 6000.3.28f1 / macOS Metal / CLI Play Mode / process exit 0
+SPEED_FLOW_PLAY_PASS catalog=20, shared mesh, lower body placement, movement and turn direction, stop retraction, pause, giant scaling, original materials preserved, no speed particles or line trails, independent expiry with other buffs, stacking, death cleanup and shader compilation
+Production C# compile errors: 0; speed aura shader supported, ShaderUtil errors: 0
+Observed editor startup issue: UnityEditor.Search.SearchDatabase ArgumentOutOfRangeException; validation completed successfully.
+First validation harness had a local variable name collision; renamed the test loop variable before running.
+Initial visual used an open cylinder; actual render showed a ring, so the final version uses a flattened filled sphere volume.

@@ -1,0 +1,612 @@
+diff --git a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/BattleClock.cs b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/BattleClock.cs
+index e6df5bc..bafe1e7 100644
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/BattleClock.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/BattleClock.cs
+@@ -6,6 +6,8 @@ using UnityEngine;
+ internal sealed class BattleClock
+ {
+     public const float AimSpeed = 0.1f;
++    // 한 진영만 남아 더는 교전이 없을 때 자동으로 쓰는 배속. 첫 테스트용 임시 값.
++    public const int FastForwardSpeed = 4;
+     // 프레임이 크게 밀려도 한 프레임에 이 이상 틱을 돌리지 않는다. 넘치는 시간은 버려서 게임이 잠시 느려진다.
+     public const int MaxTicksPerFrame = 8;
+ 
+diff --git a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
+index 528d4c8..6969778 100644
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/CombatPositioning.cs
+@@ -9,10 +9,10 @@ internal sealed class CombatPositioning
+     internal const float LostTargetSearchDuration = 4f;
+     // 보이지 않는 적을 쫓다가 이 시간 동안 조금도 가까워지지 못하면 추격을 그만두고 원래 경로로 돌아간다.
+     internal const float HiddenPursuitStallLimit = 2f;
+-    // 적에게 가는 길이 직선 거리보다 이 칸 수 넘게 길면 돌아가지 않는다. 길은 있는데 유닛에 막힌
+-    // 경우에는 뒤에서 기다리고, 지형 때문에 이만큼 돌아야 하는 적은 그 자리에서는 상대하지 않는다.
+-    // 첫 테스트용 임시 값.
+-    internal const float MaxPursuitDetour = 3f;
++    // 적에게 가는 길이 직선 거리보다 이 거리(유닛 사거리·인지와 같은 단위) 넘게 길면 돌아가지 않는다.
++    // 길은 있는데 유닛에 막힌 경우에는 뒤에서 기다리고, 지형 때문에 이만큼 돌아야 하는 적은 그 자리에서는
++    // 상대하지 않는다. 칸 크기에 곱하지 않는다: 칸이 커져도 유닛이 감수할 우회는 그대로다. 첫 테스트용 임시 값.
++    internal const float MaxPursuitDetour = 2f;
+     // 옆걸음 직후 이 시간 동안은 방금 온 쪽으로 되돌아가는 옆걸음을 고르지 않는다.
+     internal const float SidestepMemoryDuration = 2.5f;
+     // 스스로 다른 적으로 바꾼 뒤 이 시간 동안은 다시 바꾸지 않는다.
+@@ -431,7 +431,8 @@ internal sealed class CombatPositioning
+     private EnemyUnit FindTarget(EnemyUnit enemy)
+     {
+         // Taunt overrides awareness, walls, retaliation and a fight already under way.
+-        // Only a taunter proven unreachable from here falls back to the usual choice.
++        // Only a taunter proven unreachable from here falls back to the usual choice. 도발도 우회 한도를
++        // 따른다: 벽 너머의 도발 유닛에게 가는 길이 MaxPursuitDetour 넘게 돌아야 하면 끌려가지 않는다.
+         if (enemy.ActiveTaunter is { } taunter && !IsKnownUnreachable(enemy, taunter))
+         {
+             enemy.ConsumeRetaliationRequest();
+@@ -692,7 +693,7 @@ internal sealed class CombatPositioning
+         pathGoals.Clear(); pathSlots.Clear();
+         for (int i = 0; i < SlotCount; i++)
+             if (SlotAvailable(enemy, target, i)) { pathGoals.Add(SlotPosition(enemy, target, i)); pathSlots.Add(i); }
+-        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int goal, maxDetour: PursuitDetourLimit(enemy, target)))
++        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int goal, maxDetour: MaxPursuitDetour))
+             slot = pathSlots[goal];
+         else
+         {
+@@ -701,7 +702,7 @@ internal sealed class CombatPositioning
+             // reachable spot with a clear strike.
+             pathGoals.Clear(); pathGoals.Add(target.Position);
+             if (!allowOpenPosition ||
+-                !pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, strikeTarget: target, maxDetour: PursuitDetourLimit(enemy, target)))
++                !pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, strikeTarget: target, maxDetour: MaxPursuitDetour))
+             {
+                 enemy.PathRetryRemaining = StalledRetargetDelay;
+                 CheckStaticReachability(enemy, target, hidden: false);
+@@ -770,7 +771,7 @@ internal sealed class CombatPositioning
+             if (grid.IsWalkable(grid.WorldToCell(point)) && grid.HasLineOfSight(point, goal))
+                 pathGoals.Add(point);
+         }
+-        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, maxDetour: PursuitDetourLimit(enemy, target)))
++        if (pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out _, maxDetour: MaxPursuitDetour))
+         {
+             enemy.CombatPathIndex = 0; enemy.CombatPathTarget = target; enemy.CombatPathAnchor = goal;
+             enemy.CombatPathSearch = true;
+@@ -809,7 +810,7 @@ internal sealed class CombatPositioning
+             }
+         // A temporary crowd is not an unreachable target. Only reject if even a route
+         // ignoring every unit fails or is a long way round, or no valid striking position exists.
+-        if (pathfinder.Find(enemy, pathGoals, staticPath, out _, ignoreUnits: true, maxDetour: PursuitDetourLimit(enemy, target))) return;
++        if (pathfinder.Find(enemy, pathGoals, staticPath, out _, ignoreUnits: true, maxDetour: MaxPursuitDetour)) return;
+         enemy.UnreachableTarget = target;
+         enemy.UnreachableTargetPosition = enemy.LastKnownTargetPosition;
+         enemy.UnreachableFromPosition = enemy.Position;
+@@ -819,23 +820,33 @@ internal sealed class CombatPositioning
+     public bool IsReturningAlongPath(EnemyUnit enemy) =>
+         enemy.CombatPathTarget == null && enemy.CombatPath.Count > 0;
+ 
+-    public bool TryReturnAlongPath(EnemyUnit enemy, float deltaTime)
++    // firstOffset: 이 번호부터의 경로 점만 목표로 삼는다(지나온 쪽으로 되돌아가지 않게).
++    // shortOnly: 유닛을 돌아가는 짧은 길(MaxPursuitDetour 이내)만 받아들인다.
++    // continueOnly: 이미 따라가던 복귀 경로만 이어 가고 새로 찾지 않는다.
++    public bool TryReturnAlongPath(EnemyUnit enemy, float deltaTime, int firstOffset = 0, bool shortOnly = false,
++        bool continueOnly = false)
+     {
+         if (enemy.CombatPathTarget != null) enemy.CombatPath.Clear();
+         if (!TryUsePath(enemy, null, out Vector3 waypoint, out _))
+         {
++            if (continueOnly)
++            {
++                enemy.CombatPath.Clear();
++                return false;
++            }
+             if (enemy.PathRetryRemaining > 0f) return false;
+             pathGoals.Clear();
+             if (enemy.RemainingRouteWaypoints == 1) pathGoals.Add(enemy.RoutePosition);
+             else
+-                for (int i = 0; i < enemy.RemainingRouteWaypoints - 1; i++) pathGoals.Add(enemy.GetRouteWaypoint(i));
+-            if (!pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int offset))
++                for (int i = firstOffset; i < enemy.RemainingRouteWaypoints - 1; i++) pathGoals.Add(enemy.GetRouteWaypoint(i));
++            if (!pathfinder.Find(enemy, pathGoals, enemy.CombatPath, out int offset,
++                    maxDetour: shortOnly ? MaxPursuitDetour : float.PositiveInfinity))
+             {
+                 enemy.PathRetryRemaining = StalledRetargetDelay;
+                 return false;
+             }
+             enemy.CombatPathTarget = null; enemy.CombatPathIndex = 0;
+-            enemy.ReturnRouteOffset = enemy.RemainingRouteWaypoints == 1 ? -1 : offset;
++            enemy.ReturnRouteOffset = enemy.RemainingRouteWaypoints == 1 ? -1 : offset + firstOffset;
+             if (!TryUsePath(enemy, null, out waypoint, out _)) return false;
+         }
+         Vector3 next = enemy.StepToward(waypoint, deltaTime);
+@@ -943,7 +954,10 @@ internal sealed class CombatPositioning
+                 continue;
+             Vector3 point = enemy.Position + direction * Mathf.Clamp(enemy.Faction.BodyRadius * 3f, 0.4f, 0.9f);
+             float cost = Vector3.Distance(point, goal);
+-            if (cost >= shortest || !CanMove(enemy, target, enemy.Position, point))
++            // 비켜선 자리에서 목표까지 길이 열려 있을 때만 옆걸음을 뗀다. 열리지 않는 옆걸음을 이어 가면
++            // 싸움터 둘레를 옆으로, 뒤로 맴돈다. 그럴 때는 제자리에서 기다린다.
++            if (cost >= shortest || !CanMove(enemy, target, enemy.Position, point) ||
++                !CanMove(enemy, target, point, goal))
+                 continue;
+             shortest = cost;
+             waypoint = point;
+@@ -977,10 +991,6 @@ internal sealed class CombatPositioning
+         return false;
+     }
+ 
+-    // 도발은 벽 너머의 유닛을 끌어오는 주문이라, 도발한 유닛에게 가는 길에는 한도를 두지 않는다.
+-    private float PursuitDetourLimit(EnemyUnit enemy, EnemyUnit target) =>
+-        enemy.ActiveTaunter == target ? float.PositiveInfinity : MaxPursuitDetour * grid.CellSize;
+-
+     private bool ClearOfUnits(EnemyUnit enemy, EnemyUnit target, Vector3 from, Vector3 to, bool attacking)
+     {
+         Vector3 step = to - from;
+diff --git a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs
+index c558d0b..b7abc45 100644
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs
+@@ -81,6 +81,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
+     private DefenseBattle.Spell? aimedSpell;
+     private float aimedRangeScroll;
+     private int battleSpeed = 1;
++    // 한 진영만 남아 자동 빨리감기 중인지. 들어갈 때 한 번 알린다.
++    private bool fastForwarding;
+     private bool buildMode;
+     private BuildModeHud.Tool buildTool;
+     private bool trackingRightButton;
+@@ -89,6 +91,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
+     private Vector2? rightClickPointer;
+     private StageData usedStage;
+     private int fallenEnemies;
++    private int leakedEnemies;
+ 
+     private int SpellRangeStep => Mathf.RoundToInt(aimedRangeScroll);
+ 
+@@ -156,7 +159,9 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
+         battle.EnemyRemoved += enemy => view.RemoveEnemy(enemy, battle.CoreHealth);
+         battle.EnemyRemoved += enemy =>
+         {
+-            if (!enemy.ReachedCore)
++            if (enemy.ReachedCore)
++                leakedEnemies++;
++            else
+                 fallenEnemies++;
+         };
+         if (victoryPanelHud != null)
+@@ -165,7 +170,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
+         spellUnlocks = new StageSpellUnlocks();
+         hud = new DefenseHud(ui, Restart, StartBattle, UseSpell, SetBattleSpeed, encounterIcon, hudArt, factions, spellUnlocks);
+         if (leftCoreHud != null)
+-            hud.UseExternalCorePanel(new Vector2(320, -236));
++            hud.UseExternalCorePanel(leftCoreHud, new Vector2(320, -236));
+         if (manaBarHud != null)
+             hud.UseExternalManaBar((RectTransform)manaBarHud.transform, new Vector2(33, hudArt.SlotFrame != null ? -146 : -130));
+         if (buildModeHud != null)
+@@ -304,7 +309,13 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
+             ResetRightButton();
+         }
+ 
+-        battleClock.BeginFrame(Time.deltaTime, battleSpeed, aimedSpell.HasValue);
++        // 한 진영만 남으면 더는 교전이 없다. 남은 유닛이 코어까지 걷는 동안 자동으로 빨리 감는다.
++        // 배속은 틱이 도는 속도만 바꾸므로 전투 결과는 같다. 조준 슬로우가 우선한다.
++        bool onlyOneSide = battle.OnlyOneSideRemains;
++        if (onlyOneSide && !fastForwarding)
++            hud.Notify(GameText.Get("notice.fast_forward"));
++        fastForwarding = onlyOneSide;
++        battleClock.BeginFrame(Time.deltaTime, PlaybackSpeed, aimedSpell.HasValue);
+         switch (battle.CurrentPhase)
+         {
+             case DefenseBattle.Phase.Preparation:
+@@ -344,7 +355,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
+                     {
+                         int coreMax = DefenseBattle.CoreMaxHealth;
+                         defeatPanel.Show(usedStage != null ? GameText.Get(usedStage.displayNameKey) : null, battle.CoreHealth,
+-                            coreMax, coreMax - battle.CoreHealth, fallenEnemies);
++                            coreMax, leakedEnemies, fallenEnemies);
+                     }
+                     else
+                     {
+@@ -371,9 +382,12 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
+         }
+         int coreMax = DefenseBattle.CoreMaxHealth;
+         victoryPanelHud.Show(usedStage != null ? GameText.Get(usedStage.displayNameKey) : null, battle.CoreHealth, coreMax,
+-            coreMax - battle.CoreHealth, fallenEnemies);
++            leakedEnemies, fallenEnemies);
+     }
+ 
++    // 지금 전투가 도는 배속. 고른 배속과 자동 빨리감기 중 빠른 쪽.
++    private int PlaybackSpeed => fastForwarding ? Mathf.Max(battleSpeed, BattleClock.FastForwardSpeed) : battleSpeed;
++
+     private void SetBattleSpeed(int speed)
+     {
+         if (!ui.HasOpenPopup && battle.CurrentPhase is not (DefenseBattle.Phase.Defeat or DefenseBattle.Phase.Victory))
+@@ -785,6 +799,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
+             _ => 0f
+         });
+         view.AdvanceEffects(battleClock.DeltaTime);
++        view.SyncCoreShield(battle.HasCoreShield);
+         UpdateSpawnForecast();
+         view.AdvanceCoreAnimation(battleClock.DeltaTime, battleClock.PlaybackSpeed);
+         Vector3? spellCenter = aimedSpell.HasValue && TryPickAreaSpellCenter(Mouse.current, out Vector3 center)
+@@ -822,7 +837,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
+             bool inCombat = battle.CurrentPhase == DefenseBattle.Phase.Combat;
+             bool canCallWave = !ui.HasOpenPopup && battle.CurrentPhase == DefenseBattle.Phase.Preparation;
+             battleInfoHud.Refresh(battle.Round, inCombat, canCallWave, left, right, Slot(leftSide).Color,
+-                Slot(rightSide).Color, battleSpeed);
++                Slot(rightSide).Color, battleSpeed, PlaybackSpeed);
+         }
+     }
+ 
+diff --git a/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs b/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
+index aa4865b..5079cf9 100644
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/04_Combat/DefenseBattle.cs
+@@ -29,6 +29,8 @@ internal sealed class DefenseBattle
+     private const int RouteRejoinWaypoints = 3;
+     // 교전 뒤 원래 경로 대신 지금 위치에서 새 경로를 잡으려면 줄어야 하는 최소 거리(칸). 첫 테스트용 임시 값.
+     private const float RerouteMinimumSaving = 2f;
++    // 경로로 돌아갈 때, 코어까지 가장 짧게 이어지는 점보다 이 칸 수 넘게 손해인 점(지나온 쪽)은 고르지 않는다.
++    private const float RejoinSlack = 0.5f;
+     private const int ReinforcementsPerFaction = 1;
+     private const int ExtraReinforcements = 3;
+ 
+@@ -94,6 +96,7 @@ internal sealed class DefenseBattle
+     public Phase CurrentPhase { get; private set; }
+     public int Round { get; private set; } = 1;
+     public int CoreHealth { get; private set; } = CoreMaxHealth;
++    public bool HasCoreShield { get; private set; }
+     public int SpawnCount { get; private set; }
+     public int EnemiesPerRound { get; private set; }
+     public float Mana { get; private set; }
+@@ -181,6 +184,7 @@ internal sealed class DefenseBattle
+             return;
+ 
+         CurrentPhase = Phase.Combat;
++        HasCoreShield = true;
+         TickIndex = 0;
+         pendingSpells.Clear();
+         commandHistory.Clear();
+@@ -543,8 +547,13 @@ internal sealed class DefenseBattle
+                 if (!enemy.ReachedCore)
+                     continue;
+ 
+-                CoreHealth = Mathf.Max(0, CoreHealth - 1);
+-                CoreHit?.Invoke();
++                if (HasCoreShield)
++                    HasCoreShield = false;
++                else
++                {
++                    CoreHealth = Mathf.Max(0, CoreHealth - 1);
++                    CoreHit?.Invoke();
++                }
+                 enemy.Die();
+                 RemoveEnemyAt(i);
+             }
+@@ -578,6 +587,25 @@ internal sealed class DefenseBattle
+ 
+     public int FactionCount => factions.Length;
+ 
++    // 살아 있는 유닛이 한 진영뿐이고 다른 진영은 이번 라운드에 더 나올 유닛도 없다. 더는 교전이 없으므로
++    // 화면에서 빨리 감는 데 쓴다. 전투 진행에는 쓰지 않는 조회다.
++    public bool OnlyOneSideRemains
++    {
++        get
++        {
++            if (CurrentPhase != Phase.Combat || enemies.Count == 0)
++                return false;
++            int side = enemies[0].FactionIndex;
++            foreach (EnemyUnit enemy in enemies)
++                if (enemy.FactionIndex != side)
++                    return false;
++            for (int other = 0; other < factions.Length; other++)
++                if (other != side && spawnedPerFaction[other] < roundSpawnCounts[other])
++                    return false;
++            return true;
++        }
++    }
++
+     private void SpawnNext()
+     {
+         for (int factionIndex = 0; factionIndex < factions.Length; factionIndex++)
+@@ -669,14 +697,14 @@ internal sealed class DefenseBattle
+         // Finish a return path already under way. Choosing between it and a direct line to
+         // the route on every tick zigzags along the edge of where that line is clear.
+         bool offRoute = !enemy.Position.Equals(enemy.RoutePosition);
+-        if (offRoute && combat.IsReturningAlongPath(enemy) && combat.TryReturnAlongPath(enemy, deltaTime))
++        if (offRoute && combat.IsReturningAlongPath(enemy) && combat.TryReturnAlongPath(enemy, deltaTime, continueOnly: true))
+             return;
+-        bool routeInSight = false;
+-        if (offRoute && TryRejoinRoute(enemy, deltaTime, out routeInSight))
++        int firstForward = -1;
++        if (offRoute && TryRejoinRoute(enemy, deltaTime, out firstForward))
+             return;
+-        // 앞쪽 경로 점이 보이는데 다른 유닛에 가려 못 가는 것이면 길이 날 때까지 기다린다. 경로 탐색으로
+-        // 닿을 수 있는 아무 점(뒤쪽일 수 있다)으로 돌아가면 뒤로 갔다 앞으로 오며 여러 번 돌아선다.
+-        if (offRoute && !routeInSight && combat.TryReturnAlongPath(enemy, deltaTime))
++        // 보이는 경로 점이 하나도 없으면(벽 뒤) 경로 탐색으로 돌아간다. 보이는데 다른 유닛에 가려 못 가는
++        // 것이면 일단 기다린다: 여기서 바로 다른 점이나 우회로를 고르면 틱마다 방향이 바뀐다.
++        if (offRoute && firstForward < 0 && combat.TryReturnAlongPath(enemy, deltaTime))
+             return;
+ 
+         // Off-route units wait for their forward connection, rather than walking back
+@@ -697,7 +725,12 @@ internal sealed class DefenseBattle
+         if (enemy.BlockedRouteTime < RouteYieldDelay)
+             return;
+         enemy.BlockedRouteTime = 0f;
+-        if (TryRejoinRoute(enemy, deltaTime, out _))
++        // RouteYieldDelay 동안 막혀 있었다. 향하던 점을 고집하지 않고 앞쪽 경로 점 아무 데나 곧장 갈 수
++        // 있으면 그리로 가고, 없으면 그 점들로 막은 유닛을 짧게 돌아가는 길을 찾는다. 지나온 쪽 점은
++        // 여전히 고르지 않는다. 기다리기만 하면 앞의 아군이 비킬 때까지 몇 초씩 서 있게 된다.
++        if (TryRejoinRoute(enemy, deltaTime, out firstForward, anyForwardPoint: true))
++            return;
++        if (offRoute && firstForward >= 0 && combat.TryReturnAlongPath(enemy, deltaTime, firstForward, shortOnly: true))
+             return;
+         if (combat.TryFindRouteYield(enemy, RouteRejoinWaypoints, out Vector3 destination, out int offset))
+         {
+@@ -736,17 +769,21 @@ internal sealed class DefenseBattle
+             enemy.Reroute(route);
+     }
+ 
+-    // routeInSight: 벽에 가리지 않은 앞쪽 경로 점이 하나라도 있는지(유닛에 막혔는지와 무관).
+-    private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime, out bool routeInSight)
++    // firstForward: 벽에 가리지 않고, 코어까지의 길이 가장 짧은 점보다 RejoinSlack 칸 넘게 손해가 아닌 경로 점 중
++    // 가장 앞 번호(유닛에 막혔는지와 무관). 보이는 경로 점이 없으면 -1.
++    // anyForwardPoint: 향하던 점(RouteBypassOffset)보다 앞 번호만 보는 제한을 풀고, 길이 조건만으로 고른다.
++    private bool TryRejoinRoute(EnemyUnit enemy, float deltaTime, out int firstForward, bool anyForwardPoint = false)
+     {
+-        routeInSight = false;
++        firstForward = -1;
+         // The final point is on the core boundary, not a navigation waypoint. Return
+         // to its approach tile; the normal route step then handles core contact.
+         if (enemy.RemainingRouteWaypoints == 1)
+         {
+             Vector3 approach = enemy.RoutePosition;
+-            routeInSight = grid.CanPursue(enemy.Position, approach);
+-            if (!routeInSight || !combat.CanFollowRoute(enemy, approach))
++            if (!grid.CanPursue(enemy.Position, approach))
++                return false;
++            firstForward = 0;
++            if (!combat.CanFollowRoute(enemy, approach))
+                 return false;
+             Vector3 step = enemy.StepToward(approach, deltaTime);
+             enemy.Face(step);
+@@ -757,8 +794,8 @@ internal sealed class DefenseBattle
+         }
+ 
+         // 보이는 경로 점 가운데 코어까지 가장 짧게 이어지는 길. 그 점이 유닛에 막혀 있어도, 그보다
+-        // 한 칸 넘게 손해인 점(지나온 쪽)으로 되돌아가지는 않는다.
+-        int first = Mathf.Max(0, enemy.RouteBypassOffset);
++        // RejoinSlack 칸 넘게 손해인 점(지나온 쪽)으로 되돌아가지는 않는다.
++        int first = anyForwardPoint ? 0 : Mathf.Max(0, enemy.RouteBypassOffset);
+         float shortest = float.PositiveInfinity;
+         for (int offset = enemy.RemainingRouteWaypoints - 2; offset >= first; offset--)
+         {
+@@ -766,7 +803,13 @@ internal sealed class DefenseBattle
+             if (grid.CanPursue(enemy.Position, waypoint))
+                 shortest = Mathf.Min(shortest, Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset));
+         }
+-        routeInSight = !float.IsPositiveInfinity(shortest);
++        for (int offset = first; offset <= enemy.RemainingRouteWaypoints - 2 && firstForward < 0; offset++)
++        {
++            Vector3 waypoint = enemy.GetRouteWaypoint(offset);
++            if (grid.CanPursue(enemy.Position, waypoint) &&
++                Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset) <= shortest + RejoinSlack * grid.CellSize)
++                firstForward = offset;
++        }
+ 
+         // A fighter may have moved well beyond its old route index. Rejoin the furthest
+         // visible, unobstructed point ahead instead of walking backwards through the army.
+@@ -774,7 +817,7 @@ internal sealed class DefenseBattle
+         {
+             Vector3 waypoint = enemy.GetRouteWaypoint(offset);
+             if (!grid.CanPursue(enemy.Position, waypoint) ||
+-                Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset) > shortest + grid.CellSize ||
++                Vector3.Distance(enemy.Position, waypoint) + enemy.RouteLengthFrom(offset) > shortest + RejoinSlack * grid.CellSize ||
+                 !combat.CanFollowRoute(enemy, waypoint))
+                 continue;
+ 
+diff --git a/ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/BattleInfoHud.cs b/ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/BattleInfoHud.cs
+index 1b9f687..0726d96 100644
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/BattleInfoHud.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/BattleInfoHud.cs
+@@ -61,8 +61,10 @@ public sealed class BattleInfoHud : MonoBehaviour
+     }
+ 
+     /// <summary>매 프레임 전투 상태를 넘긴다.</summary>
++    /// <param name="battleSpeed">플레이어가 고른 배속. 배속 버튼 표시에 쓴다.</param>
++    /// <param name="playbackSpeed">지금 전투가 도는 배속(자동 빨리감기 포함). 타이머에 쓴다. 0이면 battleSpeed.</param>
+     public void Refresh(int stage, bool inCombat, bool canCallWave, int left, int right,
+-        Color leftColor, Color rightColor, int battleSpeed)
++        Color leftColor, Color rightColor, int battleSpeed, int playbackSpeed = 0)
+     {
+         if (stage != shownStage)
+         {
+@@ -73,7 +75,7 @@ public sealed class BattleInfoHud : MonoBehaviour
+         if (inCombat && !wasInCombat)
+             combatSeconds = 0f;
+         if (inCombat)
+-            combatSeconds += Time.unscaledDeltaTime * Mathf.Max(1, battleSpeed);
++            combatSeconds += Time.unscaledDeltaTime * Mathf.Max(1, playbackSpeed > 0 ? playbackSpeed : battleSpeed);
+         wasInCombat = inCombat;
+         int seconds = Mathf.FloorToInt(combatSeconds);
+         if (seconds != shownSeconds)
+diff --git a/ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs b/ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs
+index 0ff47f7..8c5f544 100644
+--- a/ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs
++++ b/ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs
+@@ -40,7 +40,6 @@ internal sealed class DefenseHud
+     private const float SpellSlotSpacing = 124f;
+     private const float FirstSpellSlotX = -3f;
+     private static readonly Vector2 ActionsSize = new(600, 184);
+-    private const float HealthBarThickness = 5f;
+ 
+     private readonly UIManager ui;
+     private readonly Art art;
+@@ -60,6 +59,7 @@ internal sealed class DefenseHud
+     private readonly RectTransform noticeArea;
+     private readonly TextMeshProUGUI core;
+     private readonly Image coreFill;
++    private readonly CoreShieldGlow coreShieldGlow;
+     private readonly RectTransform wallSupply;
+     private readonly Image[] wallIcons = new Image[DefenseGrid.WallLimit];
+     private readonly TextMeshProUGUI wallCount;
+@@ -82,10 +82,13 @@ internal sealed class DefenseHud
+     private readonly TextMeshProUGUI actionTip;
+     private readonly HudButton help;
+     private readonly TextMeshProUGUI helpTip;
+-    private readonly List<Image> healthMarkers = new();
++    private readonly Dictionary<EnemyUnit, UnitStatusMarker> healthMarkers = new();
++    private readonly Stack<UnitStatusMarker> freeHealthMarkers = new();
++    private readonly List<EnemyUnit> retiredMarkers = new();
++    private readonly List<Rect> unitBodyBounds = new();
++    private Sprite[] statusSprites;
+     private readonly Texture2D encounterIcon;
+     private readonly List<RawImage> encounterMarkers = new();
+-    private int visibleMarkers;
+     private bool helpPinned;
+     private string noticeText = "";
+     private float noticeUntil;
+@@ -116,6 +119,12 @@ internal sealed class DefenseHud
+         core = Label("Core", coreStatus, 62, 0, 142, 42, 31);
+         coreFill = Bar("Core Health", coreStatus, Vector2.up, Vector2.up,
+             new Vector2(62, -48), new Vector2(120, 5), UIPalette.ButtonPrimary);
++        var coreTrack = (RectTransform)coreFill.transform.parent;
++        var shieldGlow = Rect("Core Shield Glow", coreStatus, coreTrack.anchorMin, coreTrack.pivot,
++            coreTrack.anchoredPosition, coreTrack.sizeDelta);
++        coreShieldGlow = shieldGlow.gameObject.AddComponent<CoreShieldGlow>();
++        coreShieldGlow.raycastTarget = false;
++        coreShieldGlow.enabled = false;
+ 
+         wallSupply = Rect("Wall Supply", ui.HudLayer, Vector2.one, Vector2.one,
+             new Vector2(-55, -33), new Vector2(150, 84));
+@@ -197,8 +206,9 @@ internal sealed class DefenseHud
+     /// 별도 좌상단 코어 HUD(LeftCoreHud)를 쓰는 씬에서 호출한다. 기존 코어 패널을 숨기고,
+     /// 알림이 새 패널과 겹치지 않도록 알림 위치를 오른쪽으로 옮긴다.
+     /// </summary>
+-    public void UseExternalCorePanel(Vector2 noticePosition)
++    public void UseExternalCorePanel(LeftCoreHud externalCore, Vector2 noticePosition)
+     {
++        externalCore.PlaceShieldGlow(coreShieldGlow);
+         coreStatus.gameObject.SetActive(false);
+         noticeArea.anchoredPosition = noticePosition;
+     }
+@@ -300,7 +310,7 @@ internal sealed class DefenseHud
+         bool won = battle.CurrentPhase == DefenseBattle.Phase.Victory;
+         bool defeated = won || battle.CurrentPhase == DefenseBattle.Phase.Defeat;
+         round.text = GameText.Format("hud.wave", battle.Round);
+-        phase.text = won ? GameText.Get("hud.victory") : defeated ? GameText.Get("hud.defeat") : aimedSpell.HasValue ? GameText.Format("hud.aim_speed", BattleClock.AimSpeed) : inCombat ? GameText.Get("hud.combat") : GameText.Get("hud.preparation");
++        phase.text = won ? GameText.Get("hud.victory") : defeated ? GameText.Get("hud.defeat") : aimedSpell.HasValue ? GameText.Format("hud.aim_speed", BattleClock.AimSpeed) : inCombat && battle.OnlyOneSideRemains ? GameText.Format("hud.fast_forward", Mathf.Max(battleSpeed, BattleClock.FastForwardSpeed)) : inCombat ? GameText.Get("hud.combat") : GameText.Get("hud.preparation");
+         phase.color = aimedSpell.HasValue ? UIPalette.TextPrimary : UIPalette.TextSecondary;
+         combatBalance.Refresh(battle.Enemies, inCombat, ShownSides(battle));
+         lineup.gameObject.SetActive(!inCombat && !defeated);
+@@ -314,6 +324,7 @@ internal sealed class DefenseHud
+         coreFill.color = displayedCoreHealth <= DefenseBattle.CoreMaxHealth / 4
+             ? UIPalette.ButtonDanger : UIPalette.ButtonPrimary;
+         SetBarFraction(coreFill, (float)displayedCoreHealth / DefenseBattle.CoreMaxHealth);
++        coreShieldGlow.Refresh(view.CoreShieldVisible, view.CoreShieldBreakCount, Time.unscaledDeltaTime);
+         wallSupply.gameObject.SetActive(!inCombat && !defeated && !externalBuildPanel);
+         if (!inCombat && !defeated)
+         {
+@@ -344,14 +355,44 @@ internal sealed class DefenseHud
+ 
+         RefreshEncounterMarkers(battle, view);
+ 
+-        visibleMarkers = 0;
++        foreach (UnitStatusMarker marker in healthMarkers.Values) marker.Seen = false;
++        unitBodyBounds.Clear();
+         foreach (EnemyUnit enemy in battle.Enemies)
+         {
+-            if (ShowsUnitHealth(enemy))
+-                AddHealthMarker(view.ScreenPoint(enemy, 0.76f), enemy);
++            Vector3 head = view.ScreenPoint(enemy, 0.76f);
++            Vector3 feet = view.ScreenPoint(view.ToBoard(enemy.Position));
++            if (head.z <= 0f) continue;
++            RectTransformUtility.ScreenPointToLocalPointInRectangle(markers, head, null, out Vector2 top);
++            RectTransformUtility.ScreenPointToLocalPointInRectangle(markers, feet, null, out Vector2 bottom);
++            float height = Mathf.Max(12f, top.y - bottom.y);
++            float width = Mathf.Max(12f, height * .8f);
++            unitBodyBounds.Add(new Rect(top.x - width * .5f, bottom.y, width, height));
++            if (ShowsUnitHealth(enemy)) AddHealthMarker(top, enemy);
+         }
+-        for (int i = visibleMarkers; i < healthMarkers.Count; i++)
+-            healthMarkers[i].transform.parent.gameObject.SetActive(false);
++        retiredMarkers.Clear();
++        foreach (var entry in healthMarkers)
++        {
++            if (!entry.Value.Seen)
++            {
++                entry.Value.Root.gameObject.SetActive(false);
++                freeHealthMarkers.Push(entry.Value);
++                retiredMarkers.Add(entry.Key);
++                continue;
++            }
++            UnitStatusMarker marker = entry.Value;
++            bool showBuffs = marker.HasBuffs;
++            if (showBuffs)
++            {
++                foreach (Rect body in unitBodyBounds)
++                    if (body.Overlaps(marker.BuffBounds)) { showBuffs = false; break; }
++                if (showBuffs)
++                    foreach (var other in healthMarkers.Values)
++                        if (other != marker && other.Seen && (other.BarBounds.Overlaps(marker.BuffBounds) ||
++                            (other.HasBuffs && other.BuffBounds.Overlaps(marker.BuffBounds)))) { showBuffs = false; break; }
++            }
++            marker.BuffRow.gameObject.SetActive(showBuffs);
++        }
++        foreach (EnemyUnit unit in retiredMarkers) healthMarkers.Remove(unit);
+     }
+ 
+     public void ShowDefeat() => ui.ShowPopup(defeatPopup, dismissOnEscape: false);
+@@ -787,27 +828,19 @@ internal sealed class DefenseHud
+         }
+     }
+ 
+-    private static bool ShowsUnitHealth(EnemyUnit enemy) => enemy.Health < enemy.MaxHealth || enemy.HealFlash > 0f;
++    private static bool ShowsUnitHealth(EnemyUnit enemy) => enemy.Health < enemy.MaxHealth || enemy.HealFlash > 0f ||
++        enemy.Target != null || enemy.AttackBuffStacks > 0 || enemy.MoveSpeedBuffStacks > 0 || enemy.ArmorBuffStacks > 0 || enemy.IsTaunting;
+ 
+-    private void AddHealthMarker(Vector3 screen, EnemyUnit enemy)
++    private void AddHealthMarker(Vector2 position, EnemyUnit enemy)
+     {
+-        if (screen.z <= 0 ||
+-            !RectTransformUtility.ScreenPointToLocalPointInRectangle(markers, screen, null, out Vector2 position))
+-            return;
+-
+-        if (visibleMarkers == healthMarkers.Count)
++        if (!healthMarkers.TryGetValue(enemy, out UnitStatusMarker marker))
+         {
+-            Vector2 center = Vector2.one * 0.5f;
+-            healthMarkers.Add(Bar("Enemy Health", markers, center, center, Vector2.zero,
+-                new Vector2(26, HealthBarThickness), UIPalette.TextPrimary));
++            statusSprites ??= new[] { art.AttackBuff, art.MoveSpeedBuff, art.ArmorBuff != null ? art.ArmorBuff : art.Wall, art.Taunt != null ? art.Taunt : art.Enemy };
++            marker = freeHealthMarkers.Count > 0 ? freeHealthMarkers.Pop() : new UnitStatusMarker(markers, statusSprites, art.ColoredSkillIcons);
++            marker.Bind(enemy);
++            healthMarkers.Add(enemy, marker);
+         }
+-
+-        Image fill = healthMarkers[visibleMarkers++];
+-        var track = (RectTransform)fill.transform.parent;
+-        track.anchoredPosition = position;
+-        track.gameObject.SetActive(true);
+-        SetBarFraction(fill, (float)enemy.Health / enemy.MaxHealth);
+-        fill.color = enemy.Faction.Color;
++        marker.Refresh(position, Time.unscaledDeltaTime, Time.unscaledTime);
+     }
+ 
+     private static RectTransform Rect(string name, RectTransform parent, Vector2 anchor, Vector2 pivot,
+diff --git a/ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json b/ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json
+index e92cd1b..017792d 100644
+--- a/ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json
++++ b/ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json
+@@ -35,6 +35,7 @@
+     {"key": "help.radius", "text": "휠 범위 조절"},
+     {"key": "help.zoom", "text": "휠 확대·축소"},
+     {"key": "hud.aim_speed", "text": "조준 중 · {0:0.0}배속"},
++    {"key": "hud.fast_forward", "text": "빨리감기 · {0}배속"},
+     {"key": "hud.build", "text": "건설 <size=80%><color=#C7B6AD>B</color></size>"},
+     {"key": "hud.combat", "text": "전투 중"},
+     {"key": "hud.defeat", "text": "패배"},
+@@ -52,6 +53,7 @@
+     {"key": "notice.pick_taunt_target", "text": "도발할 유닛을 클릭하세요."},
+     {"key": "notice.settings_pending", "text": "설정 메뉴는 준비 중입니다."},
+     {"key": "notice.victory_restart", "text": "승리! R을 눌러 다시 시작하세요."},
++    {"key": "notice.fast_forward", "text": "한 진영만 남았습니다. 빨리 감습니다."},
+     {"key": "notice.wave_cleared", "text": "웨이브를 막아냈습니다. 다음 전투 전에 벽을 배치하세요."},
+     {"key": "result.complete", "text": "스테이지 완료"},
+     {"key": "result.core_destroyed", "text": "코어 파괴"},

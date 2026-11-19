@@ -2627,3 +2627,22 @@
 
 #### 증거
 - Tools/_out/stageselect/skill_tip.jpg (git 제외)
+
+### [20261119-ribbon-straight] 연출 리본 직선형으로, 리본 글자 세로 중앙 맞춤
+- 시각: 2026-11-19 09:50:22 +09:00
+- 작업자: ParkYeongseo
+- 사용 도구: Claude Code (Opus 5.5) / Python(numpy, Pillow) / Unity CLI (Unity 6000.3.28f1)
+- 목적 및 적용 위치: 스테이지 입장 연출·씬 와이프의 아치형 리본을 직선형으로, 리본 안 글자가 띠 중앙에서 어긋나던 문제 수정. ST_Ribbon.png, StageTransition.prefab, SceneWipe.prefab
+- 사용 방식: 기존 GPT 리본을 새로 그리지 않고, 크림 띠의 중심선을 2차식으로 맞춘 뒤 세로줄마다 반대로 밀어 평평하게 폄(양 끝 꼬리는 띠 끝과 같이 이동). 띠 중앙이 그림 중앙보다 17/214 위에 있음을 측정해 글자 위치를 그만큼 올리고 정렬을 Midline 으로
+- 결과 및 확인 방법: 성공 / Play Mode 캡처(Tools/_out/stageselect/ribbon_check_transition.jpg, Tools/_out/title/ribbon_check_wipe.jpg), 콘솔 오류 0
+- 사람의 개입: 직선형 제안, 글자 위치 문제 지적
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/07_UI/03_StageSelect/ST_Ribbon.png | Python(기존 GPT 리본 변형) | 수정 | 직선형 1200x214. 사용 |
+| ProjectBeViolenceDefense/Assets/03_Prefabs/05_UI/StageTransition.prefab, SceneWipe.prefab | Unity CLI | 수정 | 리본 비율, 글자 위치·정렬. 사용 |
+| ProjectBeViolenceDefense/Assets/01_Scenes/02_Gameplay/GameScene.unity | Unity CLI | 수정 | 트랜지션 인스턴스 재배치. 사용 |
+
+#### 증거
+- Tools/_out/stageselect/ribbon_check_transition.jpg, Tools/_out/title/ribbon_check_wipe.jpg (git 제외)

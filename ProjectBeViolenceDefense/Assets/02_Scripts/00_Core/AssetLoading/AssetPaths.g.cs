@@ -9,6 +9,8 @@ public static class AssetPaths
     public static readonly IReadOnlyList<string> All = new string[]
     {
         "BuffLightning",
+        "CoreShield",
+        "CoreShieldGlow",
         "Fonts & Materials/Netmarble Medium SDF",
         "GameText.ko",
         "LineBreaking Following Characters",
@@ -19,9 +21,15 @@ public static class AssetPaths
         "SpellTargetSilhouette",
         "Style Sheets/Default Style Sheet",
         "TMP Settings",
+        "UnitAttackAura",
+        "UnitBuffAura",
+        "UnitShieldSurface",
+        "UnitSpeedAura",
     };
 
     public const string BuffLightning = "BuffLightning";
+    public const string CoreShield = "CoreShield";
+    public const string CoreShieldGlow = "CoreShieldGlow";
     public const string GameText_ko = "GameText.ko";
     public const string LineBreaking_Following_Characters = "LineBreaking Following Characters";
     public const string LineBreaking_Leading_Characters = "LineBreaking Leading Characters";
@@ -29,6 +37,10 @@ public static class AssetPaths
     public const string SpellAreaBurst = "SpellAreaBurst";
     public const string SpellTargetSilhouette = "SpellTargetSilhouette";
     public const string TMP_Settings = "TMP Settings";
+    public const string UnitAttackAura = "UnitAttackAura";
+    public const string UnitBuffAura = "UnitBuffAura";
+    public const string UnitShieldSurface = "UnitShieldSurface";
+    public const string UnitSpeedAura = "UnitSpeedAura";
 
     public static class Fonts___Materials
     {

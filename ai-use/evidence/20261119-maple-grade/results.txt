@@ -1,0 +1,9 @@
+Unity 6000.3.28f1 / macOS Metal
+Paired Play Mode capture: process exit 0
+MAP_CAPTURE_PASS index=1 name=Stage_GoldenMaple grid=19x18 enemies10s=10
+MAPLE_GRADE_CAPTURE_PASS contrast=20_to_6 saturation=12_to_minus8
+Saved asset import/reference check: process exit 0
+MAPLE_SAVED_PROFILE_PASS contrast=6 saturation=-8 exposure=0.3 prefabReference=preserved
+No C# compilation errors in successful runs. All five before/after image pairs differ (see render-differences.txt).
+Editor SearchDatabase startup exception observed during capture; workflow passed.
+Harness fixes: initialized stage index across Play Mode domain reload; removed premature VolumeManager checks before the first batch Camera.Render initializes the pipeline. Product code was not affected.

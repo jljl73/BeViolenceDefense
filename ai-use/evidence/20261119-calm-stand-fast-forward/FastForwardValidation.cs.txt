@@ -1,0 +1,80 @@
+using System;
+using System.Linq;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
+// 임시 확인용(프로젝트 복사본에만 둔다): 한 진영만 남으면 GameScene에서 자동 빨리감기가 켜지는지 본다.
+[InitializeOnLoad]
+public static class FastForwardValidation
+{
+    const string Key = "FastForwardValidation.Running";
+    const string Scene = "Assets/01_Scenes/02_Gameplay/GameScene.unity";
+    static int phase, frames, settled, keep = -1, ticksAtStart, framesFast;
+    static double start;
+    static StageSelectionController controller;
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static FastForwardValidation() { EditorApplication.update += Update; }
+    public static void Run() { EditorSceneManager.OpenScene(Scene); SessionState.SetBool(Key, true); EditorApplication.EnterPlaymode(); }
+    static object Field(object obj, string name) => obj.GetType().GetField(name, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(obj);
+    static void Check(bool value, string message) { if (!value) throw new Exception(message); }
+    static void Update()
+    {
+        if (!SessionState.GetBool(Key, false) || !EditorApplication.isPlaying || EditorApplication.isCompiling) return;
+        try
+        {
+            if (start == 0) start = EditorApplication.timeSinceStartup;
+            if (EditorApplication.timeSinceStartup - start > 180) throw new Exception($"Timed out in phase {phase}: units {battle?.Enemies.Count} onlyOne {battle?.OnlyOneSideRemains}");
+            if (controller == null)
+            {
+                controller = Object.FindFirstObjectByType<StageSelectionController>(); if (controller == null) return;
+                game = Object.FindFirstObjectByType<VoxelDefensePrototype>(); frames = 0;
+            }
+            frames++;
+            if (phase == 0)
+            {
+                if (frames < 8) return;
+                controller.SelectStage(0);
+                phase = 1; return;
+            }
+            if (phase == 1)
+            {
+                if (controller.CurrentStage == null) return;
+                if (++settled < 30) return;
+                battle = (DefenseBattle)Field(game, "battle");
+                Check(battle.CurrentPhase == DefenseBattle.Phase.Preparation, "Not in preparation");
+                typeof(VoxelDefensePrototype).GetMethod("StartBattle", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(game, null);
+                phase = 2; return;
+            }
+            var clock = (BattleClock)Field(game, "battleClock");
+            if (phase == 2)
+            {
+                // 두 진영이 모두 나온 뒤, 한 진영만 남기고 나머지는 나오는 대로 없앤다.
+                if (keep < 0)
+                {
+                    if (battle.Enemies.Select(e => e.FactionIndex).Distinct().Count() < 2) return;
+                    Check(!battle.OnlyOneSideRemains && clock.PlaybackSpeed == 1f, $"Fast-forward before one side is gone: speed {clock.PlaybackSpeed}");
+                    keep = battle.Enemies[0].FactionIndex;
+                    Debug.Log($"FF_BOTH_SIDES units={battle.Enemies.Count} speed={clock.PlaybackSpeed} tick={battle.TickIndex}");
+                }
+                foreach (EnemyUnit unit in battle.Enemies) if (unit.FactionIndex != keep) unit.Die();
+                if (!battle.OnlyOneSideRemains) return;
+                phase = 3; frames = 0; ticksAtStart = battle.TickIndex; return;
+            }
+            if (phase == 3)
+            {
+                if (battle.CurrentPhase != DefenseBattle.Phase.Combat || !battle.OnlyOneSideRemains)
+                    throw new Exception($"Left the one-side state after {frames} frames");
+                Check((bool)Field(game, "fastForwarding"), "fastForwarding flag is off");
+                Check(clock.PlaybackSpeed == BattleClock.FastForwardSpeed, $"Playback speed {clock.PlaybackSpeed}");
+                if (++framesFast < 60) return;
+                Debug.Log($"FF_PLAY_PASS stage={controller.CurrentStage.name} kept={keep} units={battle.Enemies.Count} speed={clock.PlaybackSpeed} frames={framesFast} ticks={battle.TickIndex - ticksAtStart}");
+                SessionState.SetBool(Key, false); EditorApplication.Exit(0);
+            }
+        }
+        catch (Exception e) { Debug.LogException(e); SessionState.SetBool(Key, false); EditorApplication.Exit(1); }
+    }
+}

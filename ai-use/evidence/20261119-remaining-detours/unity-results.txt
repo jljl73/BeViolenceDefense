@@ -1,0 +1,18 @@
+Unity 6000.3.28f1 EditMode, 프로젝트 복사본(세션 임시 폴더). 실행 전 복사본의 Library/ilpp.pid 삭제.
+
+[최종: 우회 한도 거리 2 + 옆걸음은 길이 열릴 때만, 테스트 수정 후] testcasecount="118" result="Failed(Child)" total="118" passed="117" failed="1"
+  FAILED StageContentTests.GraveyardLayoutKeepsTheSceneryFrameAndLengthensRoutesWhenItsGatesAreWalled("Graveyard",41,16,"4,12 5,12 11,12 12,12",17,"4,
+  -> Expected 17 But was 23. Stage_Graveyard.asset이 23x23 수제작 지형으로 교체됨(커밋 6e06e54). 이 변경과 무관.
+
+[코드만 고치고 테스트를 고치기 전] 116개 중 5개 실패
+  BlockedApproachSidestepsAndReachesAttackRangeWithoutOverlap, LocalSteeringGoesAroundUnitsWithoutCuttingThroughAWall (옆걸음만으로 돌아가길 기대)
+  CrowdBarrierDetourKeepsTargetAndStartsAttacking (아군 줄을 길게 돌아가길 기대)
+  StalledUnitWithoutAlternativeResumesWhenFrontLineClears (대기 상태를 타깃 없음으로 봄)
+  StageContentTests 묘지 지형 검사(위와 같음)
+  옆걸음을 "목표 방향 60도 안"으로 제한한 안에서도 같은 5개가 실패했다.
+
+[도발 예외 제거 후] testcasecount="119" result="Failed(Child)" total="119" passed="118" failed="1"
+  실패 1개는 위와 같은 StageContentTests 묘지 지형 검사.
+  TauntTests.TauntReachesThroughAWallAndTheUnitWalksAShortWayRoundIt  Passed (벽 한 칸을 돌아가서 공격)
+  TauntTests.TauntDoesNotMakeAUnitWalkAllTheWayRoundALongWall  Passed (11칸 벽: 1 넘게 움직이지 않고 도발 유닛을 타깃으로 잡지 않음)
+  두 번째 테스트를 예외가 있던 코드에서 따로 돌리지는 않았다. 같은 배치의 이전 테스트(TauntReachesThroughAWallAndTheUnitWalksAroundIt)가 그 코드에서 벽을 돌아 도발 유닛을 공격하는 것으로 통과했다.

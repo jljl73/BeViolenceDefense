@@ -1,0 +1,161 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using Object=UnityEngine.Object;
+
+[InitializeOnLoad]
+public static class AttackAuraValidation
+{
+    const string Key="AttackAuraValidation.Running";
+    const string Folder="/tmp/attack-heat-captures";
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static DefenseGrid grid;
+    static DefenseBoardView view;
+    static DefenseHud hud;
+    static Camera camera;
+    static EnemyCatalog catalog;
+    static EnemyUnit[] units;
+    static EnemyUnit dummy;
+    static int phase,frame;
+    static double started;
+    static object Field(object o,string n)=>o.GetType().GetField(n,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).GetValue(o);
+    static IDictionary Views=>(IDictionary)Field(view,"enemyViews");
+    static object Aura(EnemyUnit unit)=>Field(Views[unit],"BuffAura");
+    static MeshRenderer Surface(EnemyUnit unit)=>(MeshRenderer)Field(Field(Aura(unit),"attack"),"renderer");
+    static MeshRenderer Shield(EnemyUnit unit)=>(MeshRenderer)Field(Field(Aura(unit),"shield"),"renderer");
+    static void Check(bool value,string message){if(!value)throw new Exception(message);}
+    static AttackAuraValidation(){EditorApplication.update+=Update;}
+    public static void Run(){EditorSceneManager.OpenScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");Directory.CreateDirectory(Folder);SessionState.SetBool(Key,true);EditorApplication.EnterPlaymode();}
+    static void Refresh(float dt)
+    {
+        foreach(var unit in units)
+        {
+            unit.TickTimers(dt);view.SyncEnemy(unit,dt,0f);
+            var animator=(Animator)Field(Views[unit],"Animator");
+            if(animator!=null&&dt>0){animator.speed=1;animator.Update(dt);animator.speed=0;view.SyncEnemy(unit,0,0);}
+        }
+        view.AdvanceEffects(dt);hud.Refresh(battle,grid,view,null,null,0,1);Canvas.ForceUpdateCanvases();
+    }
+    static EnemyUnit Unit(string id,Vector3 pos,int order)=>new(catalog.GetUnit(id,UIPalette.Attack,"surface validation"),0,new[]{pos,pos+Vector3.forward},order);
+    static void CheckSurface(EnemyUnit unit,bool active)
+    {
+        var overlay=Surface(unit);
+        Check(overlay.enabled==active,"Cylinder visibility mismatch");
+        Check(overlay.transform.parent==(Transform)Field(Views[unit],"Root"),"Cylinder does not follow unit root");
+        var mesh=overlay.GetComponent<MeshFilter>().sharedMesh;
+        Check(mesh==(Mesh)Field(view,"shieldSurfaceMesh"),"Cylinder mesh not shared");
+        Check(mesh.vertexCount==130&&mesh.triangles.Length==384,"Unexpected cylinder geometry");
+        if(!active)return;
+        var body=(Renderer[])Field(Views[unit],"Renderers");
+        Bounds bounds=body[0].bounds;
+        foreach(var source in body)
+        {
+            bounds.Encapsulate(source.bounds);
+            foreach(var material in source.sharedMaterials)Check(material.shader.name!="BeViolenceDefense/Unit Shield Surface","Original material replaced");
+        }
+        Check(Mathf.Abs(overlay.bounds.size.y-Mathf.Max(.1f,bounds.size.y))<.005f,"Aura height lost body bounds");
+        Check(Vector3.Distance(overlay.bounds.center,bounds.center)<.001f,"Aura lost unit position");
+        if(unit.ArmorBuffStacks>0)
+        {
+            Check(Shield(unit).enabled,"Combined shield disappeared");
+            Check(overlay.bounds.size.x<Shield(unit).bounds.size.x*.8f,"Attack aura overlaps outer shield silhouette");
+        }
+        if(!unit.IsTaunting)Check(!((MeshRenderer)Field(Aura(unit),"renderer")).enabled,"Attack still uses particle billboard");
+    }
+    static void Update()
+    {
+        if(!SessionState.GetBool(Key,false)||!EditorApplication.isPlaying||EditorApplication.isCompiling)return;
+        try
+        {
+            if(started==0)started=EditorApplication.timeSinceStartup;
+            Check(EditorApplication.timeSinceStartup-started<180,"Validation timeout");
+            if(phase==0)
+            {
+                var selection=Object.FindFirstObjectByType<StageSelectionController>();if(selection==null)return;
+                if(selection.CurrentStage==null){var ui=Object.FindFirstObjectByType<UIManager>();if(ui!=null&&ui.HasOpenPopup)selection.SelectStage(1);return;}
+                var transition=Object.FindFirstObjectByType<StageTransition>();if(transition!=null&&transition.IsPlaying)return;
+                game=Object.FindFirstObjectByType<VoxelDefensePrototype>();battle=(DefenseBattle)Field(game,"battle");if(battle==null)return;
+                game.enabled=false;
+                // Close-up evidence only: prevent foreground stage leaves from hiding the shields.
+                foreach(var particles in Object.FindObjectsByType<ParticleSystem>(FindObjectsSortMode.None))
+                    if(particles.name=="Falling Leaves")particles.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
+                grid=(DefenseGrid)Field(game,"grid");view=(DefenseBoardView)Field(game,"view");hud=(DefenseHud)Field(game,"hud");camera=(Camera)Field(game,"boardCamera");catalog=(EnemyCatalog)Field(game,"enemyCatalog");battle.StartRound();view.ShowBattleRoutes(null);
+                Vector3 place=new(8,0,10);float best=float.PositiveInfinity;
+                for(int z=2;z<grid.Depth-3;z++)for(int x=2;x<grid.Width-3;x++)
+                {
+                    bool open=true;for(int dx=0;dx<2;dx++)for(int dz=0;dz<2;dz++)open&=grid.IsWalkable(new Vector2Int(x+dx,z+dz));
+                    float score=(new Vector2(x,z)-new Vector2(8,10)).sqrMagnitude;
+                    if(open&&score<best){best=score;place=new Vector3(x+.5f,0,z+.5f);}
+                }
+                Vector3 right=Vector3.ProjectOnPlane(camera.transform.right,Vector3.up).normalized;
+                units=new EnemyUnit[3];
+                dummy=Unit("zombie",new Vector3(100,0,100),999);
+                for(int i=0;i<3;i++)
+                {
+                    units[i]=Unit("zombie",view.ToWorld(place+right*((i-1)*.55f)),100+i);
+                    ((List<EnemyUnit>)battle.Enemies).Add(units[i]);view.AddEnemy(units[i]);
+                }
+                camera.orthographicSize=1.65f;camera.transform.position=game.transform.TransformPoint(place+Vector3.up*.3f)-camera.transform.forward*18;
+                Refresh(.1f);Capture("before.png");
+                units[1].ApplyAttackBuff(6);units[2].ApplyAttackBuff(6);units[2].ApplyArmorBuff(6);Refresh(0);
+                CheckSurface(units[1],true);CheckSurface(units[2],true);
+                float age=(float)Field(Aura(units[1]),"phase");Refresh(0);Check((float)Field(Aura(units[1]),"phase")==age,"Pause advanced shield flow");
+                phase=1;return;
+            }
+            if(phase==1)
+            {
+                if(frame==24||frame==55){units[1].Attack(dummy);units[2].Attack(dummy);}
+                Refresh(1f/30f);Capture($"frame-{frame:D2}.png");
+                if(frame==24)
+                {
+                    var overlay=Surface(units[2]);var block=new MaterialPropertyBlock();overlay.GetPropertyBlock(block);
+                    Check(block.GetFloat("_AttackPulse")>.5f,"Attack did not pulse aura");
+                }
+                if(frame==24)
+                {
+                    float age=(float)Field(Aura(units[2]),"phase");var block=new MaterialPropertyBlock();Surface(units[2]).GetPropertyBlock(block);float pulse=block.GetFloat("_AttackPulse");
+                    Refresh(0);Surface(units[2]).GetPropertyBlock(block);
+                    Check((float)Field(Aura(units[2]),"phase")==age&&block.GetFloat("_AttackPulse")==pulse,"Pause advanced attack pulse");
+                }
+                if(++frame<75)return;
+                var existing=Surface(units[2]);float ratio=existing.bounds.size.x/Shield(units[2]).bounds.size.x;
+                for(int n=0;n<9;n++)units[2].ApplyAttackBuff(6);Refresh(0);
+                Check(Surface(units[2])==existing&&Mathf.Abs(Surface(units[2]).bounds.size.x/Shield(units[2]).bounds.size.x-ratio)<.001f,"Stacking multiplies aura size or renderer");
+                units[2].TickTimers(4);view.SyncEnemy(units[2],.2f,0f);
+                Check(!Shield(units[2]).enabled&&Surface(units[2]).enabled,"Independent shield expiry hid attack aura");
+                units[1].TickTimers(8);Refresh(.3f);CheckSurface(units[1],false);
+                units[2].Die();var shield=Field(Aura(units[2]),"attack");view.RemoveEnemy(units[2],battle.CoreHealth);
+                Check(!((Renderer)Field(shield,"renderer")).enabled,"Dead unit kept shield");
+                var entries=new SerializedObject(catalog).FindProperty("entries");
+                for(int i=0;i<entries.arraySize;i++)
+                {
+                    string id=entries.GetArrayElementAtIndex(i).FindPropertyRelative("id").stringValue;
+                    var unit=Unit(id,new Vector3(100+i,0,100),200+i);unit.ApplyArmorBuff(6);unit.ApplyAttackBuff(6);view.AddEnemy(unit);view.SyncEnemy(unit,.1f,0f);CheckSurface(unit,true);
+                    unit.MoveOffRoute(unit.Position+Vector3.right*.4f);view.SyncEnemy(unit,.1f,0f);CheckSurface(unit,true);
+                    unit.ApplyTaunt(6);for(int step=0;step<20;step++)view.SyncEnemy(unit,.1f,0f);CheckSurface(unit,true);
+                    unit.Die();view.RemoveEnemy(unit,battle.CoreHealth);
+                }
+                var shader=Resources.Load<Shader>("UnitAttackAura");Check(shader!=null&&shader.isSupported&&!ShaderUtil.ShaderHasError(shader),"Surface shader failed");
+                Debug.Log($"ATTACK_HEAT_PLAY_PASS catalog={entries.arraySize}, shared mesh, movement and giant scaling, original materials preserved, no attack particle plane, shield separation, independent expiry, stacking, pause including pulse, attack pulse, death cleanup and shader compilation");
+                SessionState.SetBool(Key,false);EditorApplication.Exit(0);
+            }
+        }
+        catch(Exception e){Debug.LogException(e);SessionState.SetBool(Key,false);EditorApplication.Exit(1);}
+    }
+    static void Capture(string name)
+    {
+        var canvas=((RectTransform)Field(hud,"markers")).GetComponentInParent<Canvas>().rootCanvas;
+        var mode=canvas.renderMode;var oldCamera=canvas.worldCamera;float distance=canvas.planeDistance;int order=canvas.sortingOrder;
+        int width=Screen.width*2,height=Screen.height*2;var rt=new RenderTexture(width,height,24);var previous=camera.targetTexture;var active=RenderTexture.active;
+        camera.targetTexture=rt;canvas.renderMode=RenderMode.ScreenSpaceCamera;canvas.worldCamera=camera;canvas.planeDistance=1;canvas.sortingOrder=300;Canvas.ForceUpdateCanvases();camera.Render();RenderTexture.active=rt;
+        var texture=new Texture2D(width,height,TextureFormat.RGB24,false);texture.ReadPixels(new Rect(0,0,width,height),0,0);texture.Apply();File.WriteAllBytes(Path.Combine(Folder,name),texture.EncodeToPNG());
+        canvas.renderMode=mode;canvas.worldCamera=oldCamera;canvas.planeDistance=distance;canvas.sortingOrder=order;camera.targetTexture=previous;RenderTexture.active=active;
+        Object.Destroy(texture);rt.Release();Object.Destroy(rt);Canvas.ForceUpdateCanvases();
+    }
+}

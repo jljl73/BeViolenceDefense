@@ -1,0 +1,2 @@
+7c9457f3a37b60814b6f117ca884ed126722528591a7550a258ae433e6def326  Assets/02_Scripts/00_Core/Effects/UnitBuffAura.cs
+729033be02a24469ad57f1072d64566c03ed42e4c575380c79b4c663e8264f6d  Assets/Resources/UnitBuffAura.shader

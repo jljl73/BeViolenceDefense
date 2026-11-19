@@ -1,0 +1,173 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using Object=UnityEngine.Object;
+
+[InitializeOnLoad]
+public static class SpeedAuraValidation
+{
+    const string Key="SpeedAuraValidation.Running";
+    const string Folder="/tmp/speed-ribbon-captures";
+    static VoxelDefensePrototype game;
+    static DefenseBattle battle;
+    static DefenseGrid grid;
+    static DefenseBoardView view;
+    static DefenseHud hud;
+    static Camera camera;
+    static EnemyCatalog catalog;
+    static EnemyUnit[] units;
+    static Vector3 forward, right;
+    static int phase,frame;
+    static double started;
+    static object Field(object o,string n)=>o.GetType().GetField(n,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).GetValue(o);
+    static IDictionary Views=>(IDictionary)Field(view,"enemyViews");
+    static object Aura(EnemyUnit unit)=>Field(Views[unit],"BuffAura");
+    static MeshRenderer Surface(EnemyUnit unit)=>(MeshRenderer)Field(Field(Aura(unit),"speed"),"renderer");
+    static MeshRenderer Shield(EnemyUnit unit)=>(MeshRenderer)Field(Field(Aura(unit),"shield"),"renderer");
+    static void Check(bool value,string message){if(!value)throw new Exception(message);}
+    static SpeedAuraValidation(){EditorApplication.update+=Update;}
+    public static void Run(){EditorSceneManager.OpenScene("Assets/01_Scenes/02_Gameplay/GameScene.unity");Directory.CreateDirectory(Folder);SessionState.SetBool(Key,true);EditorApplication.EnterPlaymode();}
+    static void Refresh(float dt)
+    {
+        foreach(var unit in units)
+        {
+            unit.TickTimers(dt);view.SyncEnemy(unit,dt,0f);
+            var animator=(Animator)Field(Views[unit],"Animator");
+            if(animator!=null&&dt>0){animator.speed=1;animator.Update(dt);animator.speed=0;view.SyncEnemy(unit,0,0);}
+        }
+        view.AdvanceEffects(dt);hud.Refresh(battle,grid,view,null,null,0,1);Canvas.ForceUpdateCanvases();
+    }
+    static EnemyUnit Unit(string id,Vector3 pos,int order)=>new(catalog.GetUnit(id,UIPalette.Attack,"surface validation"),0,new[]{pos,pos+Vector3.forward},order);
+    static void CheckSurface(EnemyUnit unit,bool active)
+    {
+        var overlay=Surface(unit);
+        Check(overlay.enabled==active,"Cylinder visibility mismatch");
+        Check(overlay.transform.parent==(Transform)Field(Views[unit],"Root"),"Cylinder does not follow unit root");
+        var mesh=overlay.GetComponent<MeshFilter>().sharedMesh;
+        Check(mesh==(Mesh)Field(view,"speedAuraMesh"),"Cylinder mesh not shared");
+        Check(mesh.vertexCount==64&&mesh.triangles.Length==180,"Unexpected ribbon geometry");
+        if(!active)return;
+        var body=(Renderer[])Field(Views[unit],"Renderers");
+        Bounds bounds=body[0].bounds;
+        foreach(var source in body)
+        {
+            bounds.Encapsulate(source.bounds);
+            foreach(var material in source.sharedMaterials)Check(material.shader.name!="BeViolenceDefense/Unit Shield Surface","Original material replaced");
+        }
+        float h=Mathf.Max(.1f,bounds.size.y);
+        var points=(Vector4[])Field(Field(Aura(unit),"speed"),"path");
+        for(int i=0;i<points.Length;i++)
+        {
+            Vector3 p=points[i];Check(overlay.localBounds.Contains(p),"Flow escaped culling bounds");
+            float worldY=overlay.transform.TransformPoint(p).y;
+            Check(worldY<bounds.min.y+h*.30f,"Flow escaped ankle height");
+        }
+        foreach(var line in ((Transform)Field(Views[unit],"Root")).GetComponentsInChildren<LineRenderer>())Check(line.name!="Move Speed Trail","Old speed line trail remains");
+        if(unit.ArmorBuffStacks>0)Check(Shield(unit).enabled,"Combined shield disappeared");
+        if(!unit.IsTaunting)Check(!((MeshRenderer)Field(Aura(unit),"renderer")).enabled,"Speed still uses particle billboard");
+    }
+    static void Update()
+    {
+        if(!SessionState.GetBool(Key,false)||!EditorApplication.isPlaying||EditorApplication.isCompiling)return;
+        try
+        {
+            if(started==0)started=EditorApplication.timeSinceStartup;
+            Check(EditorApplication.timeSinceStartup-started<180,"Validation timeout");
+            if(phase==0)
+            {
+                var selection=Object.FindFirstObjectByType<StageSelectionController>();if(selection==null)return;
+                if(selection.CurrentStage==null){var ui=Object.FindFirstObjectByType<UIManager>();if(ui!=null&&ui.HasOpenPopup)selection.SelectStage(1);return;}
+                var transition=Object.FindFirstObjectByType<StageTransition>();if(transition!=null&&transition.IsPlaying)return;
+                game=Object.FindFirstObjectByType<VoxelDefensePrototype>();battle=(DefenseBattle)Field(game,"battle");if(battle==null)return;
+                game.enabled=false;
+                // Close-up evidence only: prevent foreground stage leaves from hiding the shields.
+                foreach(var particles in Object.FindObjectsByType<ParticleSystem>(FindObjectsSortMode.None))
+                    if(particles.name=="Falling Leaves")particles.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
+                grid=(DefenseGrid)Field(game,"grid");view=(DefenseBoardView)Field(game,"view");hud=(DefenseHud)Field(game,"hud");camera=(Camera)Field(game,"boardCamera");catalog=(EnemyCatalog)Field(game,"enemyCatalog");battle.StartRound();view.ShowBattleRoutes(null);
+                Vector3 place=new(8,0,10);float best=float.PositiveInfinity;
+                for(int z=2;z<grid.Depth-3;z++)for(int x=2;x<grid.Width-3;x++)
+                {
+                    bool open=true;for(int dx=0;dx<2;dx++)for(int dz=0;dz<2;dz++)open&=grid.IsWalkable(new Vector2Int(x+dx,z+dz));
+                    float score=(new Vector2(x,z)-new Vector2(8,10)).sqrMagnitude;
+                    if(open&&score<best){best=score;place=new Vector3(x+.5f,0,z+.5f);}
+                }
+                right=Vector3.ProjectOnPlane(camera.transform.right,Vector3.up).normalized;
+                forward=Vector3.ProjectOnPlane(camera.transform.forward,Vector3.up).normalized;
+                units=new EnemyUnit[3];
+
+                for(int i=0;i<3;i++)
+                {
+                    units[i]=Unit("zombie",view.ToWorld(place+right*((i-1)*.55f)),100+i);
+                    ((List<EnemyUnit>)battle.Enemies).Add(units[i]);view.AddEnemy(units[i]);
+                }
+                camera.orthographicSize=1.65f;camera.transform.position=game.transform.TransformPoint(place+right*.10f+Vector3.up*.3f)-camera.transform.forward*18;
+                Refresh(.1f);Capture("before.png");
+                foreach(var unit in units)unit.ApplyMoveSpeedBuff(6);units[2].ApplyAttackBuff(6);units[2].ApplyArmorBuff(6);Refresh(0);
+                CheckSurface(units[1],true);CheckSurface(units[2],true);
+                float age=(float)Field(Aura(units[1]),"phase");Refresh(0);Check((float)Field(Aura(units[1]),"phase")==age,"Pause advanced shield flow");
+                phase=1;return;
+            }
+            if(phase==1)
+            {
+                foreach(var unit in units)unit.BeginTick();
+                Vector3 step=frame>=12&&frame<30?forward*.018f:frame>=30&&frame<48?right*.014f:Vector3.zero;
+                for(int i=1;i<3;i++)units[i].MoveOffRoute(units[i].Position+view.ToWorld(step));
+                Refresh(1f/30f);Capture($"frame-{frame:D2}.png");
+                var speed=Field(Aura(units[1]),"speed");
+                if(frame==29)
+                {
+                    float motion=(float)Field(speed,"motion");Check(motion>.2f,"Moving aura did not extend");
+                    Vector3 direction=(Vector3)Field(speed,"direction");Check(Vector3.Dot(direction,game.transform.TransformDirection(forward))>.95f,"Trail does not follow movement");
+                    float age=(float)Field(Aura(units[1]),"phase");Refresh(0);
+                    Check((float)Field(speed,"motion")==motion&&(float)Field(Aura(units[1]),"phase")==age,"Pause changed speed flow");
+                }
+                if(frame==38)
+                {
+                    var points=(Vector4[])Field(speed,"path");
+                    Vector3 near=(Vector3)(points[2]-points[0]),far=(Vector3)(points[15]-points[10]);
+                    Check(Vector3.Dot(near.normalized,far.normalized)<.85f,"Turning path remained straight");
+                    Vector4 saved=points[12];Refresh(0);Check(((Vector4[])Field(speed,"path"))[12]==saved,"Paused ribbon changed shape");
+                }
+                if(frame==47)Check(Vector3.Dot((Vector3)Field(speed,"direction"),game.transform.TransformDirection(right))>.95f,"Turn did not redirect trail");
+                if(frame==65)Check((float)Field(speed,"motion")<.001f,"Stopped trail did not retract");
+                if(++frame<90)return;
+                var existing=Surface(units[1]);
+                for(int n=0;n<9;n++)units[1].ApplyMoveSpeedBuff(6);Refresh(0);
+                Check(Surface(units[1])==existing,"Stacking duplicated speed renderer");
+                units[2].ApplyAttackBuff(10);units[2].ApplyArmorBuff(10);units[2].TickTimers(4);view.SyncEnemy(units[2],.3f,0f);
+                CheckSurface(units[2],false);Check(Shield(units[2]).enabled&&((Renderer)Field(Field(Aura(units[2]),"attack"),"renderer")).enabled,"Speed expiry hid another buff");
+                units[1].TickTimers(8);view.SyncEnemy(units[1],.3f,0f);CheckSurface(units[1],false);
+                units[0].Die();var deadSpeed=Field(Aura(units[0]),"speed");view.RemoveEnemy(units[0],battle.CoreHealth);
+                Check(!((Renderer)Field(deadSpeed,"renderer")).enabled,"Dead unit kept speed aura");
+                var entries=new SerializedObject(catalog).FindProperty("entries");
+                for(int i=0;i<entries.arraySize;i++)
+                {
+                    string id=entries.GetArrayElementAtIndex(i).FindPropertyRelative("id").stringValue;
+                    var unit=Unit(id,new Vector3(100+i,0,100),200+i);unit.ApplyArmorBuff(6);unit.ApplyAttackBuff(6);unit.ApplyMoveSpeedBuff(6);view.AddEnemy(unit);view.SyncEnemy(unit,.1f,0f);CheckSurface(unit,true);
+                    unit.MoveOffRoute(unit.Position+Vector3.right*.4f);view.SyncEnemy(unit,.1f,0f);CheckSurface(unit,true);
+                    unit.ApplyTaunt(6);for(int growStep=0;growStep<20;growStep++)view.SyncEnemy(unit,.1f,0f);CheckSurface(unit,true);
+                    unit.Die();view.RemoveEnemy(unit,battle.CoreHealth);
+                }
+                var shader=Resources.Load<Shader>("UnitSpeedAura");Check(shader!=null&&shader.isSupported&&!ShaderUtil.ShaderHasError(shader),"Surface shader failed");
+                Debug.Log($"SPEED_RIBBON_PLAY_PASS catalog={entries.arraySize}, shared ribbon mesh, ankle placement and culling bounds, movement and curved turn history, stop retraction, paused shape, giant scaling, original materials preserved, no speed particles or line trails, independent expiry with other buffs, stacking, death cleanup and shader compilation");
+                SessionState.SetBool(Key,false);EditorApplication.Exit(0);
+            }
+        }
+        catch(Exception e){Debug.LogException(e);SessionState.SetBool(Key,false);EditorApplication.Exit(1);}
+    }
+    static void Capture(string name)
+    {
+        var canvas=((RectTransform)Field(hud,"markers")).GetComponentInParent<Canvas>().rootCanvas;
+        var mode=canvas.renderMode;var oldCamera=canvas.worldCamera;float distance=canvas.planeDistance;int order=canvas.sortingOrder;
+        int width=Screen.width*2,height=Screen.height*2;var rt=new RenderTexture(width,height,24);var previous=camera.targetTexture;var active=RenderTexture.active;
+        camera.targetTexture=rt;canvas.renderMode=RenderMode.ScreenSpaceCamera;canvas.worldCamera=camera;canvas.planeDistance=1;canvas.sortingOrder=300;Canvas.ForceUpdateCanvases();camera.Render();RenderTexture.active=rt;
+        var texture=new Texture2D(width,height,TextureFormat.RGB24,false);texture.ReadPixels(new Rect(0,0,width,height),0,0);texture.Apply();File.WriteAllBytes(Path.Combine(Folder,name),texture.EncodeToPNG());
+        canvas.renderMode=mode;canvas.worldCamera=oldCamera;canvas.planeDistance=distance;canvas.sortingOrder=order;camera.targetTexture=previous;RenderTexture.active=active;
+        Object.Destroy(texture);rt.Release();Object.Destroy(rt);Canvas.ForceUpdateCanvases();
+    }
+}

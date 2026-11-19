@@ -78,6 +78,7 @@ public sealed class SimulationDeterminismTests
         Mix(BitConverter.SingleToInt32Bits(battle.Mana));
         Mix(battle.SpawnCount);
         Mix(battle.CoreHealth);
+        Mix(battle.HasCoreShield ? 1 : 0);
         foreach (EnemyUnit enemy in battle.Enemies)
         {
             Mix(enemy.SpawnOrder);

@@ -1,0 +1,11 @@
+Unity 6000.3.28f1 / macOS Metal / process exit 0
+MAP_CAPTURE_PASS index=0 name=Stage_Coast grid=17x17 enemies10s=10
+MAP_CAPTURE_PASS index=1 name=Stage_GoldenMaple grid=19x18 enemies10s=10
+MAP_CAPTURE_PASS index=2 name=Stage_Snowfield grid=19x20 enemies10s=10
+MAP_CAPTURE_PASS index=3 name=Stage_Graveyard grid=23x23 enemies10s=10
+MAP_CAPTURE_PASS index=4 name=Stage_Capital grid=35x30 enemies10s=10
+ALL_MAP_CAPTURES_PASS count=5
+5 stages x 5 captures (planning, combat 600 ticks, floor only, controlled normal floor, controlled route floor).
+All probe cameras: rotation X55/Y315, orthographic size 1.8, image 1280x960; each stage keeps its native lighting and post-processing.
+Editor startup SearchDatabase ArgumentOutOfRangeException observed; capture workflow completed.
+No game source, material, prefab or scene modified by this capture task.
