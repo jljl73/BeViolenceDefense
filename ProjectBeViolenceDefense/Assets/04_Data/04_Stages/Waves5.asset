@@ -1,0 +1,306 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 595c939316e1d03479642f44f3bd1ae1, type: 3}
+  m_Name: Waves5
+  m_EditorClassIdentifier: Assembly-CSharp::StageWaves
+  waves:
+  - note: "W1 \uACE0\uBE14\uB9B0 vs \uC5B8\uB370\uB4DC"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-grunt
+          count: 21
+        - unitId: goblin-slinger
+          count: 4
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: skeleton
+          count: 13
+        - unitId: skeleton-archer
+          count: 3
+  - note: "W2 \uC57C\uC218 vs \uC6A9\uC871"
+    factions:
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: wolf
+          count: 20
+        - unitId: bat
+          count: 6
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: demon
+          count: 2
+        - unitId: hatchling
+          count: 12
+  - note: "W3 \uACE0\uBE14\uB9B0 vs \uC6A9\uC871 - \uC545\uB9C8 \uB4F1\uC7A5"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-chief
+          count: 2
+        - unitId: goblin-grunt
+          count: 24
+        - unitId: goblin-slinger
+          count: 4
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: demon
+          count: 2
+        - unitId: hatchling
+          count: 9
+  - note: "W4 \uACE0\uBE14\uB9B0 vs \uC5B8\uB370\uB4DC - \uB9AC\uBE59 \uC544\uBA38
+      \uB4F1\uC7A5"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 1
+        - unitId: goblin-chief
+          count: 1
+        - unitId: goblin-grunt
+          count: 14
+        - unitId: goblin-slinger
+          count: 3
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: living-armor
+          count: 1
+        - unitId: zombie
+          count: 1
+        - unitId: skeleton
+          count: 8
+        - unitId: skeleton-archer
+          count: 3
+  - note: "W5 \uC57C\uC218 vs \uC6A9\uC871 - \uB291\uB300\uC778\uAC04 \uB4F1\uC7A5"
+    factions:
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: werewolf
+          count: 2
+        - unitId: wolf
+          count: 18
+        - unitId: bat
+          count: 4
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: demon
+          count: 2
+        - unitId: hatchling
+          count: 14
+  - note: "W6 \uC0BC\uD30C\uC804 - \uACE0\uBE14\uB9B0\xB7\uC57C\uC218\xB7\uC6A9\uC871"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 1
+        - unitId: goblin-grunt
+          count: 14
+        - unitId: goblin-slinger
+          count: 2
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: boar
+          count: 1
+        - unitId: wolf
+          count: 8
+        - unitId: bat
+          count: 2
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: demon
+          count: 1
+        - unitId: hatchling
+          count: 4
+  - note: "W7 \uC0BC\uD30C\uC804 - \uACE0\uBE14\uB9B0\xB7\uC5B8\uB370\uB4DC\xB7\uC57C\uC218"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 1
+        - unitId: goblin-chief
+          count: 1
+        - unitId: goblin-grunt
+          count: 16
+        - unitId: goblin-slinger
+          count: 3
+        - unitId: goblin-charger
+          count: 4
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: living-armor
+          count: 1
+        - unitId: skeleton
+          count: 8
+        - unitId: skeleton-archer
+          count: 2
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: werewolf
+          count: 1
+        - unitId: wolf
+          count: 8
+        - unitId: bat
+          count: 2
+  - note: "W8 \uC0BC\uD30C\uC804 - \uC5B8\uB370\uB4DC\xB7\uC57C\uC218\xB7\uC6A9\uC871,
+      \uC0AC\uC2E0 \uB4F1\uC7A5"
+    factions:
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: reaper
+          count: 1
+        - unitId: skeleton
+          count: 8
+        - unitId: skeleton-archer
+          count: 3
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: dire-wolf
+          count: 1
+        - unitId: boar
+          count: 1
+        - unitId: wolf
+          count: 8
+        - unitId: bat
+          count: 2
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: demon
+          count: 1
+        - unitId: hatchling
+          count: 6
+  - note: "W9 \uC0BC\uD30C\uC804 - \uACE0\uBE14\uB9B0\xB7\uC5B8\uB370\uB4DC\xB7\uC6A9\uC871"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 2
+        - unitId: goblin-chief
+          count: 1
+        - unitId: goblin-grunt
+          count: 16
+        - unitId: goblin-slinger
+          count: 4
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: reaper
+          count: 1
+        - unitId: living-armor
+          count: 1
+        - unitId: zombie
+          count: 1
+        - unitId: skeleton
+          count: 8
+        - unitId: skeleton-archer
+          count: 3
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: demon
+          count: 1
+        - unitId: hatchling
+          count: 5
+  - note: "W10 \uCD5C\uC885 \uC0AC\uD30C\uC804 - \uBAA8\uB4E0 \uD329\uC158, \uC640\uC774\uBC88
+      \uB4F1\uC7A5"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 1
+        - unitId: goblin-chief
+          count: 1
+        - unitId: goblin-grunt
+          count: 14
+        - unitId: goblin-slinger
+          count: 3
+        - unitId: goblin-charger
+          count: 3
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: reaper
+          count: 1
+        - unitId: living-armor
+          count: 1
+        - unitId: zombie
+          count: 1
+        - unitId: skeleton
+          count: 8
+        - unitId: skeleton-archer
+          count: 3
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: werewolf
+          count: 1
+        - unitId: dire-wolf
+          count: 1
+        - unitId: wolf
+          count: 10
+        - unitId: bat
+          count: 2
+    - faction: 3
+      groups:
+      - note: A
+        enemies:
+        - unitId: wyvern
+          count: 1
+        - unitId: demon
+          count: 1
+        - unitId: hatchling
+          count: 4

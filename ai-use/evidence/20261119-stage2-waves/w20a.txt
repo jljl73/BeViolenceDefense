@@ -1,0 +1,5 @@
+W1|goblin-grunt*12,goblin-slinger*2|skeleton*7,skeleton-archer*2||
+W2|||wolf*8,bat*2|hatchling*5
+W3|goblin-chief*1,goblin-grunt*12,goblin-slinger*2||boar*1,wolf*6,bat*1|
+W4||zombie*1,skeleton*8,skeleton-archer*3||demon*1,hatchling*3
+W5|orc*1,goblin-chief*1,goblin-grunt*14,goblin-slinger*3|||demon*1,hatchling*7

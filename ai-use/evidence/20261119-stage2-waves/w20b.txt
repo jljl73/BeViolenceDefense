@@ -1,0 +1,5 @@
+W6||zombie*1,skeleton*7,skeleton-archer*2,necromancer*1|dire-wolf*1,boar*1,wolf*9,bat*2|
+W7|orc*1,goblin-chief*1,goblin-grunt*16,goblin-slinger*3,goblin-charger*4|living-armor*1,skeleton*8,skeleton-archer*2|werewolf*1,wolf*8,bat*2|
+W8||reaper*1,skeleton*8,skeleton-archer*3|dire-wolf*1,boar*1,wolf*8,bat*2|demon*1,hatchling*6
+W9|orc*2,goblin-chief*1,goblin-grunt*16,goblin-slinger*4|reaper*1,living-armor*1,zombie*1,skeleton*8,skeleton-archer*3||demon*1,hatchling*5
+W10|orc*1,goblin-chief*1,goblin-grunt*14,goblin-slinger*3,goblin-charger*3|reaper*1,living-armor*1,zombie*1,skeleton*8,skeleton-archer*3|werewolf*1,dire-wolf*1,wolf*10,bat*2|wyvern*1,demon*1,hatchling*4
