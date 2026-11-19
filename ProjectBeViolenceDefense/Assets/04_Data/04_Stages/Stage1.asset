@@ -62,10 +62,6 @@ MonoBehaviour:
     cell: {x: 11, y: 14}
     size: {x: 1, y: 1}
     rotation: 3
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 7, y: 13}
-    size: {x: 1, y: 1}
-    rotation: 3
   - prefab: {fileID: 1332981551190875299, guid: baf8ecb315381ad428018f23fee7916f, type: 3}
     cell: {x: 10, y: 10}
     size: {x: 2, y: 1}
@@ -95,19 +91,11 @@ MonoBehaviour:
     size: {x: 1, y: 1}
     rotation: 2
   - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 1, y: 8}
-    size: {x: 1, y: 1}
-    rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
     cell: {x: 12, y: 2}
     size: {x: 1, y: 1}
     rotation: 2
   - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
     cell: {x: 14, y: 4}
-    size: {x: 1, y: 1}
-    rotation: 2
-  - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
-    cell: {x: 10, y: 7}
     size: {x: 1, y: 1}
     rotation: 2
   - prefab: {fileID: 7737621795722628421, guid: b5b10f919978cb24a9552b5fb24cf128, type: 3}
@@ -150,4 +138,41 @@ MonoBehaviour:
     cell: {x: 9, y: 7}
     size: {x: 1, y: 1}
     rotation: 0
+  - prefab: {fileID: 5994202452060375868, guid: 62d9adda417b9f048b341c110cd5b7b1, type: 3}
+    cell: {x: 8, y: 6}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 5994202452060375868, guid: 62d9adda417b9f048b341c110cd5b7b1, type: 3}
+    cell: {x: 10, y: 7}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 5994202452060375868, guid: 62d9adda417b9f048b341c110cd5b7b1, type: 3}
+    cell: {x: 7, y: 13}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 2005346061419623706, guid: 2ca2e22e28b0d8b478c820e80f25b803, type: 3}
+    cell: {x: 1, y: 9}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 2005346061419623706, guid: 2ca2e22e28b0d8b478c820e80f25b803, type: 3}
+    cell: {x: 1, y: 13}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 2005346061419623706, guid: 2ca2e22e28b0d8b478c820e80f25b803, type: 3}
+    cell: {x: 9, y: 1}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 2005346061419623706, guid: 2ca2e22e28b0d8b478c820e80f25b803, type: 3}
+    cell: {x: 13, y: 1}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 5994202452060375868, guid: 62d9adda417b9f048b341c110cd5b7b1, type: 3}
+    cell: {x: 16, y: 5}
+    size: {x: 1, y: 1}
+    rotation: 0
+  - prefab: {fileID: 5994202452060375868, guid: 62d9adda417b9f048b341c110cd5b7b1, type: 3}
+    cell: {x: 3, y: 14}
+    size: {x: 1, y: 1}
+    rotation: 0
   waves: {fileID: 11400000, guid: 216c3cf82e81fe24ab166ba0828e653d, type: 2}
+  reinforcementWaveLimit: 0

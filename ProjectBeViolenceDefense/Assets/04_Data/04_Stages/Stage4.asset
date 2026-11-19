@@ -512,25 +512,5 @@ MonoBehaviour:
     cell: {x: 19, y: 23}
     size: {x: 1, y: 1}
     rotation: 1
-  - prefab: {fileID: 0}
-    cell: {x: 8, y: 11}
-    size: {x: 1, y: 1}
-    rotation: 1
-  - prefab: {fileID: 0}
-    cell: {x: 8, y: 17}
-    size: {x: 1, y: 1}
-    rotation: 1
-  - prefab: {fileID: 0}
-    cell: {x: 7, y: 17}
-    size: {x: 1, y: 1}
-    rotation: 1
-  - prefab: {fileID: 0}
-    cell: {x: 5, y: 13}
-    size: {x: 1, y: 1}
-    rotation: 1
-  - prefab: {fileID: 0}
-    cell: {x: 13, y: 10}
-    size: {x: 1, y: 1}
-    rotation: 1
   waves: {fileID: 11400000, guid: 01f902fdd12c42e4d964dcf901c3f154, type: 2}
   reinforcementWaveLimit: 0

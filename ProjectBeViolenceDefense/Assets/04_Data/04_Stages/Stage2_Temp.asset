@@ -214,10 +214,6 @@ MonoBehaviour:
     cell: {x: 11, y: 17}
     size: {x: 1, y: 1}
     rotation: 2
-  - prefab: {fileID: 0}
-    cell: {x: 7, y: 10}
-    size: {x: 1, y: 1}
-    rotation: 2
   - prefab: {fileID: 7564508519049207176, guid: a2b80f0fc39a7b64aad2cdb92fd7c32a, type: 3}
     cell: {x: 1, y: 10}
     size: {x: 1, y: 1}

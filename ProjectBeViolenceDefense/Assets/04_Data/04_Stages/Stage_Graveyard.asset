@@ -21,8 +21,6 @@ MonoBehaviour:
     width: 3
     height: 3
   spawns:
-  - cell: {x: 20, y: 6}
-    faction: 2
   - cell: {x: 14, y: 0}
     faction: 0
   - cell: {x: 9, y: 0}
@@ -35,7 +33,9 @@ MonoBehaviour:
     faction: 1
   - cell: {x: 22, y: 15}
     faction: 1
-  - cell: {x: 3, y: 5}
+  - cell: {x: 3, y: 4}
+    faction: 2
+  - cell: {x: 21, y: 2}
     faction: 2
   obstacles:
   - prefab: {fileID: 1971219254228477664, guid: 013c5b158554ce04a9139735721cdf38, type: 3}
