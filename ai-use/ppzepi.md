@@ -1053,3 +1053,32 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 전체 웨이브 및 빌드는 미검증. Play Mode에서 TMP 말줄임표 글리프 누락 경고 관찰(컴파일 오류와 별개). 자동 새로고침 disabled 설정은 유지했으므로 외부에서 새 파일을 추가한 뒤 필요시 Assets/Refresh 실행.
+
+### [20261119-spell-unlock-order] 스킬 순서 및 해금 보상 교체
+- 시각: 2026-11-19 09:59:54 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / Unity MCP
+- 목적 및 적용 위치: 전투 HUD, 숫자 단축키, 초기 스킬 및 2스테이지 해금 보상
+- 사용 방식: 기존 uGUI 슬롯과 해금 조건을 확인한 뒤 공격력·이동속도 위치 및 해금 조건 교체.
+- 결과 및 확인 방법: 부분 성공 / git diff --check 통과. Unity MCP로 GameScene 편집 모드 및 프로젝트 경로 확인. 재컴파일 요청은 triggered 상태에서 완료 응답을 받지 못해 컴파일 및 Play Mode 동작 미확인.
+- 사람의 개입: 사용자가 스킬 순서와 해금 조건 지정.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs | Codex | 수정 | 1번 이동속도, 3번 공격력 슬롯으로 교체 / 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Codex | 수정 | 숫자 1·3 단축키를 슬롯에 맞게 교체 / 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/StageSpellUnlocks.cs | Codex | 수정 | 공격력을 2스테이지 클리어 해금으로 변경, 이동속도 기본 해금 / 적용 |
+| docs/ui-flow.md | Codex | 수정 | 슬롯 순서·단축키·해금 안내 동기화 / 적용 |
+
+#### 증거
+- git diff 및 Codex 세션의 Unity MCP 응답. 별도 증거 파일 없음.
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 프로젝트 파일 편집 및 Unity MCP 검증 요청.
+- 사용 방식: 코드 검색, 최소 수정, 차이 확인. CLI는 PATH와 설정된 실행 경로 모두 실행 불가여서 MCP 사용.
+
+#### 미확인 및 후속 확인
+- 팀원이 확인할 내용: Unity 재컴파일 완료와 실제 HUD/단축키 동작, 신규 게임 초기 해금 및 2스테이지 클리어 후 공격력 해금. 기존 클리어 저장값은 보존함.
+- 후속 검증: Unity MCP recompile_status가 completed, failed=false, errors=[]로 완료됨. script eval로 별도 해금 객체의 메모리 값만 바꾸어 초기 기록 0에서 이동속도·힐=해금, 공격력=2스테이지 필요, 기록 4에서 공격력=해금을 확인함(PlayerPrefs 변경 없음). Play Mode 진입 후 슬롯 RectTransform 검색 결과가 비어 실제 HUD 및 입력 검증은 미완료. Play Mode 종료 요청.
+- 부수 변경 관찰: Unity 재컴파일 중 AssetPaths.g.cs에 기존 BuffLightning 리소스 항목이 자동 생성된 것으로 보이는 변경 발견. 직접 편집하지 않고 보존함.

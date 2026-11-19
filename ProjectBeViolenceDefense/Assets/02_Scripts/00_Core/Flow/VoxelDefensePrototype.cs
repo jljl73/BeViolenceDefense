@@ -644,7 +644,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
 
         if (keyboard?.digit1Key.wasPressedThisFrame == true)
         {
-            UseSpell(DefenseBattle.Spell.AttackBuff);
+            UseSpell(DefenseBattle.Spell.MoveSpeedBuff);
             return;
         }
         if (keyboard?.digit2Key.wasPressedThisFrame == true)
@@ -654,7 +654,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         }
         if (keyboard?.digit3Key.wasPressedThisFrame == true)
         {
-            UseSpell(DefenseBattle.Spell.MoveSpeedBuff);
+            UseSpell(DefenseBattle.Spell.AttackBuff);
             return;
         }
         if (keyboard?.digit4Key.wasPressedThisFrame == true)

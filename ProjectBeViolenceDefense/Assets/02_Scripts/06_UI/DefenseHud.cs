@@ -162,12 +162,12 @@ internal sealed class DefenseHud
         AddFocusRing(startBattle, new Vector2(43, -6), 70);
 
         spellBar = Rect("Spell Bar", actionBar, Vector2.up, Vector2.up, Vector2.zero, ActionsSize);
-        attackBuff = CreateSpellSlot("Attack Buff", 0, "1", this.art.AttackBuff,
-            DefenseBattle.Spell.AttackBuff, UIPalette.Attack, cast);
+        moveSpeedBuff = CreateSpellSlot("Move Speed Buff", 0, "1", this.art.MoveSpeedBuff,
+            DefenseBattle.Spell.MoveSpeedBuff, UIPalette.MoveSpeed, cast);
         heal = CreateSpellSlot("Heal", 1, "2", this.art.Heal,
             DefenseBattle.Spell.Heal, UIPalette.Heal, cast);
-        moveSpeedBuff = CreateSpellSlot("Move Speed Buff", 2, "3", this.art.MoveSpeedBuff,
-            DefenseBattle.Spell.MoveSpeedBuff, UIPalette.MoveSpeed, cast);
+        attackBuff = CreateSpellSlot("Attack Buff", 2, "3", this.art.AttackBuff,
+            DefenseBattle.Spell.AttackBuff, UIPalette.Attack, cast);
         armorBuff = CreateSpellSlot("Armor Buff", 3, "4", this.art.ArmorBuff != null ? this.art.ArmorBuff : this.art.Wall,
             DefenseBattle.Spell.ArmorBuff, UIPalette.Armor, cast);
         taunt = CreateSpellSlot("Taunt", 4, "5", this.art.Taunt != null ? this.art.Taunt : this.art.Enemy,

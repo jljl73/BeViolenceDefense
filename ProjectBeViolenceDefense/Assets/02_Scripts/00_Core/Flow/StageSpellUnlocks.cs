@@ -9,7 +9,7 @@ internal sealed class StageSpellUnlocks
     {
         int stage = spell switch
         {
-            DefenseBattle.Spell.MoveSpeedBuff => 2,
+            DefenseBattle.Spell.AttackBuff => 2,
             DefenseBattle.Spell.ArmorBuff => 3,
             DefenseBattle.Spell.Taunt => 4,
             _ => 0
