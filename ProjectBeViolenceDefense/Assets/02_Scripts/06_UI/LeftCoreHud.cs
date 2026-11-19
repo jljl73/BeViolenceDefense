@@ -98,6 +98,13 @@ public sealed class LeftCoreHud : MonoBehaviour
         if (bubble == null)
             return;
         bubbleTitle.text = title;
+        // 긴 안내도 기존 제목 칸 안에 맞춘다. 짧은 대사는 원래 크기를 유지한다.
+        if (!bubbleTitle.enableAutoSizing)
+        {
+            bubbleTitle.fontSizeMax = bubbleTitle.fontSize;
+            bubbleTitle.fontSizeMin = Mathf.Min(20f, bubbleTitle.fontSize);
+            bubbleTitle.enableAutoSizing = true;
+        }
         bubbleBody.text = body;
         bubbleBody.gameObject.SetActive(!string.IsNullOrEmpty(body));
         talkUntil = Time.unscaledTime + (duration > 0f ? duration : bubbleTime);

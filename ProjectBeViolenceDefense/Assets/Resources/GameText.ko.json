@@ -1,5 +1,8 @@
 {
   "entries": [
+    {"key": "hint.no_encounter.title", "text": "앗, 이러면 저한테 곧장 오겠어요!"},
+    {"key": "hint.no_encounter.body", "text": "벽으로 길을 바꿔 볼까요?"},
+    {"key": "notice.no_encounter", "text": "앗, 이러면 저한테 곧장 오겠어요!\n벽으로 길을 바꿔 볼까요?"},
     {"key": "aim.area", "text": "<color=#{0}>◆ {1}</color> · 반경 {2:0.0}칸 · 마나 {3} · 대상 {4}명\n{5}"},
     {"key": "aim.area_blocked", "text": "{0} · 휠 범위 조절 · Esc 취소"},
     {"key": "aim.area_ready", "text": "휠 범위 조절 · 클릭 시전 · Esc 취소"},

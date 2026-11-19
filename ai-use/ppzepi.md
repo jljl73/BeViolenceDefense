@@ -1082,3 +1082,65 @@
 - 팀원이 확인할 내용: Unity 재컴파일 완료와 실제 HUD/단축키 동작, 신규 게임 초기 해금 및 2스테이지 클리어 후 공격력 해금. 기존 클리어 저장값은 보존함.
 - 후속 검증: Unity MCP recompile_status가 completed, failed=false, errors=[]로 완료됨. script eval로 별도 해금 객체의 메모리 값만 바꾸어 초기 기록 0에서 이동속도·힐=해금, 공격력=2스테이지 필요, 기록 4에서 공격력=해금을 확인함(PlayerPrefs 변경 없음). Play Mode 진입 후 슬롯 RectTransform 검색 결과가 비어 실제 HUD 및 입력 검증은 미완료. Play Mode 종료 요청.
 - 부수 변경 관찰: Unity 재컴파일 중 AssetPaths.g.cs에 기존 BuffLightning 리소스 항목이 자동 생성된 것으로 보이는 변경 발견. 직접 편집하지 않고 보존함.
+
+### [20261119-encounter-warning] 교전 예상 없는 웨이브 시작 경고
+- 시각: 2026-11-19 10:18:00 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / Unity MCP(Pipeline)
+- 목적 및 적용 위치: 준비 단계의 웨이브 시작 버튼 위 경고.
+- 사용 방식: 기존 ForecastEncounters 결과가 0이면 첫 입력을 취소하고 재입력은 허용. 준비 경로 갱신 시 확인 상태 초기화. 버튼·Space 공통 시작 함수에 적용.
+- 결과 및 확인 방법: 기능 검증 성공 / 컴파일 오류 0. GameScene Play Mode에서 첫 입력 Preparation 유지, 경고 표시, 경로 갱신 후 확인 초기화, 두 번째 입력 Combat 진입 및 경고 숨김 확인. 869틱 진행 확인. 최종 두 문장 화면 캡처 확인. EditMode 114개 중 113개 통과, 묘지 맵 경로 길이 검사 1개 실패.
+- 사람의 개입: 첫 번째와 세 번째 문장만 남기라는 사용자 수정 요청 반영.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Codex | 수정 | 첫 입력 경고 및 초기화, 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/BattleInfoHud.cs | Codex | 수정 | 웨이브 버튼 앵커 제공, 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs | Codex | 수정 | 팔레트 기반 버튼 위 경고 패널, 적용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Codex | 수정 | 두 문장 경고, 적용 |
+| docs/ui-flow.md | Codex | 수정 | 경고 동작 기록, 적용 |
+| ai-use/evidence/20261119-encounter-warning.png | Unity MCP | 생성 | 최종 두 문장 화면 증거 |
+
+#### 증거
+- ai-use/evidence/20261119-encounter-warning.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, 프로젝트 코드·문구·문서.
+- 사용 방식: 코드 수정 후 Unity MCP로 컴파일, 버튼 콜백 및 상태 검사, 화면 캡처.
+
+#### 미확인 및 후속 확인
+- Unity CLI는 PATH에서 찾지 못해 MCP로 검증. CLI 업데이트 미수행.
+- StageContentTests.GraveyardLayoutKeepsTheSceneryFrameAndLengthensRoutesWhenItsGatesAreWalled 테스트 실패 원인 및 기준 브랜치 재현 여부 미확인. 해당 맵·전투 계산 코드는 수정하지 않음.
+- 전체 빌드, 물리 키보드·마우스 입력 검증 미실행. 기존 예측은 선두 동시 출발 가정으로 실제 전투 전체를 시뮬레이션하지 않음.
+- 검증 중 eval 1회 시간 초과 후 상태 조회로 재확인. 최종 경고 화면 확인 후 Play Mode 종료.
+
+### [20261119-encounter-character-bubble] 경고를 주인공 말풍선으로 변경
+- 시각: 2026-11-19 10:23:01 +09:00
+- 작업자: ppzepi
+- 사용 도구: Codex / Unity MCP(Pipeline)
+- 목적 및 적용 위치: 웨이브 시작 경고를 좌상단 캐릭터의 기존 안내 말풍선에 통합.
+- 사용 방식: 공통 Hint/Say 경로와 곤란한 표정·2.8초 표시를 재사용. 버튼 위 전용 패널 코드는 제거. 제목 넘침 제보에 따라 긴 제목만 자동 축소 적용.
+- 결과 및 확인 방법: 성공 / 컴파일 오류 0. Play Mode에서 준비 단계 첫 입력 차단·말풍선 활성화 확인, 재입력 Combat 확인. 제목 29→26.5, 제목·본문 TMP overflow=false. 최종 화면 캡처 확인. UI만 수정하여 전투 테스트 재실행 안 함.
+- 사람의 개입: 좌상단 캐릭터 발화 방식 요청 및 텍스트 넘침 제보 반영.
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| ProjectBeViolenceDefense/Assets/02_Scripts/00_Core/Flow/VoxelDefensePrototype.cs | Codex | 수정 | Hint 호출로 교체, 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/DefenseHud.cs, BattleInfoHud.cs | Codex | 수정 | 직전 작업의 전용 패널·앵커 코드 제거, 적용 |
+| ProjectBeViolenceDefense/Assets/02_Scripts/06_UI/LeftCoreHud.cs | Codex | 수정 | 제목 자동 크기 조절, 적용 |
+| ProjectBeViolenceDefense/Assets/Resources/GameText.ko.json | Codex | 수정 | 제목·본문 및 HUD 미연결 시 대체 알림 키, 적용 |
+| docs/ui-flow.md | Codex | 수정 | 캐릭터 말풍선 동작 기록, 적용 |
+| ai-use/evidence/20261119-encounter-character-bubble.png | Unity MCP | 생성 | 최종 화면 확인 |
+
+#### 증거
+- ai-use/evidence/20261119-encounter-character-bubble.png
+
+#### OpenAI 도구 사용
+- 도구 및 사용 위치: Codex, UI 코드·텍스트·문서.
+- 사용 방식: 기존 말풍선 재사용, Unity MCP 컴파일·상태 조회·이미지 확인.
+
+#### 미확인 및 후속 확인
+- CLI 미사용: 앞선 작업에서 셸 PATH에 실행 파일을 찾지 못해 MCP 사용. 전체 빌드 미실행.
+- 기존 EditMode 묘지 맵 경로 검사 실패 1건은 이번 UI 수정 범위 밖이며 재검증하지 않음.

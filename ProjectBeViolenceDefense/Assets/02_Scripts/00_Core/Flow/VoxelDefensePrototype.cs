@@ -380,10 +380,19 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             battleSpeed = speed;
     }
 
+    private bool encounterWarningAcknowledged;
+
     private void StartBattle()
     {
         if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Preparation)
             return;
+
+        if (!encounterWarningAcknowledged && battle.ForecastEncounters().Count == 0)
+        {
+            encounterWarningAcknowledged = true;
+            Hint("no_encounter", LeftCoreHud.Expression.Troubled);
+            return;
+        }
 
         buildMode = false;
         battle.StartRound();
@@ -563,6 +572,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
 
     private void RefreshPlanningTiles(bool highlightChanges = false)
     {
+        encounterWarningAcknowledged = false;
         // 이번 라운드에 쓰지 않는 스폰의 경로는 null 이다.
         Vector3[][] routes = battle.RoundRoutes();
         view.ShowPlanningTiles(routes, battle.ForecastEncounterCells());
