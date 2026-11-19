@@ -182,7 +182,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         // 같은 진영 스폰이 여럿이면 라운드마다 하나만 무작위로 쓴다. 전투 입력을 정할 때만 무작위를 쓴다.
         int roundLimit = waves?.waves.Count ?? usedStage?.reinforcementWaveLimit ?? 0;
         battle = new DefenseBattle(grid, factions, BuildRoundLineup(waves), roundLimit,
-            pickSpawn: n => Random.Range(0, n));
+            pickSpawn: n => Random.Range(0, n), coreMaxHealth: usedStage?.coreMaxHealth ?? DefenseBattle.CoreMaxHealth);
+        view.ResetCoreHealth(battle.MaxCoreHealth);
         battle.EnemySpawned += view.AddEnemy;
         battle.EnemyRemoved += enemy => view.RemoveEnemy(enemy, battle.CoreHealth);
         battle.EnemyRemoved += enemy =>
@@ -387,7 +388,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
                 {
                     if (defeatPanel != null)
                     {
-                        int coreMax = DefenseBattle.CoreMaxHealth;
+                        int coreMax = battle.MaxCoreHealth;
                         defeatPanel.Show(usedStage != null ? GameText.Get(usedStage.displayNameKey) : null, battle.CoreHealth,
                             coreMax, leakedEnemies, fallenEnemies);
                     }
@@ -424,7 +425,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
             hud.Notify(GameText.Get("notice.victory_restart"));
             return;
         }
-        int coreMax = DefenseBattle.CoreMaxHealth;
+        int coreMax = battle.MaxCoreHealth;
         victoryPanelHud.Show(usedStage != null ? GameText.Get(usedStage.displayNameKey) : null, battle.CoreHealth, coreMax,
             leakedEnemies, fallenEnemies);
     }
@@ -910,7 +911,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         view.ShowAreaSpellPreview(aimedSpell, spellCenter, DefenseBattle.AreaSpellRadius(rangeStep), tauntTarget);
         hud.Refresh(battle, grid, view, aimedSpell, spellCenter, rangeStep, battleSpeed, tauntTarget);
         if (leftCoreHud != null)
-            leftCoreHud.Refresh(battle.CoreHealth, DefenseBattle.CoreMaxHealth);
+            leftCoreHud.Refresh(battle.CoreHealth, battle.MaxCoreHealth);
         if (manaBarHud != null)
             manaBarHud.Refresh(battle.Mana, DefenseBattle.MaxMana);
         if (buildModeHud != null)

@@ -328,10 +328,10 @@ internal sealed class DefenseHud
             lineup.text = LineupText(battle);
         }
         int displayedCoreHealth = battle.CoreHealth + view.PendingCoreDamage;
-        core.text = $"{displayedCoreHealth} <size=65%>/ {DefenseBattle.CoreMaxHealth}</size>";
-        coreFill.color = displayedCoreHealth <= DefenseBattle.CoreMaxHealth / 4
+        core.text = $"{displayedCoreHealth} <size=65%>/ {battle.MaxCoreHealth}</size>";
+        coreFill.color = displayedCoreHealth <= battle.MaxCoreHealth / 4
             ? UIPalette.ButtonDanger : UIPalette.ButtonPrimary;
-        SetBarFraction(coreFill, (float)displayedCoreHealth / DefenseBattle.CoreMaxHealth);
+        SetBarFraction(coreFill, (float)displayedCoreHealth / battle.MaxCoreHealth);
         coreShieldGlow.Refresh(view.CoreShieldVisible, view.CoreShieldBreakCount, Time.unscaledDeltaTime);
         wallSupply.gameObject.SetActive(!inCombat && !defeated && !externalBuildPanel);
         if (!inCombat && !defeated)

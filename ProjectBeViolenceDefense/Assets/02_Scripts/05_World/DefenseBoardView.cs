@@ -219,6 +219,7 @@ internal sealed class DefenseBoardView
     private readonly Mesh factionRingMesh;
     private int nextHitEffect;
     private int observedCoreHealth = DefenseBattle.CoreMaxHealth;
+    public void ResetCoreHealth(int health) => observedCoreHealth = health;
     private MeshRenderer coreShield;
     private Material coreShieldMaterial;
     private Vector3 coreShieldSize;

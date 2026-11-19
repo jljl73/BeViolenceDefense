@@ -1518,3 +1518,29 @@
 
 #### 미확인 및 후속 확인
 - 팀원이 확인할 내용: 바깥으로 민 장식이 다른 장식과 겹치는지 눈으로 확인. Stage1(해안) 장식은 요청 범위 밖이라 손대지 않음(ST_Art_1만 다시 캡처)
+
+### [20261119-stage-core-health] 스테이지별 성벽(코어) 체력 조절
+- 시각: 2026-11-19 확인 필요(시:분)
+- 작업자: ppzepi
+- 사용 도구: Claude Code / claude-opus-5-5, unity-editor-mcp(테스트 실행)
+- 목적 및 적용 위치: 전역 상수였던 코어 최대 체력(120)을 스테이지별로 설정. 1~5스테이지 = 30/30/40/50/50
+- 사용 방식: `StageData.coreMaxHealth` 필드 추가, `DefenseBattle` 생성자 인자·`MaxCoreHealth` 속성 추가, HUD·결과 패널·보드 뷰가 전투 인스턴스 값을 쓰도록 변경
+- 결과 및 확인 방법: 성공 / EditMode 테스트 123개 중 119개 통과. 실패 4개(RerouteAfterCombat 3, StageContent Graveyard 1)는 변경 전에도 동일하게 실패함을 확인. Play Mode 미확인
+- 사람의 개입: 체력 수치 지정
+
+#### 생성·수정 결과물
+| 파일 또는 위치 | 생성 도구 | 생성·수정 구분 | 수정 내용 및 최종 사용 여부 |
+| --- | --- | --- | --- |
+| 02_Scripts/04_Combat/DefenseBattle.cs | Claude Code | 수정 | coreMaxHealth 인자, MaxCoreHealth / 사용 |
+| 02_Scripts/05_World/StageData.cs | Claude Code | 수정 | coreMaxHealth 필드(기본 120) / 사용 |
+| 02_Scripts/05_World/DefenseBoardView.cs, 00_Core/Flow/VoxelDefensePrototype.cs, 06_UI/DefenseHud.cs | Claude Code | 수정 | 스테이지 값 전달·표시 / 사용 |
+| 04_Data/04_Stages/Stage1, Stage2_Temp, Stage3, Stage_Graveyard, Stage4.asset | Claude Code | 수정 | 30/30/40/50/50 / 사용 |
+
+#### 증거
+- 없음
+
+#### Unity CLI 사용 — 사용한 경우에만 작성
+- 구현하거나 수행한 작업: unity-editor-mcp로 EditMode 테스트 실행(변경 전·후 비교)
+- 활용 방식: 변경 후 전체 실행, git stash 후 재실행으로 기존 실패 여부 확인
+- 잘된 점: 기존 실패와 신규 실패 구분이 빠름
+- 잘 안된 점 및 개선 필요: 기존 실패 테스트 4개 존재

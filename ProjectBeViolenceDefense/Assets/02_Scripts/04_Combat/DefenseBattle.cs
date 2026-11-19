@@ -95,7 +95,8 @@ internal sealed class DefenseBattle
     public IReadOnlyList<EnemyUnit> Enemies => enemies;
     public Phase CurrentPhase { get; private set; }
     public int Round { get; private set; } = 1;
-    public int CoreHealth { get; private set; } = CoreMaxHealth;
+    public int MaxCoreHealth { get; }
+    public int CoreHealth { get; private set; }
     public bool HasCoreShield { get; private set; }
     public int SpawnCount { get; private set; }
     public int EnemiesPerRound { get; private set; }
@@ -103,13 +104,14 @@ internal sealed class DefenseBattle
 
     public DefenseBattle(DefenseGrid grid, EnemyFaction[] factions,
         Func<int, IReadOnlyList<EnemyFaction>[]> roundLineup = null, int roundLimit = 0,
-        Func<int, int> pickSpawn = null)
+        Func<int, int> pickSpawn = null, int coreMaxHealth = CoreMaxHealth)
     {
         this.grid = grid;
         this.factions = factions;
         this.roundLineup = roundLineup;
         this.roundLimit = roundLimit;
         this.pickSpawn = pickSpawn;
+        MaxCoreHealth = CoreHealth = coreMaxHealth;
         roundRoute = new int[factions.Length];
         combat = new CombatPositioning(grid, enemies);
         spawnedPerFaction = new int[factions.Length];

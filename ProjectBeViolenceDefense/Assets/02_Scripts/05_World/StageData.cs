@@ -61,6 +61,8 @@ public sealed class StageData : ScriptableObject
     public StageWaves waves;
     [Min(0), Tooltip("웨이브 편성이 없을 때 클리어에 필요한 웨이브 수. 0이면 무한 증원.")]
     public int reinforcementWaveLimit;
+    [Min(1), Tooltip("코어(성벽) 최대 체력")]
+    public int coreMaxHealth = DefenseBattle.CoreMaxHealth;
 
     public IEnumerable<Vector2Int> BlockedCells()
     {

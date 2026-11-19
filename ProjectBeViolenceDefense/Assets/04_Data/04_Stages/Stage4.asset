@@ -514,3 +514,4 @@ MonoBehaviour:
     rotation: 1
   waves: {fileID: 11400000, guid: 01f902fdd12c42e4d964dcf901c3f154, type: 2}
   reinforcementWaveLimit: 0
+  coreMaxHealth: 50
