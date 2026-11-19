@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 595c939316e1d03479642f44f3bd1ae1, type: 3}
+  m_Name: Waves3
+  m_EditorClassIdentifier: Assembly-CSharp::StageWaves
+  waves:
+  - note: "W1 \uACE0\uBE14\uB9B0 vs \uC5B8\uB370\uB4DC - \uC5B8\uB370\uB4DC \uC6B0\uC138(\uC804\uB825
+      +10%)"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-grunt
+          count: 10
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: skeleton
+          count: 6
+        - unitId: skeleton-archer
+          count: 1
+  - note: "W2 \uC5B8\uB370\uB4DC vs \uC57C\uC218 - \uC57C\uC218 \uC6B0\uC138(+10%),
+      \uBE60\uB978 \uC57C\uC218\uB97C \uBCBD\uC73C\uB85C \uBD99\uC7A1\uAE30"
+    factions:
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: skeleton
+          count: 5
+        - unitId: zombie
+          count: 1
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: wolf
+          count: 8
+        - unitId: bat
+          count: 3
+  - note: "W3 \uACE0\uBE14\uB9B0 vs \uC57C\uC218 - \uACE0\uBE14\uB9B0 \uC6B0\uC138(+10%)"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: goblin-chief
+          count: 1
+        - unitId: goblin-grunt
+          count: 10
+        - unitId: goblin-slinger
+          count: 2
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: boar
+          count: 1
+        - unitId: wolf
+          count: 5
+        - unitId: bat
+          count: 2
+  - note: "W4 \uC0BC\uD30C\uC804 - \uC5B8\uB370\uB4DC \uC6B0\uC138"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 1
+        - unitId: goblin-grunt
+          count: 9
+        - unitId: goblin-slinger
+          count: 2
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: skeleton
+          count: 6
+        - unitId: zombie
+          count: 1
+        - unitId: skeleton-archer
+          count: 3
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: dire-wolf
+          count: 1
+        - unitId: wolf
+          count: 6
+        - unitId: bat
+          count: 2
+  - note: "W5 \uCD5C\uC885 \uC0BC\uD30C\uC804 - \uC57C\uC218 \uC6B0\uC138"
+    factions:
+    - faction: 0
+      groups:
+      - note: A
+        enemies:
+        - unitId: orc
+          count: 1
+        - unitId: goblin-chief
+          count: 1
+        - unitId: goblin-grunt
+          count: 12
+        - unitId: goblin-slinger
+          count: 3
+        - unitId: goblin-charger
+          count: 3
+    - faction: 1
+      groups:
+      - note: A
+        enemies:
+        - unitId: reaper
+          count: 1
+        - unitId: skeleton
+          count: 7
+        - unitId: skeleton-archer
+          count: 3
+        - unitId: necromancer
+          count: 1
+    - faction: 2
+      groups:
+      - note: A
+        enemies:
+        - unitId: werewolf
+          count: 1
+        - unitId: boar
+          count: 1
+        - unitId: wolf
+          count: 9
+        - unitId: bat
+          count: 3

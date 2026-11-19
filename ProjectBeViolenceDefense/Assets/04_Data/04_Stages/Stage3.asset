@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2073990d430741046825d63736970c68, type: 3}
   m_Name: Stage3
   m_EditorClassIdentifier: Assembly-CSharp::StageData
+  displayNameKey: 
   width: 19
   depth: 20
   core:
@@ -347,4 +348,5 @@ MonoBehaviour:
     cell: {x: 3, y: 9}
     size: {x: 1, y: 1}
     rotation: 3
-  waves: {fileID: 11400000, guid: e575b5104fe545d4f9caeba1cd994cc9, type: 2}
+  waves: {fileID: 11400000, guid: 5c168d5511df1d649801fcb4475f0c86, type: 2}
+  reinforcementWaveLimit: 0

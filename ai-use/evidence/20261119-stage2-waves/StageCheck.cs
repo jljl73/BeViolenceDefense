@@ -167,7 +167,7 @@ internal static class StageCheck
                     Console.WriteLine($"    +{k}: " + Dump(e));
                 }
         }
-        string Side(int s) { var u = all.Where(e => e.FactionIndex == s).ToList(); return $"진영{s} 출전 {u.Count} 코어도달 {u.Count(e => e.ReachedCore)} 공격 {u.Sum(e => e.AttacksPerformed)}회"; }
+        string Side(int s) { var u = all.Where(e => e.FactionIndex == s).ToList(); return $"진영{s} 출전 {u.Count} 코어도달 {u.Count(e => e.ReachedCore)} 사망 {u.Count(e => !e.ReachedCore && !e.IsAlive)} 공격 {u.Sum(e => e.AttacksPerformed)}회"; }
         Console.WriteLine($"  전투[{spec}]: {(finished ? "종료" : "미종료!")} {ticks / 60f:0.0}s | 마법 {casts}(힐 {heals}) | " + string.Join(" | ", Enumerable.Range(0, sides).Where(s => queues[s].Count > 0).Select(Side)) +
             (firstHitTick < 0 ? " | 교전 없음" : $" | 첫 타격 {firstHitTick / 60f:0.0}s ({firstHitPos.x:0.0},{firstHitPos.z:0.0}), 타격 많은 칸 " +
             string.Join(" ", hitCells.OrderByDescending(k => k.Value).Take(3).Select(k => $"({k.Key.x},{k.Key.y})x{k.Value}"))));
