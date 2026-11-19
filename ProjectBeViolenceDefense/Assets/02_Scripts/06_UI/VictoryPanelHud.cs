@@ -66,6 +66,8 @@ public sealed class VictoryPanelHud : MonoBehaviour
 
     public bool IsOpen => content.activeSelf;
 
+    public void SetNextCaption(string key) => SetCaption(nextCaption, key);
+
     private void Awake()
     {
         Initialize();

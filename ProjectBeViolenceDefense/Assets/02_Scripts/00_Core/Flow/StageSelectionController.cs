@@ -16,6 +16,7 @@ public sealed class StageSelectionController : MonoBehaviour
     private static int retryStage = -1;
     private bool entering;
     private bool startCovered;
+    private StageProgress progress;
 
     public int SelectedStage { get; private set; } = -1;
     public StageContent CurrentStage { get; private set; }
@@ -26,10 +27,11 @@ public sealed class StageSelectionController : MonoBehaviour
 
     private void Start()
     {
-        popup.Bind(stages, SelectStage);
+        progress = new StageProgress();
+        popup.Bind(stages, SelectStage, progress, ui);
         int pending = retryStage;
         retryStage = -1;
-        if (pending >= 0 && pending < stages.Length)
+        if (pending >= 0 && progress.IsUnlocked(pending + 1, stages.Length))
         {
             startCovered = true;
             SelectStage(pending);
@@ -44,7 +46,8 @@ public sealed class StageSelectionController : MonoBehaviour
 
     public void SelectStage(int index)
     {
-        if (entering || SelectedStage >= 0 || index < 0 || index >= stages.Length || stages[index] == null)
+        if (progress == null || !progress.IsUnlocked(index + 1, stages.Length) ||
+            entering || SelectedStage >= 0 || index < 0 || index >= stages.Length || stages[index] == null)
             return;
         StageContent prefab = stages[index];
         if (prefab.Data == null || prefab.BoardCamera == null || prefab.Data.Validate(prefab.Data.CreateGrid()) != null)
@@ -71,7 +74,13 @@ public sealed class StageSelectionController : MonoBehaviour
         SelectedStage = index;
         if (ui.HasOpenPopup)
             ui.CloseTopPopup();
-        game.InitializeStage(CurrentStage, index + 1, Retry);
+        game.InitializeStage(CurrentStage, index + 1, Retry, ReturnToSelection);
+    }
+
+    private void ReturnToSelection()
+    {
+        retryStage = -1;
+        SceneManager.LoadScene(gameObject.scene.buildIndex);
     }
 
     private void Retry()

@@ -1,0 +1,174 @@
+4446: Compiling Ray Tracing Shader "TraceRays.urtshader", keywords = <no keywords>
+4447: Shader warning in 'TraceRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4448:     finished in 0.00 seconds. Local cache hits 0, remote cache hits 0, compiled 1 platform variants
+4449:  -> (artifact id: '35caf1831cc6872b2bb022b8975ba315') in 0.00776175 seconds
+4450: Start importing Packages/com.unity.render-pipelines.universal/Runtime/RendererFeatures/SurfaceCacheGI/SurfaceCacheCore/RisEstimation.urtshader using Guid(713f6141bd66a134383b787f2eaa7c11) (ScriptedImporter)
+4451: Compiling Ray Tracing Shader "RisEstimation.urtshader", keywords = <no keywords>
+4451: Compiling Ray Tracing Shader "RisEstimation.urtshader", keywords = <no keywords>
+4452: Shader warning in 'RisEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4453:     finished in 0.00 seconds. Local cache hits 0, remote cache hits 0, compiled 1 platform variants
+4454:  -> (artifact id: '7ebae7e4d2306cf4429b21ed342afdbc') in 0.006253166 seconds
+4455: Start importing Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/RenderingLayerMask/TraceRenderingLayerMask.urtshader using Guid(94a070d33e408384bafc1dea4a565df9) (ScriptedImporter)
+4456: Compiling Ray Tracing Shader "TraceRenderingLayerMask.urtshader", keywords = <no keywords>
+4456: Compiling Ray Tracing Shader "TraceRenderingLayerMask.urtshader", keywords = <no keywords>
+4457: Shader warning in 'TraceRenderingLayerMask': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4458:     finished in 0.00 seconds. Local cache hits 0, remote cache hits 0, compiled 1 platform variants
+4459:  -> (artifact id: 'd1274bc1b79d3f09d8a27e30bd40f805') in 0.005172375 seconds
+4460: Start importing Packages/com.unity.render-pipelines.universal/Runtime/RendererFeatures/SurfaceCacheGI/SurfaceCacheCore/UniformEstimation.urtshader using Guid(94a39d12848d8d64ca962a72b74e7c50) (ScriptedImporter)
+4461: Compiling Ray Tracing Shader "UniformEstimation.urtshader", keywords = <no keywords>
+4461: Compiling Ray Tracing Shader "UniformEstimation.urtshader", keywords = <no keywords>
+4462: Shader warning in 'UniformEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4463:     finished in 0.00 seconds. Local cache hits 0, remote cache hits 0, compiled 1 platform variants
+4464:  -> (artifact id: 'a2650526f09f1cdd6ad41c83937477a1') in 0.005001708 seconds
+4465: Start importing Packages/com.unity.render-pipelines.core/Tests/Editor/UnifiedRayTracing/TraceTransparentRays.urtshader using Guid(6513c3b892e933c4f8d00c19d5c47532) (ScriptedImporter)
+4466: Compiling Ray Tracing Shader "TraceTransparentRays.urtshader", keywords = <no keywords>
+4466: Compiling Ray Tracing Shader "TraceTransparentRays.urtshader", keywords = <no keywords>
+4467: Shader warning in 'TraceTransparentRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4468:     finished in 0.00 seconds. Local cache hits 0, remote cache hits 0, compiled 1 platform variants
+4469:  -> (artifact id: 'a2e8943e2202a917d7295c659c3e94c1') in 0.002944375 seconds
+4470: Start importing Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/DynamicGI/DynamicGISkyOcclusion.urtshader using Guid(5a2a534753fbdb44e96c3c78b5a6999d) (ScriptedImporter)
+4471: Compiling Ray Tracing Shader "DynamicGISkyOcclusion.urtshader", keywords = <no keywords>
+4471: Compiling Ray Tracing Shader "DynamicGISkyOcclusion.urtshader", keywords = <no keywords>
+4472: Shader warning in 'DynamicGISkyOcclusion': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4473:     finished in 0.00 seconds. Local cache hits 0, remote cache hits 0, compiled 1 platform variants
+4474:  -> (artifact id: 'af6f149d4b34ba52fdb9ed302174c632') in 0.004009542 seconds
+4475: Start importing Packages/com.unity.render-pipelines.core/Tests/Editor/UnifiedRayTracing/TraceRaysAndFetchAttributes.urtshader using Guid(fbc59f55df2416344b008dc23753cae2) (ScriptedImporter)
+4476: Compiling Ray Tracing Shader "TraceRaysAndFetchAttributes.urtshader", keywords = <no keywords>
+4476: Compiling Ray Tracing Shader "TraceRaysAndFetchAttributes.urtshader", keywords = <no keywords>
+4477: Shader warning in 'TraceRaysAndFetchAttributes': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4478:     finished in 0.00 seconds. Local cache hits 0, remote cache hits 0, compiled 1 platform variants
+4479:  -> (artifact id: 'f7eba3e254f3027b0632c33a8c523e99') in 0.003650333 seconds
+4480: Start importing Packages/com.unity.render-pipelines.universal/Runtime/RendererFeatures/SurfaceCacheGI/SurfaceCacheCore/RestirCandidateTemporal.urtshader using Guid(ad3a9f9982f8c4f4a839a78955e78458) (ScriptedImporter)
+4481: Compiling Ray Tracing Shader "RestirCandidateTemporal.urtshader", keywords = <no keywords>
+4481: Compiling Ray Tracing Shader "RestirCandidateTemporal.urtshader", keywords = <no keywords>
+4482: Shader warning in 'RestirCandidateTemporal': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4483:     finished in 0.00 seconds. Local cache hits 0, remote cache hits 0, compiled 1 platform variants
+4484:  -> (artifact id: '1d6eb03eed35d4959f9ba95beb9541e8') in 0.004542417 seconds
+4485: Start importing Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/VirtualOffset/TraceVirtualOffset.urtshader using Guid(ff2cbab5da58bf04d82c5f34037ed123) (ScriptedImporter)
+4486: Compiling Ray Tracing Shader "TraceVirtualOffset.urtshader", keywords = <no keywords>
+4486: Compiling Ray Tracing Shader "TraceVirtualOffset.urtshader", keywords = <no keywords>
+4487: Shader warning in 'TraceVirtualOffset': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4488:     finished in 0.00 seconds. Local cache hits 0, remote cache hits 0, compiled 1 platform variants
+4489:  -> (artifact id: '1d4eb117c91568957db0380abd9369d0') in 0.004841916 seconds
+4490: WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+4491: WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+4496: Launching external process: /Applications/Unity/Hub/Editor/6000.3.28f1/Unity.app/Contents/Helpers/UnityShaderCompiler
+4497: Shader warning in 'RestirCandidateTemporal': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4498: Shader warning in 'TraceTransparentRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4499: Shader warning in 'TraceRenderingLayerMask': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4500: Shader warning in 'TraceRaysAndFetchAttributes': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4501: Shader warning in 'DynamicGISkyOcclusion': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4497: Shader warning in 'RestirCandidateTemporal': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4498: Shader warning in 'TraceTransparentRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4499: Shader warning in 'TraceRenderingLayerMask': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4500: Shader warning in 'TraceRaysAndFetchAttributes': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4501: Shader warning in 'DynamicGISkyOcclusion': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4502: Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+4498: Shader warning in 'TraceTransparentRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4499: Shader warning in 'TraceRenderingLayerMask': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4500: Shader warning in 'TraceRaysAndFetchAttributes': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4501: Shader warning in 'DynamicGISkyOcclusion': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4502: Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+4503: Shader warning in 'TraceVirtualOffset': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4499: Shader warning in 'TraceRenderingLayerMask': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4500: Shader warning in 'TraceRaysAndFetchAttributes': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4501: Shader warning in 'DynamicGISkyOcclusion': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4502: Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+4503: Shader warning in 'TraceVirtualOffset': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4504: Shader warning in 'TraceRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4500: Shader warning in 'TraceRaysAndFetchAttributes': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4501: Shader warning in 'DynamicGISkyOcclusion': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4502: Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+4503: Shader warning in 'TraceVirtualOffset': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4504: Shader warning in 'TraceRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4505: Shader warning in 'RisEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4502: Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+4503: Shader warning in 'TraceVirtualOffset': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4504: Shader warning in 'TraceRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4505: Shader warning in 'RisEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4506: Shader warning in 'UniformEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4507: Launching external process: /Applications/Unity/Hub/Editor/6000.3.28f1/Unity.app/Contents/Helpers/UnityShaderCompiler
+4503: Shader warning in 'TraceVirtualOffset': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4504: Shader warning in 'TraceRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4505: Shader warning in 'RisEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4506: Shader warning in 'UniformEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4507: Launching external process: /Applications/Unity/Hub/Editor/6000.3.28f1/Unity.app/Contents/Helpers/UnityShaderCompiler
+4508: Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+4504: Shader warning in 'TraceRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4505: Shader warning in 'RisEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4506: Shader warning in 'UniformEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4507: Launching external process: /Applications/Unity/Hub/Editor/6000.3.28f1/Unity.app/Contents/Helpers/UnityShaderCompiler
+4508: Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+4509: Launching external process: /Applications/Unity/Hub/Editor/6000.3.28f1/Unity.app/Contents/Helpers/UnityShaderCompiler
+4505: Shader warning in 'RisEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4506: Shader warning in 'UniformEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+4507: Launching external process: /Applications/Unity/Hub/Editor/6000.3.28f1/Unity.app/Contents/Helpers/UnityShaderCompiler
+4508: Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+4509: Launching external process: /Applications/Unity/Hub/Editor/6000.3.28f1/Unity.app/Contents/Helpers/UnityShaderCompiler
+4510: Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+8976:     d3d11 (total internal programs: 2, unique: 2)
+8977: Shader warning in 'BeViolenceDefense/Unit Shield Surface': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitShieldSurface.shader(53) (on d3d11)
+8978: 
+8979: Compiling Subshader: 0, Pass: , Fragment program with <no keywords>
+8980: Platform defines: SHADER_API_DESKTOP UNITY_ENABLE_DETAIL_NORMALMAP UNITY_ENABLE_REFLECTION_BUFFERS UNITY_LIGHTMAP_FULL_HDR UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_PASS_SRPDEFAULTUNLIT UNITY_PBS_USE_BRDF1 UNITY_PLATFORM_SUPPORTS_DEPTH_FETCH UNITY_SPECCUBE_BLENDING UNITY_SPECCUBE_BOX_PROJECTION UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
+8981: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+8981: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+8982: Shader warning in 'BeViolenceDefense/Unit Shield Surface': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitShieldSurface.shader(53) (on metal)
+8983: 
+8984: Compiling Subshader: 0, Pass: <Unnamed Pass 0>, Fragment program with <no keywords>
+8985: Platform defines: SHADER_API_DESKTOP UNITY_ENABLE_DETAIL_NORMALMAP UNITY_ENABLE_REFLECTION_BUFFERS UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_LIGHTMAP_FULL_HDR UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_PASS_SRPDEFAULTUNLIT UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BLENDING UNITY_SPECCUBE_BOX_PROJECTION UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
+8986: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+8986: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+8987: Shader warning in 'BeViolenceDefense/Unit Shield Surface': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitShieldSurface.shader(57) (on d3d11)
+8988: 
+8989: Compiling Subshader: 0, Pass: , Fragment program with <no keywords>
+8990: Platform defines: SHADER_API_DESKTOP UNITY_ENABLE_DETAIL_NORMALMAP UNITY_ENABLE_REFLECTION_BUFFERS UNITY_LIGHTMAP_FULL_HDR UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_PASS_SRPDEFAULTUNLIT UNITY_PBS_USE_BRDF1 UNITY_PLATFORM_SUPPORTS_DEPTH_FETCH UNITY_SPECCUBE_BLENDING UNITY_SPECCUBE_BOX_PROJECTION UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
+8991: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+8991: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+8992: Shader warning in 'BeViolenceDefense/Unit Shield Surface': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitShieldSurface.shader(57) (on metal)
+8993: 
+8994: Compiling Subshader: 0, Pass: <Unnamed Pass 0>, Fragment program with <no keywords>
+8995: Platform defines: SHADER_API_DESKTOP UNITY_ENABLE_DETAIL_NORMALMAP UNITY_ENABLE_REFLECTION_BUFFERS UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_LIGHTMAP_FULL_HDR UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_PASS_SRPDEFAULTUNLIT UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BLENDING UNITY_SPECCUBE_BOX_PROJECTION UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
+8996: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+9017:     d3d11 (total internal programs: 2, unique: 2)
+9018: Shader warning in 'BeViolenceDefense/Unit Attack Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitAttackAura.shader(49) (on d3d11)
+9019: 
+9020: Compiling Subshader: 0, Pass: , Fragment program with <no keywords>
+9021: Platform defines: SHADER_API_DESKTOP UNITY_ENABLE_DETAIL_NORMALMAP UNITY_ENABLE_REFLECTION_BUFFERS UNITY_LIGHTMAP_FULL_HDR UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_PASS_SRPDEFAULTUNLIT UNITY_PBS_USE_BRDF1 UNITY_PLATFORM_SUPPORTS_DEPTH_FETCH UNITY_SPECCUBE_BLENDING UNITY_SPECCUBE_BOX_PROJECTION UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
+9022: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+9022: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+9023: Shader warning in 'BeViolenceDefense/Unit Attack Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitAttackAura.shader(49) (on metal)
+9024: 
+9025: Compiling Subshader: 0, Pass: <Unnamed Pass 0>, Fragment program with <no keywords>
+9026: Platform defines: SHADER_API_DESKTOP UNITY_ENABLE_DETAIL_NORMALMAP UNITY_ENABLE_REFLECTION_BUFFERS UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_LIGHTMAP_FULL_HDR UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_PASS_SRPDEFAULTUNLIT UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BLENDING UNITY_SPECCUBE_BOX_PROJECTION UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
+9027: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+9027: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+9028: Shader warning in 'BeViolenceDefense/Unit Attack Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitAttackAura.shader(52) (on d3d11)
+9029: 
+9030: Compiling Subshader: 0, Pass: , Fragment program with <no keywords>
+9031: Platform defines: SHADER_API_DESKTOP UNITY_ENABLE_DETAIL_NORMALMAP UNITY_ENABLE_REFLECTION_BUFFERS UNITY_LIGHTMAP_FULL_HDR UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_PASS_SRPDEFAULTUNLIT UNITY_PBS_USE_BRDF1 UNITY_PLATFORM_SUPPORTS_DEPTH_FETCH UNITY_SPECCUBE_BLENDING UNITY_SPECCUBE_BOX_PROJECTION UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
+9032: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+9032: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+9033: Shader warning in 'BeViolenceDefense/Unit Attack Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitAttackAura.shader(52) (on metal)
+9034: 
+9035: Compiling Subshader: 0, Pass: <Unnamed Pass 0>, Fragment program with <no keywords>
+9036: Platform defines: SHADER_API_DESKTOP UNITY_ENABLE_DETAIL_NORMALMAP UNITY_ENABLE_REFLECTION_BUFFERS UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_LIGHTMAP_FULL_HDR UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_PASS_SRPDEFAULTUNLIT UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BLENDING UNITY_SPECCUBE_BOX_PROJECTION UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
+9037: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+9375:     d3d11 (total internal programs: 2, unique: 2)
+9376: Shader warning in 'BeViolenceDefense/Unit Speed Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitSpeedAura.shader(60) (on d3d11)
+9377: 
+9378: Compiling Subshader: 0, Pass: , Fragment program with <no keywords>
+9379: Platform defines: SHADER_API_DESKTOP UNITY_ENABLE_DETAIL_NORMALMAP UNITY_ENABLE_REFLECTION_BUFFERS UNITY_LIGHTMAP_FULL_HDR UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_PASS_SRPDEFAULTUNLIT UNITY_PBS_USE_BRDF1 UNITY_PLATFORM_SUPPORTS_DEPTH_FETCH UNITY_SPECCUBE_BLENDING UNITY_SPECCUBE_BOX_PROJECTION UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
+9380: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+9380: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+9381: Shader warning in 'BeViolenceDefense/Unit Speed Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitSpeedAura.shader(60) (on metal)
+9382: 
+9383: Compiling Subshader: 0, Pass: <Unnamed Pass 0>, Fragment program with <no keywords>
+9384: Platform defines: SHADER_API_DESKTOP UNITY_ENABLE_DETAIL_NORMALMAP UNITY_ENABLE_REFLECTION_BUFFERS UNITY_FRAMEBUFFER_FETCH_AVAILABLE UNITY_LIGHTMAP_FULL_HDR UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_PASS_SRPDEFAULTUNLIT UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BLENDING UNITY_SPECCUBE_BOX_PROJECTION UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
+9385: Disabled keywords: SHADER_API_GLES30 SHADER_API_GLES31 SHADER_API_GLES32 UNITY_ASTC_NORMALMAP_ENCODING UNITY_COLORSPACE_GAMMA UNITY_HARDWARE_TIER1 UNITY_HARDWARE_TIER2 UNITY_HARDWARE_TIER3 UNITY_LIGHTMAP_DLDR_ENCODING UNITY_LIGHTMAP_RGBM_ENCODING UNITY_METAL_SHADOWS_USE_POINT_FILTERING UNITY_NO_DXT5nm UNITY_NO_SCREENSPACE_SHADOWS UNITY_PBS_USE_BRDF2 UNITY_PBS_USE_BRDF3 UNITY_PRETRANSFORM_TO_DISPLAY_ORIENTATION UNITY_UNIFIED_SHADER_PRECISION_MODEL UNITY_VIRTUAL_TEXTURING
+15519: Launching external process: /Applications/Unity/Hub/Editor/6000.3.28f1/Unity.app/Contents/Resources/Scripting/il2cpp/build/deploy/Analytics
+15520: STAGE_PROGRESS_BUILD StandaloneWindows64 Succeeded
+15521: UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+15522: UnityEngine.StackTraceUtility:ExtractStackTrace () (at /Users/bokken/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:35)
+15523: UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+15524: UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])

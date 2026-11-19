@@ -1,0 +1,33 @@
+Shader warning in 'TraceRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'RisEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'TraceRenderingLayerMask': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'UniformEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'TraceTransparentRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'DynamicGISkyOcclusion': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'TraceRaysAndFetchAttributes': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'RestirCandidateTemporal': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'TraceVirtualOffset': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'RestirCandidateTemporal': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'TraceTransparentRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'TraceRenderingLayerMask': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'TraceRaysAndFetchAttributes': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'DynamicGISkyOcclusion': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'TraceVirtualOffset': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'TraceRays': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'RisEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+Shader warning in 'UniformEstimation': Compilation failed: Platform doesn't support Ray Tracing Shader compilation.
+[TestRunBuilder] Creating new file 'Assets/Resources/PerformanceTestRunInfo.json' (2253 bytes)
+[TestRunBuilder] Creating new file 'Assets/Resources/PerformanceTestRunSettings.json' (23 bytes)
+Shader warning in 'BeViolenceDefense/Unit Shield Surface': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitShieldSurface.shader(53) (on d3d11)
+Shader warning in 'BeViolenceDefense/Unit Shield Surface': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitShieldSurface.shader(53) (on metal)
+Shader warning in 'BeViolenceDefense/Unit Shield Surface': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitShieldSurface.shader(57) (on d3d11)
+Shader warning in 'BeViolenceDefense/Unit Shield Surface': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitShieldSurface.shader(57) (on metal)
+Shader warning in 'BeViolenceDefense/Unit Attack Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitAttackAura.shader(49) (on d3d11)
+Shader warning in 'BeViolenceDefense/Unit Attack Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitAttackAura.shader(49) (on metal)
+Shader warning in 'BeViolenceDefense/Unit Attack Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitAttackAura.shader(52) (on d3d11)
+Shader warning in 'BeViolenceDefense/Unit Attack Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitAttackAura.shader(52) (on metal)
+Shader warning in 'BeViolenceDefense/Unit Speed Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitSpeedAura.shader(60) (on d3d11)
+Shader warning in 'BeViolenceDefense/Unit Speed Aura': pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them at Assets/Resources/UnitSpeedAura.shader(60) (on metal)
+Complete build size    384.5 mb
+Build Finished, Result: Success.
+Exiting batchmode successfully now!

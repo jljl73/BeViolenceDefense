@@ -1,0 +1,81 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+public static class BuildReadinessAudit
+{
+    const string Output="/tmp/be-build-audit-results";
+    public static void Run()
+    {
+        Directory.CreateDirectory(Output);
+        var info=new StringBuilder();
+        info.AppendLine("Unity="+Application.unityVersion);
+        info.AppendLine("MacSupported="+BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Standalone,BuildTarget.StandaloneOSX));
+        info.AppendLine("WindowsSupported="+BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Standalone,BuildTarget.StandaloneWindows64));
+        info.AppendLine("Backend="+PlayerSettings.GetScriptingBackend(NamedBuildTarget.Standalone));
+        info.AppendLine("Stripping="+PlayerSettings.GetManagedStrippingLevel(NamedBuildTarget.Standalone));
+        info.AppendLine("Architecture="+EditorUserBuildSettings.GetPlatformSettings("OSXUniversal","Architecture"));
+        info.AppendLine("MacGraphics="+string.Join(",",PlayerSettings.GetGraphicsAPIs(BuildTarget.StandaloneOSX)));
+        info.AppendLine("WindowsGraphics="+string.Join(",",PlayerSettings.GetGraphicsAPIs(BuildTarget.StandaloneWindows64)));
+        info.AppendLine("Identifier="+PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Standalone));
+        info.AppendLine("Product="+PlayerSettings.companyName+" / "+PlayerSettings.productName);
+        var scenes=EditorBuildSettings.scenes.Where(x=>x.enabled).Select(x=>x.path).ToArray();
+        foreach(var path in scenes) info.AppendLine("Scene="+path+" exists="+File.Exists(path));
+        var deps=AssetDatabase.GetDependencies(scenes,true);
+        int missingScripts=0,missingRefs=0;
+        foreach(var path in scenes)
+        {
+            var scene=EditorSceneManager.OpenScene(path);
+            foreach(var root in scene.GetRootGameObjects()) Scan(root,path,info,ref missingScripts,ref missingRefs);
+        }
+        foreach(var path in deps.Where(x=>x.EndsWith(".prefab")))
+        {
+            var root=AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if(root!=null) Scan(root,path,info,ref missingScripts,ref missingRefs);
+        }
+        foreach(var path in deps.Where(x=>x.EndsWith(".asset")))
+        foreach(var obj in AssetDatabase.LoadAllAssetsAtPath(path))
+            if(obj is ScriptableObject) ScanReferences(obj,path,info,ref missingRefs);
+        info.AppendLine("Dependencies="+deps.Length+" MissingScripts="+missingScripts+" MissingReferences="+missingRefs);
+        foreach(var path in AssetDatabase.FindAssets("t:Shader",new[]{"Assets"}).Select(AssetDatabase.GUIDToAssetPath))
+        {
+            var shader=AssetDatabase.LoadAssetAtPath<Shader>(path);
+            info.AppendLine("Shader="+path+" supported="+shader.isSupported);
+            foreach(var message in ShaderUtil.GetShaderMessages(shader)) info.AppendLine("ShaderMessage="+message.severity+" "+message.message);
+        }
+        foreach(var plugin in PluginImporter.GetAllImporters())
+            info.AppendLine("Plugin="+plugin.assetPath+" native="+plugin.isNativePlugin+" any="+plugin.GetCompatibleWithAnyPlatform()+" mac="+plugin.GetCompatibleWithPlatform(BuildTarget.StandaloneOSX)+" win="+plugin.GetCompatibleWithPlatform(BuildTarget.StandaloneWindows64));
+        File.WriteAllText(Output+"/preflight.txt",info.ToString());
+        File.WriteAllLines(Output+"/dependencies.txt",deps);
+        Debug.Log("BUILD_PREFLIGHT "+info.ToString());
+        var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions {scenes=scenes,locationPathName=Output+"/macOS/BeViolenceDefense.app",target=BuildTarget.StandaloneOSX,options=BuildOptions.DetailedBuildReport});
+        var summary=report.summary;
+        File.WriteAllText(Output+"/build-summary.txt",$"result={summary.result}\nplatform={summary.platform}\nsize={summary.totalSize}\ntime={summary.totalTime}\nerrors={summary.totalErrors}\nwarnings={summary.totalWarnings}\n");
+        var steps=new StringBuilder();
+        foreach(var step in report.steps) foreach(var message in step.messages) if(message.type==LogType.Error||message.type==LogType.Warning||message.type==LogType.Exception) steps.AppendLine(step.name+": "+message.type+": "+message.content);
+        File.WriteAllText(Output+"/build-messages.txt",steps.ToString());
+        Debug.Log("BUILD_AUDIT_RESULT "+summary.result);
+        EditorApplication.Exit(summary.result==BuildResult.Succeeded?0:1);
+    }
+    static void Scan(GameObject root,string path,StringBuilder info,ref int scripts,ref int refs)
+    {
+        foreach(var t in root.GetComponentsInChildren<Transform>(true))
+        {
+            int count=GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(t.gameObject);
+            if(count>0){scripts+=count;info.AppendLine("MissingScript="+path+" / "+t.name+" / "+count);}
+            foreach(var c in t.GetComponents<Component>()) if(c!=null) ScanReferences(c,path+" / "+t.name,info,ref refs);
+        }
+    }
+    static void ScanReferences(UnityEngine.Object obj,string path,StringBuilder info,ref int refs)
+    {
+        var serialized=new SerializedObject(obj);var prop=serialized.GetIterator();
+        while(prop.Next(true)) if(prop.propertyType==SerializedPropertyType.ObjectReference && prop.objectReferenceValue==null && prop.objectReferenceInstanceIDValue!=0)
+        {refs++;info.AppendLine("MissingReference="+path+" / "+obj.GetType().Name+" / "+prop.propertyPath);}
+    }
+}

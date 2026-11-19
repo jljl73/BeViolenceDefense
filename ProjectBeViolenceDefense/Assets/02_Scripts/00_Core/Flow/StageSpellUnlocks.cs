@@ -1,9 +1,8 @@
-using UnityEngine;
-
 internal sealed class StageSpellUnlocks
 {
-    private const string ClearedStagesKey = "BeViolenceDefense.Progress.SpellStagesCleared";
-    private int clearedStages = PlayerPrefs.GetInt(ClearedStagesKey);
+    private readonly StageProgress progress;
+
+    public StageSpellUnlocks(StageProgress progress = null) => this.progress = progress ?? new StageProgress();
 
     public int MissingStage(DefenseBattle.Spell spell)
     {
@@ -14,20 +13,8 @@ internal sealed class StageSpellUnlocks
             DefenseBattle.Spell.Taunt => 4,
             _ => 0
         };
-        return (clearedStages & (1 << stage)) == 0 ? stage : 0;
+        return progress.IsCleared(stage) ? 0 : stage;
     }
 
-    public void RecordClear(int stageNumber)
-    {
-        if (stageNumber is < 2 or > 4)
-            return;
-
-        int updated = clearedStages | (1 << stageNumber);
-        if (updated == clearedStages)
-            return;
-
-        clearedStages = updated;
-        PlayerPrefs.SetInt(ClearedStagesKey, clearedStages);
-        PlayerPrefs.Save();
-    }
+    public void RecordClear(int stageNumber) => progress.RecordClear(stageNumber);
 }

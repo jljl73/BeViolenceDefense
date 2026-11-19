@@ -1,0 +1,6 @@
+result=Succeeded
+platform=StandaloneOSX
+size=421840622
+time=00:01:16.2602030
+errors=0
+warnings=6

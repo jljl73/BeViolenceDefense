@@ -1,0 +1,24 @@
+COMMAND: file ProjectBeViolenceDefense/Builds/Readiness-20261119/windows/BeViolenceDefense.exe
+EXIT: 0
+ProjectBeViolenceDefense/Builds/Readiness-20261119/windows/BeViolenceDefense.exe: PE32+ executable (GUI) x86-64, for MS Windows
+
+COMMAND: file ProjectBeViolenceDefense/Builds/Readiness-20261119/macOS/BeViolenceDefense.app/Contents/MacOS/ProjectBeViolenceDefense
+EXIT: 0
+ProjectBeViolenceDefense/Builds/Readiness-20261119/macOS/BeViolenceDefense.app/Contents/MacOS/ProjectBeViolenceDefense: Mach-O universal binary with 2 architectures: [x86_64:Mach-O 64-bit executable x86_64] [arm64:Mach-O 64-bit executable arm64]
+ProjectBeViolenceDefense/Builds/Readiness-20261119/macOS/BeViolenceDefense.app/Contents/MacOS/ProjectBeViolenceDefense (for architecture x86_64):	Mach-O 64-bit executable x86_64
+ProjectBeViolenceDefense/Builds/Readiness-20261119/macOS/BeViolenceDefense.app/Contents/MacOS/ProjectBeViolenceDefense (for architecture arm64):	Mach-O 64-bit executable arm64
+
+COMMAND: codesign -dv --verbose=2 ProjectBeViolenceDefense/Builds/Readiness-20261119/macOS/BeViolenceDefense.app
+EXIT: 0
+Executable=/Users/mignon/BeViolenceDefense/ProjectBeViolenceDefense/Builds/Readiness-20261119/macOS/BeViolenceDefense.app/Contents/MacOS/ProjectBeViolenceDefense
+Identifier=com.Unity-Technologies.com.unity.template.urp-blank
+Format=app bundle with Mach-O universal (x86_64 arm64)
+CodeDirectory v=20400 size=524 flags=0x2(adhoc) hashes=9+3 location=embedded
+Signature=adhoc
+Info.plist entries=17
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=187
+Internal requirements count=0 size=12
+
+COMMAND: codesign --verify --deep --strict ProjectBeViolenceDefense/Builds/Readiness-20261119/macOS/BeViolenceDefense.app
+EXIT: 0

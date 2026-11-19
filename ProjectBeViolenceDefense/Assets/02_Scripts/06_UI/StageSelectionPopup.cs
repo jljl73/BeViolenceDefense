@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// 스테이지 선택 화면: 왼쪽에 위아래로 천천히 떠 있는 주인공 그림과 대사 띠, 오른쪽에 위에서부터 스테이지 카드 1~5.
-/// 카드 상태는 진행도(<see cref="unlockedStages"/>)로 정한다. 앞 스테이지는 클리어, 마지막으로 열린 스테이지는 현재, 나머지는 잠김.
+/// 실제 클리어 기록, 현재 도전할 스테이지, 입장 가능, 잠김 상태를 구분한다.
 /// 진행도마다 대사와 주인공 표정 그림이 바뀐다(<see cref="moods"/>, 진행도 1부터 순서대로).
 /// 배치는 StageSelectionPopup.prefab에 있다.
 public sealed class StageSelectionPopup : MonoBehaviour
@@ -55,26 +55,26 @@ public sealed class StageSelectionPopup : MonoBehaviour
     [SerializeField] private TextMeshProUGUI line;
     [SerializeField] private CanvasGroup lineGroup;
 
-    [Header("Progress (임시: 저장 연동 전)")]
-    [Tooltip("열린 스테이지 수. 저장 기능이 붙기 전까지는 모든 스테이지를 열어 둔다.")]
-    [SerializeField, Min(1)] private int unlockedStages = 5;
-
     [SerializeField] private float currentScale = 1.04f;
 
     private const float LockedAlpha = 0.72f;
     private StageContent[] stages = Array.Empty<StageContent>();
     private Action<int> select;
+    private StageProgress progress;
+    private StageProgressMenu progressMenu;
     private Vector2 heroineHome;
     private bool heroineHomeSet;
     private MotionHandle heroineFloat;
     private Vector2[] cardHome = Array.Empty<Vector2>();
 
-    public int UnlockedStages => unlockedStages;
+    public int UnlockedStages => progress?.UnlockedStageCount(stages.Length) ?? 0;
 
-    public void Bind(StageContent[] stages, Action<int> select)
+    internal void Bind(StageContent[] stages, Action<int> select, StageProgress progress, UIManager ui)
     {
         this.stages = stages;
         this.select = select;
+        this.progress = progress;
+        progressMenu ??= new StageProgressMenu(ui, title, progress, Refresh);
         title.text = GameText.Get("stage_select.title");
         if (settingsButton != null && settingsPanel != null)
         {
@@ -99,22 +99,15 @@ public sealed class StageSelectionPopup : MonoBehaviour
             PlayIntro();
     }
 
-    /// 저장 기능이 진행도를 넘겨줄 자리. 1 = 첫 스테이지만 열림.
-    public void SetProgress(int unlocked)
-    {
-        unlockedStages = Mathf.Max(1, unlocked);
-        Refresh();
-    }
-
     private void Enter(int index)
     {
-        if (index < Mathf.Min(unlockedStages, stages.Length))
+        if (progress != null && progress.IsUnlocked(index + 1, stages.Length))
             select?.Invoke(index);
     }
 
     private void Refresh()
     {
-        int open = Mathf.Clamp(unlockedStages, 1, Mathf.Max(1, stages.Length));
+        int currentStage = progress?.CurrentStage(stages.Length) ?? 1;
         for (int i = 0; i < cards.Length; i++)
         {
             Card c = cards[i];
@@ -122,7 +115,8 @@ public sealed class StageSelectionPopup : MonoBehaviour
             c.root.gameObject.SetActive(exists);
             if (!exists)
                 continue;
-            bool current = i == open - 1, cleared = i < open - 1, locked = i >= open;
+            bool cleared = progress.IsCleared(i + 1), locked = !progress.IsUnlocked(i + 1, stages.Length);
+            bool current = i + 1 == currentStage && !cleared;
             c.number.text = (i + 1).ToString("00");
             c.label.text = stages[i].DisplayName;
             if (i < thumbnails.Length && thumbnails[i] != null)
@@ -136,8 +130,8 @@ public sealed class StageSelectionPopup : MonoBehaviour
 
             c.chip.color = locked ? Fade(UIPalette.TextOnLightMuted, 0.18f) : UIPalette.ChipOnLight;
             c.chipText.color = locked ? UIPalette.TextOnLightMuted : UIPalette.TextOnLight;
-            c.chipText.text = GameText.Get(cleared ? "stage_select.state.cleared" : current ? "stage_select.state.current" : "stage_select.state.locked");
-            c.chipIcon.gameObject.SetActive(!current);
+            c.chipText.text = GameText.Get(cleared ? "stage_select.state.cleared" : locked ? "stage_select.state.locked" : current ? "stage_select.state.current" : "stage_select.state.available");
+            c.chipIcon.gameObject.SetActive(cleared || locked);
             c.chipIcon.sprite = cleared ? checkIcon : lockIcon;
             c.chipIcon.color = cleared ? UIPalette.TextOnLight : UIPalette.TextOnLightMuted;
 
@@ -150,7 +144,7 @@ public sealed class StageSelectionPopup : MonoBehaviour
             c.buttonLock.color = UIPalette.TextPrimary;
         }
         if (moods.Length > 0)
-            ShowMood(moods[Mathf.Clamp(open - 1, 0, moods.Length - 1)]);
+            ShowMood(moods[Mathf.Clamp(currentStage - 1, 0, moods.Length - 1)]);
     }
 
     private void ShowMood(Mood mood)
@@ -207,7 +201,7 @@ public sealed class StageSelectionPopup : MonoBehaviour
         {
             Card c = cards[i];
             float delay = 0.05f * i;
-            float targetAlpha = i >= Mathf.Min(unlockedStages, stages.Length) ? LockedAlpha : 1f;
+            float targetAlpha = i >= UnlockedStages ? LockedAlpha : 1f;
             LMotion.Create(cardHome[i] + new Vector2(80f, 0f), cardHome[i], 0.35f).WithEase(Ease.OutCubic).WithDelay(delay)
                 .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale).BindToAnchoredPosition(c.root).AddTo(gameObject);
             LMotion.Create(0f, targetAlpha, 0.3f).WithDelay(delay).WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)

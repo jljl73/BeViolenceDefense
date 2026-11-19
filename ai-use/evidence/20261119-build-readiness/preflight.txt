@@ -1,0 +1,82 @@
+Unity=6000.3.28f1
+MacSupported=True
+WindowsSupported=True
+Backend=Mono2x
+Stripping=Disabled
+Architecture=x64ARM64
+MacGraphics=Metal
+WindowsGraphics=Direct3D12,Direct3D11
+Identifier=com.Unity-Technologies.com.unity.template.urp-blank
+Product=DefaultCompany / ProjectBeViolenceDefense
+Scene=Assets/01_Scenes/01_Menu/TitleScene.unity exists=True
+Scene=Assets/01_Scenes/02_Gameplay/GameScene.unity exists=True
+Dependencies=1162 MissingScripts=0 MissingReferences=0
+Shader=Assets/05_Art/02_Materials/CharacterFlatLit.shader supported=True
+Shader=Assets/05_Art/02_Materials/PageCurl.shader supported=True
+Shader=Assets/05_Art/02_Materials/ShoreWater.shader supported=True
+Shader=Assets/Resources/BuffLightning.shader supported=True
+Shader=Assets/Resources/CoreShield.shader supported=True
+Shader=Assets/Resources/CoreShieldGlow.shader supported=True
+Shader=Assets/Resources/SpellAreaBurst.shader supported=True
+Shader=Assets/Resources/SpellTargetSilhouette.shader supported=True
+Shader=Assets/Resources/UnitAttackAura.shader supported=True
+ShaderMessage=Warning pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them
+ShaderMessage=Warning pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them
+Shader=Assets/Resources/UnitBuffAura.shader supported=True
+Shader=Assets/Resources/UnitShieldSurface.shader supported=True
+ShaderMessage=Warning pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them
+ShaderMessage=Warning pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them
+Shader=Assets/Resources/UnitSpeedAura.shader supported=True
+ShaderMessage=Warning pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them
+Shader=Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile.shader supported=True
+Plugin=Packages/com.unity.ai.assistant/Plugins/Shared/System.Collections.Immutable_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.collections/Unity.Collections.LowLevel.ILSupport/Unity.Collections.LowLevel.ILSupport.dll native=False any=True mac=False win=False
+Plugin=Packages/com.unity.nuget.newtonsoft-json/Runtime/AOT/Newtonsoft.Json.dll native=False any=True mac=True win=True
+Plugin=Packages/com.unity.ai.assistant/Plugins/Shared/System.Reflection.Metadata_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/Shared/System.Threading.Tasks.Extensions_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.visualscripting/Editor/VisualScripting.Core/Dependencies/DotNetZip/Unity.VisualScripting.IonicZip.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.collab-proxy/Lib/Editor/PlasticSCM/unityplastic.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.nuget.mono-cecil/Mono.Cecil.Pdb.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/Tokenizer/Microsoft.ML.Tokenizers_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/CodeAnalysis/6_5/Microsoft.CodeAnalysis.CSharp_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ide.rider/Rider/Editor/JetBrains.Rider.PathLocator.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.burst/Unity.Burst.CodeGen/Unity.Burst.Cecil.Pdb.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/CodeAnalysis/6_5/Microsoft.CodeAnalysis_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.collab-proxy/Lib/Editor/PlasticSCM/log4netPlastic.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.nuget.mono-cecil/Mono.Cecil.Rocks.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.pipeline/Runtime/Plugins/CodeAnalysis/UnityPipeline.Microsoft.CodeAnalysis.CSharp.dll native=False any=False mac=True win=True
+Plugin=Packages/com.unity.pipeline/Runtime/Plugins/CodeAnalysis/UnityPipeline.System.Reflection.Metadata.dll native=False any=True mac=True win=True
+Plugin=Packages/com.unity.ai.assistant/Plugins/Shared/System.Runtime.CompilerServices.Unsafe_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.nuget.newtonsoft-json/Runtime/Newtonsoft.Json.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/Shared/System.Text.Encodings.Web_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ext.nunit/net40/unity-custom/nunit.framework.dll native=False any=True mac=True win=True
+Plugin=Packages/com.unity.ai.assistant/Plugins/Shared/Microsoft.Bcl.AsyncInterfaces_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.nuget.mono-cecil/Mono.Cecil.Mdb.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/Shared/System.Text.Json_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.collab-proxy/Lib/Editor/PlasticSCM/Unity.Plastic.Newtonsoft.Json.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/Shared/Microsoft.Bcl.Memory_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/CodeAnalysis/6_4/Microsoft.CodeAnalysis_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.collab-proxy/Lib/Editor/PlasticSCM/Unity.Plastic.Antlr3.Runtime.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.visualscripting/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.burst/Unity.Burst.Unsafe.dll native=False any=True mac=True win=True
+Plugin=Packages/com.unity.burst/Unity.Burst.CodeGen/Unity.Burst.Cecil.Mdb.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/Shared/Google.Protobuf_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/CodeAnalysis/6_4/Microsoft.CodeAnalysis.CSharp_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.pipeline/Runtime/Plugins/CodeAnalysis/UnityPipeline.System.Runtime.CompilerServices.Unsafe.dll native=False any=True mac=True win=True
+Plugin=Packages/com.unity.visualscripting/Editor/VisualScripting.Core/EditorAssetResources/Unity.VisualScripting.TextureAssets.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.collab-proxy/Lib/Editor/PlasticSCM/liblz4Plastic.dylib native=True any=False mac=False win=False
+Plugin=Packages/com.unity.collab-proxy/Lib/Editor/PlasticSCM/zlib64Plastic.dll native=True any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/Shared/Microsoft.Bcl.HashCode_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.burst/Unity.Burst.CodeGen/Unity.Burst.Cecil.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.pipeline/Runtime/Plugins/CodeAnalysis/UnityPipeline.System.Collections.Immutable.dll native=False any=True mac=True win=True
+Plugin=Packages/com.unity.burst/Unity.Burst.CodeGen/Unity.Burst.Cecil.Rocks.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.pipeline/Runtime/Plugins/CodeAnalysis/UnityPipeline.Microsoft.CodeAnalysis.dll native=False any=False mac=True win=True
+Plugin=Packages/com.unity.collab-proxy/Lib/Editor/PlasticSCM/lz4x64Plastic.dll native=True any=False mac=False win=False
+Plugin=Packages/com.unity.visualscripting/Runtime/VisualScripting.Flow/Dependencies/NCalc/Unity.VisualScripting.Antlr3.Runtime.dll native=False any=True mac=False win=False
+Plugin=Packages/com.unity.inputsystem/InputSystem/Plugins/iOS/iOSStepCounter.mm native=True any=False mac=False win=False
+Plugin=Packages/com.unity.visualscripting/Editor/VisualScripting.Core/Dependencies/Assemblies/Unity.VisualScripting.sqlite3.dll native=True any=False mac=False win=False
+Plugin=Packages/com.unity.pipeline/Runtime/Analyzers/IlInterpreterAnalyzer.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Plugins/Markdig/Markdig_AIA.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.ide.visualstudio/Editor/Plugins/AppleEventIntegration.bundle native=True any=False mac=False win=False
+Plugin=Packages/com.unity.ai.assistant/Modules/Unity.AI.Toolkit.Sdk/Editor/AiEditorToolsSdk.dll native=False any=False mac=False win=False
+Plugin=Packages/com.unity.nuget.mono-cecil/Mono.Cecil.dll native=False any=False mac=False win=False
