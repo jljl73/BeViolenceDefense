@@ -11,7 +11,7 @@ public sealed class MapScaleTests
         var large = new DefenseGrid(2f);
         Assert.That(large.Center, Is.EqualTo(small.Center * 2f));
         Assert.That(large.CorePosition, Is.EqualTo(small.CorePosition * 2f));
-        for (int route = 0; route < small.Routes.Count; route++)
+        for (int route = 0; route < small.Routes.Length; route++)
         {
             Assert.That(large.Routes[route].Length, Is.EqualTo(small.Routes[route].Length));
             for (int i = 0; i < small.Routes[route].Length; i++)

@@ -37,7 +37,7 @@ public sealed class DefenseGrid
     public IReadOnlyList<int> SpawnFactions => spawnFactions;
     public IReadOnlyCollection<Vector2Int> FixedWalls => fixedWalls;
     // 코어까지 갈 수 없는 스폰이 있으면 null.
-    public IReadOnlyList<Vector3[]> Routes => routes;
+    public Vector3[][] Routes => routes;
     // 경로 계산이 실패한 첫 스폰 인덱스. 성공하면 -1.
     public int UnreachableSpawn { get; private set; } = -1;
     public int WallCount => placed.Count;

@@ -549,9 +549,8 @@ internal sealed class DefenseBoardView
     {
         var shell = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         shell.name = "Core Shield Shell";
-        var collider = shell.GetComponent<Collider>();
-        collider.enabled = false;
-        Release(collider);
+        // WebGL(IL2CPP) 엔진 코드 스트리핑으로 SphereCollider가 빠지면 콜라이더가 없을 수 있다.
+        Release(shell.GetComponent<Collider>());
         shell.transform.SetParent(core, false);
         shell.transform.localPosition = Vector3.up * Mathf.Max(0.55f, platformTop + 0.35f);
         float diameter = footprint + 0.45f;
@@ -736,15 +735,15 @@ internal sealed class DefenseBoardView
     private void PositionCamera() =>
         camera.transform.position = root.TransformPoint(cameraFocus) - camera.transform.forward * CameraDistance;
 
-    public void ShowPlanningTiles(IReadOnlyList<Vector3[]> routes = null,
+    public void ShowPlanningTiles(Vector3[][] routes = null,
         IReadOnlyCollection<Vector2Int> encounters = null)
         => ShowRoutes(routes, encounters, showPlanningRoutes: true);
 
     /// <summary>전투 중에는 준비 경로를 숨기고 웨이브 시작 직후 교전 예고 칸만 표시한다.</summary>
-    public void ShowBattleForecast(IReadOnlyList<Vector3[]> routes = null, IReadOnlyCollection<Vector2Int> encounters = null)
+    public void ShowBattleForecast(Vector3[][] routes = null, IReadOnlyCollection<Vector2Int> encounters = null)
         => ShowRoutes(routes, encounters, showPlanningRoutes: false);
 
-    private void ShowRoutes(IReadOnlyList<Vector3[]> routes,
+    private void ShowRoutes(Vector3[][] routes,
         IReadOnlyCollection<Vector2Int> encounters, bool showPlanningRoutes)
     {
         routes = ToBoard(routes);
@@ -797,10 +796,10 @@ internal sealed class DefenseBoardView
         }
     }
 
-    private int DrawPlanningRoutes(IReadOnlyList<Vector3[]> routes)
+    private int DrawPlanningRoutes(Vector3[][] routes)
     {
         var stepsByCell = new Dictionary<Vector2Int, List<(int Route, Vector3 Direction)>>();
-        for (int route = 0; route < routes.Count; route++)
+        for (int route = 0; route < routes.Length; route++)
         {
             Vector3[] path = routes[route];
             // 이번 라운드에 쓰지 않는 스폰.
@@ -827,7 +826,7 @@ internal sealed class DefenseBoardView
             return 0;
 
         int markerCount = 0;
-        for (int route = 0; route < routes.Count; route++)
+        for (int route = 0; route < routes.Length; route++)
         {
             Vector3[] path = routes[route];
             if (path == null || path.Length < 2)
@@ -1035,7 +1034,7 @@ internal sealed class DefenseBoardView
     /// </summary>
     // routes를 주면 경로가 null인 스폰(이번 라운드에 쓰지 않음)은 숨긴다.
     public void ShowSpawnForecast(IReadOnlyList<int> countsPerFaction, bool nextWave, IReadOnlyList<Vector2Int> cells,
-        IReadOnlyList<Vector3[]> routes = null)
+        Vector3[][] routes = null)
     {
         float clock = Time.unscaledTime;
         for (int i = 0; i < cells.Count; i++)
@@ -1173,12 +1172,12 @@ internal sealed class DefenseBoardView
     /// 꺼져 있으면 한 번만 훑는다(준비 단계 예고는 호출부가 간격을 정해 다시 부른다).
     /// </summary>
     /// <returns>가장 긴 길을 끝까지 훑는 데 걸리는 시간(초). 훑을 길이 없으면 0.</returns>
-    public float StartRouteTracers(IReadOnlyList<Vector3[]> routes, IReadOnlyList<int> countsPerFaction, bool loop = true)
+    public float StartRouteTracers(Vector3[][] routes, IReadOnlyList<int> countsPerFaction, bool loop = true)
     {
         StopRouteTracers();
         routes = ToBoard(routes);
         float longestRoute = 0f;
-        for (int spawn = 0; spawn < routes.Count; spawn++)
+        for (int spawn = 0; spawn < routes.Length; spawn++)
         {
             Vector3[] path = routes[spawn];
             if (path == null || countsPerFaction[spawnFactions[spawn]] <= 0)
@@ -1794,11 +1793,11 @@ internal sealed class DefenseBoardView
 
     public Vector3 ToWorld(Vector3 board) => board * cellSize;
 
-    private IReadOnlyList<Vector3[]> ToBoard(IReadOnlyList<Vector3[]> routes)
+    private Vector3[][] ToBoard(Vector3[][] routes)
     {
         if (routes == null || cellSize == 1f)
             return routes;
-        var board = new Vector3[routes.Count][];
+        var board = new Vector3[routes.Length][];
         for (int i = 0; i < board.Length; i++)
         {
             Vector3[] route = routes[i];

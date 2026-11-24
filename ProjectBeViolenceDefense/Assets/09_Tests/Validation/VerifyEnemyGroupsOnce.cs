@@ -125,7 +125,7 @@ internal static class VerifyEnemyGroupsOnce
             Require(new[] { 0, 1, 2 }.All(y => grid.IsFixedWall(new Vector2Int(5, y))) && !grid.IsFixedWall(new Vector2Int(5, 3)),
                 "A rotated 1x3 obstacle must block exactly three cells.");
             Require(!grid.HasLineOfSight(new Vector3(4, 0, 1), new Vector3(6, 0, 1)), "Obstacle cells must block sight.");
-            Require(grid.Routes.Count == 3 && grid.SpawnFactions.SequenceEqual(new[] { 0, 1, 1 }),
+            Require(grid.Routes.Length == 3 && grid.SpawnFactions.SequenceEqual(new[] { 0, 1, 1 }),
                 "Each spawn must get its own route and faction.");
 
             var factions = new[]

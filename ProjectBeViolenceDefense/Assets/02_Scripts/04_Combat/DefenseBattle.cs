@@ -644,7 +644,7 @@ internal sealed class DefenseBattle
     // 이번 라운드에 쓰는 스폰의 경로. 인덱스는 grid.Routes 와 같고, 쓰지 않는 스폰은 null 이다.
     public Vector3[][] RoundRoutes()
     {
-        var routes = new Vector3[grid.Routes.Count][];
+        var routes = new Vector3[grid.Routes.Length][];
         for (int f = 0; f < factions.Length; f++)
             foreach (int route in RoundSpawns(f))
                 routes[route] = grid.Routes[route];

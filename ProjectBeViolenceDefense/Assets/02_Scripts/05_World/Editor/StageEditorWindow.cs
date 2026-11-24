@@ -398,7 +398,7 @@ internal sealed class StageEditorWindow : EditorWindow
 
         if (preview.Routes != null)
         {
-            for (int i = 0; i < preview.Routes.Count; i++)
+            for (int i = 0; i < preview.Routes.Length; i++)
             {
                 Vector3[] route = preview.Routes[i];
                 var points = new Vector3[route.Length];
