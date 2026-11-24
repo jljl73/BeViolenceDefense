@@ -144,7 +144,7 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
 
     private bool firstVisit;
 
-    // 첫 웨이브 안내 대사. 전투를 멈추지 않고 대화창이 저절로 넘어간다.
+    // 첫 웨이브 안내 대사. 대화창이 저절로 넘어가고, 떠 있는 동안 전투 시간은 멈춘다.
     private void PlayFirstWaveLines(bool shieldBreak)
     {
         if (!firstVisit || dialogueHud == null || stageDialogues == null || ui.HasOpenPopup)
@@ -360,7 +360,9 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (onlyOneSide && !fastForwarding)
             hud.Notify(GameText.Get("notice.fast_forward"));
         fastForwarding = onlyOneSide;
-        battleClock.BeginFrame(Time.deltaTime, PlaybackSpeed, aimedSpell.HasValue);
+        // 대화창이 떠 있는 동안에는 전투 시간이 흐르지 않는다(틱·마나·이펙트 모두 멈춤).
+        bool dialogueOpen = dialogueHud != null && dialogueHud.IsOpen;
+        battleClock.BeginFrame(dialogueOpen ? 0f : Time.deltaTime, PlaybackSpeed, aimedSpell.HasValue);
         switch (battle.CurrentPhase)
         {
             case DefenseBattle.Phase.Preparation:
@@ -463,7 +465,8 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         if (ui.HasOpenPopup || battle.CurrentPhase != DefenseBattle.Phase.Preparation)
             return;
 
-        if (!encounterWarningAcknowledged && battle.ForecastEncounters().Count == 0)
+        // 이번 라운드에 진영이 하나뿐이면(튜토리얼 1웨이브 등) 교전이 생길 수 없으니 경고하지 않는다.
+        if (!encounterWarningAcknowledged && RoundFactionCount() >= 2 && battle.ForecastEncounters().Count == 0)
         {
             encounterWarningAcknowledged = true;
             Hint("no_encounter", LeftCoreHud.Expression.Troubled);
@@ -477,6 +480,15 @@ public sealed class VoxelDefensePrototype : MonoBehaviour
         hud.Notify("");
         if (battle.Round == 1)
             PlayFirstWaveLines(shieldBreak: false);
+    }
+
+    private int RoundFactionCount()
+    {
+        int count = 0;
+        for (int side = 0; side < battle.FactionCount; side++)
+            if (battle.RoundSpawnCount(side) > 0)
+                count++;
+        return count;
     }
 
     private void ReadCameraInput(Keyboard keyboard)
